@@ -1,26 +1,246 @@
 @import "tailwindcss";
 
+/* ─── Design System Tokens ─── */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Color — warm cream base, lavender-blue botanical accents */
+  --color-bg: #FAF9F6;
+  --color-bg-alt: #F4F2EE;
+  --color-text: #2C2825;
+  --color-text-secondary: #746E67;
+  --color-text-tertiary: #A8A29C;
+  --color-border: #E8E4DF;
+  --color-accent: #9088C4;
+  --color-accent-muted: #B0A8D8;
+  --color-accent-soft: #EDEBF5;
+  --color-blush: #F0E8EC;
+
+  /* Typography scale */
+  --font-size-xs: 0.6875rem;     /* 11px */
+  --font-size-sm: 0.8125rem;     /* 13px */
+  --font-size-base: 0.9375rem;   /* 15px */
+  --font-size-lg: 1.0625rem;     /* 17px */
+  --font-size-xl: 1.25rem;       /* 20px */
+  --font-size-2xl: 1.5rem;       /* 24px */
+  --font-size-3xl: clamp(1.75rem, 3vw, 2.25rem);
+  --font-size-display: clamp(3.25rem, 9vw, 7rem);
+
+  /* Tracking — tighter at display, open at small */
+  --tracking-tight: -0.035em;
+  --tracking-snug: -0.015em;
+  --tracking-normal: -0.005em;
+  --tracking-wide: 0.04em;
+  --tracking-wider: 0.08em;
+
+  /* Leading */
+  --leading-tight: 0.95;
+  --leading-snug: 1.15;
+  --leading-normal: 1.55;
+  --leading-relaxed: 1.7;
+
+  /* Spacing */
+  --space-section: clamp(6rem, 12vw, 11rem);
+  --space-block: clamp(2rem, 4vw, 3.5rem);
+  --space-element: 1.25rem;
+  --space-inline: 0.75rem;
+
+  /* Layout */
+  --max-width: 68rem;
+  --padding-x: clamp(1.5rem, 5vw, 4rem);
+
+  /* Borders — deliberately thin, almost invisible */
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --border-width: 1px;
+
+  /* Easing (per Emil skill — custom curves, not defaults) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
+/* ─── Register tokens with Tailwind v4 ─── */
+
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-bg: var(--color-bg);
+  --color-bg-alt: var(--color-bg-alt);
+  --color-text-primary: var(--color-text);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-tertiary: var(--color-text-tertiary);
+  --color-border: var(--color-border);
+  --color-accent: var(--color-accent);
+  --color-accent-soft: var(--color-accent-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Reset ─── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── Base ─── */
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  font-optical-sizing: auto;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-size: var(--font-size-base);
+  line-height: var(--leading-normal);
+  letter-spacing: var(--tracking-normal);
+  font-weight: 400;
+}
+
+/* ─── Typography ─── */
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--font-size-display);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  font-weight: 300;
+}
+
+h2 {
+  font-size: var(--font-size-3xl);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-snug);
+  font-weight: 400;
+}
+
+h3 {
+  font-size: var(--font-size-2xl);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-snug);
+  font-weight: 400;
+}
+
+p { margin: 0; }
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ─── Selection ─── */
+
+::selection {
+  background-color: var(--color-accent-soft);
+  color: var(--color-text);
+}
+
+/* ─── Section rhythm ─── */
+
+.section {
+  padding-top: var(--space-section);
+  padding-bottom: var(--space-section);
+}
+
+.section-inner {
+  max-width: var(--max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--padding-x);
+  padding-right: var(--padding-x);
+}
+
+/* ─── Section label — small, quiet, uppercase ─── */
+
+.section-label {
+  font-size: var(--font-size-xs);
+  font-weight: 450;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: var(--space-element);
+}
+
+/* ─── Section heading ─── */
+
+.section-heading {
+  font-size: var(--font-size-3xl);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-snug);
+  font-weight: 400;
+  color: var(--color-text);
+  margin-bottom: var(--space-block);
+}
+
+/* ─── Body text — comfortable measure ─── */
+
+.body-text {
+  font-size: var(--font-size-lg);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+  max-width: 38rem;
+}
+
+/* ─── Buttons — restrained, not chunky ─── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 450;
+  letter-spacing: var(--tracking-wide);
+  line-height: 1;
+  padding: 0.75rem 1.75rem;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background-color: var(--color-text);
+  color: var(--color-bg);
+  border-color: var(--color-text);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+/* ─── Thin divider ─── */
+
+.divider {
+  width: 100%;
+  height: var(--border-width);
+  background-color: var(--color-border);
+  border: none;
+}
+
+/* ─── Reduced motion ─── */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .btn { transition: none; }
 }
