@@ -99,8 +99,8 @@ export default function Hero() {
           ripple
           style={{
             width: "100%",
-            maxWidth: "min(78vw, 640px)",
-            height: "clamp(85px, 13vw, 150px)",
+            maxWidth: "min(95vw, 1080px)",
+            height: "clamp(150px, 22vw, 260px)",
             pointerEvents: "auto",
           }}
         />
@@ -205,11 +205,11 @@ export default function Hero() {
         /* ── Top Center Block: Wordmark with WebGL Warp ── */
         .hero-center-content {
           position: absolute;
-          top: clamp(12%, 16vh, 20%);
+          top: clamp(8%, 12vh, 16%);
           left: 0;
           right: 0;
           width: 100%;
-          max-width: 1100px;
+          max-width: 1250px;
           margin-inline: auto;
           display: flex;
           flex-direction: column;
