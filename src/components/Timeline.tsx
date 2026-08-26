@@ -1,90 +1,69 @@
+import Link from "next/link";
 import SectionWrapper from "./SectionWrapper";
+import Reveal from "./Reveal";
+import { SCHEDULE } from "@/data/hackathon";
 
-const MILESTONES = [
-  { date: "January 15", title: "Applications Open", description: "Registration opens for teams and individuals." },
-  { date: "February 20", title: "Team Formation Mixer", description: "An online event to meet potential teammates and explore ideas." },
-  { date: "March 1", title: "Opening Ceremony", description: "Keynotes, theme reveal, and the official start of building." },
-  { date: "March 1–2", title: "Building Phase", description: "36 hours of focused work with access to mentors, workshops, and quiet spaces." },
-  { date: "March 2", title: "Presentations", description: "Teams present their work to a panel of judges and fellow participants." },
-  { date: "March 2", title: "Closing & Awards", description: "Winners announced, community celebration, and reflections." },
-];
-
-export default function Timeline() {
+export default function Timeline({ compact = false }: { compact?: boolean }) {
   return (
-    <SectionWrapper id="timeline">
-      <p className="section-label">Timeline</p>
-      <h2 className="section-heading">How it unfolds.</h2>
+    <SectionWrapper
+      id="schedule"
+      label="Schedule"
+      heading={<>Thirty-six hours, start to stage.</>}
+      lede={
+        compact ? (
+          <p>
+            The shape of the weekend. Times are indicative and will be locked two weeks
+            out —{" "}
+            <Link href="/schedule" className="underline decoration-[var(--color-accent)] decoration-1 underline-offset-4">
+              see the full schedule
+            </Link>
+            .
+          </p>
+        ) : undefined
+      }
+    >
+      <div className="grid gap-4 md:grid-cols-3">
+        {SCHEDULE.map((day, di) => (
+          <Reveal key={day.day} delay={di * 0.08}>
+            <div className="glass glass-sheen h-full p-6">
+              <header className="mb-5">
+                <p className="eyebrow text-[var(--color-accent)]">{day.day}</p>
+                <p className="mt-1 text-[var(--font-size-lg)] font-light tracking-[var(--tracking-snug)]">
+                  {day.date}
+                </p>
+              </header>
 
-      <div className="timeline-list">
-        <div className="timeline-line" aria-hidden="true" />
+              <ol className="relative space-y-5 border-l border-[rgba(47,85,39,0.14)] pl-5">
+                {(compact ? day.items.slice(0, 4) : day.items).map((item) => (
+                  <li key={item.time + item.title} className="relative">
+                    <span
+                      aria-hidden
+                      className="absolute -left-[1.44rem] top-[0.5em] h-1.5 w-1.5 rounded-full bg-[var(--color-accent-bright)] ring-2 ring-[rgba(255,255,255,0.7)]"
+                    />
+                    <p className="font-mono text-[var(--font-size-xs)] tracking-[var(--tracking-wide)] text-[var(--color-text-tertiary)]">
+                      {item.time}
+                    </p>
+                    <p className="mt-0.5 font-medium tracking-[var(--tracking-snug)]">
+                      {item.title}
+                    </p>
+                    {item.note && (
+                      <p className="mt-0.5 text-[var(--font-size-sm)] text-[var(--color-text-secondary)]">
+                        {item.note}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ol>
 
-        {MILESTONES.map((m, i) => (
-          <div key={i} className="timeline-item">
-            <div
-              className={`timeline-dot ${i === 0 ? "timeline-dot--active" : ""}`}
-              aria-hidden="true"
-            />
-            <p className="timeline-date">{m.date}</p>
-            <h3 className="timeline-title">{m.title}</h3>
-            <p className="timeline-desc">{m.description}</p>
-          </div>
+              {compact && day.items.length > 4 && (
+                <p className="mt-5 text-[var(--font-size-sm)] text-[var(--color-text-tertiary)]">
+                  + {day.items.length - 4} more
+                </p>
+              )}
+            </div>
+          </Reveal>
         ))}
       </div>
-
-      <style>{`
-        .timeline-list {
-          display: flex;
-          flex-direction: column;
-          position: relative;
-          padding-left: 1.75rem;
-          max-width: 36rem;
-        }
-        .timeline-line {
-          position: absolute;
-          left: 3px;
-          top: 6px;
-          bottom: 6px;
-          width: var(--border-width);
-          background-color: var(--color-border);
-        }
-        .timeline-item {
-          position: relative;
-          padding-bottom: var(--space-block);
-        }
-        .timeline-item:last-child {
-          padding-bottom: 0;
-        }
-        .timeline-dot {
-          position: absolute;
-          left: -1.55rem;
-          top: 5px;
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-          background-color: var(--color-border);
-        }
-        .timeline-dot--active {
-          background-color: var(--color-accent);
-        }
-        .timeline-date {
-          font-size: var(--font-size-xs);
-          color: var(--color-text-tertiary);
-          letter-spacing: var(--tracking-wider);
-          text-transform: uppercase;
-          margin-bottom: 0.2rem;
-        }
-        .timeline-title {
-          font-size: var(--font-size-lg);
-          font-weight: 450;
-          letter-spacing: var(--tracking-snug);
-          margin-bottom: 0.2rem;
-        }
-        .timeline-desc {
-          font-size: var(--font-size-base);
-          color: var(--color-text-secondary);
-          line-height: var(--leading-relaxed);
-        }
-      `}</style>
     </SectionWrapper>
   );
 }

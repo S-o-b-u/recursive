@@ -1,92 +1,121 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { motion, useReducedMotion } from "motion/react";
+import { NAV_LINKS, EVENT } from "@/data/hackathon";
+import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 
-const NAV_LINKS = [
-  { label: "About", href: "#about" },
-  { label: "Experience", href: "#experience" },
-  { label: "Timeline", href: "#timeline" },
-  { label: "Tracks", href: "#tracks" },
-  { label: "Prizes", href: "#prizes" },
-  { label: "FAQ", href: "#faq" },
-];
+const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export default function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const reduced = useReducedMotion();
 
   return (
     <>
       <nav className="nav-root">
-        <div className="nav-glass-pill">
-          {/* Circular logo/asterisk mimicking the left button in the reference */}
-          <a href="#" className="nav-logo-btn" aria-label="Home">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-asterisk">
-              <line x1="12" y1="4" x2="12" y2="20"></line>
-              <line x1="4" y1="12" x2="20" y2="12"></line>
-              <line x1="6.34" y1="6.34" x2="17.66" y2="17.66"></line>
-              <line x1="6.34" y1="17.66" x2="17.66" y2="6.34"></line>
-            </svg>
-          </a>
-
-          <div className="nav-desktop-links">
-            {NAV_LINKS.map((link) => (
-              <a key={link.href} href={link.href} className="nav-link">
-                {link.label}
-              </a>
-            ))}
-          </div>
-
-          <a href="#register" className="nav-register-btn">
-            Register
-          </a>
-
-          {/* Mobile Toggle */}
-          <button
-            className="nav-toggle"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-            aria-expanded={menuOpen}
+        <motion.div
+          className="nav-glass-container"
+          initial={reduced ? false : { y: -22, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: reduced ? 0 : 0.7, ease: EASE_OUT, delay: reduced ? 0 : 0.2 }}
+        >
+          <LiquidGlassCard
+            glowIntensity="sm"
+            shadowIntensity="md"
+            borderRadius="999px" /* completely pill-shaped */
+            blurIntensity="lg"
+            className="pointer-events-auto"
           >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            >
-              {menuOpen ? (
-                <>
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </>
-              ) : (
-                <>
-                  <line x1="3" y1="12" x2="21" y2="12" />
-                  <line x1="3" y1="6" x2="21" y2="6" />
-                  <line x1="3" y1="18" x2="21" y2="18" />
-                </>
-              )}
-            </svg>
-          </button>
-        </div>
+            <div className="nav-glass-pill-layout">
+              {/* Brand mark — recursive asterisk */}
+              <Link href="/" className="nav-brand" aria-label={`${EVENT.name} — home`}>
+                <span className="nav-logo-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="nav-asterisk">
+                    <line x1="12" y1="4" x2="12" y2="20" />
+                    <line x1="4" y1="12" x2="20" y2="12" />
+                    <line x1="6.34" y1="6.34" x2="17.66" y2="17.66" />
+                    <line x1="6.34" y1="17.66" x2="17.66" y2="6.34" />
+                  </svg>
+                </span>
+                <span className="nav-wordmark">{EVENT.name}</span>
+              </Link>
+
+              <div className="nav-desktop-links">
+                {NAV_LINKS.map((link) => (
+                  <Link key={link.href} href={link.href} className="nav-link">
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+
+              <LiquidGlassCard
+                glowIntensity="sm"
+                shadowIntensity="sm"
+                borderRadius="999px"
+                blurIntensity="sm"
+                tone="dark"
+                className="nav-cta-glass"
+              >
+                <a
+                  href={EVENT.devfolioUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="nav-cta"
+                >
+                  Register
+                </a>
+              </LiquidGlassCard>
+
+              {/* Mobile toggle */}
+              <button
+                className="nav-toggle"
+                onClick={() => setMenuOpen(!menuOpen)}
+                aria-label="Toggle menu"
+                aria-expanded={menuOpen}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  {menuOpen ? (
+                    <>
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </>
+                  ) : (
+                    <>
+                      <line x1="4" y1="9" x2="20" y2="9" />
+                      <line x1="4" y1="15" x2="20" y2="15" />
+                    </>
+                  )}
+                </svg>
+              </button>
+            </div>
+          </LiquidGlassCard>
+        </motion.div>
       </nav>
 
-      {/* Mobile Menu Glass Sheet */}
+      {/* Mobile glass sheet */}
       {menuOpen && (
         <div className="nav-mobile-sheet">
           <div className="nav-mobile-content">
             {NAV_LINKS.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
                 className="nav-mobile-link"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
+            <a
+              href={EVENT.devfolioUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary nav-mobile-cta"
+            >
+              Register on Devfolio
+            </a>
           </div>
         </div>
       )}
@@ -94,183 +123,154 @@ export default function Navigation() {
       <style>{`
         .nav-root {
           position: fixed;
-          top: clamp(1rem, 3vh, 2rem);
+          top: clamp(0.75rem, 2.2vh, 1.5rem);
           left: 0;
           width: 100%;
           z-index: 100;
           display: flex;
           justify-content: center;
-          pointer-events: none; /* Let clicks pass through the full-width wrapper */
+          pointer-events: none; /* only the pill catches clicks */
         }
 
-        .nav-glass-pill {
-          pointer-events: auto; /* Re-enable clicks for the pill itself */
+        .nav-glass-container {
+          pointer-events: auto;
+          width: max-content;          /* never full-width */
+          max-width: calc(100vw - 1.5rem);
+        }
+
+        .nav-glass-pill-layout {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
-          padding: 0.375rem;
-          border-radius: 9999px;
-          
-          /* The Liquid Glass Material */
-          background: rgba(250, 249, 246, 0.4);
-          backdrop-filter: blur(24px) saturate(180%);
-          -webkit-backdrop-filter: blur(24px) saturate(180%);
-          
-          /* Light catching edges and depth */
-          border-top: 1px solid rgba(255, 255, 255, 0.6);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-          box-shadow: 
-            0 12px 32px rgba(0, 0, 0, 0.1),
-            inset 0 1px 2px rgba(255, 255, 255, 0.8),
-            inset 0 -1px 2px rgba(0, 0, 0, 0.05);
-            
-          transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+          gap: 0.25rem;
+          padding: 0.35rem;
         }
 
+        .nav-brand {
+          display: flex;
+          align-items: center;
+          gap: 0.55rem;
+          flex-shrink: 0;
+          padding-right: 0.3rem;
+        }
+        .nav-wordmark {
+          font-family: var(--font-display), var(--font-geist-sans), sans-serif;
+          font-weight: 700;
+          font-size: 0.98rem;
+          letter-spacing: -0.01em;
+          text-transform: uppercase;
+          color: var(--color-accent-deep);
+          white-space: nowrap;
+        }
         .nav-logo-btn {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 2.75rem;
-          height: 2.75rem;
+          display: grid;
+          place-items: center;
+          width: 2.3rem;
+          height: 2.3rem;
           border-radius: 50%;
-          color: var(--color-text);
-          
-          /* Inner pill button styling matching the reference */
-          background: rgba(255, 255, 255, 0.5);
-          box-shadow: 
-            0 2px 8px rgba(0,0,0,0.05),
-            inset 0 2px 4px rgba(255,255,255,0.9),
-            inset 0 -2px 4px rgba(0,0,0,0.02);
-            
-          transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1), background-color 150ms ease;
+          color: var(--color-accent-deep);
+          background: rgba(255, 255, 255, 0.6);
+          box-shadow:
+            0 2px 8px rgba(22, 45, 26, 0.08),
+            inset 0 1px 3px rgba(255, 255, 255, 0.95);
+          transition: transform 200ms var(--ease-out), color 200ms ease;
+          flex-shrink: 0;
         }
+        .nav-asterisk { width: 1.1rem; height: 1.1rem; }
+        .nav-brand:hover .nav-logo-btn { transform: rotate(45deg); color: var(--color-accent); }
+        .nav-brand:active .nav-logo-btn { transform: scale(0.92); }
 
-        .nav-asterisk {
-          width: 1.25rem;
-          height: 1.25rem;
-        }
-
-        /* Physical tactile feedback */
-        .nav-logo-btn:active {
-          transform: scale(0.92);
-          background: rgba(255, 255, 255, 0.3);
+        @media (max-width: 520px) {
+          .nav-wordmark { display: none; }
         }
 
         .nav-desktop-links {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
-          padding: 0 0.75rem;
+          gap: 0.1rem;
+          padding-inline: 0.3rem;
         }
-
         .nav-link {
-          font-size: 0.875rem;
+          font-size: 0.85rem;
           font-weight: 500;
-          color: var(--color-text-secondary);
-          padding: 0.5rem 0.75rem;
-          border-radius: 9999px;
-          transition: color 150ms ease, background-color 150ms ease;
+          color: #3d4f3b;
+          padding: 0.5rem 0.8rem;
+          border-radius: var(--radius-pill);
+          transition: color 160ms ease, background-color 160ms ease;
+          white-space: nowrap;
         }
-
         .nav-link:hover {
-          color: var(--color-text);
-          background-color: rgba(255, 255, 255, 0.3);
+          color: var(--color-accent-deep);
+          background-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .nav-cta-glass {
+          border-radius: var(--radius-pill);
         }
 
-        .nav-register-btn {
+        .nav-cta {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          height: 2.75rem;
-          padding: 0 1.5rem;
-          border-radius: 9999px;
-          font-size: 0.875rem;
+          font-size: 0.825rem;
           font-weight: 600;
-          color: var(--color-text);
-          text-decoration: none;
-          
-          /* Embossed glossy pill matching reference */
-          background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.4) 100%);
-          border-top: 1px solid rgba(255,255,255,1);
-          box-shadow: 
-            0 4px 12px rgba(0,0,0,0.05),
-            inset 0 2px 4px rgba(255,255,255,0.8),
-            inset 0 -2px 4px rgba(0,0,0,0.05);
-            
-          transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1), filter 150ms ease;
+          letter-spacing: -0.01em;
+          color: #f3f8ee;
+          padding: 0.6rem 1.1rem;
+          border-radius: var(--radius-pill);
+          background: transparent;
+          transition: filter 180ms var(--ease-out), transform 180ms var(--ease-out);
+          white-space: nowrap;
         }
-
-        /* Physical tactile feedback */
-        .nav-register-btn:active {
-          transform: scale(0.95);
-          filter: brightness(0.95);
-        }
+        .nav-cta:hover { filter: brightness(1.06); }
+        .nav-cta:active { transform: scale(0.96); }
 
         .nav-toggle {
           display: none;
-          align-items: center;
-          justify-content: center;
-          width: 2.75rem;
-          height: 2.75rem;
+          place-items: center;
+          width: 2.3rem;
+          height: 2.3rem;
           border-radius: 50%;
           border: none;
-          background: rgba(255, 255, 255, 0.5);
-          color: var(--color-text);
+          background: rgba(255, 255, 255, 0.6);
+          color: var(--color-accent-deep);
           cursor: pointer;
-          box-shadow: 
-            0 2px 8px rgba(0,0,0,0.05),
-            inset 0 2px 4px rgba(255,255,255,0.9),
-            inset 0 -2px 4px rgba(0,0,0,0.02);
-          transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow:
+            0 2px 8px rgba(22, 45, 26, 0.08),
+            inset 0 1px 3px rgba(255, 255, 255, 0.95);
+          transition: transform 160ms var(--ease-out);
         }
-
-        .nav-toggle:active {
-          transform: scale(0.92);
-        }
+        .nav-toggle:active { transform: scale(0.92); }
 
         .nav-mobile-sheet {
           position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
+          inset: 0;
           z-index: 90;
-          background: rgba(250, 249, 246, 0.7);
-          backdrop-filter: blur(32px) saturate(200%);
-          -webkit-backdrop-filter: blur(32px) saturate(200%);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          animation: fade-in 300ms cubic-bezier(0.16, 1, 0.3, 1);
+          background: rgba(239, 243, 235, 0.78);
+          backdrop-filter: blur(30px) saturate(200%);
+          -webkit-backdrop-filter: blur(30px) saturate(200%);
+          display: grid;
+          place-items: center;
+          animation: nav-fade-in 300ms var(--ease-out);
         }
-
         .nav-mobile-content {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 1.5rem;
+          gap: 1.35rem;
         }
-
         .nav-mobile-link {
-          font-size: 1.5rem;
-          font-weight: 400;
-          letter-spacing: -0.02em;
+          font-size: 1.6rem;
+          font-weight: 300;
+          letter-spacing: var(--tracking-snug);
           color: var(--color-text);
-          text-decoration: none;
-          transition: transform 150ms ease;
         }
-        
-        .nav-mobile-link:active {
-          transform: scale(0.95);
-        }
+        .nav-mobile-cta { margin-top: 0.75rem; }
 
-        @keyframes fade-in {
+        @keyframes nav-fade-in {
           from { opacity: 0; }
           to { opacity: 1; }
         }
 
-        /* Reduced Transparency Fallback */
         @media (prefers-reduced-transparency: reduce) {
           .nav-glass-pill {
             background: var(--color-bg);
@@ -285,17 +285,9 @@ export default function Navigation() {
           }
         }
 
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
-          .nav-desktop-links {
-            display: none;
-          }
-          .nav-toggle {
-            display: flex;
-          }
-          .nav-register-btn {
-            display: none;
-          }
+        @media (max-width: 860px) {
+          .nav-desktop-links, .nav-cta { display: none; }
+          .nav-toggle { display: grid; }
         }
       `}</style>
     </>

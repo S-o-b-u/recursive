@@ -20,7 +20,7 @@ const THEMES = [
 
 export default function Experience() {
   return (
-    <SectionWrapper id="experience" alternate>
+    <SectionWrapper id="experience" tone="alt">
       <p className="section-label">The Experience</p>
       <h2 className="section-heading">
         Not your typical hackathon.
