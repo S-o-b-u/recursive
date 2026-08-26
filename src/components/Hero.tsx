@@ -287,7 +287,7 @@ export default function Hero() {
         /* ── Bottom Unified Glass Dock ── */
         .hero-bottom-area {
           position: absolute;
-          bottom: clamp(2.5rem, 6vh, 4rem);
+          bottom: clamp(4.25rem, 9vh, 6.25rem);
           left: 0;
           right: 0;
           width: 100%;

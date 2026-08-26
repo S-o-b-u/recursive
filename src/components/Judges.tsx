@@ -1,38 +1,74 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { JUDGES } from "@/data/hackathon";
-import { RevealHeading, RevealBlock } from "@/components/ui/reveal";
+import { RevealHeading, RevealBlock, ParallaxY } from "@/components/ui/reveal";
 import MediaSlot from "@/components/ui/MediaSlot";
 
 /**
- * JUDGES — six portrait slots. No invented names: a card shows "To be
- * announced" until you fill `name`, `role` and `photo.src` in JUDGES.
+ * JUDGES — a pinboard, not a contact sheet.
+ *
+ * Six cards on twelve columns with mismatched widths, aspect ratios, vertical
+ * drops and a degree or two of rotation each, so it reads as photographs left
+ * on a table rather than a CMS query. Every card drifts at its own rate; hover
+ * straightens the one you're looking at.
+ *
+ * Names stay empty in the data until each judge confirms — the caption falls
+ * back to "To be announced" on its own.
  */
+const CARDS = [
+  { c: "1 / 5", ratio: "4 / 5", drop: 0, rot: "-1.5deg", drift: 72 },
+  { c: "6 / 9", ratio: "3 / 4", drop: 6, rot: "1.2deg", drift: -58 },
+  { c: "10 / 13", ratio: "4 / 5", drop: 1.5, rot: "-0.8deg", drift: 90 },
+  { c: "2 / 6", ratio: "1 / 1", drop: 4, rot: "1.4deg", drift: -66 },
+  { c: "7 / 10", ratio: "4 / 5", drop: 9, rot: "-1.1deg", drift: 80 },
+  { c: "11 / 13", ratio: "3 / 4", drop: 2, rot: "0.9deg", drift: -52 },
+] as const;
+
 export default function Judges() {
   return (
     <section id="judges" className="jd" aria-label="Judges">
       <div className="jd-inner">
-        <RevealHeading className="jd-heading" lines={["The people", "judging this."]} />
+        <div className="jd-head">
+          <RevealHeading className="jd-heading" lines={["The people", "judging this."]} />
+          <RevealBlock className="jd-note" y={16} delay={0.2}>
+            <p>Names go up here as they confirm.</p>
+          </RevealBlock>
+        </div>
 
-        <RevealBlock className="jd-note" y={16}>
-          <p>Names go up here as they confirm.</p>
-        </RevealBlock>
+        <div className="jd-board">
+          {JUDGES.map((judge, i) => {
+            const card = CARDS[i % CARDS.length];
+            const named = judge.name.trim().length > 0;
 
-        <RevealBlock className="jd-grid" selector=".jd-card" stagger={0.07} y={26}>
-          {JUDGES.map((judge) => (
-            <article key={judge.photo.expect} className="jd-card">
-              <MediaSlot
-                slot={judge.photo}
-                ratio="4 / 5"
-                sizes="(max-width: 720px) 50vw, 30vw"
-              />
-              <h3 className="jd-name" data-empty={judge.name ? "false" : "true"}>
-                {judge.name || "To be announced"}
-              </h3>
-              {judge.role ? <p className="jd-role">{judge.role}</p> : null}
-            </article>
-          ))}
-        </RevealBlock>
+            return (
+              <ParallaxY
+                key={judge.photo.expect}
+                className="jd-card"
+                distance={card.drift}
+                style={
+                  {
+                    "--c": card.c,
+                    "--drop": card.drop,
+                    "--rot": card.rot,
+                  } as CSSProperties
+                }
+              >
+                <MediaSlot
+                  slot={judge.photo}
+                  ratio={card.ratio}
+                  sizes="(max-width: 900px) 50vw, 30vw"
+                />
+                <div className="jd-cap">
+                  <span className="jd-name" data-empty={named ? "false" : "true"}>
+                    {named ? judge.name : "To be announced"}
+                  </span>
+                  {judge.role ? <span className="jd-role">{judge.role}</span> : null}
+                </div>
+              </ParallaxY>
+            );
+          })}
+        </div>
       </div>
 
       <style>{`
@@ -41,7 +77,8 @@ export default function Judges() {
           width: 100%;
           background: var(--color-bg);
           color: #111a12;
-          padding-block: clamp(6rem, 13vh, 10rem);
+          padding-block: clamp(6rem, 14vh, 11rem);
+          overflow: hidden;
         }
 
         .jd-inner {
@@ -50,59 +87,95 @@ export default function Judges() {
           padding-inline: var(--padding-x);
         }
 
+        .jd-head {
+          display: grid;
+          grid-template-columns: repeat(12, minmax(0, 1fr));
+          column-gap: clamp(1rem, 2.4vw, 2rem);
+          align-items: end;
+        }
+
         .jd-heading {
+          grid-column: 1 / 9;
           font-family: var(--font-hiruko), var(--font-display), sans-serif;
           font-weight: 900;
-          font-size: clamp(2.3rem, 6.6vw, 5.25rem);
-          line-height: 0.95;
-          letter-spacing: -0.02em;
-          text-transform: uppercase;
-          color: #111a12;
-        }
-
-        .jd-note {
-          margin-top: clamp(1.25rem, 3vh, 2rem);
-          font-family: var(--font-geist-sans), sans-serif;
-          font-size: clamp(1.1rem, 1.9vw, 1.45rem);
-          font-weight: 380;
+          font-size: clamp(2.3rem, 7vw, 5.5rem);
+          line-height: 0.94;
           letter-spacing: -0.022em;
-          color: var(--color-text-secondary);
+          text-transform: uppercase;
         }
 
-        .jd-grid {
-          margin-top: clamp(2.5rem, 6vh, 4rem);
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: clamp(1.25rem, 2.6vw, 2rem) clamp(1rem, 2.2vw, 1.75rem);
-        }
-
-        .jd-card { display: flex; flex-direction: column; }
-
-        .jd-name {
-          margin-top: 0.95rem;
+        .jd-note { grid-column: 9 / 13; padding-bottom: 0.7rem; }
+        .jd-note p {
+          margin: 0;
           font-family: var(--font-geist-sans), sans-serif;
-          font-size: clamp(1rem, 1.5vw, 1.15rem);
+          font-size: clamp(0.98rem, 1.5vw, 1.2rem);
+          font-weight: 380;
+          line-height: 1.45;
+          letter-spacing: -0.018em;
+          color: var(--color-text-secondary);
+          text-wrap: pretty;
+        }
+
+        .jd-board {
+          margin-top: clamp(3.5rem, 9vh, 6rem);
+          display: grid;
+          grid-template-columns: repeat(12, minmax(0, 1fr));
+          column-gap: clamp(1rem, 2.2vw, 1.8rem);
+          row-gap: clamp(2rem, 5vw, 4rem);
+          align-items: start;
+        }
+
+        .jd-card {
+          grid-column: var(--c);
+          margin-top: calc(var(--drop) * 1vw);
+          transform: rotate(var(--rot));
+          transition: transform 600ms var(--ease-out);
+        }
+        /* Straighten and lift the one under the cursor. The GSAP drift lives on
+           the inner node, so this transform never fights it. */
+        .jd-card:hover { transform: rotate(0deg) translateY(-6px); }
+
+        .jd-cap {
+          display: flex;
+          flex-direction: column;
+          gap: 0.2rem;
+          padding-top: 0.85rem;
+        }
+        .jd-name {
+          font-family: var(--font-geist-sans), sans-serif;
+          font-size: clamp(0.95rem, 1.3vw, 1.08rem);
           font-weight: 500;
-          letter-spacing: -0.02em;
-          color: #111a12;
+          letter-spacing: -0.018em;
         }
         .jd-name[data-empty="true"] {
           font-family: var(--font-geist-mono), monospace;
-          font-size: 0.78rem;
+          font-size: 0.76rem;
           font-weight: 400;
-          letter-spacing: 0.02em;
+          letter-spacing: 0.01em;
           color: var(--color-text-tertiary);
         }
-
         .jd-role {
-          margin-top: 0.2rem;
           font-family: var(--font-geist-mono), monospace;
           font-size: 0.74rem;
           color: var(--color-text-secondary);
         }
 
-        @media (max-width: 720px) {
-          .jd-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        @media (max-width: 900px) {
+          .jd-heading, .jd-note { grid-column: 1 / -1; }
+          .jd-note { padding-top: 1.1rem; padding-bottom: 0; }
+          .jd-board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .jd-card {
+            grid-column: auto;
+            margin-top: calc(var(--drop) * 0.6vw);
+          }
+          /* One ratio for everything once the columns are even, otherwise the
+             portrait and square cards fight for row height. */
+          .jd-card .ms { aspect-ratio: 4 / 5 !important; }
+        }
+
+        @media (max-width: 520px) {
+          .jd-board { grid-template-columns: minmax(0, 1fr); }
+          .jd-card { margin-top: 0; transform: rotate(0deg); }
         }
       `}</style>
     </section>

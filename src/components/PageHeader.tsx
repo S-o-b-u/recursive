@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import Reveal from "./Reveal";
+import WarpText from "./ui/WarpText";
 
 /**
  * Sub-page header. Opens on the same deep-forest tone the hero pushes into, then
@@ -27,7 +28,23 @@ export default function PageHeader({
             Back home
           </Link>
           <p className="ph-label">{label}</p>
-          <h1 className="ph-title">{title}</h1>
+          <div className="my-2">
+            <WarpText
+              text={title}
+              align="left"
+              color="#EFF3EB"
+              fontSize="clamp(2.5rem, 6.5vw, 4.8rem)"
+              fontWeight={300}
+              fontFamily="var(--font-display), Georgia, serif"
+              letterSpacing="-0.035em"
+              style={{
+                width: "100%",
+                maxWidth: "30ch",
+                height: "clamp(60px, 8vw, 100px)",
+                pointerEvents: "auto",
+              }}
+            />
+          </div>
           {lede && <div className="ph-lede">{lede}</div>}
         </Reveal>
       </div>

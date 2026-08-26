@@ -20,16 +20,19 @@ const THEMES = [
 
 export default function Experience() {
   return (
-    <SectionWrapper id="experience" tone="alt">
-      <p className="section-label">The Experience</p>
-      <h2 className="section-heading">
-        Not your typical hackathon.
-      </h2>
-      <p className="body-text" style={{ marginBottom: "var(--space-block)" }}>
-        Recursive is designed around three guiding principles that shape
-        every part of the event — from mentorship to judging to the way
-        we think about what&apos;s worth building.
-      </p>
+    <SectionWrapper
+      id="experience"
+      tone="alt"
+      label="The Experience"
+      heading="Not your typical hackathon."
+      lede={
+        <p>
+          Recursive is designed around three guiding principles that shape
+          every part of the event — from mentorship to judging to the way
+          we think about what&apos;s worth building.
+        </p>
+      }
+    >
 
       <div className="experience-grid">
         {THEMES.map((theme, i) => (

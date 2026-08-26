@@ -1,6 +1,7 @@
 import { EVENT } from "@/data/hackathon";
 import Reveal from "./Reveal";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
+import WarpText from "@/components/ui/WarpText";
 
 export default function RegisterCTA() {
   return (
@@ -11,11 +12,22 @@ export default function RegisterCTA() {
             <p className="eyebrow text-[var(--color-accent)]">
               {EVENT.seats} seats · {EVENT.dates}
             </p>
-            <h2 className="cta-heading">
-              The hill is quiet right now.
-              <br />
-              Come make some noise.
-            </h2>
+            <div className="my-2">
+              <WarpText
+                text={"The hill is quiet right now.\nCome make some noise."}
+                color="#16241A"
+                fontSize="clamp(1.8rem, 4vw, 2.75rem)"
+                fontWeight={300}
+                fontFamily="var(--font-display), Georgia, serif"
+                letterSpacing="-0.035em"
+                lineHeight={1.1}
+                style={{
+                  width: "100%",
+                  height: "clamp(75px, 11vw, 115px)",
+                  pointerEvents: "auto",
+                }}
+              />
+            </div>
             <p className="body-text mx-auto text-center">
               Registration is free and takes about two minutes. Bring a team or find one
               when you arrive.

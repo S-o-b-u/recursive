@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import WarpText from "./WarpText";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -126,7 +127,24 @@ export function ScrollRevealParagraph({
     >
       <div className="scroll-reveal-inner" ref={textBlockRef}>
         {eyebrow && <span className="scroll-reveal-eyebrow">{eyebrow}</span>}
-        {heading && <h2 className="scroll-reveal-heading">{heading}</h2>}
+        {heading && (
+          <div className="mb-6 flex justify-center">
+            <WarpText
+              text={heading}
+              color={tone === "dark" ? "#EFF3EB" : "#16241A"}
+              fontSize="clamp(2.2rem, 5.5vw, 3.8rem)"
+              fontWeight={700}
+              fontFamily="var(--font-display), Georgia, serif"
+              letterSpacing="-0.035em"
+              style={{
+                width: "100%",
+                maxWidth: "24ch",
+                height: "clamp(54px, 7vw, 84px)",
+                pointerEvents: "auto",
+              }}
+            />
+          </div>
+        )}
 
         <div className={`scroll-reveal-paragraphs ${paragraphClassName}`}>
           {paragraphs.map((pText, pIdx) => {

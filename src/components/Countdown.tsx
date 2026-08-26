@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { EVENT } from "@/data/hackathon";
 import { RevealHeading, RevealBlock } from "@/components/ui/reveal";
+
+gsap.registerPlugin(ScrollTrigger);
 
 /**
  * THE COUNTER — a deep-forest slab inset in the light page, so it reads as one

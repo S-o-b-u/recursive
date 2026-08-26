@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import WarpText from "@/components/ui/WarpText";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -118,9 +119,22 @@ export default function Lore() {
           The Lore
         </span>
 
-        <h2 ref={headingRef} className="lore-heading">
-          Why The Chair Exists
-        </h2>
+        <div ref={headingRef} className="w-full mb-6 flex justify-center">
+          <WarpText
+            text="Why The Chair Exists"
+            color="#EFF3EB"
+            fontSize="clamp(2.4rem, 6.5vw, 4.4rem)"
+            fontWeight={700}
+            fontFamily="var(--font-display), Georgia, serif"
+            letterSpacing="-0.035em"
+            style={{
+              width: "100%",
+              maxWidth: "20ch",
+              height: "clamp(60px, 8vw, 95px)",
+              pointerEvents: "auto",
+            }}
+          />
+        </div>
 
         <div className="lore-paragraphs">
           {paragraphs.map((pText, pIdx) => {

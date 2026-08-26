@@ -4,6 +4,7 @@ import { display, geist, geistMono, hiruko } from "./fonts";
 import SmoothScroll from "@/components/SmoothScroll";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import GradualBlur from "@/components/ui/GradualBlur";
 import { EVENT } from "@/data/hackathon";
 
 export const metadata: Metadata = {
@@ -26,6 +27,22 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
           <Footer />
         </SmoothScroll>
+
+        {/* Fixed ramp along the bottom edge so whatever is scrolling past
+            dissolves instead of ending on a hard line. target="page" adds +100
+            to zIndex, so 0 here lands on 100 — level with the nav, which never
+            overlaps it, and above the mobile sheet at 90. */}
+        <GradualBlur
+          target="page"
+          position="bottom"
+          height="6rem"
+          strength={2}
+          divCount={5}
+          curve="bezier"
+          exponential
+          opacity={1}
+          zIndex={0}
+        />
       </body>
     </html>
   );

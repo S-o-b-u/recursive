@@ -16,6 +16,8 @@ const CRITERIA = [
   { name: "Story", note: "Can you make a stranger care in two minutes?" },
 ];
 
+import WarpText from "@/components/ui/WarpText";
+
 export default function PrizesPage() {
   return (
     <main>
@@ -33,7 +35,23 @@ export default function PrizesPage() {
 
       <section className="section pt-0">
         <div className="section-inner">
-          <h2 className="section-heading">Judging criteria</h2>
+          <div className="mb-6">
+            <WarpText
+              text="Judging criteria"
+              align="left"
+              color="#16241A"
+              fontSize="clamp(1.75rem, 3.5vw, 2.5rem)"
+              fontWeight={350}
+              fontFamily="var(--font-display), Georgia, serif"
+              letterSpacing="-0.03em"
+              style={{
+                width: "100%",
+                maxWidth: "30ch",
+                height: "clamp(44px, 5vw, 64px)",
+                pointerEvents: "auto",
+              }}
+            />
+          </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {CRITERIA.map((c) => (
               <div key={c.name} className="glass glass-sheen p-6">

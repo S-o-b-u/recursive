@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useLayoutEffect, useRef } from "react";
+import { ReactNode, useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -250,5 +250,139 @@ export function RevealBlock({
     <div ref={rootRef} className={className}>
       {children}
     </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────
+   ParallaxY — a slow vertical drift, scrubbed to scroll.
+
+   The outer div is the trigger and never moves; the inner one carries
+   the tween. Animating the same element you measure means a mid-scroll
+   ScrollTrigger.refresh() re-reads a displaced position — this split
+   makes the anchors immovable.
+
+   `ease: "none"` because scrub already supplies the easing; anything
+   else fights the scrollbar. Transform only, so it composites on the
+   GPU and never triggers layout.
+   ──────────────────────────────────────────────────────────────── */
+export function ParallaxY({
+  children,
+  className = "",
+  /** Total travel in px across the whole pass. Negative = drifts down. */
+  distance = 70,
+  start = "top bottom",
+  end = "bottom top",
+  style,
+}: {
+  children: ReactNode;
+  className?: string;
+  distance?: number;
+  start?: string;
+  end?: string;
+  /** Placement for the outer (never-transformed) node — grid-column, rotation, offsets. */
+  style?: CSSProperties;
+}) {
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useIso(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const inner = root.firstElementChild as HTMLElement | null;
+    if (!inner) return;
+
+    if (reduced()) {
+      gsap.set(inner, { y: 0 });
+      return;
+    }
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        inner,
+        { y: distance / 2 },
+        {
+          y: -distance / 2,
+          ease: "none",
+          scrollTrigger: {
+            trigger: root,
+            start,
+            end,
+            scrub: 1,
+            invalidateOnRefresh: true,
+          },
+        }
+      );
+    }, root);
+
+    return () => ctx.revert();
+  }, [distance, start, end]);
+
+  return (
+    <div ref={rootRef} className={className} style={style}>
+      <div className="px-in">{children}</div>
+
+      <style href="parallax-y" precedence="default">{`
+        .px-in { will-change: transform; }
+      `}</style>
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────
+   RuleDraw — a hairline that draws itself left-to-right. scaleX, not
+   width, so it costs nothing to animate.
+   ──────────────────────────────────────────────────────────────── */
+export function RuleDraw({
+  className = "",
+  delay = 0,
+  duration = 1.6,
+}: {
+  className?: string;
+  delay?: number;
+  duration?: number;
+}) {
+  const rootRef = useRef<HTMLSpanElement>(null);
+
+  useIso(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    if (reduced()) {
+      gsap.set(root, { scaleX: 1 });
+      return;
+    }
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        root,
+        { scaleX: 0 },
+        {
+          scaleX: 1,
+          ease: "expo.out",
+          duration,
+          delay,
+          scrollTrigger: { trigger: root, start: "top 92%", once: true },
+        }
+      );
+    }, root);
+
+    return () => ctx.revert();
+  }, [delay, duration]);
+
+  return (
+    <>
+      <span ref={rootRef} className={`rd ${className}`} aria-hidden="true" />
+
+      <style href="rule-draw" precedence="default">{`
+        .rd {
+          display: block;
+          width: 100%;
+          height: 1px;
+          background: var(--color-border);
+          transform: scaleX(0);
+          transform-origin: left center;
+        }
+      `}</style>
+    </>
   );
 }

@@ -1,15 +1,46 @@
 import Image from "next/image";
 import type { Slot } from "@/data/hackathon";
+import RetroDither, {
+  type RetroDitherOptions,
+} from "@/components/canvasui/RetroDither";
 
 /**
  * A media placeholder that turns into real media the moment you fill in `src`.
  *
  * Empty  → a labelled box showing the exact path to drop the file at.
- * Filled → <Image fill> or an autoplaying muted <video>, cropped to the ratio.
+ * Filled → <Image fill> or an autoplaying muted <video>, cropped to the ratio,
+ *          wrapped in the RetroDither lens so the cursor drags a dithered
+ *          window across it.
+ *
+ * The dither only mounts for slots that actually have a `src`. That matters:
+ * every instance takes a WebGL2 context and browsers cap you at roughly sixteen,
+ * while this page carries twenty-plus slots. Empty placeholders create none.
  *
  * The <style> carries href + precedence so React dedupes it — this renders
  * twenty-plus times per page and shouldn't emit twenty copies of the CSS.
  */
+
+/** The lens settings, one place so every image on the site matches. */
+const DITHER: RetroDitherOptions = {
+  radius: 0.5,
+  softness: 1,
+  pixelSize: 2,
+  levels: 4,
+  colorize: 0.1,
+  contrast: 0.6,
+  brightness: 0,
+  strength: 0.75,
+  baseStrength: 0,
+  invert: 0,
+  scanlines: 0,
+  pattern: "bayer",
+  trail: 0.4,
+  degauss: 0.8,
+  followSpeed: 3,
+  darkColor: [0, 0, 0],
+  lightColor: [1, 1, 1],
+};
+
 export default function MediaSlot({
   slot,
   ratio = "4 / 3",
@@ -17,6 +48,7 @@ export default function MediaSlot({
   sizes = "(max-width: 860px) 100vw, 33vw",
   className = "",
   tone = "light",
+  dither = true,
 }: {
   slot: Slot;
   ratio?: string;
@@ -24,8 +56,35 @@ export default function MediaSlot({
   sizes?: string;
   className?: string;
   tone?: "light" | "dark";
+  /** Opt out for marks that must stay pixel-exact, e.g. a sponsor logo. */
+  dither?: boolean;
 }) {
   const { label, expect, src, kind = "image" } = slot;
+
+  const media = src ? (
+    kind === "video" ? (
+      <video
+        className="ms-media"
+        src={src}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-label={label}
+        style={{ objectFit: fit }}
+      />
+    ) : (
+      <Image
+        src={src}
+        alt={label}
+        fill
+        sizes={sizes}
+        className="ms-media"
+        style={{ objectFit: fit }}
+      />
+    )
+  ) : null;
 
   return (
     <div
@@ -33,28 +92,13 @@ export default function MediaSlot({
       style={{ aspectRatio: ratio }}
       data-filled={src ? "true" : "false"}
     >
-      {src ? (
-        kind === "video" ? (
-          <video
-            className="ms-media"
-            src={src}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            aria-label={label}
-            style={{ objectFit: fit }}
-          />
+      {media ? (
+        dither ? (
+          <RetroDither className="ms-dither" {...DITHER}>
+            {media}
+          </RetroDither>
         ) : (
-          <Image
-            src={src}
-            alt={label}
-            fill
-            sizes={sizes}
-            className="ms-media"
-            style={{ objectFit: fit }}
-          />
+          media
         )
       ) : (
         <div className="ms-empty">
@@ -82,6 +126,13 @@ export default function MediaSlot({
         .ms-dark[data-filled="false"] {
           background: rgba(255, 255, 255, 0.05);
           border-color: rgba(230, 240, 225, 0.24);
+        }
+
+        /* RetroDither renders its own relative wrapper; stretch it over the
+           ratio box so <Image fill> still has a sized ancestor. */
+        .ms-dither {
+          position: absolute;
+          inset: 0;
         }
 
         .ms-media {

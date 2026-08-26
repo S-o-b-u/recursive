@@ -134,10 +134,18 @@ const drawLine = (
   line: string,
   x: number,
   y: number,
-  letterSpacing: number
+  letterSpacing: number,
+  align: "left" | "center" | "right" = "center",
+  width = 0
 ) => {
   const chars = Array.from(line);
-  let cursor = x - measureLine(ctx, line, letterSpacing) / 2;
+  const lineWidth = measureLine(ctx, line, letterSpacing);
+  let cursor = x - lineWidth / 2;
+  if (align === "left") {
+    cursor = 0;
+  } else if (align === "right") {
+    cursor = width - lineWidth;
+  }
 
   chars.forEach((char, index) => {
     ctx.fillText(char, cursor, y);
@@ -152,6 +160,7 @@ export interface WarpTextProps {
   src?: string;
   imageSrc?: string;
   color?: string;
+  align?: "left" | "center" | "right";
   warpStrength?: number;
   warpScale?: number;
   speed?: number;
@@ -198,8 +207,8 @@ const buildTextCanvas = ({
   // If rendering an image (e.g. logo.png)
   if (loadedImage && loadedImage.complete && loadedImage.naturalWidth > 0) {
     const imgRatio = loadedImage.naturalWidth / loadedImage.naturalHeight;
-    const maxWidth = width * 0.94;
-    const maxHeight = height * 0.92;
+    const maxWidth = width * 0.96;
+    const maxHeight = height * 0.94;
     let drawW = maxWidth;
     let drawH = maxWidth / imgRatio;
 
@@ -215,7 +224,6 @@ const buildTextCanvas = ({
     ctx.imageSmoothingQuality = "high";
     ctx.drawImage(loadedImage, drawX, drawY, drawW, drawH);
 
-    // Apply color tint if provided (e.g., #111a12 or #122415)
     if (props.color && props.color !== "original") {
       ctx.globalCompositeOperation = "source-in";
       ctx.fillStyle = props.color;
@@ -246,7 +254,7 @@ const buildTextCanvas = ({
   });
   container.appendChild(probe);
   const computed = window.getComputedStyle(probe);
-  let fontSizePx = parseFloat(computed.fontSize) || 96;
+  let fontSizePx = parseFloat(computed.fontSize) || 64;
   const fontFamily = computed.fontFamily || "sans-serif";
   const fontWeight = computed.fontWeight || String(props.fontWeight ?? 800);
   let letterSpacing =
@@ -257,7 +265,7 @@ const buildTextCanvas = ({
   if (!Number.isFinite(lineHeight)) {
     lineHeight =
       fontSizePx *
-      (typeof props.lineHeight === "number" ? props.lineHeight : 0.92);
+      (typeof props.lineHeight === "number" ? props.lineHeight : 0.95);
   }
   probe.remove();
 
@@ -273,8 +281,9 @@ const buildTextCanvas = ({
   };
   applyFont();
 
-  const maxWidth = width * 0.92;
-  const maxHeight = height * 0.88;
+  const align = props.align || "center";
+  const maxWidth = width * 0.98;
+  const maxHeight = height * 0.95;
   const widest = Math.max(
     ...lines.map((line) => measureLine(ctx, line, letterSpacing)),
     1
@@ -294,9 +303,11 @@ const buildTextCanvas = ({
     drawLine(
       ctx,
       line,
-      width / 2,
+      align === "left" ? 0 : align === "right" ? width : width / 2,
       startY + index * lineHeight,
-      letterSpacing
+      letterSpacing,
+      align,
+      width
     )
   );
 
@@ -320,6 +331,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
   src,
   imageSrc,
   color = "#f8f5ff",
+  align = "center",
   warpStrength = 0.08,
   warpScale = 1.7,
   speed = 0.55,
@@ -327,11 +339,11 @@ export const WarpText: React.FC<WarpTextProps> = ({
   pointerStrength = 0.38,
   refraction = 0.018,
   ripple = true,
-  fontSize = "clamp(3rem, 10vw, 9rem)",
+  fontSize = "clamp(2rem, 5vw, 4.5rem)",
   fontWeight = 800,
   fontFamily = "inherit",
-  letterSpacing = "-0.06em",
-  lineHeight = 0.9,
+  letterSpacing = "-0.03em",
+  lineHeight = 1.0,
   className = "",
   style,
 }) => {
@@ -343,6 +355,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
     src: src || imageSrc,
     imageSrc: src || imageSrc,
     color,
+    align,
     fontSize,
     fontWeight,
     fontFamily,
@@ -367,6 +380,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
       src: effectiveSrc,
       imageSrc: effectiveSrc,
       color,
+      align,
       fontSize,
       fontWeight,
       fontFamily,
@@ -402,6 +416,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
     text,
     effectiveSrc,
     color,
+    align,
     fontSize,
     fontWeight,
     fontFamily,
@@ -676,8 +691,9 @@ export const WarpText: React.FC<WarpTextProps> = ({
       ref={containerRef}
       className={`warp-text ${className}`.trim()}
       style={style}
-      role="img"
-      aria-label={text || "logo"}
+      role="heading"
+      aria-level={2}
+      aria-label={typeof text === "string" ? text : "heading"}
     />
   );
 };
