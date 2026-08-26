@@ -8,7 +8,11 @@ export const EVENT = {
   name: "RECURSIVE",
   tagline: "Where ideas branch, evolve, and bloom.",
   edition: "Hackathon 2026",
-  dates: "March 20 – 22, 2026",
+  // TODO: PLACEHOLDER DATE. `dates` is the display string, `startsAt` is what the
+  // countdown counts to — change both together. Dec 11 2026 is a Friday, so the
+  // Fri→Sun schedule below lines up.
+  dates: "December 11 – 13, 2026",
+  startsAt: "2026-12-11T09:00:00+05:30",
   duration: "36 hours",
   format: "In person · Kolkata, India",
   venue: "To be announced",
@@ -26,20 +30,61 @@ export const EVENT = {
   },
 } as const;
 
+/**
+ * A media placeholder. Drop the real file into `/public` at `expect`, then set
+ * `src` to that same path — the slot swaps from placeholder to real media.
+ */
+export type Slot = {
+  label: string;
+  expect: string;
+  src?: string;
+  kind?: "image" | "video";
+};
+
+/**
+ * The chapter running the event.
+ * TODO: verify the college name, city and founding year before launch — these
+ * were carried over from the earlier draft, not confirmed.
+ */
+export const COLLEGE = {
+  chapter: "ACM Student Chapter",
+  college: "Netaji Subhash Engineering College",
+  collegeShort: "NSEC",
+  city: "Kolkata",
+  acmFounded: "1947",
+} as const;
+
+/** College / chapter logos. Fill `src` once the files are in /public. */
+export const COLLEGE_LOGOS: Slot[] = [
+  { label: "College logo", expect: "/images/college/nsec.png", src: "" },
+  { label: "ACM chapter logo", expect: "/images/college/acm-chapter.png", src: "" },
+  { label: "ACM logo", expect: "/images/college/acm.png", src: "" },
+];
+
 export type Track = {
   slug: string;
   title: string;
   seat: string;
+  /** One line. This is what the home-page themes grid shows. */
+  line: string;
+  /** Cover art or clip for the themes grid. */
+  media: Slot;
   summary: string;
   prompts: string[];
 };
 
-/** Four tracks — one for each chair on the hill. */
+/**
+ * Four themes.
+ * TODO: these are placeholders — replace the titles and lines with the real
+ * themes once they are locked.
+ */
 export const TRACKS: Track[] = [
   {
     slug: "generative-nature",
     title: "Generative Nature",
     seat: "Seat 01",
+    line: "Simple rules, repeated, until something grows.",
+    media: { label: "Generative Nature", expect: "/images/themes/generative.jpg", src: "" },
     summary:
       "Systems that grow. Recursion, L-systems, cellular automata, agents that evolve their own rules — anything where a simple instruction repeated becomes something beautiful.",
     prompts: [
@@ -52,6 +97,8 @@ export const TRACKS: Track[] = [
     slug: "climate-regeneration",
     title: "Climate & Regeneration",
     seat: "Seat 02",
+    line: "Software for soil, air, water and the people counting it.",
+    media: { label: "Climate & Regeneration", expect: "/images/themes/climate.jpg", src: "" },
     summary:
       "Software for the living world. Measure, restore, or protect — from soil sensors to supply-chain transparency to tools that make climate data legible.",
     prompts: [
@@ -64,6 +111,8 @@ export const TRACKS: Track[] = [
     slug: "open-web",
     title: "Open Web & Dev Tools",
     seat: "Seat 03",
+    line: "Sharpen the tools the rest of us build with.",
+    media: { label: "Open Web & Dev Tools", expect: "/images/themes/openweb.jpg", src: "" },
     summary:
       "Sharpen the tools everyone builds with. Compilers, debuggers, protocols, editors, local-first sync — infrastructure that other people's ideas can root into.",
     prompts: [
@@ -76,6 +125,8 @@ export const TRACKS: Track[] = [
     slug: "wildcard",
     title: "Wildcard",
     seat: "Seat 04",
+    line: "The idea that kept you up. Bring that one.",
+    media: { label: "Wildcard", expect: "/images/themes/wildcard.mp4", src: "", kind: "video" },
     summary:
       "Anything that grows. If it doesn't fit a track but it made you stay up until 4am, it belongs here. Judged on originality and craft, nothing else.",
     prompts: [
@@ -84,6 +135,33 @@ export const TRACKS: Track[] = [
       "Something genuinely new",
     ],
   },
+];
+
+/**
+ * Judges. No names until they confirm — fill `name`/`role` and the photo `src`
+ * as each one says yes.
+ */
+export type Judge = { name: string; role: string; photo: Slot };
+
+export const JUDGES: Judge[] = [
+  { name: "", role: "", photo: { label: "Judge 01", expect: "/images/judges/01.jpg", src: "" } },
+  { name: "", role: "", photo: { label: "Judge 02", expect: "/images/judges/02.jpg", src: "" } },
+  { name: "", role: "", photo: { label: "Judge 03", expect: "/images/judges/03.jpg", src: "" } },
+  { name: "", role: "", photo: { label: "Judge 04", expect: "/images/judges/04.jpg", src: "" } },
+  { name: "", role: "", photo: { label: "Judge 05", expect: "/images/judges/05.jpg", src: "" } },
+  { name: "", role: "", photo: { label: "Judge 06", expect: "/images/judges/06.jpg", src: "" } },
+];
+
+/** Sponsor logo wall. Add a slot per signed sponsor, drop the logo in, set `src`. */
+export const SPONSOR_SLOTS: Slot[] = [
+  { label: "Sponsor 01", expect: "/images/sponsors/01.svg", src: "" },
+  { label: "Sponsor 02", expect: "/images/sponsors/02.svg", src: "" },
+  { label: "Sponsor 03", expect: "/images/sponsors/03.svg", src: "" },
+  { label: "Sponsor 04", expect: "/images/sponsors/04.svg", src: "" },
+  { label: "Sponsor 05", expect: "/images/sponsors/05.svg", src: "" },
+  { label: "Sponsor 06", expect: "/images/sponsors/06.svg", src: "" },
+  { label: "Sponsor 07", expect: "/images/sponsors/07.svg", src: "" },
+  { label: "Sponsor 08", expect: "/images/sponsors/08.svg", src: "" },
 ];
 
 export type ScheduleDay = {
@@ -95,7 +173,7 @@ export type ScheduleDay = {
 export const SCHEDULE: ScheduleDay[] = [
   {
     day: "Day 01",
-    date: "Friday, March 20",
+    date: "Friday, December 11",
     items: [
       { time: "09:00", title: "Check-in & breakfast", note: "Badges, swag, and the first coffee." },
       { time: "10:30", title: "Opening ceremony", note: "Tracks, rules, and judging criteria." },
@@ -107,7 +185,7 @@ export const SCHEDULE: ScheduleDay[] = [
   },
   {
     day: "Day 02",
-    date: "Saturday, March 21",
+    date: "Saturday, December 12",
     items: [
       { time: "08:00", title: "Breakfast" },
       { time: "11:00", title: "Mentor rounds", note: "Every team gets a 20-minute slot." },
@@ -119,7 +197,7 @@ export const SCHEDULE: ScheduleDay[] = [
   },
   {
     day: "Day 03",
-    date: "Sunday, March 22",
+    date: "Sunday, December 13",
     items: [
       { time: "08:00", title: "Breakfast" },
       { time: "12:00", title: "Submissions close", note: "Hard deadline on Devfolio." },
@@ -242,9 +320,8 @@ export const FAQS: Faq[] = [
 ];
 
 export const NAV_LINKS = [
-  { label: "About", href: "/#about" },
-  { label: "Tracks", href: "/tracks" },
-  { label: "Schedule", href: "/schedule" },
-  { label: "Prizes", href: "/prizes" },
-  { label: "FAQ", href: "/faq" },
+  { label: "The chair", href: "/#about" },
+  { label: "Themes", href: "/#themes" },
+  { label: "Judges", href: "/#judges" },
+  { label: "Sponsors", href: "/#sponsors" },
 ];

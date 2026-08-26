@@ -1,78 +1,178 @@
-import SectionWrapper from "./SectionWrapper";
-import Reveal from "./Reveal";
-import { EVENT } from "@/data/hackathon";
+"use client";
 
-const FACTS = [
-  { label: "When", value: EVENT.dates },
-  { label: "How long", value: EVENT.duration },
-  { label: "Where", value: EVENT.format },
-  { label: "Team size", value: EVENT.teamSize },
+import { EVENT } from "@/data/hackathon";
+import { RevealWords, RevealHeading, RevealBlock } from "@/components/ui/reveal";
+
+/**
+ * THE CHAIR — answers the question the hero deliberately provokes.
+ *
+ * Short lines, wide measure: three sentences a person will actually read,
+ * set big enough that they land like signage rather than a blog post.
+ * No pinning — the section scrolls at normal speed and the prose illuminates.
+ */
+
+const STORY = [
+  "There is a plastic chair on a hill. The same chair as every terrace and every roadside tea shop in this city.",
+  "Four of them up there. A team is one to four people, so the chairs are the seats. Three fill with people you know. Nobody is holding the fourth one.",
+  "The hill is thirty-six hours that will not compile. You climb it anyway, and at the top there is a thing that works and did not exist on Friday.",
 ];
 
 export default function About() {
   return (
-    <SectionWrapper
-      id="about"
-      label="About"
-      heading={<>A simple rule, repeated, becomes a forest.</>}
-      tone="deep"
-      className="about"
-    >
-      <div className="grid gap-[var(--space-block)] md:grid-cols-[1.15fr_1fr] md:items-start">
-        <Reveal className="space-y-5 text-[var(--font-size-lg)] leading-[var(--leading-relaxed)] font-light text-[rgba(232,241,224,0.74)]">
-          <p>
-            Recursion and growth are the same idea wearing different clothes. A fern
-            unfurls by repeating one instruction at a smaller scale. A river delta
-            branches by branching. Nothing plans the whole shape — the shape is what
-            the rule leaves behind.
-          </p>
-          <p>
-            {EVENT.name} is {EVENT.duration} built on that premise. You arrive with one
-            small idea and a hard deadline, and you find out what it grows into. No
-            themes handed down from a stage, no busywork — four tracks, four chairs on
-            the hill, and a room full of people willing to stay up with you.
-          </p>
-          <p>
-            It is free, it is for beginners as much as for veterans, and everything you
-            make stays yours.
-          </p>
-        </Reveal>
+    <section id="about" className="ab" aria-label="About the chair">
+      <div className="ab-spill" aria-hidden="true" />
 
-        <Reveal delay={0.1}>
-          <ul className="glass-dark grid gap-0 p-2">
-            {FACTS.map((f, i) => (
-              <li
-                key={f.label}
-                className={`flex items-baseline justify-between gap-4 px-5 py-4 ${
-                  i > 0 ? "border-t border-[rgba(232,241,224,0.1)]" : ""
-                }`}
-              >
-                <span className="about-fact-label">{f.label}</span>
-                <span className="text-right text-[var(--font-size-lg)] font-light tracking-[var(--tracking-snug)] text-[#EFF3EB]">
-                  {f.value}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </Reveal>
+      <div className="ab-inner">
+        <RevealHeading
+          className="ab-heading"
+          lines={["The chair is", "the whole point."]}
+        />
+
+        <RevealWords paragraphs={STORY} className="ab-story" />
+
+        <RevealBlock className="ab-meta" y={18}>
+          <span>{EVENT.teamSize}</span>
+          <span>{EVENT.duration}</span>
+          <span>{EVENT.format}</span>
+        </RevealBlock>
+
+        <RevealBlock className="ab-kicker" y={22}>
+          <p className="ab-kicker-line">Four chairs. One is yours.</p>
+          <a
+            href={EVENT.devfolioUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ab-kicker-link"
+          >
+            go grab it
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M5 12h14M13 6l6 6-6 6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </a>
+        </RevealBlock>
       </div>
 
       <style>{`
-        .about {
+        .ab {
           position: relative;
-          isolation: isolate;
-          padding-top: clamp(5rem, 10vh, 7.5rem);
+          width: 100%;
+          background: var(--color-bg);
+          color: #111a12;
+          padding-block: clamp(7rem, 15vh, 12rem) clamp(6rem, 13vh, 10rem);
+          overflow: hidden;
         }
-        .about .section-label { color: var(--color-accent-bright); }
-        .about .section-label::before { background: var(--color-accent-bright); }
-        .about-fact-label {
-          font-size: var(--font-size-xs);
-          font-weight: 550;
-          letter-spacing: var(--tracking-wider);
+
+        /* Green light spilling off the hero's grass onto the paper. Not a fade
+           to white — a settle, so the two scenes share an edge. */
+        .ab-spill {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: clamp(5rem, 12vh, 9rem);
+          pointer-events: none;
+          background: linear-gradient(
+            180deg,
+            rgba(96, 148, 60, 0.26) 0%,
+            rgba(96, 148, 60, 0.08) 45%,
+            rgba(96, 148, 60, 0) 100%
+          );
+        }
+
+        .ab-inner {
+          position: relative;
+          max-width: 84rem;
+          margin-inline: auto;
+          padding-inline: var(--padding-x);
+        }
+
+        .ab-heading {
+          font-family: var(--font-hiruko), var(--font-display), sans-serif;
+          font-weight: 900;
+          font-size: clamp(2.5rem, 7.6vw, 6rem);
+          line-height: 0.94;
+          letter-spacing: -0.02em;
           text-transform: uppercase;
-          color: rgba(232, 241, 224, 0.5);
+          color: #111a12;
+        }
+
+        /* Wide measure, big type, few lines — reads as a statement, not a page
+           of copy. Overrides the RevealWords defaults. */
+        .ab-story { margin-top: clamp(2.5rem, 6vh, 4rem); }
+        .ab-story .rw-para {
+          max-width: 68rem;
+          font-size: clamp(1.3rem, 2.55vw, 2.15rem);
+          font-weight: 380;
+          line-height: 1.42;
+          letter-spacing: -0.022em;
+          color: #111a12;
+        }
+
+        .ab-meta {
+          margin-top: clamp(2.5rem, 6vh, 3.75rem);
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 0.6rem 1.1rem;
+          font-family: var(--font-geist-mono), monospace;
+          font-size: 0.8rem;
+          letter-spacing: 0.02em;
+          color: var(--color-text-secondary);
+        }
+        .ab-meta span { display: inline-flex; align-items: center; }
+        .ab-meta span + span::before {
+          content: "";
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: var(--color-accent);
+          opacity: 0.5;
+          margin-right: 1.1rem;
+        }
+
+        .ab-kicker {
+          margin-top: clamp(3rem, 7vh, 5rem);
+          display: flex;
+          flex-wrap: wrap;
+          align-items: baseline;
+          gap: 0.6rem 1.6rem;
+        }
+        .ab-kicker-line {
+          margin: 0;
+          font-family: var(--font-hiruko), var(--font-display), sans-serif;
+          font-weight: 900;
+          font-size: clamp(1.6rem, 4vw, 3.1rem);
+          line-height: 1.02;
+          letter-spacing: -0.02em;
+          text-transform: uppercase;
+          color: #111a12;
+        }
+        .ab-kicker-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+          font-family: var(--font-geist-mono), monospace;
+          font-size: 0.85rem;
+          letter-spacing: 0.02em;
+          color: var(--color-accent-deep);
+          padding-bottom: 2px;
+          border-bottom: 1px solid rgba(47, 85, 39, 0.35);
+          transition: gap 200ms var(--ease-out), color 200ms ease;
+        }
+        .ab-kicker-link svg { width: 0.9rem; height: 0.9rem; }
+        .ab-kicker-link:hover { gap: 0.7rem; color: var(--color-accent); }
+
+        @media (max-width: 520px) {
+          .ab-kicker { flex-direction: column; align-items: flex-start; }
         }
       `}</style>
-    </SectionWrapper>
+    </section>
   );
 }

@@ -1,132 +1,334 @@
-import Link from "next/link";
-import { EVENT, NAV_LINKS } from "@/data/hackathon";
+"use client";
 
-const SECONDARY = [
-  { label: "Sponsors", href: "/sponsors" },
-  { label: "Code of Conduct", href: "/code-of-conduct" },
-  { label: "Team", href: "/team" },
-];
+import { gsap } from "gsap";
+import React, { useEffect, useRef } from "react";
+import { EVENT } from "@/data/hackathon";
+import WarpText from "@/components/ui/WarpText";
+
+interface CrowdCanvasProps {
+  src: string;
+  rows?: number;
+  cols?: number;
+}
+
+export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || typeof window === "undefined") return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const config = {
+      src,
+      rows,
+      cols,
+    };
+
+    // UTILS
+    const randomRange = (min: number, max: number) =>
+      min + Math.random() * (max - min);
+    // biome-ignore lint/suspicious/noExplicitAny: External tween data
+    const randomIndex = (array: any[]) => randomRange(0, array.length) | 0;
+    // biome-ignore lint/suspicious/noExplicitAny: External tween data
+    const removeFromArray = (array: any[], i: number) => array.splice(i, 1)[0];
+    // biome-ignore lint/suspicious/noExplicitAny: External tween data
+    const removeItemFromArray = (array: any[], item: any) =>
+      removeFromArray(array, array.indexOf(item));
+    // biome-ignore lint/suspicious/noExplicitAny: External tween data
+    const removeRandomFromArray = (array: any[]) =>
+      removeFromArray(array, randomIndex(array));
+    // biome-ignore lint/suspicious/noExplicitAny: External tween data
+    const getRandomFromArray = (array: any[]) => array[randomIndex(array) | 0];
+
+    // TWEEN FACTORIES
+    // biome-ignore lint/suspicious/noExplicitAny: External tween data
+    const resetPeep = ({ stage, peep }: { stage: any; peep: any }) => {
+      const direction = Math.random() > 0.5 ? 1 : -1;
+      const offsetY = 100 - 250 * gsap.parseEase("power2.in")(Math.random());
+      const startY = stage.height - peep.height + offsetY;
+      let startX: number;
+      let endX: number;
+
+      if (direction === 1) {
+        startX = -peep.width;
+        endX = stage.width;
+        peep.scaleX = 1;
+      } else {
+        startX = stage.width + peep.width;
+        endX = 0;
+        peep.scaleX = -1;
+      }
+
+      peep.x = startX;
+      peep.y = startY;
+      peep.anchorY = startY;
+
+      return {
+        startX,
+        startY,
+        endX,
+      };
+    };
+
+    // biome-ignore lint/suspicious/noExplicitAny: External tween data
+    const normalWalk = ({ peep, props }: { peep: any; props: any }) => {
+      const { startX, startY, endX } = props;
+      const xDuration = 10;
+      const yDuration = 0.25;
+
+      const tl = gsap.timeline();
+      tl.timeScale(randomRange(0.5, 1.5));
+      tl.to(
+        peep,
+        {
+          duration: xDuration,
+          x: endX,
+          ease: "none",
+        },
+        0,
+      );
+      tl.to(
+        peep,
+        {
+          duration: yDuration,
+          repeat: xDuration / yDuration,
+          yoyo: true,
+          y: startY - 10,
+        },
+        0,
+      );
+
+      return tl;
+    };
+
+    const walks = [normalWalk];
+
+    // TYPES
+    type Peep = {
+      image: HTMLImageElement;
+      rect: number[];
+      width: number;
+      height: number;
+      // biome-ignore lint/suspicious/noExplicitAny: Draw arguments
+      drawArgs: any[];
+      x: number;
+      y: number;
+      anchorY: number;
+      scaleX: number;
+      // biome-ignore lint/suspicious/noExplicitAny: Tween
+      walk: any;
+      setRect: (rect: number[]) => void;
+      render: (ctx: CanvasRenderingContext2D) => void;
+    };
+
+    // FACTORY FUNCTIONS
+    const createPeep = ({
+      image,
+      rect,
+    }: {
+      image: HTMLImageElement;
+      rect: number[];
+    }): Peep => {
+      const peep: Peep = {
+        image,
+        rect: [],
+        width: 0,
+        height: 0,
+        drawArgs: [],
+        x: 0,
+        y: 0,
+        anchorY: 0,
+        scaleX: 1,
+        walk: null,
+        setRect: (rect: number[]) => {
+          peep.rect = rect;
+          peep.width = rect[2];
+          peep.height = rect[3];
+          peep.drawArgs = [peep.image, ...rect, 0, 0, peep.width, peep.height];
+        },
+        render: (ctx: CanvasRenderingContext2D) => {
+          ctx.save();
+          ctx.translate(peep.x, peep.y);
+          ctx.scale(peep.scaleX, 1);
+          ctx.drawImage(
+            peep.image,
+            peep.rect[0],
+            peep.rect[1],
+            peep.rect[2],
+            peep.rect[3],
+            0,
+            0,
+            peep.width,
+            peep.height,
+          );
+          ctx.restore();
+        },
+      };
+
+      peep.setRect(rect);
+      return peep;
+    };
+
+    // MAIN
+    const img = new Image();
+    const stage = {
+      width: 0,
+      height: 0,
+    };
+
+    const allPeeps: Peep[] = [];
+    const availablePeeps: Peep[] = [];
+    const crowd: Peep[] = [];
+
+    const createPeeps = () => {
+      const { rows, cols } = config;
+      const { naturalWidth: width, naturalHeight: height } = img;
+      const total = rows * cols;
+      const rectWidth = width / rows;
+      const rectHeight = height / cols;
+
+      for (let i = 0; i < total; i++) {
+        allPeeps.push(
+          createPeep({
+            image: img,
+            rect: [
+              (i % rows) * rectWidth,
+              ((i / rows) | 0) * rectHeight,
+              rectWidth,
+              rectHeight,
+            ],
+          }),
+        );
+      }
+    };
+
+    const initCrowd = () => {
+      while (availablePeeps.length) {
+        addPeepToCrowd().walk.progress(Math.random());
+      }
+    };
+
+    const addPeepToCrowd = () => {
+      const peep = removeRandomFromArray(availablePeeps);
+      const walk = getRandomFromArray(walks)({
+        peep,
+        props: resetPeep({
+          peep,
+          stage,
+        }),
+      }).eventCallback("onComplete", () => {
+        removePeepFromCrowd(peep);
+        addPeepToCrowd();
+      });
+
+      peep.walk = walk;
+
+      crowd.push(peep);
+      crowd.sort((a, b) => a.anchorY - b.anchorY);
+
+      return peep;
+    };
+
+    const removePeepFromCrowd = (peep: Peep) => {
+      removeItemFromArray(crowd, peep);
+      availablePeeps.push(peep);
+    };
+
+    const render = () => {
+      if (!canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+
+      crowd.forEach((peep) => {
+        peep.render(ctx);
+      });
+
+      ctx.restore();
+    };
+
+    const resize = () => {
+      if (!canvas) return;
+      const dpr = window.devicePixelRatio || 1;
+      stage.width = canvas.clientWidth;
+      stage.height = canvas.clientHeight;
+      canvas.width = stage.width * dpr;
+      canvas.height = stage.height * dpr;
+
+      crowd.forEach((peep) => {
+        peep.walk?.kill();
+      });
+
+      crowd.length = 0;
+      availablePeeps.length = 0;
+      availablePeeps.push(...allPeeps);
+
+      initCrowd();
+    };
+
+    const init = () => {
+      createPeeps();
+      resize();
+      gsap.ticker.add(render);
+    };
+
+    img.onload = init;
+    img.src = config.src;
+
+    const handleResize = () => resize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      gsap.ticker.remove(render);
+      crowd.forEach((peep) => {
+        if (peep.walk) peep.walk.kill();
+      });
+    };
+  }, [src, rows, cols]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute bottom-0 h-full w-full pointer-events-none"
+    />
+  );
+};
 
 export default function Footer() {
   return (
-    <footer className="footer">
-      <div className="footer-inner">
-        <div className="footer-brand">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" className="footer-mark" aria-hidden="true">
-            <line x1="12" y1="4" x2="12" y2="20" />
-            <line x1="4" y1="12" x2="20" y2="12" />
-            <line x1="6.34" y1="6.34" x2="17.66" y2="17.66" />
-            <line x1="6.34" y1="17.66" x2="17.66" y2="6.34" />
-          </svg>
-          <p className="footer-wordmark">{EVENT.name}</p>
-          <p className="footer-tagline">{EVENT.tagline}</p>
-        </div>
-
-        <nav className="footer-cols" aria-label="Footer">
-          <div>
-            <p className="footer-col-label">Event</p>
-            {NAV_LINKS.map((l) => (
-              <Link key={l.href} href={l.href} className="footer-link">
-                {l.label}
-              </Link>
-            ))}
-          </div>
-          <div>
-            <p className="footer-col-label">More</p>
-            {SECONDARY.map((l) => (
-              <Link key={l.href} href={l.href} className="footer-link">
-                {l.label}
-              </Link>
-            ))}
-          </div>
-          <div>
-            <p className="footer-col-label">Elsewhere</p>
-            <a href={EVENT.discordUrl} target="_blank" rel="noopener noreferrer" className="footer-link">Discord</a>
-            <a href={EVENT.socials.x} target="_blank" rel="noopener noreferrer" className="footer-link">X</a>
-            <a href={EVENT.socials.instagram} target="_blank" rel="noopener noreferrer" className="footer-link">Instagram</a>
-            <a href={EVENT.socials.github} target="_blank" rel="noopener noreferrer" className="footer-link">GitHub</a>
-          </div>
-        </nav>
+    <footer className="relative h-screen w-full bg-[#EDF3E8] text-[#142617] overflow-hidden select-none">
+      {/* ── Giant WebGL WarpText Wordmark across the upper section ── */}
+      <div className="absolute top-[8%] sm:top-[12%] left-0 right-0 z-10 flex justify-center items-center px-4 pointer-events-auto">
+        <WarpText
+          text={EVENT.name}
+          color="#122415"
+          warpStrength={0.08}
+          warpScale={1.7}
+          speed={0.55}
+          pointerInfluence={0.42}
+          pointerStrength={0.38}
+          refraction={0.018}
+          ripple
+          fontSize="clamp(4.5rem, 16vw, 15rem)"
+          fontWeight={900}
+          fontFamily="var(--font-hiruko), var(--font-display), var(--font-geist-sans), sans-serif"
+          letterSpacing="clamp(0.04em, 1.2vw, 0.14em)"
+          style={{
+            width: "100%",
+            height: "clamp(160px, 25vw, 320px)",
+            pointerEvents: "auto",
+          }}
+        />
       </div>
 
-      <div className="footer-base">
-        <p>
-          © {new Date().getFullYear()} {EVENT.name}. {EVENT.format}.
-        </p>
-        <a href={`mailto:${EVENT.email}`} className="footer-link footer-email">
-          {EVENT.email}
-        </a>
+      {/* ── OpenPeeps Animated Crowd Canvas ── */}
+      <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
+        <CrowdCanvas src="/images/peeps/all-peeps.png" rows={15} cols={7} />
       </div>
-
-      <style>{`
-        .footer {
-          background: var(--color-bg-deep);
-          color: #dfe8d9;
-          padding: clamp(3rem, 7vw, 5rem) 0 2rem;
-        }
-        .footer-inner {
-          max-width: var(--max-width);
-          margin-inline: auto;
-          padding-inline: var(--padding-x);
-          display: grid;
-          gap: clamp(2.5rem, 6vw, 5rem);
-          grid-template-columns: 1fr;
-        }
-        .footer-mark { width: 1.5rem; height: 1.5rem; color: var(--color-accent-bright); }
-        .footer-wordmark {
-          margin-top: 0.9rem;
-          font-size: 1.35rem;
-          font-weight: 300;
-          letter-spacing: 0.14em;
-        }
-        .footer-tagline {
-          margin-top: 0.4rem;
-          max-width: 24ch;
-          color: #9cb195;
-          font-size: var(--font-size-sm);
-          line-height: var(--leading-relaxed);
-        }
-        .footer-cols {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 2rem;
-        }
-        .footer-col-label {
-          font-size: var(--font-size-xs);
-          text-transform: uppercase;
-          letter-spacing: var(--tracking-wider);
-          color: #6f8569;
-          margin-bottom: 0.9rem;
-        }
-        .footer-link {
-          display: block;
-          font-size: var(--font-size-sm);
-          color: #cfdcc8;
-          padding: 0.28rem 0;
-          transition: color 160ms ease;
-        }
-        .footer-link:hover { color: var(--color-accent-bright); }
-        .footer-base {
-          max-width: var(--max-width);
-          margin: clamp(2.5rem, 6vw, 4rem) auto 0;
-          padding: 1.5rem var(--padding-x) 0;
-          border-top: 1px solid rgba(255, 255, 255, 0.08);
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.75rem;
-          justify-content: space-between;
-          font-size: var(--font-size-xs);
-          color: #7e9377;
-        }
-        .footer-email { padding: 0; }
-
-        @media (min-width: 820px) {
-          .footer-inner { grid-template-columns: 1.1fr 1.4fr; }
-        }
-        @media (max-width: 520px) {
-          .footer-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        }
-      `}</style>
     </footer>
   );
 }

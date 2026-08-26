@@ -1,5 +1,6 @@
 import { EVENT } from "@/data/hackathon";
 import Reveal from "./Reveal";
+import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 
 export default function RegisterCTA() {
   return (
@@ -20,25 +21,22 @@ export default function RegisterCTA() {
               when you arrive.
             </p>
             <div className="cta-actions">
-              <a
+              <LiquidMetalButton
+                label="Register on Devfolio"
                 href={EVENT.devfolioUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary"
-              >
-                Register on Devfolio
-                <svg viewBox="0 0 24 24" className="btn-icon" aria-hidden="true">
-                  <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </a>
-              <a
+                width={190}
+                height={46}
+              />
+              <LiquidMetalButton
+                label="Join Discord"
                 href={EVENT.discordUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-glass"
-              >
-                Join Discord
-              </a>
+                width={145}
+                height={46}
+              />
             </div>
           </div>
         </Reveal>

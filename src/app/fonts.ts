@@ -19,3 +19,11 @@ export const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
 });
+
+export const hiruko = localFont({
+  src: "../../public/fonts/HirukoBlackAlternate.ttf",
+  weight: "900",
+  style: "normal",
+  display: "swap",
+  variable: "--font-hiruko",
+});

@@ -44,7 +44,39 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
 
+    // Hash links (the hero's "scroll for lore", the nav anchors) would otherwise
+    // hard-jump: `scroll-behavior: smooth` is off because Lenis owns scrolling.
+    // Delegate them to lenis.scrollTo so every in-page jump eases like the rest.
+    const onClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+      const anchor = (event.target as Element | null)?.closest?.("a");
+      if (!anchor) return;
+
+      const href = anchor.getAttribute("href");
+      if (!href) return;
+
+      // Same-page hashes only: "#themes" or "/#themes".
+      const hash = href.startsWith("#")
+        ? href
+        : href.startsWith("/#") && window.location.pathname === "/"
+          ? href.slice(1)
+          : null;
+      if (!hash || hash === "#") return;
+
+      const target = document.querySelector(hash);
+      if (!target) return;
+
+      event.preventDefault();
+      lenis.scrollTo(target as HTMLElement, { offset: 0 });
+      window.history.pushState(null, "", hash);
+    };
+
+    document.addEventListener("click", onClick);
+
     return () => {
+      document.removeEventListener("click", onClick);
       gsap.ticker.remove(tick);
       lenis.off('scroll', ScrollTrigger.update);
       lenis.destroy();

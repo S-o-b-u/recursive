@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { NAV_LINKS, EVENT } from "@/data/hackathon";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
+import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
@@ -50,23 +51,15 @@ export default function Navigation() {
                 ))}
               </div>
 
-              <LiquidGlassCard
-                glowIntensity="sm"
-                shadowIntensity="sm"
-                borderRadius="999px"
-                blurIntensity="sm"
-                tone="dark"
-                className="nav-cta-glass"
-              >
-                <a
-                  href={EVENT.devfolioUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="nav-cta"
-                >
-                  Register
-                </a>
-              </LiquidGlassCard>
+              <LiquidMetalButton
+                label="Register"
+                href={EVENT.devfolioUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                width={104}
+                height={38}
+                className="nav-cta-liquid-metal"
+              />
 
               {/* Mobile toggle */}
               <button
