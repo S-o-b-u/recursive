@@ -1,3 +1,4 @@
+import IntroSequence from "@/components/IntroSequence";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
 import ACM from "@/components/ACM";
@@ -9,6 +10,7 @@ import SponsorWall from "@/components/SponsorWall";
 export default function Home() {
   return (
     <main>
+      <IntroSequence />
       <Hero />
       <About />
       <ACM />

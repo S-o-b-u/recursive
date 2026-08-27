@@ -117,6 +117,12 @@ html {
   text-rendering: optimizeLegibility;
   font-optical-sizing: auto;
   /* NOTE: no `scroll-behavior: smooth` — Lenis owns scrolling. */
+
+  /* Always reserve the scrollbar gutter. Without this, any `overflow: hidden`
+     scroll lock (the intro) removes the classic scrollbar, the layout viewport
+     grows ~15px, and every `object-fit: cover` plate re-crops — which reads as
+     a sudden zoom + horizontal slide the moment the lock is taken or released. */
+  scrollbar-gutter: stable;
 }
 
 body {

@@ -4,6 +4,7 @@ import { ReactNode, useEffect, useRef } from 'react';
 import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { setLenis } from '@/lib/lenis';
 
 // Register once at module scope so every component that creates a
 // ScrollTrigger shares the same (idempotent) plugin instance.
@@ -34,6 +35,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       touchMultiplier: 2,
     });
     lenisRef.current = lenis;
+    setLenis(lenis);
 
     lenis.on('scroll', ScrollTrigger.update);
 
@@ -81,6 +83,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       lenis.off('scroll', ScrollTrigger.update);
       lenis.destroy();
       lenisRef.current = null;
+      setLenis(null);
     };
   }, []);
 

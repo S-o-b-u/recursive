@@ -4,6 +4,8 @@ import type { CSSProperties } from "react";
 import { JUDGES } from "@/data/hackathon";
 import { RevealHeading, RevealBlock, ParallaxY } from "@/components/ui/reveal";
 import MediaSlot from "@/components/ui/MediaSlot";
+import JudgeRevealCard from "@/components/ui/JudgeRevealCard";
+import Seal from "@/components/ui/Seal";
 
 /**
  * JUDGES — a pinboard, not a contact sheet.
@@ -13,8 +15,11 @@ import MediaSlot from "@/components/ui/MediaSlot";
  * on a table rather than a CMS query. Every card drifts at its own rate; hover
  * straightens the one you're looking at.
  *
- * Names stay empty in the data until each judge confirms — the caption falls
- * back to "To be announced" on its own.
+ * While NO judge is confirmed the whole board is cordoned off: the cards sit
+ * dimmed and blurred behind <Seal> — crossed barrier tape and an ink
+ * stamp. Confirm one judge (fill `name`, optionally `photo.src` in the data)
+ * and the seal lifts; each still-unconfirmed card falls back to its own
+ * <JudgeRevealCard> + "yet to reveal" caption.
  */
 const CARDS = [
   { c: "1 / 5", ratio: "4 / 5", drop: 0, rot: "-1.5deg", drift: 72 },
@@ -26,48 +31,77 @@ const CARDS = [
 ] as const;
 
 export default function Judges() {
+  const sealed = JUDGES.every(
+    (j) => j.name.trim().length === 0 && !j.photo.src,
+  );
+
   return (
     <section id="judges" className="jd" aria-label="Judges">
       <div className="jd-inner">
         <div className="jd-head">
           <RevealHeading className="jd-heading" lines={["The people", "judging this."]} />
           <RevealBlock className="jd-note" y={16} delay={0.2}>
-            <p>Names go up here as they confirm.</p>
+            <p>
+              {sealed
+                ? "The panel is set. The names stay sealed until the reveal."
+                : "Names go up here as they confirm."}
+            </p>
           </RevealBlock>
         </div>
 
-        <div className="jd-board">
-          {JUDGES.map((judge, i) => {
-            const card = CARDS[i % CARDS.length];
-            const named = judge.name.trim().length > 0;
+        <div className="jd-board-wrap" data-sealed={sealed ? "true" : "false"}>
+          <div className="jd-board">
+            {JUDGES.map((judge, i) => {
+              const card = CARDS[i % CARDS.length];
+              const named = judge.name.trim().length > 0;
+              const revealed = named || Boolean(judge.photo.src);
 
-            return (
-              <ParallaxY
-                key={judge.photo.expect}
-                className="jd-card"
-                distance={card.drift}
-                style={
-                  {
-                    "--c": card.c,
-                    "--drop": card.drop,
-                    "--rot": card.rot,
-                  } as CSSProperties
-                }
-              >
-                <MediaSlot
-                  slot={judge.photo}
-                  ratio={card.ratio}
-                  sizes="(max-width: 900px) 50vw, 30vw"
-                />
-                <div className="jd-cap">
-                  <span className="jd-name" data-empty={named ? "false" : "true"}>
-                    {named ? judge.name : "To be announced"}
-                  </span>
-                  {judge.role ? <span className="jd-role">{judge.role}</span> : null}
-                </div>
-              </ParallaxY>
-            );
-          })}
+              return (
+                <ParallaxY
+                  key={judge.photo.expect}
+                  className="jd-card"
+                  distance={card.drift}
+                  style={
+                    {
+                      "--c": card.c,
+                      "--drop": card.drop,
+                      "--rot": card.rot,
+                    } as CSSProperties
+                  }
+                >
+                  {revealed ? (
+                    <MediaSlot
+                      slot={judge.photo}
+                      ratio={card.ratio}
+                      sizes="(max-width: 900px) 50vw, 30vw"
+                    />
+                  ) : (
+                    <JudgeRevealCard ratio={card.ratio} index={i} />
+                  )}
+
+                  {/* While the whole board is sealed the stamp speaks for every
+                      card; a per-card caption would just fight it. */}
+                  {!sealed && (
+                    <div className="jd-cap">
+                      {named ? (
+                        <>
+                          <span className="jd-name">{judge.name}</span>
+                          {judge.role ? <span className="jd-role">{judge.role}</span> : null}
+                        </>
+                      ) : (
+                        <span className="jd-pending">
+                          <i className="jd-pending-dot" aria-hidden="true" />
+                          yet to reveal
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </ParallaxY>
+              );
+            })}
+          </div>
+
+          {sealed && <Seal word="PANEL SEALED" />}
         </div>
       </div>
 
@@ -116,13 +150,28 @@ export default function Judges() {
           text-wrap: pretty;
         }
 
-        .jd-board {
+        .jd-board-wrap {
+          position: relative;
           margin-top: clamp(3.5rem, 9vh, 6rem);
+        }
+
+        .jd-board {
           display: grid;
           grid-template-columns: repeat(12, minmax(0, 1fr));
           column-gap: clamp(1rem, 2.2vw, 1.8rem);
           row-gap: clamp(2rem, 5vw, 4rem);
           align-items: start;
+        }
+
+        /* Cordoned off: the pinboard sits behind the seal, dimmed and softened
+           so it reads as "roped off", and nothing under it responds to hover. */
+        .jd-board-wrap[data-sealed="true"] .jd-board {
+          filter: saturate(0.82) brightness(0.99) blur(1.4px);
+          opacity: 0.9;
+        }
+        .jd-board-wrap[data-sealed="true"] .jd-card { pointer-events: none; }
+        .jd-board-wrap[data-sealed="true"] .jd-card:hover {
+          transform: rotate(var(--rot));
         }
 
         .jd-card {
@@ -147,17 +196,49 @@ export default function Judges() {
           font-weight: 500;
           letter-spacing: -0.018em;
         }
-        .jd-name[data-empty="true"] {
-          font-family: var(--font-geist-mono), monospace;
-          font-size: 0.76rem;
-          font-weight: 400;
-          letter-spacing: 0.01em;
-          color: var(--color-text-tertiary);
-        }
         .jd-role {
           font-family: var(--font-geist-mono), monospace;
           font-size: 0.74rem;
           color: var(--color-text-secondary);
+        }
+
+        /* "yet to reveal" tag — mono, spaced, with a slow moss pulse. */
+        .jd-pending {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-family: var(--font-geist-mono), monospace;
+          font-size: 0.72rem;
+          font-weight: 450;
+          letter-spacing: 0.09em;
+          text-transform: uppercase;
+          color: var(--color-text-tertiary);
+        }
+        .jd-pending-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: var(--color-accent);
+          animation: jd-pending-pulse 2.6s var(--ease-out) infinite;
+        }
+        @keyframes jd-pending-pulse {
+          0%   { box-shadow: 0 0 0 0 rgba(92, 140, 58, 0.45); opacity: 1; }
+          70%  { box-shadow: 0 0 0 7px rgba(92, 140, 58, 0); opacity: 0.55; }
+          100% { box-shadow: 0 0 0 0 rgba(92, 140, 58, 0); opacity: 1; }
+        }
+
+        /* Hovering a card straightens it (below) and lets the reveal warm up:
+           the frost thins, the bust firms, the sprig leans. */
+        .jd-card:hover .jrc-veil { opacity: 0.55; }
+        .jd-card:hover .jrc-figure { opacity: 1; }
+        .jd-card:hover .jrc-q { opacity: 0.58; }
+        .jd-card:hover .jrc-sprig {
+          opacity: 0.9;
+          transform: translateY(-2px) rotate(-4deg);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .jd-pending-dot { animation: none; }
         }
 
         @media (max-width: 900px) {
@@ -170,7 +251,8 @@ export default function Judges() {
           }
           /* One ratio for everything once the columns are even, otherwise the
              portrait and square cards fight for row height. */
-          .jd-card .ms { aspect-ratio: 4 / 5 !important; }
+          .jd-card .ms,
+          .jd-card .jrc { aspect-ratio: 4 / 5 !important; }
         }
 
         @media (max-width: 520px) {

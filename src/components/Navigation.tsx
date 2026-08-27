@@ -6,6 +6,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { NAV_LINKS, EVENT } from "@/data/hackathon";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
+import NavLink from "@/components/ui/NavLink";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
@@ -31,7 +32,7 @@ export default function Navigation() {
           >
             <div className="nav-glass-pill-layout">
               {/* Brand mark — recursive asterisk */}
-              <Link href="/" className="nav-brand" aria-label={`${EVENT.name} — home`}>
+              <NavLink href="/" className="nav-brand" ariaLabel={`${EVENT.name} — home`}>
                 <span className="nav-logo-btn">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="nav-asterisk">
                     <line x1="12" y1="4" x2="12" y2="20" />
@@ -41,13 +42,11 @@ export default function Navigation() {
                   </svg>
                 </span>
                 <span className="nav-wordmark">{EVENT.name}</span>
-              </Link>
+              </NavLink>
 
               <div className="nav-desktop-links">
                 {NAV_LINKS.map((link) => (
-                  <Link key={link.href} href={link.href} className="nav-link">
-                    {link.label}
-                  </Link>
+                  <NavLink key={link.href} href={link.href} label={link.label} />
                 ))}
               </div>
 
@@ -86,6 +85,64 @@ export default function Navigation() {
           </LiquidGlassCard>
         </motion.div>
       </nav>
+
+      {/* Liquid ripple for the nav-link outline — referenced by CSS `filter` */}
+      <svg
+        className="nav-wave-defs"
+        width="0"
+        height="0"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <filter id="nav-wave" x="-30%" y="-30%" width="160%" height="160%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.022 0.05"
+            numOctaves="2"
+            seed="7"
+            result="noise"
+          >
+            <animate
+              attributeName="baseFrequency"
+              dur="7s"
+              values="0.022 0.05; 0.04 0.022; 0.022 0.05"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="noise"
+            scale="5.5"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+
+        {/* gentler ripple for the item's own text/label */}
+        <filter id="nav-wave-txt" x="-25%" y="-25%" width="150%" height="150%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.014 0.03"
+            numOctaves="2"
+            seed="4"
+            result="n"
+          >
+            <animate
+              attributeName="baseFrequency"
+              dur="5.5s"
+              values="0.014 0.03; 0.028 0.016; 0.014 0.03"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="n"
+            scale="1.8"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+      </svg>
 
       {/* Mobile glass sheet */}
       {menuOpen && (
@@ -139,11 +196,15 @@ export default function Navigation() {
         }
 
         .nav-brand {
+          position: relative;
+          isolation: isolate;
+          overflow: hidden;
+          border-radius: var(--radius-pill);
           display: flex;
           align-items: center;
           gap: 0.55rem;
           flex-shrink: 0;
-          padding-right: 0.3rem;
+          padding: 3px 0.55rem 3px 3px;
         }
         .nav-wordmark {
           font-family: var(--font-display), var(--font-geist-sans), sans-serif;
@@ -183,6 +244,9 @@ export default function Navigation() {
           padding-inline: 0.3rem;
         }
         .nav-link {
+          position: relative;
+          isolation: isolate;
+          overflow: hidden;
           font-size: 0.85rem;
           font-weight: 500;
           color: #3d4f3b;
@@ -194,6 +258,117 @@ export default function Navigation() {
         .nav-link:hover {
           color: var(--color-accent-deep);
           background-color: rgba(255, 255, 255, 0.5);
+        }
+        /* full static outline under the travelling highlight */
+        .nav-link.is-hovered,
+        .nav-link.is-tapped,
+        .nav-brand.is-hovered,
+        .nav-brand.is-tapped {
+          box-shadow: inset 0 0 0 1px rgba(92, 140, 58, 0.26);
+        }
+        .nav-brand.is-hovered {
+          background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* item content — ripples like the hero wordmark while active */
+        .nav-link-body {
+          position: relative;
+          z-index: 2;
+          display: inline-flex;
+          align-items: center;
+        }
+        .nav-brand .nav-link-body { gap: 0.55rem; }
+        .nav-link-txt { display: inline-block; }
+
+        .nav-link.is-hovered .nav-link-body,
+        .nav-brand.is-hovered .nav-link-body {
+          filter: url(#nav-wave-txt);
+        }
+        .nav-link.is-tapped .nav-link-body,
+        .nav-brand.is-tapped .nav-link-body {
+          filter: url(#nav-wave-txt);
+        }
+
+        /* Liquid outline — a conic-gradient border that lights up, spins on
+           hover, and ripples through the #nav-wave turbulence filter. */
+        @property --nav-a {
+          syntax: "<angle>";
+          initial-value: 0deg;
+          inherits: false;
+        }
+        .nav-link-ring {
+          position: absolute;
+          inset: 0;
+          z-index: 3;
+          border-radius: var(--radius-pill);
+          padding: 1.5px;
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 200ms var(--ease-out);
+          background: conic-gradient(
+            from var(--nav-a),
+            rgba(143, 196, 90, 0) 0deg,
+            var(--color-accent-bright) 55deg,
+            #eef8df 100deg,
+            var(--color-accent) 160deg,
+            rgba(143, 196, 90, 0) 240deg,
+            rgba(143, 196, 90, 0) 360deg
+          );
+          -webkit-mask:
+            linear-gradient(#000 0 0) content-box,
+            linear-gradient(#000 0 0);
+          -webkit-mask-composite: xor;
+          mask:
+            linear-gradient(#000 0 0) content-box,
+            linear-gradient(#000 0 0);
+          mask-composite: exclude;
+        }
+        .nav-link.is-hovered .nav-link-ring,
+        .nav-brand.is-hovered .nav-link-ring {
+          opacity: 0.85;
+          animation: nav-ring-spin 2.4s linear infinite;
+          filter: url(#nav-wave) drop-shadow(0 0 4px rgba(143, 196, 90, 0.45));
+        }
+        .nav-link.is-tapped .nav-link-ring,
+        .nav-brand.is-tapped .nav-link-ring {
+          opacity: 1;
+          animation: nav-ring-spin 0.7s linear infinite;
+          filter: url(#nav-wave) drop-shadow(0 0 6px rgba(143, 196, 90, 0.6));
+        }
+        @keyframes nav-ring-spin {
+          to { --nav-a: 360deg; }
+        }
+
+        .nav-link-ripple {
+          position: absolute;
+          z-index: 1;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          pointer-events: none;
+          transform: translate(-50%, -50%) scale(0);
+          background: radial-gradient(
+            circle,
+            rgba(143, 196, 90, 0.55) 0%,
+            rgba(143, 196, 90, 0) 70%
+          );
+          animation: nav-link-ripple 0.62s var(--ease-out) forwards;
+        }
+        @keyframes nav-link-ripple {
+          to { transform: translate(-50%, -50%) scale(7); opacity: 0; }
+        }
+
+        .nav-wave-defs { position: absolute; width: 0; height: 0; }
+
+        @media (prefers-reduced-motion: reduce) {
+          .nav-link.is-hovered .nav-link-ring,
+          .nav-link.is-tapped .nav-link-ring,
+          .nav-brand.is-hovered .nav-link-ring,
+          .nav-brand.is-tapped .nav-link-ring {
+            animation: none;
+            filter: none;
+          }
+          .nav-link-ripple { display: none; }
         }
         
         .nav-cta-glass {

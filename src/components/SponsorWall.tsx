@@ -9,6 +9,8 @@ import {
   RuleDraw,
 } from "@/components/ui/reveal";
 import MediaSlot from "@/components/ui/MediaSlot";
+import SponsorRevealCard from "@/components/ui/SponsorRevealCard";
+import SponsorVeil from "@/components/ui/SponsorVeil";
 
 /**
  * SPONSOR WALL — a broken mosaic on six columns.
@@ -34,6 +36,8 @@ const CELLS = [
 ] as const;
 
 export default function SponsorWall() {
+  const sealed = SPONSOR_SLOTS.every((slot) => !slot.src);
+
   return (
     <section id="sponsors" className="sp" aria-label="Sponsors">
       <div className="sp-inner">
@@ -41,7 +45,11 @@ export default function SponsorWall() {
           <RevealHeading className="sp-heading" lines={["Sponsors."]} />
 
           <RevealBlock className="sp-note" y={16} delay={0.18}>
-            <p>Logos land here as they sign.</p>
+            <p>
+              {sealed
+                ? "The backers are lined up. Names stay sealed until the reveal."
+                : "Logos land here as they sign."}
+            </p>
             <a href={`mailto:${EVENT.email}`} className="sp-link">
               back this one
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -60,26 +68,34 @@ export default function SponsorWall() {
 
         <RuleDraw className="sp-rule" />
 
-        <div className="sp-wall">
-          {SPONSOR_SLOTS.map((slot, i) => {
-            const cell = CELLS[i % CELLS.length];
+        <div className="sp-wall-wrap" data-sealed={sealed ? "true" : "false"}>
+          <div className="sp-wall">
+            {SPONSOR_SLOTS.map((slot, i) => {
+              const cell = CELLS[i % CELLS.length];
 
-            return (
-              <ParallaxY
-                key={slot.expect}
-                className="sp-cell"
-                distance={cell.drift}
-                style={{ "--c": cell.c, "--r": cell.r } as CSSProperties}
-              >
-                <MediaSlot
-                  slot={slot}
-                  ratio={cell.ratio}
-                  fit="contain"
-                  sizes="(max-width: 780px) 50vw, 33vw"
-                />
-              </ParallaxY>
-            );
-          })}
+              return (
+                <ParallaxY
+                  key={slot.expect}
+                  className="sp-cell"
+                  distance={cell.drift}
+                  style={{ "--c": cell.c, "--r": cell.r } as CSSProperties}
+                >
+                  {slot.src ? (
+                    <MediaSlot
+                      slot={slot}
+                      ratio={cell.ratio}
+                      fit="contain"
+                      sizes="(max-width: 780px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <SponsorRevealCard ratio={cell.ratio} index={i} />
+                  )}
+                </ParallaxY>
+              );
+            })}
+          </div>
+
+          {sealed && <SponsorVeil />}
         </div>
       </div>
 
@@ -152,14 +168,27 @@ export default function SponsorWall() {
           background: rgba(47, 85, 39, 0.26);
         }
 
-        .sp-wall {
+        .sp-wall-wrap {
+          position: relative;
           margin-top: clamp(2.5rem, 6vh, 4.5rem);
+        }
+
+        .sp-wall {
           display: grid;
           grid-template-columns: repeat(6, minmax(0, 1fr));
           column-gap: clamp(0.9rem, 2vw, 1.6rem);
           row-gap: clamp(1.5rem, 4vw, 3rem);
           align-items: start;
         }
+
+        /* Racked out of focus, the same way the intro blurs its content — the
+           blur is on the cards themselves, so there's no blurred-rectangle
+           edge. Nothing under it responds to hover. */
+        .sp-wall-wrap[data-sealed="true"] .sp-wall {
+          filter: blur(6px) saturate(0.9) brightness(1.01);
+          opacity: 0.9;
+        }
+        .sp-wall-wrap[data-sealed="true"] .sp-cell { pointer-events: none; }
 
         .sp-cell {
           grid-column: var(--c);
