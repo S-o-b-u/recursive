@@ -58,8 +58,8 @@ export default function PageHeader({
           padding-bottom: clamp(4.5rem, 11vw, 8rem);
           color: #EFF3EB;
           background:
-            radial-gradient(120% 80% at 50% 0%, #16281A 0%, rgba(16, 27, 18, 0) 60%),
-            linear-gradient(180deg, #101B12 0%, #101B12 58%, var(--color-bg) 100%);
+            radial-gradient(120% 80% at 50% 0%, #162e1c 0%, rgba(13, 25, 16, 0) 65%),
+            #0d1910;
         }
         /* Hill silhouette from the hero scene, sunk into the dark. */
         .ph-hill {

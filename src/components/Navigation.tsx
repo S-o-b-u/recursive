@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { NAV_LINKS, EVENT } from "@/data/hackathon";
@@ -12,7 +12,28 @@ const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export default function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [introActive, setIntroActive] = useState(false);
   const reduced = useReducedMotion();
+
+  useEffect(() => {
+    const isHome = window.location.pathname === "/";
+    const isIntroDisabled = new URLSearchParams(window.location.search).get("intro") === "0";
+    const isIntroDone = document.documentElement.dataset.intro === "done";
+
+    if (isHome && !isIntroDisabled && !isIntroDone) {
+      setIntroActive(true);
+    }
+
+    const handleIntroDone = () => {
+      setIntroActive(false);
+    };
+
+    window.addEventListener("intro:done", handleIntroDone);
+
+    return () => {
+      window.removeEventListener("intro:done", handleIntroDone);
+    };
+  }, []);
 
   return (
     <>
@@ -20,8 +41,8 @@ export default function Navigation() {
         <motion.div
           className="nav-glass-container"
           initial={reduced ? false : { y: -22, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: reduced ? 0 : 0.7, ease: EASE_OUT, delay: reduced ? 0 : 0.2 }}
+          animate={{ y: introActive ? -22 : 0, opacity: introActive ? 0 : 1 }}
+          transition={{ duration: reduced ? 0 : 0.7, ease: EASE_OUT, delay: reduced || introActive ? 0 : 0.2 }}
         >
           <LiquidGlassCard
             glowIntensity="sm"
@@ -180,6 +201,16 @@ export default function Navigation() {
           display: flex;
           justify-content: center;
           pointer-events: none; /* only the pill catches clicks */
+          transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
+        }
+
+        .nav-root[data-intro-active="true"],
+        html[data-intro="playing"] .nav-root,
+        html[data-intro="pending"] .nav-root {
+          opacity: 0 !important;
+          visibility: hidden !important;
+          pointer-events: none !important;
+          transform: translateY(-24px) !important;
         }
 
         .nav-glass-container {

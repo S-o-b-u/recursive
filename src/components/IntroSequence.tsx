@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
@@ -56,16 +57,15 @@ const LINES: Line[] = [
   { words: ["Let's", "find", "out."] },
 ];
 
-// [enter, exit] in seconds. Short lines read fast; line 4 (the long one) gets
-// extra room. Exits are quick and accelerate away, so the outgoing line is
-// essentially gone by the time the next one starts — no smear between beats.
+// [enter, exit] in seconds. Slower, more atmospheric pacing gives each beat
+// ample room to breathe.
 const CUES: [number, number][] = [
-  [0.15, 0.95],
-  [1.15, 2.0],
-  [2.2, 3.2],
-  [3.45, 4.95],
-  [5.2, 6.1],
-  [6.35, 7.3],
+  [0.25, 1.6],
+  [1.95, 3.4],
+  [3.75, 5.2],
+  [5.55, 7.7],
+  [8.05, 9.6],
+  [9.95, 11.4],
 ];
 
 const WARP_RADIUS = 250;
@@ -105,6 +105,7 @@ export default function IntroSequence() {
   const gradeRef = useRef<HTMLDivElement>(null);
   const bloomRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
+  const branchesRef = useRef<HTMLDivElement>(null);
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const bailRef = useRef<(() => void) | null>(null);
@@ -140,6 +141,10 @@ export default function IntroSequence() {
     }
 
     setPhase("done");
+    if (typeof document !== "undefined") {
+      document.documentElement.dataset.intro = "done";
+      window.dispatchEvent(new CustomEvent("intro:done"));
+    }
     requestAnimationFrame(() => {
       const l = getLenis();
       if (l) l.scrollTo(0, { immediate: true, force: true });
@@ -165,6 +170,8 @@ export default function IntroSequence() {
 
     if (force === "0") {
       doneRef.current = true;
+      document.documentElement.dataset.intro = "done";
+      window.dispatchEvent(new CustomEvent("intro:done"));
       setPhase("done");
       return;
     }
@@ -179,10 +186,13 @@ export default function IntroSequence() {
 
     if (force !== "1" && (reduce || seen)) {
       doneRef.current = true;
+      document.documentElement.dataset.intro = "done";
+      window.dispatchEvent(new CustomEvent("intro:done"));
       setPhase("done");
       return;
     }
 
+    document.documentElement.dataset.intro = "playing";
     setPhase("playing");
   }, []);
 
@@ -412,7 +422,7 @@ export default function IntroSequence() {
           scale: 1,
           yPercent: 0,
           filter: "brightness(1) saturate(1) contrast(1)",
-          duration: 7.4,
+          duration: 11.4,
           ease: "sine.inOut",
         },
         0,
@@ -422,11 +432,33 @@ export default function IntroSequence() {
       tl.fromTo(
         focus,
         { filter: "blur(9px)" },
-        { filter: "blur(0px)", duration: 4.4, ease: "sine.out" },
+        { filter: "blur(0px)", duration: 6.2, ease: "sine.out" },
         0,
       );
-      tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 6.9, ease: "sine.inOut" }, 0.3);
-      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 7.0, ease: "none" }, 0);
+      tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 10.6, ease: "sine.inOut" }, 0.3);
+      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 11.2, ease: "none" }, 0);
+
+      // Continuous Thick Dual Mossy Tree Branch Seam:
+      // Invisible at the very start, then smoothly emerges after the opening line (at t = 1.95s).
+      const branches = branchesRef.current;
+      if (branches) {
+        tl.fromTo(
+          branches,
+          {
+            opacity: 0,
+            yPercent: 12,
+            filter: "brightness(0.4) saturate(0.6) blur(6px)",
+          },
+          {
+            opacity: 1,
+            yPercent: 0,
+            filter: "brightness(1) saturate(1) blur(0px)",
+            duration: 5.2,
+            ease: "power2.out",
+          },
+          1.95,
+        );
+      }
 
       lines.forEach((el, i) => {
         const [tin, tout] = CUES[i];
@@ -439,13 +471,13 @@ export default function IntroSequence() {
             opacity: 1,
             yPercent: 0,
             filter: "blur(0px)",
-            duration: 0.62,
+            duration: 0.72,
             ease: "power2.out",
-            stagger: 0.05,
+            stagger: 0.06,
           },
           tin,
         );
-        tl.call(activateLine, [i], tin + 0.45);
+        tl.call(activateLine, [i], tin + 0.55);
 
         if (i < lines.length - 1) {
           tl.to(
@@ -454,9 +486,9 @@ export default function IntroSequence() {
               opacity: 0,
               yPercent: -16,
               filter: "blur(4px)",
-              duration: 0.36,
+              duration: 0.42,
               ease: "power1.in",
-              stagger: 0.022,
+              stagger: 0.025,
             },
             tout,
           );
@@ -465,40 +497,37 @@ export default function IntroSequence() {
 
       // ── Hand-off ──────────────────────────────────────────────────────────
       // 1. Warm the hero's plate ~1s ahead (playing, roughly aligned, buffered).
-      tl.call(warmHeroPlate, undefined, 6.6);
-      tl.call(deactivateLines, undefined, 7.05);
+      tl.call(warmHeroPlate, undefined, 10.5);
+      tl.call(deactivateLines, undefined, 11.1);
 
       // 2. Last line eases out on its own (not yanked by the scene fade).
       const lastWords = lines[lines.length - 1].querySelectorAll<HTMLElement>(".intro-word");
       tl.to(
         lastWords,
-        { opacity: 0, yPercent: -14, filter: "blur(6px)", duration: 0.8, ease: "sine.inOut", stagger: 0.04 },
-        7.15,
+        { opacity: 0, yPercent: -14, filter: "blur(6px)", duration: 0.9, ease: "sine.inOut", stagger: 0.04 },
+        11.25,
       );
 
       // 3. A soft dawn glow rises from the hill line — masks the seam, then recedes.
       tl.fromTo(
         bloom,
         { opacity: 0, scale: 1.12 },
-        { opacity: 1, scale: 1, duration: 1.0, ease: "sine.inOut" },
-        7.25,
+        { opacity: 1, scale: 1, duration: 1.1, ease: "sine.inOut" },
+        11.4,
       );
 
       // 4. Freeze BOTH plates on the same frame, then dissolve between them —
       //    two paused videos cannot drift, so the grass does not shimmer. The
       //    0.15s gap lets the hero settle on the seeked frame behind the still-
       //    opaque scene. finish() resumes the hero plate.
-      // Pin the plate to exact identity before the crossfade — the climb ends
-      // here anyway, but this guarantees no residual transform can offset it
-      // against the hero (that was the "not synced" double image).
-      tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 7.4);
-      tl.set(focus, { clearProps: "filter" }, 7.4);
-      tl.call(freezePlates, undefined, 7.4);
-      tl.to(scene, { autoAlpha: 0, duration: 0.9, ease: "sine.inOut" }, 7.55);
-      tl.set(root, { pointerEvents: "none" }, 7.9);
+      tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 11.55);
+      tl.set(focus, { clearProps: "filter" }, 11.55);
+      tl.call(freezePlates, undefined, 11.55);
+      tl.to(scene, { autoAlpha: 0, duration: 1.0, ease: "sine.inOut" }, 11.7);
+      tl.set(root, { pointerEvents: "none" }, 12.0);
 
       // 5. Glow recedes over the settled landing page.
-      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 1.15, ease: "power1.inOut" }, 7.95);
+      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 1.2, ease: "power1.inOut" }, 12.1);
     }, root);
 
     const tl = tlRef.current!;
@@ -551,9 +580,11 @@ export default function IntroSequence() {
 
       const words = root.querySelectorAll<HTMLElement>(".intro-word");
       const wordInners = root.querySelectorAll<HTMLElement>(".intro-word-i");
+      const branchImgs = root.querySelectorAll<HTMLElement>(".intro-branch");
       gsap.killTweensOf([scene, bloom, media, focus, grade, bar]);
       gsap.killTweensOf(words);
       gsap.killTweensOf(wordInners);
+      gsap.killTweensOf(branchImgs);
       gsap.set(wordInners, { clearProps: "transform,textShadow" });
 
       warmHeroPlate();
@@ -564,6 +595,7 @@ export default function IntroSequence() {
       // the scene dissolves between two frozen frames into the hero. ~1.7s.
       const q = gsap.timeline({ onComplete: finish });
       q.to(words, { autoAlpha: 0, yPercent: -16, filter: "blur(6px)", duration: 0.28, ease: "power2.in" }, 0);
+      q.to(branchImgs, { autoAlpha: 0, scale: 1.04, duration: 0.35, ease: "sine.in" }, 0);
       q.to(
         media,
         {
@@ -647,6 +679,39 @@ export default function IntroSequence() {
         </div>
 
         <div ref={gradeRef} className="intro-grade" aria-hidden="true" />
+
+        {/* Continuous Thick Dual Mossy Tree Branch Seam (matching post-animation About seam) */}
+        <div ref={branchesRef} className="intro-seam-branch" aria-hidden="true">
+          <div className="intro-seam-branch-track">
+            <Image
+              src="/images/other/gacher er dal.png"
+              alt=""
+              width={1400}
+              height={380}
+              className="intro-branch-seg intro-branch-left"
+              priority
+            />
+            {/* Center moss backing to seal the hollow arch completely */}
+            <div className="intro-branch-center-moss">
+              <Image
+                src="/images/other/gacher er dal.png"
+                alt=""
+                width={1000}
+                height={280}
+                className="intro-branch-center-img"
+                priority
+              />
+            </div>
+            <Image
+              src="/images/other/gacher er dal.png"
+              alt=""
+              width={1400}
+              height={380}
+              className="intro-branch-seg intro-branch-right"
+              priority
+            />
+          </div>
+        </div>
 
         <div className="intro-captions">
           {LINES.map((line, i) => (
@@ -777,6 +842,98 @@ export default function IntroSequence() {
               rgba(214, 230, 196, 0.08) 58%,
               rgba(214, 230, 196, 0) 78%),
             linear-gradient(0deg, rgba(255, 240, 208, 0.14) 0%, rgba(255, 240, 208, 0) 42%);
+        }
+
+        /* ── Continuous Thick Dual Branch spanning full-bleed across bottom seam (matching About section) ── */
+        .intro-seam-branch {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          transform: translateY(50%);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 6;
+          pointer-events: none;
+          user-select: none;
+          overflow: visible;
+          opacity: 0;
+        }
+
+        .intro-seam-branch-track {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 114vw;
+          min-width: 114vw;
+          margin-left: clamp(0rem, 3.5vw, 4rem);
+        }
+
+        .intro-branch-seg {
+          flex: 1 1 56%;
+          min-width: 780px;
+          height: auto;
+          max-height: clamp(190px, 30vw, 420px);
+          object-fit: contain;
+          filter: drop-shadow(0 26px 48px rgba(14, 24, 16, 0.42));
+        }
+
+        .intro-branch-left {
+          margin-right: -5vw;
+          transform: scale(1.16) translateZ(0);
+        }
+
+        .intro-branch-right {
+          transform: scaleX(-1) scale(1.16) translateZ(0);
+          margin-left: -5vw;
+        }
+
+        /* Center moss backing that completely fills the hollow arch */
+        .intro-branch-center-moss {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -46%) rotate(180deg) scale(0.95);
+          width: 52vw;
+          min-width: 680px;
+          max-width: 960px;
+          z-index: -1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          opacity: 0.98;
+          filter: brightness(0.92) contrast(1.06);
+          pointer-events: none;
+        }
+
+        .intro-branch-center-img {
+          width: 100%;
+          height: auto;
+          object-fit: contain;
+        }
+
+        @media (max-width: 768px) {
+          .intro-seam-branch-track {
+            width: 145vw;
+            min-width: 145vw;
+            margin-left: -22.5vw;
+          }
+          .intro-branch-seg {
+            min-width: 540px;
+            max-height: clamp(150px, 42vw, 240px);
+          }
+          .intro-branch-left {
+            transform: scale(1.18) translateZ(0);
+          }
+          .intro-branch-right {
+            transform: scaleX(-1) scale(1.18) translateZ(0);
+          }
+          .intro-branch-center-moss {
+            width: 75vw;
+            min-width: 480px;
+          }
         }
 
         .intro-captions {

@@ -301,8 +301,17 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
 export default function Footer() {
   return (
     <footer className="relative h-screen w-full bg-[#EDF3E8] text-[#142617] overflow-hidden select-none">
+      {/* ── Dawn horizon ──────────────────────────────────────────────────
+          The sections above end in deep forest dark; the footer is sage light.
+          Left alone that meets as a hard line. These two layers dissolve it:
+          the band starts at the exact forest colour (so the seam vanishes) and
+          melts down into the sage, while a warm glow lifts over the seam like
+          the sun cresting the hill — the same dawn that closes the intro. */}
+      <div className="ftr-dawn" aria-hidden="true" />
+      <div className="ftr-dawn-glow" aria-hidden="true" />
+
       {/* ── Giant WebGL WarpText Wordmark across the upper section ── */}
-      <div className="absolute top-[8%] sm:top-[12%] left-0 right-0 z-10 flex justify-center items-center px-4 pointer-events-auto">
+      <div className="absolute top-[27%] sm:top-[26%] left-0 right-0 z-10 flex justify-center items-center px-4 pointer-events-auto">
         <WarpText
           text={EVENT.name}
           color="#122415"
@@ -329,6 +338,53 @@ export default function Footer() {
       <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
         <CrowdCanvas src="/images/peeps/all-peeps.png" rows={15} cols={7} />
       </div>
+
+      <style href="footer-dawn" precedence="default">{`
+        /* Deep-forest at the very top (pixel-matched to the sections above so
+           there is no seam), melting down into the sage footer. */
+        .ftr-dawn {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 46vh;
+          z-index: 1;
+          pointer-events: none;
+          background: linear-gradient(
+            180deg,
+            #0d1910 0%,
+            #0d1910 5%,
+            rgba(15, 30, 19, 0.9) 14%,
+            rgba(24, 44, 29, 0.56) 26%,
+            rgba(92, 120, 74, 0.18) 40%,
+            rgba(200, 214, 175, 0.05) 58%,
+            rgba(237, 243, 232, 0) 78%
+          );
+        }
+        /* Warm dawn cresting the ridge — screen-blended so it only adds light. */
+        .ftr-dawn-glow {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 52vh;
+          z-index: 2;
+          pointer-events: none;
+          mix-blend-mode: screen;
+          background:
+            radial-gradient(88% 58% at 50% 2%,
+              rgba(255, 228, 164, 0.50) 0%,
+              rgba(255, 216, 150, 0.22) 28%,
+              rgba(226, 236, 198, 0.06) 54%,
+              transparent 72%),
+            linear-gradient(180deg,
+              rgba(255, 238, 198, 0.14) 0%,
+              rgba(255, 238, 198, 0) 32%);
+        }
+        @media (prefers-reduced-transparency: reduce) {
+          .ftr-dawn-glow { display: none; }
+        }
+      `}</style>
     </footer>
   );
 }

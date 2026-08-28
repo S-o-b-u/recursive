@@ -8,14 +8,11 @@ export const EVENT = {
   name: "RECURSIVE",
   tagline: "Where ideas branch, evolve, and bloom.",
   edition: "Hackathon 2026",
-  // TODO: PLACEHOLDER DATE. `dates` is the display string, `startsAt` is what the
-  // countdown counts to — change both together. Dec 11 2026 is a Friday, so the
-  // Fri→Sun schedule below lines up.
-  dates: "December 11 – 13, 2026",
-  startsAt: "2026-12-11T09:00:00+05:30",
-  duration: "36 hours",
+  dates: "October 8, 2026",
+  startsAt: "2026-10-08T09:00:00+05:30",
+  duration: "8 hours",
   format: "In person · Kolkata, India",
-  venue: "To be announced",
+  venue: "Guru Nanak Institute of Technology, Kolkata",
   teamSize: "1 – 4 builders",
   seats: 4, // the four chairs on the hill
   // TODO: swap in the real links before launch.
@@ -43,22 +40,21 @@ export type Slot = {
 
 /**
  * The chapter running the event.
- * TODO: verify the college name, city and founding year before launch — these
- * were carried over from the earlier draft, not confirmed.
  */
 export const COLLEGE = {
   chapter: "ACM Student Chapter",
-  college: "Netaji Subhash Engineering College",
-  collegeShort: "NSEC",
+  college: "Guru Nanak Institute of Technology",
+  collegeShort: "GNIT",
+  department: "Department of Information Technology",
   city: "Kolkata",
   acmFounded: "1947",
 } as const;
 
-/** College / chapter logos. Fill `src` once the files are in /public. */
+/** College / chapter logos. */
 export const COLLEGE_LOGOS: Slot[] = [
-  { label: "College logo", expect: "/images/college/nsec.png", src: "" },
-  { label: "ACM chapter logo", expect: "/images/college/acm-chapter.png", src: "" },
-  { label: "ACM logo", expect: "/images/college/acm.png", src: "" },
+  { label: "GNIT", expect: "/images/gnit-logos/GNIT.png", src: "/images/gnit-logos/GNIT.png" },
+  { label: "GNIT ACM Student Chapter", expect: "/images/gnit-logos/gnit-acm.png", src: "/images/gnit-logos/gnit-acm.png" },
+  { label: "ACM", expect: "/images/gnit-logos/ACM2.png", src: "/images/gnit-logos/ACM2.png" },
 ];
 
 export type Track = {
@@ -80,59 +76,63 @@ export type Track = {
  */
 export const TRACKS: Track[] = [
   {
-    slug: "generative-nature",
-    title: "Generative Nature",
+    slug: "aiml",
+    title: "AI & Machine Learning",
     seat: "Seat 01",
-    line: "Simple rules, repeated, until something grows.",
-    media: { label: "Generative Nature", expect: "/images/themes/generative.jpg", src: "" },
+    line: "Autonomous intelligence, generative pipelines, and self-evolving models.",
+    media: { label: "AI & Machine Learning", expect: "/images/themes/generative.jpg", src: "" },
     summary:
-      "Systems that grow. Recursion, L-systems, cellular automata, agents that evolve their own rules — anything where a simple instruction repeated becomes something beautiful.",
+      "Build the next frontier of intelligence. Autonomous agentic pipelines, multimodal generative models, neural search, real-time computer vision, and systems that learn and adapt.",
     prompts: [
-      "Procedural worlds that never repeat",
-      "Creative tools built on generative grammars",
-      "Agentic pipelines that refine their own output",
+      "Autonomous Multi-Agent Workflows",
+      "Multimodal Generative Creation Tools",
+      "Edge AI & Real-time Neural Inference",
+      "LLM Tooling & Automated Reasoning",
     ],
   },
   {
-    slug: "climate-regeneration",
-    title: "Climate & Regeneration",
+    slug: "cybersec",
+    title: "CyberSecurity & Privacy",
     seat: "Seat 02",
-    line: "Software for soil, air, water and the people counting it.",
-    media: { label: "Climate & Regeneration", expect: "/images/themes/climate.jpg", src: "" },
+    line: "Zero-trust defenses, cryptographic proofs, and resilient infrastructure.",
+    media: { label: "CyberSecurity & Privacy", expect: "/images/themes/climate.jpg", src: "" },
     summary:
-      "Software for the living world. Measure, restore, or protect — from soil sensors to supply-chain transparency to tools that make climate data legible.",
+      "Fortify digital frontiers. Build zero-trust architectures, automated threat detection engines, zero-knowledge cryptographic systems, and privacy-preserving protocols.",
     prompts: [
-      "Making emissions data actually usable",
-      "Community tooling for restoration projects",
-      "Low-power sensing for farms and forests",
+      "Zero-Knowledge Proofs & Privacy Layers",
+      "Automated Vulnerability & Threat Hunting",
+      "Decentralized Identity & Auth Systems",
+      "Next-Gen Network Security & Honeypots",
     ],
   },
   {
-    slug: "open-web",
-    title: "Open Web & Dev Tools",
+    slug: "fintech",
+    title: "FinTech & Web3",
     seat: "Seat 03",
-    line: "Sharpen the tools the rest of us build with.",
-    media: { label: "Open Web & Dev Tools", expect: "/images/themes/openweb.jpg", src: "" },
+    line: "Decentralized liquidity, intelligent markets, and modern payments.",
+    media: { label: "FinTech & Web3", expect: "/images/themes/openweb.jpg", src: "" },
     summary:
-      "Sharpen the tools everyone builds with. Compilers, debuggers, protocols, editors, local-first sync — infrastructure that other people's ideas can root into.",
+      "Rethink the velocity of value. Decentralized finance protocols, high-frequency algorithmic market tooling, biometric payment rails, and autonomous financial agents.",
     prompts: [
-      "Local-first apps that survive the network",
-      "Developer experience nobody has fixed yet",
-      "Protocols for a less centralised web",
+      "Smart Contract Auditing & Security",
+      "Programmable Micro-Payments & Streams",
+      "Decentralized Liquidity & Prediction Markets",
+      "Fraud Detection with Graph Neural Nets",
     ],
   },
   {
-    slug: "wildcard",
-    title: "Wildcard",
+    slug: "open-innovation",
+    title: "Open Innovation",
     seat: "Seat 04",
-    line: "The idea that kept you up. Bring that one.",
-    media: { label: "Wildcard", expect: "/images/themes/wildcard.mp4", src: "", kind: "video" },
+    line: "Hardware hacking, biotech, wild ideas, and boundary-breaking craft.",
+    media: { label: "Open Innovation", expect: "/images/themes/wildcard.mp4", src: "", kind: "video" },
     summary:
-      "Anything that grows. If it doesn't fit a track but it made you stay up until 4am, it belongs here. Judged on originality and craft, nothing else.",
+      "Anything that grows. BioTech, IoT & hardware, weird developer tools, sensory interfaces, or the idea that kept you up until 4am. Judged on pure creativity and engineering craft.",
     prompts: [
-      "The idea you couldn't stop thinking about",
-      "Hardware, games, art, weird interfaces",
-      "Something genuinely new",
+      "Hardware, IoT & Sensor Networks",
+      "BioTech & Environmental Intelligence",
+      "Novel Developer Tooling & Languages",
+      "Experimental Games & Spatial Interfaces",
     ],
   },
 ];
@@ -172,38 +172,17 @@ export type ScheduleDay = {
 
 export const SCHEDULE: ScheduleDay[] = [
   {
-    day: "Day 01",
-    date: "Friday, December 11",
+    day: "October 8",
+    date: "Thursday, October 8, 2026",
     items: [
       { time: "09:00", title: "Check-in & breakfast", note: "Badges, swag, and the first coffee." },
-      { time: "10:30", title: "Opening ceremony", note: "Tracks, rules, and judging criteria." },
-      { time: "12:00", title: "Hacking begins", note: "The clock starts. 36 hours." },
-      { time: "15:00", title: "Workshop — Generative systems", note: "Hands-on, beginner friendly." },
-      { time: "20:00", title: "Dinner & team mixer", note: "Still looking for a team? Come here." },
-      { time: "23:30", title: "Midnight snacks" },
-    ],
-  },
-  {
-    day: "Day 02",
-    date: "Saturday, December 12",
-    items: [
-      { time: "08:00", title: "Breakfast" },
-      { time: "11:00", title: "Mentor rounds", note: "Every team gets a 20-minute slot." },
-      { time: "14:00", title: "Workshop — Shipping fast", note: "Deploys, demos, and dead ends." },
-      { time: "18:00", title: "Checkpoint demos", note: "Two minutes, no slides." },
-      { time: "21:00", title: "Dinner & lightning talks" },
-      { time: "02:00", title: "Late-night quiet hours", note: "Rest area opens." },
-    ],
-  },
-  {
-    day: "Day 03",
-    date: "Sunday, December 13",
-    items: [
-      { time: "08:00", title: "Breakfast" },
-      { time: "12:00", title: "Submissions close", note: "Hard deadline on Devfolio." },
-      { time: "13:00", title: "Expo & judging", note: "Judges walk the floor." },
-      { time: "16:00", title: "Finalist presentations", note: "Top six on the main stage." },
-      { time: "17:30", title: "Closing & prizes" },
+      { time: "10:00", title: "Opening ceremony", note: "Tracks, problem statements, and judging criteria." },
+      { time: "10:30", title: "Hacking begins", note: "The clock starts. 8-hour sprint." },
+      { time: "13:30", title: "Lunch & checkpoint", note: "Fuel up and touch base with mentors." },
+      { time: "16:30", title: "Mentor review rounds", note: "Floor feedback on working prototypes." },
+      { time: "18:30", title: "Hacking ends & submission", note: "Hard deadline on Devfolio." },
+      { time: "19:00", title: "Presentations & judging", note: "Project demos on the main stage." },
+      { time: "20:00", title: "Closing & prizes", note: "Awards and celebrations." },
     ],
   },
 ];
@@ -299,7 +278,7 @@ export const FAQS: Faq[] = [
   },
   {
     q: "Can I start building before the event?",
-    a: "No. Everything you submit must be written during the 36 hours. You can arrive with an idea, sketches, research, and a plan — that's encouraged. Boilerplate and open-source libraries are fine; a half-finished project is not.",
+    a: "No. Everything you submit must be written during the 8 hours. You can arrive with an idea, sketches, research, and a plan — that's encouraged. Boilerplate and open-source libraries are fine; a half-finished project is not.",
   },
   {
     q: "What should I bring?",

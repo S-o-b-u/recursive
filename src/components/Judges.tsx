@@ -6,6 +6,7 @@ import { RevealHeading, RevealBlock, ParallaxY } from "@/components/ui/reveal";
 import MediaSlot from "@/components/ui/MediaSlot";
 import JudgeRevealCard from "@/components/ui/JudgeRevealCard";
 import Seal from "@/components/ui/Seal";
+import Atmosphere from "@/components/ui/Atmosphere";
 
 /**
  * JUDGES — a pinboard, not a contact sheet.
@@ -37,6 +38,8 @@ export default function Judges() {
 
   return (
     <section id="judges" className="jd" aria-label="Judges">
+      <Atmosphere zIndex={-1} seed={67} count={16} opacity={0.75} />
+
       <div className="jd-inner">
         <div className="jd-head">
           <RevealHeading className="jd-heading" lines={["The people", "judging this."]} />
@@ -69,6 +72,9 @@ export default function Judges() {
                     } as CSSProperties
                   }
                 >
+                  {/* Tactile Frosted Washi Tape Pin */}
+                  <div className="jd-tape" aria-hidden="true" />
+
                   {revealed ? (
                     <MediaSlot
                       slot={judge.photo}
@@ -109,10 +115,12 @@ export default function Judges() {
         .jd {
           position: relative;
           width: 100%;
-          background: var(--color-bg);
-          color: #111a12;
+          background: radial-gradient(130% 90% at 50% 30%, #162e1c 0%, #0d1910 100%);
+          background-color: #0d1910;
+          color: #f3f8ee;
           padding-block: clamp(6rem, 14vh, 11rem);
           overflow: hidden;
+          z-index: 10;
         }
 
         .jd-inner {
@@ -136,6 +144,7 @@ export default function Judges() {
           line-height: 0.94;
           letter-spacing: -0.022em;
           text-transform: uppercase;
+          color: #f3f8ee;
         }
 
         .jd-note { grid-column: 9 / 13; padding-bottom: 0.7rem; }
@@ -146,7 +155,7 @@ export default function Judges() {
           font-weight: 380;
           line-height: 1.45;
           letter-spacing: -0.018em;
-          color: var(--color-text-secondary);
+          color: rgba(243, 248, 238, 0.72);
           text-wrap: pretty;
         }
 
@@ -175,31 +184,53 @@ export default function Judges() {
         }
 
         .jd-card {
+          position: relative;
           grid-column: var(--c);
           margin-top: calc(var(--drop) * 1vw);
           transform: rotate(var(--rot));
-          transition: transform 600ms var(--ease-out);
+          filter: drop-shadow(0 22px 42px rgba(0, 0, 0, 0.55));
+          transition: transform 600ms var(--ease-out), filter 600ms var(--ease-out);
         }
-        /* Straighten and lift the one under the cursor. The GSAP drift lives on
-           the inner node, so this transform never fights it. */
-        .jd-card:hover { transform: rotate(0deg) translateY(-6px); }
+        /* Straighten and lift the one under the cursor */
+        .jd-card:hover {
+          transform: rotate(0deg) translateY(-8px);
+          filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.7));
+        }
+
+        /* Tactile frosted washi tape pin */
+        .jd-tape {
+          position: absolute;
+          top: -10px;
+          left: 50%;
+          transform: translateX(-50%) rotate(-1.5deg);
+          width: 52px;
+          height: 19px;
+          background: rgba(230, 242, 222, 0.48);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
+          border: 1px solid rgba(255, 255, 255, 0.42);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+          z-index: 10;
+          pointer-events: none;
+        }
 
         .jd-cap {
           display: flex;
           flex-direction: column;
           gap: 0.2rem;
-          padding-top: 0.85rem;
+          padding-top: 0.95rem;
         }
         .jd-name {
           font-family: var(--font-geist-sans), sans-serif;
           font-size: clamp(0.95rem, 1.3vw, 1.08rem);
           font-weight: 500;
           letter-spacing: -0.018em;
+          color: #f3f8ee;
         }
         .jd-role {
           font-family: var(--font-geist-mono), monospace;
           font-size: 0.74rem;
-          color: var(--color-text-secondary);
+          color: rgba(243, 248, 238, 0.65);
         }
 
         /* "yet to reveal" tag — mono, spaced, with a slow moss pulse. */
@@ -212,13 +243,14 @@ export default function Judges() {
           font-weight: 450;
           letter-spacing: 0.09em;
           text-transform: uppercase;
-          color: var(--color-text-tertiary);
+          color: rgba(243, 248, 238, 0.6);
         }
         .jd-pending-dot {
-          width: 5px;
-          height: 5px;
+          width: 6px;
+          height: 6px;
           border-radius: 50%;
-          background: var(--color-accent);
+          background: #a6e06a;
+          box-shadow: 0 0 10px rgba(166, 224, 106, 0.7);
           animation: jd-pending-pulse 2.6s var(--ease-out) infinite;
         }
         @keyframes jd-pending-pulse {

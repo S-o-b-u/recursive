@@ -12,7 +12,6 @@ export default function SectionWrapper({
   lede,
   children,
   className = "",
-  tone = "default",
 }: {
   id?: string;
   label?: string;
@@ -22,45 +21,53 @@ export default function SectionWrapper({
   className?: string;
   tone?: "default" | "alt" | "deep";
 }) {
-  const bg =
-    tone === "alt"
-      ? "bg-[var(--color-bg-alt)]"
-      : tone === "deep"
-        ? "bg-[var(--color-bg-deep)] text-[#EFF3EB]"
-        : "";
-
-  const headingColor = tone === "deep" ? "#EFF3EB" : "#16241A";
-
   return (
-    <section id={id} className={`section ${bg} ${className}`}>
-      <div className="section-inner">
+    <section
+      id={id}
+      className={`section bg-[#0d1910] text-[#f3f8ee] relative overflow-hidden ${className}`}
+      style={{
+        background: "radial-gradient(130% 90% at 50% 30%, #162e1c 0%, #0d1910 100%)",
+        backgroundColor: "#0d1910",
+      }}
+    >
+      <div className="section-inner relative z-10">
         {(label || heading || lede) && (
           <Reveal>
-            {label && <p className="section-label">{label}</p>}
+            {label && (
+              <p className="section-label text-[#a6e06a] font-mono tracking-widest text-xs uppercase mb-3">
+                {label}
+              </p>
+            )}
             {heading && (
               typeof heading === "string" ? (
-                <div className="mb-[var(--space-element)]">
+                <div className="mb-4">
                   <WarpText
                     text={heading}
                     align="left"
-                    color={headingColor}
-                    fontSize="clamp(1.75rem, 3.8vw, 2.75rem)"
-                    fontWeight={350}
-                    fontFamily="var(--font-display), Georgia, serif"
-                    letterSpacing="-0.03em"
+                    color="#f3f8ee"
+                    fontSize="clamp(1.85rem, 4vw, 3rem)"
+                    fontWeight={800}
+                    fontFamily="var(--font-hiruko), var(--font-display), sans-serif"
+                    letterSpacing="-0.025em"
                     style={{
                       width: "100%",
                       maxWidth: "40ch",
-                      height: "clamp(46px, 5.5vw, 68px)",
+                      height: "clamp(48px, 6vw, 72px)",
                       pointerEvents: "auto",
                     }}
                   />
                 </div>
               ) : (
-                <h2 className="section-heading">{heading}</h2>
+                <h2 className="font-hiruko font-black text-3xl sm:text-4xl lg:text-5xl tracking-tight text-[#f3f8ee] max-w-[32ch] mb-4">
+                  {heading}
+                </h2>
               )
             )}
-            {lede && <div className="body-text mb-[var(--space-block)]">{lede}</div>}
+            {lede && (
+              <div className="font-sans text-base sm:text-lg text-[#8da488] max-w-[55ch] mb-10 leading-relaxed">
+                {lede}
+              </div>
+            )}
           </Reveal>
         )}
         {children}
@@ -68,3 +75,4 @@ export default function SectionWrapper({
     </section>
   );
 }
+

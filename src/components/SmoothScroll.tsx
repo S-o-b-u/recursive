@@ -59,6 +59,17 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       const href = anchor.getAttribute("href");
       if (!href) return;
 
+      // Brand logo / scroll to top when on home page
+      if ((href === "/" || href === "#top" || href === "#") && window.location.pathname === "/") {
+        event.preventDefault();
+        lenis.scrollTo(0, {
+          duration: 1.2,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        });
+        window.history.pushState(null, "", "/");
+        return;
+      }
+
       // Same-page hashes only: "#themes" or "/#themes".
       const hash = href.startsWith("#")
         ? href
@@ -71,7 +82,11 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       if (!target) return;
 
       event.preventDefault();
-      lenis.scrollTo(target as HTMLElement, { offset: 0 });
+      lenis.scrollTo(target as HTMLElement, {
+        offset: -12,
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      });
       window.history.pushState(null, "", hash);
     };
 

@@ -11,6 +11,7 @@ import {
 import MediaSlot from "@/components/ui/MediaSlot";
 import SponsorRevealCard from "@/components/ui/SponsorRevealCard";
 import SponsorVeil from "@/components/ui/SponsorVeil";
+import Atmosphere from "@/components/ui/Atmosphere";
 
 /**
  * SPONSOR WALL — a broken mosaic on six columns.
@@ -40,6 +41,8 @@ export default function SponsorWall() {
 
   return (
     <section id="sponsors" className="sp" aria-label="Sponsors">
+      <Atmosphere zIndex={-1} seed={83} count={16} opacity={0.72} />
+
       <div className="sp-inner">
         <div className="sp-head">
           <RevealHeading className="sp-heading" lines={["Sponsors."]} />
@@ -103,10 +106,12 @@ export default function SponsorWall() {
         .sp {
           position: relative;
           width: 100%;
-          background: var(--color-bg-alt);
-          color: #111a12;
+          background: radial-gradient(130% 90% at 50% 30%, #162c1c 0%, #0d1910 100%);
+          background-color: #0d1910;
+          color: #f3f8ee;
           padding-block: clamp(6rem, 14vh, 11rem);
           overflow: hidden;
+          z-index: 10;
         }
 
         .sp-inner {
@@ -130,6 +135,7 @@ export default function SponsorWall() {
           line-height: 0.92;
           letter-spacing: -0.024em;
           text-transform: uppercase;
+          color: #f3f8ee;
         }
 
         .sp-note {
@@ -147,7 +153,7 @@ export default function SponsorWall() {
           font-weight: 380;
           line-height: 1.45;
           letter-spacing: -0.02em;
-          color: var(--color-text-secondary);
+          color: rgba(243, 248, 238, 0.72);
         }
         .sp-link {
           display: inline-flex;
@@ -155,17 +161,17 @@ export default function SponsorWall() {
           gap: 0.4rem;
           font-family: var(--font-geist-mono), monospace;
           font-size: 0.82rem;
-          color: var(--color-accent-deep);
+          color: #a6e06a;
           padding-bottom: 2px;
-          border-bottom: 1px solid rgba(47, 85, 39, 0.35);
+          border-bottom: 1px solid rgba(166, 224, 106, 0.45);
           transition: gap 300ms var(--ease-out), color 300ms ease;
         }
         .sp-link svg { width: 0.85rem; height: 0.85rem; }
-        .sp-link:hover { gap: 0.75rem; color: var(--color-accent); }
+        .sp-link:hover { gap: 0.75rem; color: #c4f391; }
 
         .sp-rule {
           margin-top: clamp(1.75rem, 4vh, 3rem);
-          background: rgba(47, 85, 39, 0.26);
+          background: rgba(143, 196, 90, 0.22);
         }
 
         .sp-wall-wrap {
@@ -181,28 +187,38 @@ export default function SponsorWall() {
           align-items: start;
         }
 
-        /* Racked out of focus, the same way the intro blurs its content — the
-           blur is on the cards themselves, so there's no blurred-rectangle
-           edge. Nothing under it responds to hover. */
         .sp-wall-wrap[data-sealed="true"] .sp-wall {
-          filter: blur(6px) saturate(0.9) brightness(1.01);
-          opacity: 0.9;
+          filter: saturate(0.82) brightness(0.98) blur(1.4px);
+          opacity: 0.92;
         }
         .sp-wall-wrap[data-sealed="true"] .sp-cell { pointer-events: none; }
 
         .sp-cell {
           grid-column: var(--c);
           grid-row: var(--r);
+          position: relative;
+          filter: drop-shadow(0 20px 42px rgba(0, 0, 0, 0.55));
+          transition: transform 600ms var(--ease-out), filter 600ms var(--ease-out);
+        }
+        .sp-cell:hover {
+          transform: translateY(-6px);
+          filter: drop-shadow(0 28px 55px rgba(0, 0, 0, 0.68));
+        }
+
+        @media (max-width: 900px) {
+          .sp-heading, .sp-note { grid-column: 1 / -1; }
+          .sp-note { padding-top: 1.1rem; padding-bottom: 0; }
         }
 
         @media (max-width: 780px) {
-          .sp-heading, .sp-note { grid-column: 1 / -1; }
-          .sp-note { padding-top: 1.1rem; padding-bottom: 0; }
-          .sp-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-          /* Drop the hand placement entirely — at two columns the holes stop
-             reading as composition and just look like missing logos. */
-          .sp-cell { grid-column: auto; grid-row: auto; }
-          .sp-cell .ms { aspect-ratio: 16 / 9 !important; }
+          .sp-wall {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1.25rem;
+          }
+          .sp-cell {
+            grid-column: auto !important;
+            grid-row: auto !important;
+          }
         }
       `}</style>
     </section>
