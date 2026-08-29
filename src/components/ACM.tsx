@@ -1,300 +1,289 @@
 "use client";
 
 import Image from "next/image";
-import { COLLEGE } from "@/data/hackathon";
-import { RevealWords, RevealHeading, RevealBlock } from "@/components/ui/reveal";
-
-/**
- * Botanical Divider Motif — central petal sprout with vertical dot trail.
- */
-function BotanicalSprout({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 140 70"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-hidden="true"
-    >
-      <path
-        d="M70 12C68 22 62 28 52 32C62 34 67 40 70 50C73 40 78 34 88 32C78 28 72 22 70 12Z"
-        fill="currentColor"
-      />
-      <path
-        d="M50 33C38 34 26 28 20 22C24 32 34 40 46 41C48 38 49 35 50 33Z"
-        fill="currentColor"
-      />
-      <path
-        d="M90 33C102 34 114 28 120 22C116 32 106 40 94 41C92 38 91 35 90 33Z"
-        fill="currentColor"
-      />
-      <circle cx="70" cy="4" r="1.5" fill="currentColor" />
-      <circle cx="70" cy="8" r="1" fill="currentColor" />
-      <circle cx="70" cy="58" r="1.5" fill="currentColor" />
-      <circle cx="70" cy="64" r="1.5" fill="currentColor" />
-    </svg>
-  );
-}
+import { RevealBlock, RevealWords } from "@/components/ui/reveal";
 
 const SUBLOGOS = [
-  { src: "/college_logo/jis.png", alt: "JIS Group", width: 95, height: 32 },
-  { src: "/college_logo/aicte.png", alt: "AICTE Approved", width: 44, height: 32 },
-  { src: "/college_logo/naac.png", alt: "NAAC Accredited", width: 44, height: 32 },
-  { src: "/college_logo/nba.png", alt: "NBA Accredited", width: 44, height: 32 },
+  { src: "/college_logo/jis.png",   alt: "JIS Group",         width: 95,  height: 32 },
+  { src: "/college_logo/aicte.png", alt: "AICTE Approved",    width: 44,  height: 32 },
+  { src: "/college_logo/naac.png",  alt: "NAAC Accredited",   width: 44,  height: 32 },
+  { src: "/college_logo/nba.png",   alt: "NBA Accredited",    width: 44,  height: 32 },
 ];
 
 const STORY = [
-  "Recursive is organized by the ACM Student Chapter of Guru Nanak Institute of Technology in collaboration with the Department of Information Technology. The chapter brings together developers, designers, and problem solvers across Kolkata for an eight-hour sprint of focused building and real software craft.",
+  "Recursive is organized by the ACM Student Chapter at Guru Nanak Institute of Technology, in collaboration with the Department of Information Technology. The chapter brings together developers, designers, and builders from across Kolkata for eight hours of focused work and honest software craft.",
 ];
 
 export default function ACM() {
   return (
     <section id="acm" className="acm" aria-label="Organizers of Recursive">
+
+      {/* ── Watermark text layer behind everything ── */}
+      <div className="acm-watermark" aria-hidden="true">
+        <div className="acm-marquee acm-marquee-left">
+          <div className="acm-marquee-track">
+            <span>PRESENTED BY ✦ PRESENTED BY ✦ PRESENTED BY ✦ PRESENTED BY ✦&nbsp;</span>
+            <span>PRESENTED BY ✦ PRESENTED BY ✦ PRESENTED BY ✦ PRESENTED BY ✦&nbsp;</span>
+          </div>
+        </div>
+        <div className="acm-marquee acm-marquee-right">
+          <div className="acm-marquee-track">
+            <span>ORGANIZED BY ✦ ORGANIZED BY ✦ ORGANIZED BY ✦ ORGANIZED BY ✦&nbsp;</span>
+            <span>ORGANIZED BY ✦ ORGANIZED BY ✦ ORGANIZED BY ✦ ORGANIZED BY ✦&nbsp;</span>
+          </div>
+        </div>
+      </div>
+
       <div className="acm-inner">
-        {/* ── Symmetrical Botanical Sprout ── */}
-        <RevealBlock y={14}>
-          <div className="acm-ornament-wrap">
-            <BotanicalSprout className="acm-sprout" />
+
+        {/* ── Thin rule at the top ── */}
+        <RevealBlock y={8}>
+          <div className="acm-rule-top" />
+        </RevealBlock>
+
+        {/* ── Main chapter logo, large & centered ── */}
+        <RevealBlock y={20} delay={0.06} className="acm-logo-block">
+          <Image
+            src="/college_logo/gnitacm.png"
+            alt="GNIT ACM Student Chapter"
+            width={340}
+            height={110}
+            className="acm-main-logo"
+            priority
+          />
+        </RevealBlock>
+
+        {/* ── Accreditation sublogos ── */}
+        <RevealBlock y={12} delay={0.12} className="acm-sublogos-block">
+          <div className="acm-sublogos">
+            {SUBLOGOS.map((s) => (
+              <Image
+                key={s.src}
+                src={s.src}
+                alt={s.alt}
+                width={s.width}
+                height={s.height}
+                className="acm-sublogo"
+              />
+            ))}
           </div>
         </RevealBlock>
 
-        {/* ── Centered Heading ── */}
-        <div className="acm-head-wrap">
-          <RevealHeading
-            className="acm-heading"
-            lines={["The ACM Chapter"]}
-          />
-        </div>
+        {/* ── Thin rule separator ── */}
+        <RevealBlock y={8} delay={0.14}>
+          <div className="acm-rule-mid" />
+        </RevealBlock>
 
-        {/* ── Main Chapter Logo & Supporting Sublogos (No Backgrounds) ── */}
-        <div className="acm-brand-stage">
-          {/* Main Logo: GNIT ACM */}
-          <RevealBlock y={16} delay={0.08}>
-            <div className="acm-main-logo-wrap">
-              <Image
-                src="/college_logo/gnitacm.png"
-                alt="GNIT ACM Student Chapter in collaboration with Department of IT"
-                width={280}
-                height={90}
-                className="acm-main-logo-img"
-                priority
-              />
-            </div>
-          </RevealBlock>
-
-          {/* Sublogos Row: JIS, AICTE, NAAC, NBA (Small & Clean) */}
-          <RevealBlock y={12} delay={0.12}>
-            <div className="acm-sublogos-row">
-              {SUBLOGOS.map((sub) => (
-                <div key={sub.src} className="acm-sublogo-item">
-                  <Image
-                    src={sub.src}
-                    alt={sub.alt}
-                    width={sub.width}
-                    height={sub.height}
-                    className="acm-sublogo-img"
-                  />
-                </div>
-              ))}
-            </div>
-          </RevealBlock>
-        </div>
-
-        {/* ── Wide Single Story Paragraph ── */}
+        {/* ── Organizer blurb ── */}
         <div className="acm-story-wrap">
           <RevealWords paragraphs={STORY} className="acm-story" />
         </div>
 
-        {/* ── Centered Signoff ── */}
-        <RevealBlock className="acm-signoff-block" y={16} delay={0.16}>
-          <div className="acm-signoff">
-            <span className="acm-signoff-line">See you on the hill.</span>
-            <span className="acm-signoff-dot">·</span>
-            <span className="acm-signoff-who">
-              {COLLEGE.chapter} × {COLLEGE.collaboration}, {COLLEGE.collegeShort}
-            </span>
-          </div>
+        {/* ── Location line at bottom ── */}
+        <RevealBlock y={10} delay={0.18} className="acm-footer-block">
+          <p className="acm-location">
+            Sodepur, Kolkata · October 08, 2026
+          </p>
         </RevealBlock>
+
       </div>
 
       <style>{`
+        /* ─────────────────────────────────────────
+           Section shell
+        ───────────────────────────────────────── */
         .acm {
           position: relative;
           width: 100%;
-          background: transparent;
-          color: #111a12;
-          padding-top: clamp(8.5rem, 19vh, 14rem);
-          padding-bottom: clamp(6rem, 14vh, 10rem);
+          color: #0f1623;
+          padding-top: clamp(10rem, 22vh, 16rem);
+          padding-bottom: clamp(8rem, 16vh, 12rem);
           overflow: hidden;
           z-index: 1;
+          background: transparent;
         }
 
+        /* ─────────────────────────────────────────
+           Giant watermark
+           — Dual scrolling marquee
+        ───────────────────────────────────────── */
+        .acm-watermark {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          pointer-events: none;
+          user-select: none;
+          z-index: 0;
+          overflow: hidden;
+          width: 100vw;
+          left: 50%;
+          transform: translateX(-50%);
+        }
+
+        .acm-marquee {
+          width: 100%;
+          overflow: hidden;
+          display: flex;
+          white-space: nowrap;
+        }
+
+        .acm-marquee-track {
+          display: flex;
+          width: max-content;
+        }
+
+        .acm-marquee-track span {
+          display: inline-block;
+          font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
+          font-weight: 700;
+          font-size: clamp(6rem, 18vw, 16rem);
+          line-height: 0.85;
+          letter-spacing: -0.02em;
+          text-transform: uppercase;
+          color: rgba(15, 22, 35, 0.04);
+          padding: 0 1vw;
+        }
+
+        .acm-marquee-left .acm-marquee-track {
+          animation: acm-scroll-left 60s linear infinite;
+        }
+
+        .acm-marquee-right .acm-marquee-track {
+          animation: acm-scroll-right 60s linear infinite;
+        }
+
+        @keyframes acm-scroll-left {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+
+        @keyframes acm-scroll-right {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
+        }
+
+        /* ─────────────────────────────────────────
+           Content layer
+        ───────────────────────────────────────── */
         .acm-inner {
           position: relative;
-          max-width: 96rem;
+          z-index: 1;
+          max-width: 82rem;
           margin-inline: auto;
           padding-inline: var(--padding-x);
-          text-align: center;
           display: flex;
           flex-direction: column;
           align-items: center;
-        }
-
-        .acm-ornament-wrap {
-          display: flex;
-          justify-content: center;
-          margin-bottom: clamp(1.2rem, 2.2vh, 1.8rem);
-        }
-
-        .acm-sprout {
-          width: clamp(100px, 13vw, 140px);
-          height: auto;
-          color: #2F5527;
-          opacity: 0.85;
-        }
-
-        .acm-head-wrap {
-          width: 100%;
           text-align: center;
         }
 
-        .acm-heading {
-          font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-weight: 500;
-          font-size: clamp(2.6rem, 5.8vw, 4.6rem);
-          line-height: 1.12;
-          letter-spacing: -0.028em;
-          color: #111a12;
-          text-align: center;
+        /* ─────────────────────────────────────────
+           Rules
+        ───────────────────────────────────────── */
+        .acm-rule-top {
+          width: clamp(2rem, 6vw, 4rem);
+          height: 1.5px;
+          background: rgba(15, 22, 35, 0.18);
+          margin-bottom: clamp(2.5rem, 5vh, 3.5rem);
         }
 
-        .acm-heading .rh-line {
-          display: flex;
-          justify-content: center;
-        }
-
-        /* ── Brand Stage Hierarchy (Main Logo + Sublogos) ── */
-        .acm-brand-stage {
+        .acm-rule-mid {
           width: 100%;
-          margin-top: clamp(2rem, 4.5vh, 3.5rem);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: clamp(1.1rem, 2.2vh, 1.6rem);
+          max-width: 40rem;
+          height: 1px;
+          background: rgba(15, 22, 35, 0.1);
+          margin-top: clamp(2rem, 4vh, 3rem);
         }
 
-        .acm-main-logo-wrap {
+        /* ─────────────────────────────────────────
+           Main logo
+        ───────────────────────────────────────── */
+        .acm-logo-block {
           display: flex;
           justify-content: center;
-          align-items: center;
         }
 
-        .acm-main-logo-img {
+        .acm-main-logo {
           width: auto;
-          height: clamp(54px, 8.5vw, 76px);
+          height: clamp(64px, 10vw, 96px);
           object-fit: contain;
-          opacity: 0.95;
-          transition: transform 220ms ease, opacity 220ms ease;
+          opacity: 0.96;
+          transition: opacity 200ms ease;
         }
 
-        .acm-main-logo-img:hover {
-          transform: scale(1.03);
+        .acm-main-logo:hover {
           opacity: 1;
         }
 
-        /* ── Sublogos Row (Small & Clean) ── */
-        .acm-sublogos-row {
+        /* ─────────────────────────────────────────
+           Sublogos
+        ───────────────────────────────────────── */
+        .acm-sublogos-block {
+          margin-top: clamp(1.75rem, 3.5vh, 2.5rem);
+        }
+
+        .acm-sublogos {
           display: flex;
           align-items: center;
           justify-content: center;
           flex-wrap: wrap;
-          gap: clamp(1.2rem, 2.8vw, 2.4rem);
+          gap: clamp(1.4rem, 3vw, 2.5rem);
         }
 
-        .acm-sublogo-item {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .acm-sublogo-img {
+        .acm-sublogo {
           width: auto;
-          height: clamp(22px, 3.2vw, 30px);
+          height: clamp(22px, 3vw, 28px);
           object-fit: contain;
-          opacity: 0.72;
-          filter: grayscale(20%);
-          transition: opacity 220ms ease, transform 220ms ease, filter 220ms ease;
+          opacity: 0.55;
+          filter: grayscale(35%);
+          transition: opacity 180ms ease, filter 180ms ease;
         }
 
-        .acm-sublogo-img:hover {
-          opacity: 0.95;
+        .acm-sublogo:hover {
+          opacity: 0.9;
           filter: grayscale(0%);
-          transform: scale(1.06);
         }
 
-        /* ── Wide Single Story Paragraph ── */
+        /* ─────────────────────────────────────────
+           Story paragraph
+        ───────────────────────────────────────── */
         .acm-story-wrap {
-          margin-top: clamp(2.75rem, 6vh, 4.5rem);
+          margin-top: clamp(2.5rem, 5vh, 4rem);
           width: 100%;
-          max-width: 88rem;
-        }
-
-        .acm-story {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
+          max-width: 66rem;
         }
 
         .acm-story .rw-para {
           margin: 0 auto;
-          max-width: 86rem;
+          max-width: 64rem;
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: clamp(1.4rem, 2.45vw, 2.1rem);
+          font-size: clamp(1.05rem, 1.7vw, 1.35rem);
           font-weight: 400;
-          line-height: 1.76;
-          letter-spacing: -0.012em;
-          color: #18261A;
+          line-height: 1.82;
+          letter-spacing: -0.008em;
+          color: rgba(15, 22, 35, 0.65);
           text-align: center;
           text-wrap: balance;
         }
 
-        /* ── Signoff ── */
-        .acm-signoff-block {
-          margin-top: clamp(3rem, 6vh, 4.5rem);
+        /* ─────────────────────────────────────────
+           Location footer line
+        ───────────────────────────────────────── */
+        .acm-footer-block {
+          margin-top: clamp(2rem, 4vh, 3rem);
         }
 
-        .acm-signoff {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-          gap: 0.65rem 0.95rem;
-          padding: 0.6rem 1.6rem;
-          border-radius: var(--radius-pill);
-          background: rgba(255, 255, 255, 0.6);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
-          border: 1px solid rgba(47, 85, 39, 0.18);
-          box-shadow: 0 4px 16px rgba(22, 45, 26, 0.05);
-        }
-
-        .acm-signoff-line {
-          font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-size: 0.94rem;
-          font-weight: 500;
-          color: #111a12;
-        }
-
-        .acm-signoff-dot {
-          color: #8FC45A;
-        }
-
-        .acm-signoff-who {
+        .acm-location {
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: 0.85rem;
+          font-size: 0.78rem;
           font-weight: 500;
-          color: #4A5F48;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: rgba(15, 22, 35, 0.38);
+          margin: 0;
         }
       `}</style>
     </section>
