@@ -20,8 +20,6 @@ const STORY = [
 export default function About() {
   return (
     <section id="about" className="ab" aria-label="About the chair">
-      <div className="ab-spill" aria-hidden="true" />
-
       <div className="ab-inner">
         <RevealHeading
           className="ab-heading"
@@ -67,23 +65,7 @@ export default function About() {
           color: #111a12;
           padding-block: clamp(7rem, 15vh, 12rem) clamp(6rem, 13vh, 10rem);
           overflow: hidden;
-        }
-
-        /* Green light spilling off the hero's grass onto the paper. Not a fade
-           to white — a settle, so the two scenes share an edge. */
-        .ab-spill {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: clamp(5rem, 12vh, 9rem);
-          pointer-events: none;
-          background: linear-gradient(
-            180deg,
-            rgba(96, 148, 60, 0.26) 0%,
-            rgba(96, 148, 60, 0.08) 45%,
-            rgba(96, 148, 60, 0) 100%
-          );
+          z-index: 1;
         }
 
         .ab-inner {
@@ -91,6 +73,7 @@ export default function About() {
           max-width: 84rem;
           margin-inline: auto;
           padding-inline: var(--padding-x);
+          z-index: 2;
         }
 
         .ab-heading {

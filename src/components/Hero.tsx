@@ -67,17 +67,19 @@ export default function Hero() {
   return (
     <section id="hero" className="hero" ref={sectionRef}>
       {/* ── 100% Crisp, Pure Video Background (Zero filters, no blur/jitter transforms) ── */}
-      <video
-        ref={videoRef}
-        className="hero-video"
-        src="/bg/hero_bg.mp4"
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        aria-hidden="true"
-      />
+      <div className="hero-video-wrap">
+        <video
+          ref={videoRef}
+          className="hero-video"
+          src="/bg/hero_bg.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+        />
+      </div>
 
       {/* ── Main Wordmark with WebGL WarpText ── */}
       <motion.div
@@ -140,6 +142,18 @@ export default function Hero() {
         </div>
       </motion.div>
 
+      {/* ── Mossy Log Natural Divider Over Seam ── */}
+      <div className="hero-log-divider" aria-hidden="true">
+        <img
+          src="/log.png"
+          alt=""
+          className="hero-log-img"
+          loading="eager"
+          decoding="async"
+          draggable={false}
+        />
+      </div>
+
       {/* ── Simple Clean Chair Annotation (No Box, No Glow) ── */}
       <motion.div
         className="hero-chair-annotation"
@@ -184,8 +198,20 @@ export default function Hero() {
           position: relative;
           height: 100svh;
           width: 100%;
-          overflow: hidden;
+          overflow-x: clip;
+          overflow-y: visible;
           background: #e4e9dc;
+          z-index: 10;
+        }
+
+        .hero-video-wrap {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          pointer-events: none;
+          z-index: 1;
         }
 
         /* ── 100% Clean Video Plate — Unscaled & Hardware Accelerated for Pure Clarity ── */
@@ -239,7 +265,7 @@ export default function Hero() {
           left: calc(50% + 72px);
           top: 53.5%;
           transform: translateY(-50%);
-          z-index: 15;
+          z-index: 20;
           display: flex;
           align-items: center;
           gap: 0.55rem;
@@ -284,18 +310,49 @@ export default function Hero() {
           letter-spacing: -0.01em;
         }
 
+        /* ── Mossy Log Natural Divider Over Seam ── */
+        .hero-log-divider {
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          transform: translate(-50%, 50%);
+          width: 100%;
+          max-width: 100vw;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          pointer-events: none;
+          user-select: none;
+          -webkit-user-select: none;
+          z-index: 12;
+        }
+
+        .hero-log-img {
+          width: clamp(1100px, 110vw, 2200px);
+          max-width: none;
+          height: auto;
+          aspect-ratio: 2172 / 724;
+          object-fit: contain;
+          pointer-events: none;
+          user-select: none;
+          -webkit-user-drag: none;
+          filter: none;
+          transform: translateZ(0);
+        }
+
         /* ── Bottom Unified Glass Dock ── */
         .hero-bottom-area {
           position: absolute;
-          bottom: clamp(4.25rem, 9vh, 6.25rem);
+          bottom: clamp(4.25rem, 9.5vh, 6.25rem);
           left: 0;
           right: 0;
           width: 100%;
           display: flex;
           justify-content: center;
-          z-index: 20;
+          z-index: 25;
           will-change: transform, opacity;
           padding-inline: 1rem;
+          pointer-events: auto;
         }
 
         .hero-action-dock-split {
@@ -358,11 +415,17 @@ export default function Hero() {
           .hero-chair-annotation {
             display: none;
           }
+          .hero-log-img {
+            width: clamp(950px, 130vw, 1500px);
+          }
+          .hero-log-divider {
+            transform: translate(-50%, 50%);
+          }
         }
 
         @media (max-width: 600px) {
           .hero-center-content {
-            top: 22%;
+            top: 20%;
           }
           .hero-wordmark {
             font-size: clamp(2.8rem, 14vw, 4.5rem);
@@ -379,6 +442,15 @@ export default function Hero() {
           .hero-dock-btn-primary,
           .hero-dock-btn-discord {
             width: 100%;
+          }
+          .hero-log-img {
+            width: clamp(720px, 160vw, 1000px);
+          }
+          .hero-log-divider {
+            transform: translate(-50%, 50%);
+          }
+          .hero-bottom-area {
+            bottom: clamp(3rem, 6vh, 4.5rem);
           }
         }
       `}</style>
