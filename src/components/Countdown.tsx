@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { EVENT } from "@/data/hackathon";
-import { RevealBlock, RevealHeading, RuleDraw } from "@/components/ui/reveal";
-import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
+import { RevealBlock, RevealHeading } from "@/components/ui/reveal";
 import { FlipDiskMatrix } from "@/components/ui/flip-disk-matrix";
 
 /**
@@ -47,7 +47,7 @@ function pad(n: number): string {
   return n.toString().padStart(2, "0");
 }
 
-export default function Countdown() {
+function LiveTimer() {
   const [timeString, setTimeString] = useState<string>("00:00:00");
   const [mounted, setMounted] = useState(false);
 
@@ -66,10 +66,8 @@ export default function Countdown() {
       const seconds = totalSec % 60;
 
       if (days > 0) {
-        // Format: "39:14:22" — days:hours:minutes (fits 8 chars = 47 cols)
         setTimeString(`${pad(days)}:${pad(hours)}:${pad(minutes)}`);
       } else {
-        // Format: "08:14:22" — hours:minutes:seconds
         setTimeString(`${pad(hours)}:${pad(minutes)}:${pad(seconds)}`);
       }
     };
@@ -79,6 +77,16 @@ export default function Countdown() {
     return () => clearInterval(timer);
   }, []);
 
+  return (
+    <FlipDiskMatrix
+      displayText={mounted ? timeString : "00:00:00"}
+      cols={53}
+      rows={11}
+    />
+  );
+}
+
+export default function Countdown() {
   return (
     <section id="countdown" className="cd" aria-label="Hackathon Countdown">
       <div className="cd-inner">
@@ -97,7 +105,7 @@ export default function Countdown() {
           />
         </div>
 
-        {/* ── Static "GATES OPEN IN" Badge — stable, never re-renders on tick ── */}
+        {/* ── "GATES OPEN IN" Badge ── */}
         <RevealBlock y={14} delay={0.06}>
           <div className="cd-badge-wrap">
             <div className="cd-live-badge">
@@ -112,47 +120,32 @@ export default function Countdown() {
         {/* ── Electromechanical Flip-Disk Matrix Display ── */}
         <RevealBlock y={22} delay={0.1} className="cd-matrix-reveal">
           <div className="cd-matrix-wrapper">
-            <FlipDiskMatrix
-              displayText={mounted ? timeString : "00:00:00"}
-              cols={53}
-              rows={11}
-            />
+            <LiveTimer />
           </div>
         </RevealBlock>
 
         {/* ── Legend: what each pair of digits means ── */}
         <RevealBlock y={10} delay={0.14}>
           <div className="cd-legend">
-            <span className="cd-legend-item">Days</span>
+            <span className="cd-legend-item">DAYS</span>
             <span className="cd-legend-sep">:</span>
-            <span className="cd-legend-item">Hours</span>
+            <span className="cd-legend-item">HOURS</span>
             <span className="cd-legend-sep">:</span>
-            <span className="cd-legend-item">Minutes</span>
+            <span className="cd-legend-item">MINUTES</span>
           </div>
         </RevealBlock>
+      </div>
 
-        {/* ── Bottom Section Specs & CTA ── */}
-        <RevealBlock y={16} delay={0.16}>
-          <RuleDraw className="cd-rule-bottom" />
-          <div className="cd-foot">
-            <div className="cd-specs">
-              <span className="cd-spec-item">{EVENT.duration}</span>
-              <span className="cd-spec-dot">✦</span>
-              <span className="cd-spec-item">{EVENT.format}</span>
-              <span className="cd-spec-dot">✦</span>
-              <span className="cd-spec-item">{EVENT.teamSize}</span>
-            </div>
-
-            <LiquidMetalButton
-              label="Register on Devfolio"
-              href={EVENT.devfolioUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              width={195}
-              height={44}
-            />
-          </div>
-        </RevealBlock>
+      {/* ── Valley Mask Overlay (Full uncropped natural aspect ratio anchored at bottom) ── */}
+      <div className="cd-valley" aria-hidden="true">
+        <Image
+          src="/valley.png"
+          alt=""
+          width={2752}
+          height={1536}
+          className="cd-valley-img"
+          priority
+        />
       </div>
 
       <style>{`
@@ -162,7 +155,7 @@ export default function Countdown() {
           background: transparent;
           color: #111a12;
           padding-top: clamp(6rem, 14vh, 10rem);
-          padding-bottom: clamp(2rem, 5vh, 4rem);
+          padding-bottom: clamp(11rem, 19vw, 24rem);
           overflow: hidden;
           z-index: 1;
         }
@@ -176,6 +169,7 @@ export default function Countdown() {
           display: flex;
           flex-direction: column;
           align-items: center;
+          z-index: 1;
         }
 
         .cd-ornament-wrap {
@@ -258,7 +252,7 @@ export default function Countdown() {
           width: 100%;
           display: flex;
           justify-content: center;
-          margin-top: clamp(2.5rem, 5vh, 4rem);
+          margin-top: clamp(2rem, 4vh, 3.5rem);
         }
 
         .cd-matrix-wrapper {
@@ -294,44 +288,21 @@ export default function Countdown() {
           opacity: 0;
         }
 
-        /* ── Bottom Info Bar ── */
-        .cd-rule-bottom {
+        /* ── Valley overlay — uncropped, full width, anchored to bottom ── */
+        .cd-valley {
+          position: absolute;
+          bottom: 0;
+          left: 0;
           width: 100%;
-          max-width: 72rem;
-          background: rgba(47, 85, 39, 0.16);
-          margin-top: clamp(2.5rem, 5vh, 4rem);
+          pointer-events: none;
+          z-index: 10;
+          line-height: 0;
         }
 
-        .cd-foot {
-          margin-top: 1.25rem;
+        .cd-valley-img {
           width: 100%;
-          max-width: 72rem;
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          justify-content: space-between;
-          gap: 1.25rem;
-        }
-
-        .cd-specs {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          gap: 0.6rem 0.8rem;
-          font-family: var(--font-dm-sans), sans-serif;
-          font-size: 0.82rem;
-          font-weight: 550;
-          letter-spacing: 0.01em;
-          color: #2F5527;
-        }
-
-        .cd-spec-item {
-          /* Plain text — no capsule, no background, no border */
-        }
-
-        .cd-spec-dot {
-          font-size: 0.65rem;
-          color: #8FC45A;
+          height: auto;
+          display: block;
         }
       `}</style>
     </section>
