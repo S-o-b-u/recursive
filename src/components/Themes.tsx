@@ -33,7 +33,7 @@ export default function Themes() {
   return (
     <section id="themes" className="th" aria-label="Themes">
       <div className="th-inner">
-        <RevealHeading className="th-heading" lines={["Build one of", "these four."]} />
+        <RevealHeading className="th-heading" lines={["Four directions", "to build in."]} />
 
         <div className="th-ladder">
           {TRACKS.map((track, i) => {
@@ -85,7 +85,7 @@ export default function Themes() {
         .th {
           position: relative;
           width: 100%;
-          background: var(--color-bg-alt);
+          background: transparent;
           color: #111a12;
           padding-block: clamp(6rem, 14vh, 11rem);
           overflow: hidden;
@@ -98,12 +98,12 @@ export default function Themes() {
         }
 
         .th-heading {
-          font-family: var(--font-hiruko), var(--font-display), sans-serif;
-          font-weight: 900;
-          font-size: clamp(2.3rem, 7vw, 5.5rem);
-          line-height: 0.94;
-          letter-spacing: -0.022em;
-          text-transform: uppercase;
+          font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
+          font-weight: 500;
+          font-size: clamp(2rem, 4.4vw, 3.25rem);
+          line-height: 1.12;
+          letter-spacing: -0.025em;
+          color: #111a12;
         }
         /* Second line steps in — the whole section is built on offsets, so the
            heading may as well admit it. */
@@ -133,11 +133,11 @@ export default function Themes() {
         }
         .th-num span {
           display: block;
-          font-family: var(--font-hiruko), var(--font-display), sans-serif;
-          font-weight: 900;
-          font-size: clamp(3.6rem, 11vw, 10rem);
-          line-height: 0.78;
-          letter-spacing: -0.04em;
+          font-family: var(--font-bebas), sans-serif;
+          font-weight: 400;
+          font-size: clamp(3.2rem, 9vw, 8rem);
+          line-height: 0.8;
+          letter-spacing: 0.02em;
           color: transparent;
           -webkit-text-stroke: 1.5px rgba(17, 26, 18, 0.42);
         }
@@ -151,12 +151,11 @@ export default function Themes() {
 
         .th-title {
           margin: 0;
-          font-family: var(--font-hiruko), var(--font-display), sans-serif;
-          font-weight: 900;
-          font-size: clamp(1.5rem, 2.9vw, 2.5rem);
-          line-height: 0.98;
+          font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
+          font-weight: 500;
+          font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+          line-height: 1.15;
           letter-spacing: -0.02em;
-          text-transform: uppercase;
           text-wrap: balance;
         }
 

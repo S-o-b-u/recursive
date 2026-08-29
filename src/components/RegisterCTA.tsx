@@ -1,55 +1,45 @@
 import { EVENT } from "@/data/hackathon";
 import Reveal from "./Reveal";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
-import WarpText from "@/components/ui/WarpText";
 
+/**
+ * Registration CTA — no glass card wrapper, clean typographic layout
+ * floating directly on the cloud background with LiquidMetalButtons.
+ */
 export default function RegisterCTA() {
   return (
     <section id="register" className="cta-scene">
       <div className="cta-inner">
         <Reveal>
-          <div className="glass glass-strong glass-sheen cta-card">
-            <p className="eyebrow text-[var(--color-accent)]">
-              {EVENT.seats} seats · {EVENT.dates}
-            </p>
-            <div className="my-2">
-              <WarpText
-                text={"The hill is quiet right now.\nCome make some noise."}
-                color="#16241A"
-                fontSize="clamp(1.8rem, 4vw, 2.75rem)"
-                fontWeight={300}
-                fontFamily="var(--font-display), Georgia, serif"
-                letterSpacing="-0.035em"
-                lineHeight={1.1}
-                style={{
-                  width: "100%",
-                  height: "clamp(75px, 11vw, 115px)",
-                  pointerEvents: "auto",
-                }}
-              />
-            </div>
-            <p className="body-text mx-auto text-center">
-              Registration is free and takes about two minutes. Bring a team or find one
-              when you arrive.
-            </p>
-            <div className="cta-actions">
-              <LiquidMetalButton
-                label="Register on Devfolio"
-                href={EVENT.devfolioUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                width={190}
-                height={46}
-              />
-              <LiquidMetalButton
-                label="Join Discord"
-                href={EVENT.discordUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                width={145}
-                height={46}
-              />
-            </div>
+          <p className="cta-eyebrow">
+            {EVENT.seats} seats · {EVENT.dates}
+          </p>
+          <h2 className="cta-heading">
+            The hill is quiet right now.
+            <br />
+            Come make some noise.
+          </h2>
+          <p className="cta-body">
+            Registration is free and takes about two minutes. Bring a team or
+            find one when you arrive.
+          </p>
+          <div className="cta-actions">
+            <LiquidMetalButton
+              label="Register on Devfolio"
+              href={EVENT.devfolioUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              width={190}
+              height={46}
+            />
+            <LiquidMetalButton
+              label="Join Discord"
+              href={EVENT.discordUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              width={145}
+              height={46}
+            />
           </div>
         </Reveal>
       </div>
@@ -63,7 +53,7 @@ export default function RegisterCTA() {
           overflow: hidden;
           padding-top: var(--space-section);
           padding-bottom: clamp(14rem, 30vw, 24rem);
-          background: linear-gradient(180deg, var(--color-bg) 0%, #dbe8cf 55%, #cfe2c0 100%);
+          background: transparent;
         }
         .cta-inner {
           position: relative;
@@ -71,27 +61,42 @@ export default function RegisterCTA() {
           max-width: 46rem;
           margin-inline: auto;
           padding-inline: var(--padding-x);
-        }
-        .cta-card {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 1.1rem;
-          padding: clamp(2rem, 5vw, 3.25rem);
           text-align: center;
         }
+        .cta-eyebrow {
+          margin: 0;
+          font-family: var(--font-dm-sans), var(--font-geist-sans), sans-serif;
+          font-size: 0.8rem;
+          font-weight: 500;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: var(--color-accent);
+        }
         .cta-heading {
-          font-size: clamp(1.6rem, 4.2vw, 2.75rem);
-          font-weight: 300;
-          line-height: 1.08;
-          letter-spacing: var(--tracking-tight);
+          margin: 1rem 0 0;
+          font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
+          font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+          font-weight: 500;
+          line-height: 1.2;
+          letter-spacing: -0.025em;
+          color: var(--color-text);
+        }
+        .cta-body {
+          margin: 1rem 0 0;
+          font-family: var(--font-dm-sans), var(--font-geist-sans), sans-serif;
+          font-size: clamp(0.9rem, 1.3vw, 1.05rem);
+          font-weight: 400;
+          line-height: 1.6;
+          color: var(--color-text-secondary);
+          max-width: 32rem;
+          margin-inline: auto;
         }
         .cta-actions {
           display: flex;
           flex-wrap: wrap;
           gap: 0.75rem;
           justify-content: center;
-          margin-top: 0.6rem;
+          margin-top: 1.5rem;
         }
         .cta-hill {
           position: absolute;

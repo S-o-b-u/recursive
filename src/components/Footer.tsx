@@ -47,21 +47,29 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     // biome-ignore lint/suspicious/noExplicitAny: External tween data
     const resetPeep = ({ stage, peep }: { stage: any; peep: any }) => {
       const direction = Math.random() > 0.5 ? 1 : -1;
-      const offsetY = 100 - 250 * gsap.parseEase("power2.in")(Math.random());
-      const startY = stage.height - peep.height + offsetY;
+      // Multi-layer depth distribution:
+      // depth 0 = front row (firmly overlaps the bottom floor)
+      // depth 1 = back row (stands elevated behind the front row)
+      const depth = Math.pow(Math.random(), 1.25);
+      const scale = 1.02 + (1 - depth * 0.3) * 0.22;
+      
+      // Ground the front row deeply so they seamlessly meet and cross the bottom of the screen (+32px),
+      // with back rows elevated by up to 72px so their heads rise up without exposing any cutoffs.
+      const startY = stage.height - peep.height * scale + 32 - depth * 72;
       let startX: number;
       let endX: number;
 
       if (direction === 1) {
-        startX = -peep.width;
-        endX = stage.width;
-        peep.scaleX = 1;
+        startX = -peep.width * scale - Math.random() * 80;
+        endX = stage.width + peep.width * scale + Math.random() * 80;
+        peep.scaleX = scale;
       } else {
-        startX = stage.width + peep.width;
-        endX = 0;
-        peep.scaleX = -1;
+        startX = stage.width + peep.width * scale + Math.random() * 80;
+        endX = -peep.width * scale - Math.random() * 80;
+        peep.scaleX = -scale;
       }
 
+      peep.scaleY = scale;
       peep.x = startX;
       peep.y = startY;
       peep.anchorY = startY;
@@ -80,7 +88,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       const yDuration = 0.25;
 
       const tl = gsap.timeline();
-      tl.timeScale(randomRange(0.5, 1.5));
+      tl.timeScale(randomRange(0.6, 1.4));
       tl.to(
         peep,
         {
@@ -94,9 +102,9 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
         peep,
         {
           duration: yDuration,
-          repeat: xDuration / yDuration,
+          repeat: Math.round(xDuration / yDuration),
           yoyo: true,
-          y: startY - 10,
+          y: startY - 8,
         },
         0,
       );
@@ -118,6 +126,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       y: number;
       anchorY: number;
       scaleX: number;
+      scaleY?: number;
       // biome-ignore lint/suspicious/noExplicitAny: Tween
       walk: any;
       setRect: (rect: number[]) => void;
@@ -142,6 +151,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
         y: 0,
         anchorY: 0,
         scaleX: 1,
+        scaleY: 1,
         walk: null,
         setRect: (rect: number[]) => {
           peep.rect = rect;
@@ -152,7 +162,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
         render: (ctx: CanvasRenderingContext2D) => {
           ctx.save();
           ctx.translate(peep.x, peep.y);
-          ctx.scale(peep.scaleX, 1);
+          ctx.scale(peep.scaleX, peep.scaleY || Math.abs(peep.scaleX));
           ctx.drawImage(
             peep.image,
             peep.rect[0],
@@ -300,12 +310,12 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
 
 export default function Footer() {
   return (
-    <footer className="relative h-screen w-full bg-[#EDF3E8] text-[#142617] overflow-hidden select-none">
+    <footer className="relative h-screen w-full bg-transparent text-[#142617] overflow-hidden select-none">
       {/* ── Giant WebGL WarpText Wordmark across the upper section ── */}
-      <div className="absolute top-[8%] sm:top-[12%] left-0 right-0 z-10 flex justify-center items-center px-4 pointer-events-auto">
+      <div className="absolute top-[14%] sm:top-[16%] left-0 right-0 z-10 flex justify-center items-center px-4 pointer-events-auto">
         <WarpText
           text={EVENT.name}
-          color="#122415"
+          color="#142617"
           warpStrength={0.08}
           warpScale={1.7}
           speed={0.55}
@@ -313,13 +323,14 @@ export default function Footer() {
           pointerStrength={0.38}
           refraction={0.018}
           ripple
-          fontSize="clamp(4.5rem, 16vw, 15rem)"
+          fontSize="clamp(4.2rem, 14.5vw, 13rem)"
           fontWeight={900}
-          fontFamily="var(--font-hiruko), var(--font-display), var(--font-geist-sans), sans-serif"
-          letterSpacing="clamp(0.04em, 1.2vw, 0.14em)"
+          fontFamily="var(--font-hiruko), sans-serif"
+          letterSpacing="-0.015em"
           style={{
             width: "100%",
-            height: "clamp(160px, 25vw, 320px)",
+            maxWidth: "92rem",
+            height: "clamp(150px, 22vw, 280px)",
             pointerEvents: "auto",
           }}
         />

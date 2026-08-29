@@ -111,12 +111,11 @@ export default function PageHeader({
         }
         .ph-title {
           margin-top: 0.6rem;
-          font-family: var(--font-display), var(--font-geist-sans), sans-serif;
+          font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
           font-size: clamp(2.5rem, 6.5vw, 4.5rem);
-          font-weight: 700;
+          font-weight: 500;
           line-height: 0.98;
           letter-spacing: -0.03em;
-          text-transform: uppercase;
         }
         .ph-lede {
           margin-top: 1.25rem;

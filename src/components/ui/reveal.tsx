@@ -110,11 +110,11 @@ export function RevealWords({
         }
         .rw-para {
           margin: 0;
-          font-family: var(--font-geist-sans), system-ui, sans-serif;
-          font-size: clamp(1.15rem, 2.05vw, 1.6rem);
-          font-weight: 350;
-          line-height: 1.66;
-          letter-spacing: -0.014em;
+          font-family: var(--font-dm-sans), system-ui, sans-serif;
+          font-size: clamp(1.2rem, 2.1vw, 1.65rem);
+          font-weight: 400;
+          line-height: 1.68;
+          letter-spacing: -0.012em;
           text-wrap: pretty;
         }
         .rw-word { display: inline-block; }

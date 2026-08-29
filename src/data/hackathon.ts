@@ -6,19 +6,15 @@
 
 export const EVENT = {
   name: "RECURSIVE",
-  tagline: "Where ideas branch, evolve, and bloom.",
+  tagline: "Build something that matters.",
   edition: "Hackathon 2026",
-  // TODO: PLACEHOLDER DATE. `dates` is the display string, `startsAt` is what the
-  // countdown counts to — change both together. Dec 11 2026 is a Friday, so the
-  // Fri→Sun schedule below lines up.
-  dates: "December 11 – 13, 2026",
-  startsAt: "2026-12-11T09:00:00+05:30",
-  duration: "36 hours",
-  format: "In person · Kolkata, India",
-  venue: "To be announced",
+  dates: "October 8, 2026",
+  startsAt: "2026-10-08T09:00:00+05:30",
+  duration: "8 hours",
+  format: "In person · Sodepur, Kolkata",
+  venue: "Guru Nanak Institute of Technology",
   teamSize: "1 – 4 builders",
   seats: 4, // the four chairs on the hill
-  // TODO: swap in the real links before launch.
   devfolioUrl: "#",
   discordUrl: "#",
   email: "team@recursive.dev",
@@ -42,23 +38,20 @@ export type Slot = {
 };
 
 /**
- * The chapter running the event.
- * TODO: verify the college name, city and founding year before launch — these
- * were carried over from the earlier draft, not confirmed.
+ * The chapter and college running the event.
  */
 export const COLLEGE = {
   chapter: "ACM Student Chapter",
-  college: "Netaji Subhash Engineering College",
-  collegeShort: "NSEC",
-  city: "Kolkata",
+  collaboration: "Department of Information Technology",
+  college: "Guru Nanak Institute of Technology",
+  collegeShort: "GNIT",
+  city: "Sodepur, Kolkata",
   acmFounded: "1947",
 } as const;
 
-/** College / chapter logos. Fill `src` once the files are in /public. */
+/** College / chapter logos. */
 export const COLLEGE_LOGOS: Slot[] = [
-  { label: "College logo", expect: "/images/college/nsec.png", src: "" },
-  { label: "ACM chapter logo", expect: "/images/college/acm-chapter.png", src: "" },
-  { label: "ACM logo", expect: "/images/college/acm.png", src: "" },
+  { label: "GNIT ACM Student Chapter", expect: "/college_logo/gnitacm.png", src: "/college_logo/gnitacm.png" },
 ];
 
 export type Track = {
@@ -173,7 +166,7 @@ export type ScheduleDay = {
 export const SCHEDULE: ScheduleDay[] = [
   {
     day: "Day 01",
-    date: "Friday, December 11",
+    date: "Thursday, October 8",
     items: [
       { time: "09:00", title: "Check-in & breakfast", note: "Badges, swag, and the first coffee." },
       { time: "10:30", title: "Opening ceremony", note: "Tracks, rules, and judging criteria." },
@@ -185,7 +178,7 @@ export const SCHEDULE: ScheduleDay[] = [
   },
   {
     day: "Day 02",
-    date: "Saturday, December 12",
+    date: "Friday, October 9",
     items: [
       { time: "08:00", title: "Breakfast" },
       { time: "11:00", title: "Mentor rounds", note: "Every team gets a 20-minute slot." },
@@ -197,7 +190,7 @@ export const SCHEDULE: ScheduleDay[] = [
   },
   {
     day: "Day 03",
-    date: "Sunday, December 13",
+    date: "Saturday, October 10",
     items: [
       { time: "08:00", title: "Breakfast" },
       { time: "12:00", title: "Submissions close", note: "Hard deadline on Devfolio." },

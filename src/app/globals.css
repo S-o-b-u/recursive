@@ -44,7 +44,7 @@
   --font-size-xl: 1.25rem;
   --font-size-2xl: 1.5rem;
   --font-size-3xl: clamp(1.75rem, 3vw, 2.35rem);
-  --font-size-display: clamp(2.75rem, 8vw, 6rem);
+  --font-size-display: clamp(1.75rem, 4vw, 3rem);
 
   /* Tracking */
   --tracking-tight: -0.035em;
@@ -127,8 +127,13 @@ html {
 
 body {
   background-color: var(--color-bg);
+  background-image: url("/cloud.jpg");
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   color: var(--color-text);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-dm-sans), var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   font-size: var(--font-size-base);
   line-height: var(--leading-normal);
   letter-spacing: var(--tracking-normal);
@@ -139,7 +144,8 @@ body {
 /* ─── Typography ─── */
 
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 400;
+  font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
+  font-weight: 500;
   text-wrap: balance;
 }
 

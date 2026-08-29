@@ -13,11 +13,11 @@ export default function Home() {
       <IntroSequence />
       <Hero />
       <About />
-      <ACM />
       <Countdown />
       <Themes />
       <Judges />
       <SponsorWall />
+      <ACM />
     </main>
   );
 }

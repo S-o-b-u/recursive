@@ -2,58 +2,99 @@
 
 import { EVENT } from "@/data/hackathon";
 import { RevealWords, RevealHeading, RevealBlock } from "@/components/ui/reveal";
+import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 
 /**
- * THE CHAIR — answers the question the hero deliberately provokes.
- *
- * Short lines, wide measure: three sentences a person will actually read,
- * set big enough that they land like signage rather than a blog post.
- * No pinning — the section scrolls at normal speed and the prose illuminates.
+ * Botanical Crown Flourish Motif.
  */
+function BotanicalCrown({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 180 44"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        d="M90 6C90 6 86 16 74 19C62 22 46 16 34 22C24 27 20 37 12 39C6 40 2 37 0 35"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M90 6C90 6 94 16 106 19C118 22 134 16 146 22C156 27 160 37 168 39C174 40 178 37 180 35"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      {/* Central sprout */}
+      <path
+        d="M90 2V14M90 2C86.5 5.5 83 9 83 13C83 16.5 86.5 18 90 18C93.5 18 97 16.5 97 13C97 9 93.5 5.5 90 2Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      {/* Leaves left */}
+      <path
+        d="M68 20C65 16 59 15 56 18C53 21 55 26 59 27C63 28 66 24 68 20Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+      />
+      {/* Leaves right */}
+      <path
+        d="M112 20C115 16 121 15 124 18C127 21 125 26 121 27C117 28 114 24 112 20Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+      />
+      {/* Dots */}
+      <circle cx="90" cy="25" r="2" fill="currentColor" />
+      <circle cx="90" cy="33" r="1.5" fill="currentColor" />
+      <circle cx="90" cy="40" r="1" fill="currentColor" />
+      <circle cx="44" cy="22" r="1.5" fill="currentColor" />
+      <circle cx="136" cy="22" r="1.5" fill="currentColor" />
+    </svg>
+  );
+}
 
 const STORY = [
-  "There is a plastic chair on a hill. The same chair as every terrace and every roadside tea shop in this city.",
-  "Four of them up there. A team is one to four people, so the chairs are the seats. Three fill with people you know. Nobody is holding the fourth one.",
-  "The hill is thirty-six hours that will not compile. You climb it anyway, and at the top there is a thing that works and did not exist on Friday.",
+  "The plastic chair is an everyday staple across Kolkata, scattered on college terraces, roadside tea stalls, and neighborhood corners where people gather to talk for hours. For this hackathon, four of these chairs sit together on the hill as an open table for your team. You arrive with people you know or team up in the morning, claim your spot, and spend eight focused hours turning an idea into working software before the day ends.",
 ];
 
 export default function About() {
   return (
-    <section id="about" className="ab" aria-label="About the chair">
+    <section id="about" className="ab" aria-label="About the Chair">
       <div className="ab-inner">
-        <RevealHeading
-          className="ab-heading"
-          lines={["The chair is", "the whole point."]}
-        />
-
-        <RevealWords paragraphs={STORY} className="ab-story" />
-
-        <RevealBlock className="ab-meta" y={18}>
-          <span>{EVENT.teamSize}</span>
-          <span>{EVENT.duration}</span>
-          <span>{EVENT.format}</span>
+        {/* ── Symmetrical Botanical Flourish ── */}
+        <RevealBlock y={14}>
+          <div className="ab-ornament-wrap">
+            <BotanicalCrown className="ab-crown" />
+          </div>
         </RevealBlock>
 
-        <RevealBlock className="ab-kicker" y={22}>
-          <p className="ab-kicker-line">Four chairs. One is yours.</p>
-          <a
+        {/* ── Centered Heading ── */}
+        <div className="ab-head-wrap">
+          <RevealHeading
+            className="ab-heading"
+            lines={["The Story of the Chair"]}
+          />
+        </div>
+
+        {/* ── Wide Single Story Paragraph ── */}
+        <div className="ab-story-wrap">
+          <RevealWords paragraphs={STORY} className="ab-story" />
+        </div>
+
+        {/* ── Liquid Metal Button ── */}
+        <RevealBlock className="ab-action-wrap" y={16} delay={0.12}>
+          <LiquidMetalButton
+            label="Claim Your Seat"
             href={EVENT.devfolioUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="ab-kicker-link"
-          >
-            go grab it
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M5 12h14M13 6l6 6-6 6"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </a>
+            width={210}
+            height={48}
+          />
         </RevealBlock>
       </div>
 
@@ -61,99 +102,90 @@ export default function About() {
         .ab {
           position: relative;
           width: 100%;
-          background: var(--color-bg);
+          background: transparent;
           color: #111a12;
-          padding-block: clamp(7rem, 15vh, 12rem) clamp(6rem, 13vh, 10rem);
+          padding-top: clamp(8.5rem, 19vh, 14rem);
+          padding-bottom: clamp(6rem, 14vh, 10rem);
           overflow: hidden;
           z-index: 1;
         }
 
         .ab-inner {
           position: relative;
-          max-width: 84rem;
+          max-width: 96rem;
           margin-inline: auto;
           padding-inline: var(--padding-x);
-          z-index: 2;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .ab-ornament-wrap {
+          display: flex;
+          justify-content: center;
+          margin-bottom: clamp(1.2rem, 2.2vh, 1.8rem);
+        }
+
+        .ab-crown {
+          width: clamp(130px, 16vw, 180px);
+          height: auto;
+          color: #2F5527;
+          opacity: 0.85;
+        }
+
+        .ab-head-wrap {
+          width: 100%;
+          text-align: center;
         }
 
         .ab-heading {
-          font-family: var(--font-hiruko), var(--font-display), sans-serif;
-          font-weight: 900;
-          font-size: clamp(2.5rem, 7.6vw, 6rem);
-          line-height: 0.94;
-          letter-spacing: -0.02em;
-          text-transform: uppercase;
+          font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
+          font-weight: 500;
+          font-size: clamp(2.6rem, 5.8vw, 4.6rem);
+          line-height: 1.1;
+          letter-spacing: -0.03em;
           color: #111a12;
+          text-align: center;
         }
 
-        /* Wide measure, big type, few lines — reads as a statement, not a page
-           of copy. Overrides the RevealWords defaults. */
-        .ab-story { margin-top: clamp(2.5rem, 6vh, 4rem); }
+        .ab-heading .rh-line {
+          display: flex;
+          justify-content: center;
+        }
+
+        /* ── Wide Single Story Paragraph ── */
+        .ab-story-wrap {
+          margin-top: clamp(2.75rem, 6vh, 4.5rem);
+          width: 100%;
+          max-width: 88rem;
+        }
+
+        .ab-story {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+        }
+
         .ab-story .rw-para {
-          max-width: 68rem;
-          font-size: clamp(1.3rem, 2.55vw, 2.15rem);
-          font-weight: 380;
-          line-height: 1.42;
-          letter-spacing: -0.022em;
-          color: #111a12;
+          margin: 0 auto;
+          max-width: 86rem;
+          font-family: var(--font-dm-sans), sans-serif;
+          font-size: clamp(1.4rem, 2.45vw, 2.1rem);
+          font-weight: 400;
+          line-height: 1.76;
+          letter-spacing: -0.012em;
+          color: #18261A;
+          text-align: center;
+          text-wrap: balance;
         }
 
-        .ab-meta {
-          margin-top: clamp(2.5rem, 6vh, 3.75rem);
+        /* ── Action Wrap ── */
+        .ab-action-wrap {
+          margin-top: clamp(2.75rem, 5.5vh, 4.5rem);
           display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          gap: 0.6rem 1.1rem;
-          font-family: var(--font-geist-mono), monospace;
-          font-size: 0.8rem;
-          letter-spacing: 0.02em;
-          color: var(--color-text-secondary);
-        }
-        .ab-meta span { display: inline-flex; align-items: center; }
-        .ab-meta span + span::before {
-          content: "";
-          width: 4px;
-          height: 4px;
-          border-radius: 50%;
-          background: var(--color-accent);
-          opacity: 0.5;
-          margin-right: 1.1rem;
-        }
-
-        .ab-kicker {
-          margin-top: clamp(3rem, 7vh, 5rem);
-          display: flex;
-          flex-wrap: wrap;
-          align-items: baseline;
-          gap: 0.6rem 1.6rem;
-        }
-        .ab-kicker-line {
-          margin: 0;
-          font-family: var(--font-hiruko), var(--font-display), sans-serif;
-          font-weight: 900;
-          font-size: clamp(1.6rem, 4vw, 3.1rem);
-          line-height: 1.02;
-          letter-spacing: -0.02em;
-          text-transform: uppercase;
-          color: #111a12;
-        }
-        .ab-kicker-link {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.4rem;
-          font-family: var(--font-geist-mono), monospace;
-          font-size: 0.85rem;
-          letter-spacing: 0.02em;
-          color: var(--color-accent-deep);
-          padding-bottom: 2px;
-          border-bottom: 1px solid rgba(47, 85, 39, 0.35);
-          transition: gap 200ms var(--ease-out), color 200ms ease;
-        }
-        .ab-kicker-link svg { width: 0.9rem; height: 0.9rem; }
-        .ab-kicker-link:hover { gap: 0.7rem; color: var(--color-accent); }
-
-        @media (max-width: 520px) {
-          .ab-kicker { flex-direction: column; align-items: flex-start; }
+          justify-content: center;
         }
       `}</style>
     </section>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { display, geist, geistMono, hiruko } from "./fonts";
+import { display, geist, geistMono, hiruko, dmSans, headingNow, bebasNeue } from "./fonts";
 import SmoothScroll from "@/components/SmoothScroll";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geist.variable} ${geistMono.variable} ${display.variable} ${hiruko.variable}`}
+      className={`${geist.variable} ${geistMono.variable} ${display.variable} ${hiruko.variable} ${dmSans.variable} ${headingNow.variable} ${bebasNeue.variable}`}
     >
       <body>
         <SmoothScroll>
@@ -28,10 +28,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Footer />
         </SmoothScroll>
 
-        {/* Fixed ramp along the bottom edge so whatever is scrolling past
-            dissolves instead of ending on a hard line. target="page" adds +100
-            to zIndex, so 0 here lands on 100 — level with the nav, which never
-            overlaps it, and above the mobile sheet at 90. */}
         <GradualBlur
           target="page"
           position="bottom"
