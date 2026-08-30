@@ -281,7 +281,10 @@ export default function SponsorStage() {
           width: 100%;
           /* The track supplies the scroll distance; the stage inside is one
              viewport tall and sticks for the difference. */
-          --sxp-track: 320vh;
+          --sxp-track: 340vh;
+          position: relative;
+          width: 100%;
+          background: transparent;
         }
 
         .sxp-track {
@@ -302,9 +305,6 @@ export default function SponsorStage() {
           --sxp-iy: calc((100% - var(--sxp-win-h)) / 2 * (1 - var(--sxp-p)));
           --sxp-ix: calc((100% - var(--sxp-win-w)) / 2 * (1 - var(--sxp-p)));
           --sxp-r: calc(28px * (1 - var(--sxp-p)));
-          /* One source of truth: natural 2.75:1 aspect ratio scaling (756 / 2079 = 36.4%) */
-          --sxp-hands-h: clamp(220px, 36.4vw, 720px);
-          --sxp-hands-lift: clamp(0.5rem, 2vh, 2rem);
 
           position: sticky;
           top: 0;
@@ -480,25 +480,24 @@ export default function SponsorStage() {
           align-items: center;
           justify-content: flex-start;
           padding-inline: var(--padding-x);
-          /* Desktop: position lower down in the open sky */
-          padding-top: clamp(6.8rem, 13.5vh, 9.6rem);
-          padding-bottom: clamp(14rem, 28vh, 24rem);
+          /* Elevated positioning in the upper sky for generous breathing room */
+          padding-top: clamp(3.2rem, 6.2vh, 4.8rem);
+          padding-bottom: clamp(2rem, 4vh, 3.5rem);
         }
 
         /* ── The mossy handshake ──
-           Fully flexible artwork that stretches and resizes dynamically across
-           all screen sizes (ultrawide, desktop, laptop, tablet, mobile). */
+           Atmospheric artwork: mossy arms rising out of the mist and clouds */
         .sxp-hands {
           position: absolute;
           left: 0;
           right: 0;
-          bottom: var(--sxp-hands-lift);
+          bottom: clamp(0px, 1vh, 1.5rem);
           width: 100%;
-          height: var(--sxp-hands-h);
+          height: clamp(260px, 36.4vw, 700px);
           z-index: 0;
           pointer-events: none;
-          -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 100%);
-          mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 100%);
+          -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.5) 12%, #000 24%, #000 100%);
+          mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.5) 12%, #000 24%, #000 100%);
         }
         .sxp-hands img {
           width: 100% !important;
@@ -516,15 +515,15 @@ export default function SponsorStage() {
           flex-direction: column;
           align-items: center;
           text-align: center;
-          gap: clamp(0.35rem, 0.9vh, 0.65rem);
+          gap: clamp(0.3rem, 0.8vh, 0.55rem);
         }
 
         .sxp-motif {
-          width: clamp(130px, 14vw, 185px);
+          width: clamp(120px, 13vw, 170px);
           height: auto;
           color: #2F5527;
           opacity: 0.92;
-          margin-bottom: 0.15rem;
+          margin-bottom: 0.1rem;
         }
 
         .sxp-eyebrow {
@@ -537,10 +536,10 @@ export default function SponsorStage() {
         }
 
         .sxp-heading {
-          margin: 0.15rem 0 0;
+          margin: 0.1rem 0 0;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
           font-weight: 500;
-          font-size: clamp(2.4rem, 4.8vw, 4.1rem);
+          font-size: clamp(2.3rem, 4.6vw, 3.9rem);
           line-height: 1.05;
           letter-spacing: -0.028em;
           color: #111a12;
@@ -550,7 +549,7 @@ export default function SponsorStage() {
           margin: 0;
           max-width: 44rem;
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: clamp(0.95rem, 1.35vw, 1.15rem);
+          font-size: clamp(0.92rem, 1.3vw, 1.1rem);
           line-height: 1.5;
           color: #2A3B28;
           text-wrap: pretty;
@@ -562,16 +561,16 @@ export default function SponsorStage() {
           display: grid;
           place-items: center;
           width: 100%;
-          margin-top: clamp(0.4rem, 1.2vh, 1rem);
+          margin-top: clamp(0.4rem, 1.2vh, 0.9rem);
         }
 
         .sxp-seal-q {
           grid-area: 1 / 1;
-          font-family: var(--font-hiruko), var(--font-display), Georgia, serif;
-          font-weight: 700;
-          font-size: clamp(5rem, 15vh, 9.2rem);
+          font-family: var(--font-bebas), var(--font-heading), sans-serif;
+          font-weight: 400;
+          font-size: clamp(5.5rem, 14vh, 9rem);
           line-height: 0.8;
-          color: rgba(38, 70, 32, 0.28);
+          color: rgba(38, 70, 32, 0.25);
           filter: blur(6px);
           animation: sxp-seal-breathe 8s ease-in-out infinite;
           user-select: none;
@@ -579,11 +578,11 @@ export default function SponsorStage() {
 
         .sxp-seal-word {
           grid-area: 1 / 1;
-          font-family: var(--font-hiruko), var(--font-display), sans-serif;
-          font-weight: 900;
-          font-size: clamp(1.6rem, 4.4vw, 3.1rem);
+          font-family: var(--font-bebas), var(--font-heading), sans-serif;
+          font-weight: 400;
+          font-size: clamp(2.4rem, 5.2vw, 4rem);
           line-height: 1;
-          letter-spacing: 0.19em;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
           color: #16300F;
           text-shadow:
@@ -606,7 +605,7 @@ export default function SponsorStage() {
         }
 
         .sxp-cta-wrap {
-          margin-top: clamp(0.7rem, 1.8vh, 1.4rem);
+          margin-top: clamp(0.8rem, 2vh, 1.4rem);
           display: flex;
           justify-content: center;
           align-items: center;
@@ -618,26 +617,27 @@ export default function SponsorStage() {
           .sxp { --sxp-track: 280vh; }
           .sxp-stage {
             --sxp-win-w: min(88vw, 34rem);
-            --sxp-hands-h: clamp(150px, 36vw, 320px);
+          }
+          .sxp-hands {
+            height: clamp(160px, 36vw, 320px);
           }
           .sxp-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); }
           .sxp-body {
-            padding-top: clamp(3.8rem, 8vh, 5rem);
-            padding-bottom: clamp(9rem, 24vh, 15rem);
+            padding-top: clamp(2.8rem, 6vh, 4rem);
+            padding-bottom: clamp(2rem, 4vh, 3rem);
           }
         }
 
         @media (max-width: 620px) {
           .sxp { --sxp-track: 260vh; }
-          .sxp-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-          .sxp-stage {
-            --sxp-hands-h: clamp(120px, 28vw, 190px);
-            --sxp-hands-lift: 0;
+          .sxp-hands {
+            height: clamp(130px, 28vw, 190px);
+            bottom: 0px;
           }
+          .sxp-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .sxp-body {
-            /* Position items high up under the mobile navbar with a wide open sky below */
-            padding-top: clamp(3.4rem, 7vh, 4.4rem);
-            padding-bottom: clamp(6rem, 16vh, 9rem);
+            padding-top: clamp(2.4rem, 5vh, 3.4rem);
+            padding-bottom: clamp(1.5rem, 3vh, 2.5rem);
           }
           .sxp-motif {
             width: 90px;
@@ -655,7 +655,8 @@ export default function SponsorStage() {
             margin-top: 0.2rem;
           }
           .sxp-seal-word {
-            font-size: 1.15rem;
+            font-size: 1.8rem;
+            letter-spacing: 0.14em;
           }
           .sxp-seal-q {
             font-size: 3.5rem;
