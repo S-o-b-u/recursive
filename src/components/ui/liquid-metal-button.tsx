@@ -5,6 +5,20 @@ import { Sparkles } from "lucide-react";
 import type React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+/**
+ * Two curves, named once.
+ *
+ * The press moves `transform` and it has to feel connected to the finger, so it
+ * is short and does not overshoot. Two layers had been left on an 0.8s spring
+ * (`all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)`) that belongs to the text/icon
+ * morph — routed through `all` that curve also lands on transform, which is why
+ * those two wobbled while their siblings snapped.
+ */
+const EASE =
+  "transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s ease, opacity 0.2s ease";
+/** Same, for the layers whose box also resizes with `dimensions`. */
+const EASE_SIZE = `${EASE}, width 0.4s ease, height 0.4s ease`;
+
 export interface LiquidMetalButtonProps {
   label?: string;
   onClick?: () => void;
@@ -40,6 +54,19 @@ export function LiquidMetalButton({
   const shaderMount = useRef<any>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const rippleId = useRef(0);
+  const visibleRef = useRef(true);
+  const hoverRef = useRef(false);
+
+  /**
+   * What the shader should idle at right now.
+   *
+   * The observer parks it at 0 off screen, but hover and click used to write
+   * 0.6 / 1 unconditionally — so leaving a button or clicking one and scrolling
+   * away within the 300ms reset restarted a shader nothing could see, and it
+   * kept running until the button happened to re-enter the viewport. Every
+   * speed change goes through here instead.
+   */
+  const restSpeed = () => (!visibleRef.current ? 0 : hoverRef.current ? 1 : 0.6);
 
   const dimensions = useMemo(() => {
     if (viewMode === "icon") {
@@ -54,7 +81,8 @@ export function LiquidMetalButton({
         shaderHeight: h,
       };
     } else {
-      const w = customWidth ?? Math.max(142, label.length * 9 + 44);
+      const iconExtra = icon ? 24 : 0;
+      const w = customWidth ?? Math.max(142, label.length * 9 + 44 + iconExtra);
       const h = customHeight ?? 46;
       return {
         width: w,
@@ -65,7 +93,7 @@ export function LiquidMetalButton({
         shaderHeight: h,
       };
     }
-  }, [viewMode, customWidth, customHeight, label]);
+  }, [viewMode, customWidth, customHeight, label, icon]);
 
   useEffect(() => {
     const styleId = "shader-canvas-style-exploded";
@@ -116,7 +144,7 @@ export function LiquidMetalButton({
               u_contour: 0,
               u_angle: 45,
               u_scale: 8,
-              u_shape: 1,
+              u_shape: 0,
               u_offsetX: 0.1,
               u_offsetY: -0.1,
             },
@@ -126,9 +154,8 @@ export function LiquidMetalButton({
 
           observer = new IntersectionObserver(
             ([entry]) => {
-              if (shaderMount.current?.setSpeed) {
-                shaderMount.current.setSpeed(entry.isIntersecting ? 0.6 : 0);
-              }
+              visibleRef.current = entry.isIntersecting;
+              shaderMount.current?.setSpeed?.(restSpeed());
             },
             { rootMargin: "100px" }
           );
@@ -152,24 +179,22 @@ export function LiquidMetalButton({
 
   const handleMouseEnter = () => {
     setIsHovered(true);
-    shaderMount.current?.setSpeed?.(1);
+    hoverRef.current = true;
+    shaderMount.current?.setSpeed?.(restSpeed());
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
     setIsPressed(false);
-    shaderMount.current?.setSpeed?.(0.6);
+    hoverRef.current = false;
+    shaderMount.current?.setSpeed?.(restSpeed());
   };
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (shaderMount.current?.setSpeed) {
       shaderMount.current.setSpeed(2.4);
       setTimeout(() => {
-        if (isHovered) {
-          shaderMount.current?.setSpeed?.(1);
-        } else {
-          shaderMount.current?.setSpeed?.(0.6);
-        }
+        shaderMount.current?.setSpeed?.(restSpeed());
       }, 300);
     }
 
@@ -203,7 +228,7 @@ export function LiquidMetalButton({
             height: `${dimensions.height}px`,
             transformStyle: "preserve-3d",
             transition:
-              "transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s ease, opacity 0.2s ease",
+              EASE,
             transform: "none",
           }}
         >
@@ -267,7 +292,7 @@ export function LiquidMetalButton({
               height: `${dimensions.height}px`,
               transformStyle: "preserve-3d",
               transition:
-                "transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s ease, opacity 0.2s ease",
+                EASE,
               transform: `translateZ(10px) ${isPressed ? "translateY(1px) scale(0.98)" : "translateY(0) scale(1)"}`,
               zIndex: 20,
             }}
@@ -283,7 +308,7 @@ export function LiquidMetalButton({
                   ? "inset 0px 2px 4px rgba(0, 0, 0, 0.4), inset 0px 1px 2px rgba(0, 0, 0, 0.3)"
                   : "none",
                 transition:
-                  "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s ease, height 0.4s ease, box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
+                  EASE_SIZE,
               }}
             />
           </div>
@@ -297,7 +322,7 @@ export function LiquidMetalButton({
               height: `${dimensions.height}px`,
               transformStyle: "preserve-3d",
               transition:
-                "transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s ease, opacity 0.2s ease",
+                EASE,
               transform: `translateZ(0px) ${isPressed ? "translateY(1px) scale(0.98)" : "translateY(0) scale(1)"}`,
               zIndex: 10,
             }}
@@ -309,7 +334,7 @@ export function LiquidMetalButton({
                 borderRadius: "100px",
                 boxShadow: "none",
                 transition:
-                  "transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s ease, opacity 0.2s ease",
+                  EASE,
                 background: "rgb(0 0 0 / 0)",
               }}
             >
@@ -354,7 +379,7 @@ export function LiquidMetalButton({
                 transformStyle: "preserve-3d",
                 transform: "translateZ(25px)",
                 transition:
-                  "transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s ease, opacity 0.2s ease",
+                  EASE,
                 overflow: "hidden",
                 borderRadius: "100px",
                 textDecoration: "none",
@@ -402,7 +427,7 @@ export function LiquidMetalButton({
                 transformStyle: "preserve-3d",
                 transform: "translateZ(25px)",
                 transition:
-                  "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s ease, height 0.4s ease",
+                  EASE_SIZE,
                 overflow: "hidden",
                 borderRadius: "100px",
               }}

@@ -5,7 +5,7 @@ import ACM from "@/components/ACM";
 import Countdown from "@/components/Countdown";
 import Themes from "@/components/Themes";
 import Judges from "@/components/Judges";
-import SponsorWall from "@/components/SponsorWall";
+import SponsorStage from "@/components/SponsorStage";
 
 export default function Home() {
   return (
@@ -21,9 +21,14 @@ export default function Home() {
       <div className="night">
         <Themes />
         <Judges />
-        <SponsorWall />
-        <ACM />
       </div>
+
+      {/* The way back out. A window opens on the black field and what is behind
+          it is the sky — the sponsors sit inside it, on cloud. By the time the
+          window fills the viewport it is painting the same pixels as the page
+          backdrop, so ACM below simply continues on that background. */}
+      <SponsorStage />
+      <ACM />
     </main>
   );
 }
