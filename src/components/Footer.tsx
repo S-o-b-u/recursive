@@ -52,7 +52,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       // depth 1 = back row (stands elevated behind the front row)
       const depth = Math.pow(Math.random(), 1.25);
       const scale = 1.02 + (1 - depth * 0.3) * 0.22;
-      
+
       // Ground the front row deeply so they seamlessly meet and cross the bottom of the screen (+32px),
       // with back rows elevated by up to 72px so their heads rise up without exposing any cutoffs.
       const startY = stage.height - peep.height * scale + 32 - depth * 72;
@@ -259,12 +259,10 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
 
       ctx.restore();
 
-      // Tint every drawn pixel to a muted sage green using source-atop,
-      // which only paints over existing opaque pixels (the peep shapes)
-      // and leaves the transparent background untouched.
+      // Tint every drawn pixel to deep botanical dark green using source-atop
       ctx.save();
       ctx.globalCompositeOperation = 'source-atop';
-      ctx.fillStyle = '#b4cda0';
+      ctx.fillStyle = '#1c301c';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.restore();
     };
@@ -313,7 +311,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     <canvas
       ref={canvasRef}
       className="absolute bottom-0 h-full w-full pointer-events-none"
-      style={{ opacity: 0.14 }}
+      style={{ opacity: 0.2 }}
     />
   );
 };
@@ -321,14 +319,13 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
 export default function Footer() {
 
   return (
-    <footer className="relative h-screen w-full bg-[#010301] text-[#EEF5E6] overflow-hidden select-none">
-      {/* ── Top Atmospheric Gradient: seamlessly dissolves the straight line between .night/ACM and Footer ── */}
+    <footer className="relative h-screen w-full bg-transparent text-[#16241A] overflow-hidden select-none">
 
       {/* ── Giant WebGL WarpText Wordmark across the upper section ── */}
       <div className="absolute top-[24%] sm:top-[26%] left-0 right-0 z-10 flex justify-center items-center px-4 pointer-events-auto">
         <WarpText
           text={EVENT.name}
-          color="#EEF5E6"
+          color="#142617"
           warpStrength={0.08}
           warpScale={1.7}
           speed={0.55}
@@ -357,11 +354,7 @@ export default function Footer() {
       </div>
 
       <style>{`
-        /* A whisper of ground under the crowd, so they are standing on
-           something rather than floating in the sky. This replaces the old
-           seam blend, which faded from black — it existed to join a dark ACM to
-           a dark footer, and once the sponsor stage handed the page back to
-           daylight it was painting a wall across the top of the cloud. */
+        /* A whisper of meadow ground under the crowd */
         .footer-ground {
           position: absolute;
           inset: auto 0 0 0;
@@ -371,8 +364,8 @@ export default function Footer() {
           background: linear-gradient(
             180deg,
             rgba(200, 214, 194, 0) 0%,
-            rgba(190, 206, 182, 0.18) 58%,
-            rgba(176, 194, 166, 0.3) 100%
+            rgba(190, 206, 182, 0.24) 55%,
+            rgba(168, 188, 158, 0.42) 100%
           );
         }
       `}</style>
