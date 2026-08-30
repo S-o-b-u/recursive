@@ -11,7 +11,7 @@ const SUBLOGOS = [
 ];
 
 const STORY = [
-  "Recursive is organized by the ACM Student Chapter at Guru Nanak Institute of Technology, in collaboration with the Department of Information Technology. The chapter brings together developers, designers, and builders from across Kolkata for eight hours of focused work and honest software craft.",
+  "The chapter brings together developers, designers, and builders from across Kolkata for eight hours of focused work and honest software craft.",
 ];
 
 export default function ACM() {
@@ -41,39 +41,33 @@ export default function ACM() {
           <div className="acm-rule-top" />
         </RevealBlock>
 
-        {/* ── Main chapter logo, large & centered ── */}
-        <RevealBlock y={20} delay={0.06} className="acm-logo-block">
-          <div className="acm-logo-plate">
-            <Image
-              src="/college_logo/gnitacm.png"
-              alt="GNIT ACM Student Chapter"
-              width={340}
-              height={110}
-              className="acm-main-logo"
-              priority
-            />
-          </div>
+        {/* ── Eyebrow ── */}
+        <RevealBlock y={10} delay={0.03} className="acm-eyebrow-block">
+          <p className="acm-eyebrow">Organized by</p>
         </RevealBlock>
 
-        {/* ── Accreditation sublogos ── */}
-        <RevealBlock y={12} delay={0.12} className="acm-sublogos-block">
-          <div className="acm-sublogos">
-            {SUBLOGOS.map((s) => (
-              <span className="acm-sublogo-plate" key={s.src}>
-                <Image
-                  src={s.src}
-                  alt={s.alt}
-                  width={s.width}
-                  height={s.height}
-                  className="acm-sublogo"
-                />
-              </span>
-            ))}
-          </div>
+        {/* ── Main chapter logo, monochrome on dark ── */}
+        <RevealBlock y={20} delay={0.06} className="acm-logo-block">
+          <Image
+            src="/college_logo/gnitacm.png"
+            alt="GNIT ACM Student Chapter"
+            width={420}
+            height={135}
+            className="acm-main-logo"
+            priority
+          />
+        </RevealBlock>
+
+        {/* ── Collaboration line ── */}
+        <RevealBlock y={10} delay={0.09} className="acm-collab-block">
+          <p className="acm-collab">
+            in collaboration with the{" "}
+            <span className="acm-collab-dept">Department of Information Technology</span>
+          </p>
         </RevealBlock>
 
         {/* ── Thin rule separator ── */}
-        <RevealBlock y={8} delay={0.14}>
+        <RevealBlock y={8} delay={0.12}>
           <div className="acm-rule-mid" />
         </RevealBlock>
 
@@ -82,8 +76,24 @@ export default function ACM() {
           <RevealWords paragraphs={STORY} className="acm-story" />
         </div>
 
+        {/* ── Accreditation sublogos ── */}
+        <RevealBlock y={10} delay={0.16} className="acm-sublogos-block">
+          <div className="acm-sublogos">
+            {SUBLOGOS.map((s) => (
+              <Image
+                key={s.src}
+                src={s.src}
+                alt={s.alt}
+                width={s.width}
+                height={s.height}
+                className="acm-sublogo"
+              />
+            ))}
+          </div>
+        </RevealBlock>
+
         {/* ── Location line at bottom ── */}
-        <RevealBlock y={10} delay={0.18} className="acm-footer-block">
+        <RevealBlock y={10} delay={0.2} className="acm-footer-block">
           <p className="acm-location">
             Sodepur, Kolkata · October 08, 2026
           </p>
@@ -98,9 +108,13 @@ export default function ACM() {
         .acm {
           position: relative;
           width: 100%;
+<<<<<<< HEAD
           color: #0f1623;
           /* Same tightening as the sections above — this one ran even wider
              (22vh) and left the biggest hole in the run. */
+=======
+          color: #EEF5E6;
+>>>>>>> f1f6e6301a1cab9d9d8fdfbfd327d62bc7cd20cc
           padding-top: clamp(5rem, 11vh, 8.5rem);
           padding-bottom: clamp(5.5rem, 12vh, 9rem);
           overflow: hidden;
@@ -109,8 +123,7 @@ export default function ACM() {
         }
 
         /* ─────────────────────────────────────────
-           Giant watermark
-           — Dual scrolling marquee
+           Giant watermark — Dual scrolling marquee
         ───────────────────────────────────────── */
         .acm-watermark {
           position: absolute;
@@ -126,6 +139,7 @@ export default function ACM() {
           width: 100vw;
           left: 50%;
           transform: translateX(-50%);
+<<<<<<< HEAD
           /* Hollow out the middle and both ends: the rows read as a band top
              and bottom, and the panel sits in clear air between them. */
           mask-image:
@@ -138,6 +152,11 @@ export default function ACM() {
           -webkit-mask-composite: source-in;
           justify-content: space-between;
           padding-block: clamp(1rem, 4vh, 3rem);
+=======
+          mask-image: radial-gradient(ellipse 85% 65% at 50% 50%, black 30%, transparent 85%);
+          -webkit-mask-image: radial-gradient(ellipse 85% 65% at 50% 50%, black 30%, transparent 85%);
+          opacity: 0.85;
+>>>>>>> f1f6e6301a1cab9d9d8fdfbfd327d62bc7cd20cc
         }
 
         .acm-marquee {
@@ -145,6 +164,7 @@ export default function ACM() {
           overflow: hidden;
           display: flex;
           white-space: nowrap;
+          padding: 0.5rem 0;
         }
 
         .acm-marquee-track {
@@ -158,6 +178,7 @@ export default function ACM() {
         .acm-marquee-track span {
           display: inline-block;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
+<<<<<<< HEAD
           font-weight: 700;
           font-size: clamp(4rem, 11vw, 9.5rem);
           line-height: 0.9;
@@ -166,6 +187,16 @@ export default function ACM() {
           color: transparent;
           -webkit-text-stroke: 1.2px rgba(28, 48, 26, 0.14);
           padding: 0 2vw;
+=======
+          font-weight: 800;
+          font-size: clamp(5.5rem, 15vw, 13rem);
+          line-height: 0.88;
+          letter-spacing: -0.01em;
+          text-transform: uppercase;
+          color: transparent;
+          -webkit-text-stroke: 1px rgba(190, 224, 168, 0.13);
+          padding: 0 1.5vw;
+>>>>>>> f1f6e6301a1cab9d9d8fdfbfd327d62bc7cd20cc
         }
 
         .acm-marquee-left .acm-marquee-track {
@@ -207,81 +238,94 @@ export default function ACM() {
         .acm-rule-top {
           width: clamp(2rem, 6vw, 4rem);
           height: 1.5px;
+<<<<<<< HEAD
           background: rgba(15, 22, 35, 0.18);
           margin-bottom: clamp(2.5rem, 5vh, 3.5rem);
+=======
+          background: rgba(190, 224, 168, 0.28);
+          margin-bottom: clamp(2rem, 4vh, 3rem);
+>>>>>>> f1f6e6301a1cab9d9d8fdfbfd327d62bc7cd20cc
         }
 
         .acm-rule-mid {
           width: 100%;
-          max-width: 40rem;
+          max-width: 32rem;
           height: 1px;
+<<<<<<< HEAD
           background: rgba(15, 22, 35, 0.1);
           margin-top: clamp(2rem, 4vh, 3rem);
+=======
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(190, 224, 168, 0.18) 30%,
+            rgba(190, 224, 168, 0.18) 70%,
+            transparent 100%
+          );
+          margin-top: clamp(2.5rem, 5vh, 3.5rem);
+>>>>>>> f1f6e6301a1cab9d9d8fdfbfd327d62bc7cd20cc
         }
 
         /* ─────────────────────────────────────────
-           Main logo
+           Eyebrow
+        ───────────────────────────────────────── */
+        .acm-eyebrow-block {
+          display: flex;
+          justify-content: center;
+        }
+
+        .acm-eyebrow {
+          font-family: var(--font-geist-mono), monospace;
+          font-size: clamp(0.68rem, 0.95vw, 0.78rem);
+          font-weight: 500;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: rgba(143, 196, 90, 0.75);
+          margin: 0 0 clamp(1.8rem, 3.5vh, 2.8rem);
+        }
+
+        /* ─────────────────────────────────────────
+           Main logo — vibrant natural colors on dark
         ───────────────────────────────────────── */
         .acm-logo-block {
           display: flex;
           justify-content: center;
         }
 
-        /* The chapter and accreditation marks are brand-coloured artwork on
-           transparency — navy, maroon, teal. Against the night field they sink,
-           so each one sits on its own light plate instead of being recoloured. */
-        .acm-logo-plate {
-          display: inline-flex;
-          padding: clamp(1rem, 2.4vw, 1.5rem) clamp(1.4rem, 3vw, 2.1rem);
-          border-radius: var(--radius-lg);
-          background: rgba(241, 246, 234, 0.95);
-          box-shadow:
-            0 26px 64px -34px rgba(0, 0, 0, 0.95),
-            inset 0 0 0 1px rgba(190, 224, 168, 0.28);
-        }
-
         .acm-main-logo {
           width: auto;
-          height: clamp(64px, 10vw, 96px);
+          height: clamp(56px, 8.5vw, 84px);
           object-fit: contain;
+          filter: drop-shadow(0 0 16px rgba(45, 100, 255, 0.28)) brightness(1.25) contrast(1.05);
+          opacity: 0.98;
+          transition: transform 250ms ease, opacity 250ms ease;
+        }
+
+        .acm-main-logo:hover {
+          opacity: 1;
+          transform: scale(1.02);
         }
 
         /* ─────────────────────────────────────────
-           Sublogos
+           Collaboration line
         ───────────────────────────────────────── */
-        .acm-sublogos-block {
-          margin-top: clamp(1.75rem, 3.5vh, 2.5rem);
+        .acm-collab-block {
+          margin-top: clamp(1.5rem, 3vh, 2.2rem);
         }
 
-        .acm-sublogos {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-          gap: clamp(1.4rem, 3vw, 2.5rem);
+        .acm-collab {
+          font-family: var(--font-dm-sans), sans-serif;
+          font-size: clamp(0.88rem, 1.25vw, 1.05rem);
+          font-weight: 400;
+          line-height: 1.6;
+          letter-spacing: -0.005em;
+          color: rgba(214, 232, 202, 0.55);
+          margin: 0;
         }
 
-        .acm-sublogo-plate {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0.5rem 0.85rem;
-          border-radius: 12px;
-          background: rgba(241, 246, 234, 0.9);
-          box-shadow: inset 0 0 0 1px rgba(190, 224, 168, 0.22);
-          opacity: 0.82;
-          transition: opacity 180ms ease, transform 180ms ease;
-        }
-
-        .acm-sublogo-plate:hover {
-          opacity: 1;
-          transform: translateY(-2px);
-        }
-
-        .acm-sublogo {
-          width: auto;
-          height: clamp(22px, 3vw, 28px);
-          object-fit: contain;
+        .acm-collab-dept {
+          color: rgba(214, 232, 202, 0.85);
+          font-weight: 500;
         }
 
         /* ─────────────────────────────────────────
@@ -290,12 +334,12 @@ export default function ACM() {
         .acm-story-wrap {
           margin-top: clamp(2.5rem, 5vh, 4rem);
           width: 100%;
-          max-width: 66rem;
+          max-width: 52rem;
         }
 
         .acm-story .rw-para {
           margin: 0 auto;
-          max-width: 64rem;
+          max-width: 50rem;
           font-family: var(--font-dm-sans), sans-serif;
           font-size: clamp(1.05rem, 1.7vw, 1.35rem);
           font-weight: 400;
@@ -307,19 +351,52 @@ export default function ACM() {
         }
 
         /* ─────────────────────────────────────────
+           Sublogos — colorful, slightly larger, no bg
+        ───────────────────────────────────────── */
+        .acm-sublogos-block {
+          margin-top: clamp(2.5rem, 5vh, 3.5rem);
+        }
+
+        .acm-sublogos {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: clamp(1.8rem, 4vw, 3.2rem);
+        }
+
+        .acm-sublogo {
+          width: auto;
+          height: clamp(26px, 3.4vw, 36px);
+          object-fit: contain;
+          opacity: 0.85;
+          filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+          transition: opacity 200ms ease, transform 200ms ease;
+        }
+
+        .acm-sublogo:hover {
+          opacity: 1;
+          transform: translateY(-2px);
+        }
+
+        /* ─────────────────────────────────────────
            Location footer line
         ───────────────────────────────────────── */
         .acm-footer-block {
-          margin-top: clamp(2rem, 4vh, 3rem);
+          margin-top: clamp(2.5rem, 5vh, 3.5rem);
         }
 
         .acm-location {
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: 0.78rem;
+          font-size: 0.72rem;
           font-weight: 500;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
+<<<<<<< HEAD
           color: rgba(15, 22, 35, 0.38);
+=======
+          color: rgba(200, 226, 185, 0.35);
+>>>>>>> f1f6e6301a1cab9d9d8fdfbfd327d62bc7cd20cc
           margin: 0;
         }
       `}</style>
