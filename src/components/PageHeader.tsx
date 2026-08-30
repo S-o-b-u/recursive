@@ -69,7 +69,7 @@ export default function PageHeader({
           bottom: -14%;
           height: 78%;
           z-index: -1;
-          background-image: url("/foreground.png");
+          background-image: url("/images/valley.png");
           background-size: cover;
           background-position: center bottom;
           opacity: 0.2;

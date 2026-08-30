@@ -25,6 +25,8 @@ import {
  * arbitrary content such as the brand mark.
  */
 
+import { triggerScrollExpand } from "@/lib/scroll-expand";
+
 type Ripple = { x: number; y: number; id: number };
 
 export default function NavLink({
@@ -59,6 +61,24 @@ export default function NavLink({
         () => setRipples((p) => p.filter((x) => x.id !== rip.id)),
         640,
       );
+    }
+
+    // Direct Automatic Scroll Expand on navbar item click
+    const isSamePage = typeof window !== "undefined" && (
+      href.startsWith("#") ||
+      (href.startsWith("/#") && window.location.pathname === "/") ||
+      (href === "/" && window.location.pathname === "/")
+    );
+
+    if (isSamePage) {
+      const hash = href === "/" ? "#hero" : href.startsWith("/#") ? href.slice(1) : href;
+      const target = document.querySelector<HTMLElement>(hash) || (hash === "#hero" ? document.body : null);
+      if (target) {
+        e.preventDefault();
+        triggerScrollExpand(target);
+        if (hash !== "#hero") window.history.pushState(null, "", hash);
+        else window.history.pushState(null, "", "/");
+      }
     }
   };
 

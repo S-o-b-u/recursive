@@ -23,7 +23,7 @@ import {
   type ReactNode,
 } from "react";
 
-import { createRectCache } from "../rect-cache";
+import { createRectCache } from "@/lib/rect-cache";
 
 export interface RetroDitherOptions {
   /** Radius of the dither lens around the cursor, relative to the screen height. */

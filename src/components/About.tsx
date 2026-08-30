@@ -3,59 +3,7 @@
 import { EVENT } from "@/data/hackathon";
 import { RevealWords, RevealHeading, RevealBlock } from "@/components/ui/reveal";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
-
-/**
- * Botanical Crown Flourish Motif.
- */
-function BotanicalCrown({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 180 44"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-hidden="true"
-    >
-      <path
-        d="M90 6C90 6 86 16 74 19C62 22 46 16 34 22C24 27 20 37 12 39C6 40 2 37 0 35"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M90 6C90 6 94 16 106 19C118 22 134 16 146 22C156 27 160 37 168 39C174 40 178 37 180 35"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      {/* Central sprout */}
-      <path
-        d="M90 2V14M90 2C86.5 5.5 83 9 83 13C83 16.5 86.5 18 90 18C93.5 18 97 16.5 97 13C97 9 93.5 5.5 90 2Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-      {/* Leaves left */}
-      <path
-        d="M68 20C65 16 59 15 56 18C53 21 55 26 59 27C63 28 66 24 68 20Z"
-        stroke="currentColor"
-        strokeWidth="1.4"
-      />
-      {/* Leaves right */}
-      <path
-        d="M112 20C115 16 121 15 124 18C127 21 125 26 121 27C117 28 114 24 112 20Z"
-        stroke="currentColor"
-        strokeWidth="1.4"
-      />
-      {/* Dots */}
-      <circle cx="90" cy="25" r="2" fill="currentColor" />
-      <circle cx="90" cy="33" r="1.5" fill="currentColor" />
-      <circle cx="90" cy="40" r="1" fill="currentColor" />
-      <circle cx="44" cy="22" r="1.5" fill="currentColor" />
-      <circle cx="136" cy="22" r="1.5" fill="currentColor" />
-    </svg>
-  );
-}
+import Ornament from "@/components/ui/Ornament";
 
 const STORY = [
   "The plastic chair is an everyday staple across Kolkata, scattered on college terraces, roadside tea stalls, and neighborhood corners where people gather to talk for hours. For this hackathon, four of these chairs sit together on the hill as an open table for your team. You arrive with people you know or team up in the morning, claim your spot, and spend eight focused hours turning an idea into working software before the day ends.",
@@ -68,7 +16,7 @@ export default function About() {
         {/* ── Symmetrical Botanical Flourish ── */}
         <RevealBlock y={14}>
           <div className="ab-ornament-wrap">
-            <BotanicalCrown className="ab-crown" />
+            <Ornament className="ab-crown" />
           </div>
         </RevealBlock>
 
@@ -104,8 +52,10 @@ export default function About() {
           width: 100%;
           background: transparent;
           color: #111a12;
-          padding-top: clamp(8.5rem, 19vh, 14rem);
-          padding-bottom: clamp(6rem, 14vh, 10rem);
+          padding-top: clamp(6rem, 13vh, 10rem);
+          /* Stacks with the countdown's padding-top, so this is half the gap
+             that reads on screen. */
+          padding-bottom: clamp(3.5rem, 8vh, 6.5rem);
           overflow: hidden;
           z-index: 1;
         }
@@ -128,7 +78,7 @@ export default function About() {
         }
 
         .ab-crown {
-          width: clamp(130px, 16vw, 180px);
+          width: clamp(190px, 22vw, 260px);
           height: auto;
           color: #2F5527;
           opacity: 0.85;

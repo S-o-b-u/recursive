@@ -14,10 +14,16 @@ export default function Home() {
       <Hero />
       <About />
       <Countdown />
-      <Themes />
-      <Judges />
-      <SponsorWall />
-      <ACM />
+
+      {/* Everything from here down is night. The valley plate that closes the
+          countdown fades to #010301 on its last row, so `.night` picks up
+          exactly where the image leaves off and the seam disappears. */}
+      <div className="night">
+        <Themes />
+        <Judges />
+        <SponsorWall />
+        <ACM />
+      </div>
     </main>
   );
 }

@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { NAV_LINKS, EVENT } from "@/data/hackathon";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import NavLink from "@/components/ui/NavLink";
+import { triggerScrollExpand } from "@/lib/scroll-expand";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
@@ -144,31 +145,131 @@ export default function Navigation() {
         </filter>
       </svg>
 
-      {/* Mobile glass sheet */}
-      {menuOpen && (
-        <div className="nav-mobile-sheet">
-          <div className="nav-mobile-content">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMenuOpen(false)}
-                className="nav-mobile-link"
-              >
-                {link.label}
+      {/* Editorial Linen Canvas Mobile Navigation (matching LimeIQ reference) */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            className="limelq-nav-screen"
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {/* Top Bar */}
+            <div className="limelq-head">
+              <Link href="/" onClick={() => setMenuOpen(false)} className="limelq-brand">
+                {EVENT.name}
               </Link>
-            ))}
-            <a
-              href={EVENT.devfolioUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary nav-mobile-cta"
-            >
-              Register on Devfolio
-            </a>
-          </div>
-        </div>
-      )}
+
+              <button
+                type="button"
+                className="limelq-close"
+                onClick={() => setMenuOpen(false)}
+                aria-label="Close menu"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                  <line x1="19" y1="5" x2="5" y2="19" />
+                  <line x1="5" y1="5" x2="19" y2="19" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Menu List with Black Square Prefix & Hairline Dividers */}
+            <div className="limelq-list">
+              {[
+                { label: "Home", href: "/" },
+                { label: "The Chair", href: "/#about" },
+                { label: "Themes", href: "/#themes" },
+                { label: "Judges", href: "/#judges" },
+                { label: "Sponsors", href: "/#sponsors" },
+                { label: "Tracks", href: "/tracks", locked: true },
+                { label: "Schedule", href: "/schedule", locked: true },
+                { label: "Prizes", href: "/prizes", locked: true },
+                { label: "FAQ", href: "/faq", locked: true },
+              ].map((item) =>
+                item.locked ? (
+                  <div
+                    key={item.label}
+                    className="limelq-item limelq-item--locked"
+                    aria-disabled="true"
+                  >
+                    <span className="limelq-bullet" aria-hidden="true" />
+                    <span className="limelq-text">{item.label}</span>
+                    <span className="limelq-lock-badge">
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                      LOCKED
+                    </span>
+                  </div>
+                ) : (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    onClick={(e) => {
+                      setMenuOpen(false);
+                      const isSamePage =
+                        typeof window !== "undefined" &&
+                        (item.href.startsWith("#") ||
+                          (item.href.startsWith("/#") &&
+                            window.location.pathname === "/"));
+                      if (isSamePage) {
+                        const hash = item.href.startsWith("/#")
+                          ? item.href.slice(1)
+                          : item.href;
+                        const target = document.querySelector<HTMLElement>(hash);
+                        if (target) {
+                          e.preventDefault();
+                          window.setTimeout(() => triggerScrollExpand(target), 120);
+                          window.history.pushState(null, "", hash);
+                        }
+                      }
+                    }}
+                    className="limelq-item"
+                  >
+                    <span className="limelq-bullet" aria-hidden="true" />
+                    <span className="limelq-text">{item.label}</span>
+                  </Link>
+                )
+              )}
+            </div>
+
+            {/* Bottom Row */}
+            <div className="limelq-foot">
+              <a
+                href={EVENT.discordUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="limelq-foot-link"
+              >
+                Discord
+              </a>
+
+              <div onClick={() => setMenuOpen(false)}>
+                <LiquidMetalButton
+                  label="Register on Devfolio"
+                  href={EVENT.devfolioUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  width={185}
+                  height={44}
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <style>{`
         .nav-root {
@@ -409,34 +510,186 @@ export default function Navigation() {
         }
         .nav-toggle:active { transform: scale(0.92); }
 
-        .nav-mobile-sheet {
+        /* ── Editorial Linen Canvas Mobile Navigation (matching LimeIQ reference) ── */
+        .limelq-nav-screen {
           position: fixed;
           inset: 0;
-          z-index: 90;
-          background: rgba(239, 243, 235, 0.78);
-          backdrop-filter: blur(30px) saturate(200%);
-          -webkit-backdrop-filter: blur(30px) saturate(200%);
-          display: grid;
-          place-items: center;
-          animation: nav-fade-in 300ms var(--ease-out);
-        }
-        .nav-mobile-content {
+          z-index: 999;
+          background: rgba(234, 229, 220, 0.82);
+          backdrop-filter: blur(28px) saturate(180%);
+          -webkit-backdrop-filter: blur(28px) saturate(180%);
+          color: #121A12;
           display: flex;
           flex-direction: column;
-          align-items: center;
-          gap: 1.35rem;
+          justify-content: space-between;
+          padding: clamp(1.4rem, 4vh, 2.2rem) clamp(1.25rem, 5.5vw, 2.4rem);
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          -webkit-overflow-scrolling: touch;
         }
-        .nav-mobile-link {
-          font-size: 1.6rem;
-          font-weight: 300;
-          letter-spacing: var(--tracking-snug);
-          color: var(--color-text);
-        }
-        .nav-mobile-cta { margin-top: 0.75rem; }
 
-        @keyframes nav-fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
+        .limelq-head {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          padding-bottom: clamp(1rem, 2.5vh, 1.6rem);
+        }
+
+        .limelq-brand {
+          font-family: var(--font-display), var(--font-geist-sans), sans-serif;
+          font-size: clamp(1.45rem, 4.5vw, 1.85rem);
+          font-weight: 700;
+          letter-spacing: -0.01em;
+          text-transform: uppercase;
+          color: #121A12;
+          text-decoration: none;
+          text-align: center;
+        }
+
+        .limelq-close {
+          position: absolute;
+          right: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          display: grid;
+          place-items: center;
+          width: 2.5rem;
+          height: 2.5rem;
+          background: transparent;
+          border: none;
+          color: #121A12;
+          cursor: pointer;
+          padding: 0;
+          transition: transform 180ms var(--ease-out), opacity 180ms ease;
+        }
+        .limelq-close:hover { opacity: 0.7; }
+        .limelq-close:active { transform: translateY(-50%) scale(0.9); }
+
+        .limelq-list {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          margin-block: auto;
+        }
+
+        .limelq-item {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          padding-block: clamp(0.6rem, 1.8vh, 0.95rem);
+          border-bottom: 1px solid rgba(18, 26, 18, 0.2);
+          text-decoration: none;
+          color: #121A12;
+          transition: transform 180ms var(--ease-out), color 180ms ease;
+        }
+        .limelq-item:first-child {
+          border-top: 1px solid rgba(18, 26, 18, 0.2);
+        }
+        .limelq-item:hover,
+        .limelq-item:active {
+          transform: translateX(6px);
+          color: #2D5824;
+        }
+
+        .limelq-bullet {
+          display: inline-block;
+          width: 5px;
+          height: 5px;
+          background: #121A12;
+          margin-right: clamp(0.75rem, 2.5vw, 1.1rem);
+          flex-shrink: 0;
+          transition: background-color 180ms ease, transform 180ms ease;
+        }
+        .limelq-item:hover .limelq-bullet,
+        .limelq-item:active .limelq-bullet {
+          background: #2D5824;
+          transform: scale(1.3);
+        }
+
+        .limelq-text {
+          font-family: var(--font-heading), var(--font-dm-sans), var(--font-geist-sans), sans-serif;
+          font-size: clamp(1.65rem, 5.5vw, 2.45rem);
+          font-weight: 500;
+          line-height: 1.15;
+          letter-spacing: -0.02em;
+          color: inherit;
+        }
+
+        .limelq-item--locked {
+          opacity: 0.38;
+          cursor: not-allowed;
+          user-select: none;
+        }
+        .limelq-item--locked:hover,
+        .limelq-item--locked:active {
+          transform: none;
+          color: #121A12;
+        }
+        .limelq-item--locked:hover .limelq-bullet,
+        .limelq-item--locked:active .limelq-bullet {
+          background: #121A12;
+          transform: none;
+        }
+
+        .limelq-lock-badge {
+          margin-left: auto;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          font-family: var(--font-geist-mono), monospace;
+          font-size: 0.62rem;
+          font-weight: 600;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #121A12;
+          padding: 0.22rem 0.55rem;
+          border-radius: 999px;
+          background: rgba(18, 26, 18, 0.08);
+          border: 1px solid rgba(18, 26, 18, 0.14);
+        }
+
+        .limelq-foot {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding-top: clamp(1.2rem, 3vh, 2rem);
+        }
+
+        .limelq-foot-link {
+          font-family: var(--font-dm-sans), var(--font-geist-sans), sans-serif;
+          font-size: clamp(0.88rem, 2.4vw, 1rem);
+          font-weight: 500;
+          color: #121A12;
+          text-decoration: none;
+          transition: opacity 180ms ease;
+        }
+        .limelq-foot-link:hover { opacity: 0.65; }
+
+        .limelq-cta-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.6rem;
+          background: #121A12;
+          color: #F4F0E8;
+          padding: 0.65rem 1.15rem;
+          border-radius: 4px;
+          font-family: var(--font-dm-sans), sans-serif;
+          font-size: clamp(0.82rem, 2.2vw, 0.92rem);
+          font-weight: 500;
+          text-decoration: none;
+          transition: background 180ms ease, transform 180ms ease;
+        }
+        .limelq-cta-btn:hover {
+          background: #2D5824;
+        }
+        .limelq-cta-btn:active {
+          transform: scale(0.97);
+        }
+        .limelq-cta-arrow {
+          font-size: 1.05rem;
+          line-height: 1;
         }
 
         @media (prefers-reduced-transparency: reduce) {
@@ -445,11 +698,6 @@ export default function Navigation() {
             backdrop-filter: none;
             -webkit-backdrop-filter: none;
             border: 1px solid var(--color-border);
-          }
-          .nav-mobile-sheet {
-            background: var(--color-bg);
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
           }
         }
 

@@ -5,6 +5,7 @@ import SmoothScroll from "@/components/SmoothScroll";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import GradualBlur from "@/components/ui/GradualBlur";
+import PageTransition from "@/components/PageTransition";
 import { EVENT } from "@/data/hackathon";
 
 export const metadata: Metadata = {
@@ -28,15 +29,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Footer />
         </SmoothScroll>
 
+        <PageTransition />
+
         <GradualBlur
           target="page"
           position="bottom"
-          height="6rem"
-          strength={2}
-          divCount={5}
+          height="5rem"
+          strength={1.6}
+          divCount={3}
           curve="bezier"
           exponential
-          opacity={1}
+          opacity={0.95}
           zIndex={0}
         />
       </body>

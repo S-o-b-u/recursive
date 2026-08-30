@@ -30,9 +30,11 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     // Lenis 1.x drives native window scroll (autoRaf defaults to false), so we
     // pump it from GSAP's ticker and keep ScrollTrigger in sync on every frame.
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Apple-like ease-out
-      touchMultiplier: 2,
+      duration: 1.15,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Apple-style fluid exponential ease-out
+      smoothWheel: true,
+      wheelMultiplier: 1.0,
+      touchMultiplier: 1.5,
     });
     lenisRef.current = lenis;
     setLenis(lenis);
@@ -44,11 +46,47 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       lenis.raf(time * 1000);
     };
     gsap.ticker.add(tick);
-    gsap.ticker.lagSmoothing(0);
+    gsap.ticker.lagSmoothing(500, 33);
 
-    // Hash links (the hero's "scroll for lore", the nav anchors) would otherwise
-    // hard-jump: `scroll-behavior: smooth` is off because Lenis owns scrolling.
-    // Delegate them to lenis.scrollTo so every in-page jump eases like the rest.
+    const triggerScrollExpand = (target: HTMLElement) => {
+      const content =
+        target.querySelector<HTMLElement>(
+          ".section-inner, .acm-inner, .th-inner, .sp-inner, .cd-inner, .about-inner, .tracks-grid, .prize-pool-inner, .faq-inner"
+        ) || target;
+
+      lenis.scrollTo(target, {
+        offset: 0,
+        duration: 1.25,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      });
+
+      gsap.killTweensOf(content);
+      gsap.fromTo(
+        content,
+        {
+          scale: 0.955,
+          y: 24,
+          opacity: 0.72,
+          filter: "blur(5px)",
+        },
+        {
+          scale: 1,
+          y: 0,
+          opacity: 1,
+          filter: "blur(0px)",
+          duration: 0.95,
+          ease: "expo.out",
+          delay: 0.18,
+          clearProps: "scale,y,opacity,filter",
+        }
+      );
+
+      target.classList.add("is-scroll-expanded");
+      window.setTimeout(() => target.classList.remove("is-scroll-expanded"), 1400);
+    };
+
+    // Hash links (the hero's "scroll for lore", the nav anchors) execute
+    // automatic scroll expand animations to seamlessly reveal the destination.
     const onClick = (event: MouseEvent) => {
       if (event.defaultPrevented || event.button !== 0) return;
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -67,18 +105,28 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
           : null;
       if (!hash || hash === "#") return;
 
-      const target = document.querySelector(hash);
+      const target = document.querySelector<HTMLElement>(hash);
       if (!target) return;
 
       event.preventDefault();
-      lenis.scrollTo(target as HTMLElement, { offset: 0 });
+      triggerScrollExpand(target);
       window.history.pushState(null, "", hash);
     };
 
+    const onCustomExpand = (event: Event) => {
+      const customEvent = event as CustomEvent<{ target: HTMLElement | string }>;
+      const target = typeof customEvent.detail?.target === "string"
+        ? document.querySelector<HTMLElement>(customEvent.detail.target)
+        : customEvent.detail?.target;
+      if (target) triggerScrollExpand(target);
+    };
+
     document.addEventListener("click", onClick);
+    window.addEventListener("recursive-scroll-expand", onCustomExpand);
 
     return () => {
       document.removeEventListener("click", onClick);
+      window.removeEventListener("recursive-scroll-expand", onCustomExpand);
       gsap.ticker.remove(tick);
       lenis.off('scroll', ScrollTrigger.update);
       lenis.destroy();

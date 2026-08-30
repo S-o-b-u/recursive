@@ -1,6 +1,7 @@
 "use client";
 
 import { gsap } from "gsap";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useRef } from "react";
 import { EVENT } from "@/data/hackathon";
 import WarpText from "@/components/ui/WarpText";
@@ -309,10 +310,16 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
 };
 
 export default function Footer() {
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
+
   return (
     <footer className="relative h-screen w-full bg-transparent text-[#142617] overflow-hidden select-none">
+      {/* ── Top Atmospheric Gradient: seamlessly dissolves the straight line between .night/ACM and Footer ── */}
+      {isHomePage && <div className="footer-seam-blend" aria-hidden="true" />}
+
       {/* ── Giant WebGL WarpText Wordmark across the upper section ── */}
-      <div className="absolute top-[14%] sm:top-[16%] left-0 right-0 z-10 flex justify-center items-center px-4 pointer-events-auto">
+      <div className="absolute top-[24%] sm:top-[26%] left-0 right-0 z-10 flex justify-center items-center px-4 pointer-events-auto">
         <WarpText
           text={EVENT.name}
           color="#142617"
@@ -340,6 +347,28 @@ export default function Footer() {
       <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
         <CrowdCanvas src="/images/peeps/all-peeps.png" rows={15} cols={7} />
       </div>
+
+      <style>{`
+        .footer-seam-blend {
+          position: absolute;
+          top: -2px;
+          left: 0;
+          right: 0;
+          height: clamp(180px, 28vh, 360px);
+          background: linear-gradient(
+            180deg,
+            var(--color-night) 0%,
+            rgba(1, 3, 1, 0.94) 18%,
+            rgba(6, 14, 8, 0.76) 38%,
+            rgba(16, 32, 20, 0.48) 58%,
+            rgba(36, 62, 42, 0.22) 76%,
+            rgba(88, 118, 86, 0.06) 90%,
+            transparent 100%
+          );
+          pointer-events: none;
+          z-index: 5;
+        }
+      `}</style>
     </footer>
   );
 }

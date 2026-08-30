@@ -43,28 +43,31 @@ export default function ACM() {
 
         {/* ── Main chapter logo, large & centered ── */}
         <RevealBlock y={20} delay={0.06} className="acm-logo-block">
-          <Image
-            src="/college_logo/gnitacm.png"
-            alt="GNIT ACM Student Chapter"
-            width={340}
-            height={110}
-            className="acm-main-logo"
-            priority
-          />
+          <div className="acm-logo-plate">
+            <Image
+              src="/college_logo/gnitacm.png"
+              alt="GNIT ACM Student Chapter"
+              width={340}
+              height={110}
+              className="acm-main-logo"
+              priority
+            />
+          </div>
         </RevealBlock>
 
         {/* ── Accreditation sublogos ── */}
         <RevealBlock y={12} delay={0.12} className="acm-sublogos-block">
           <div className="acm-sublogos">
             {SUBLOGOS.map((s) => (
-              <Image
-                key={s.src}
-                src={s.src}
-                alt={s.alt}
-                width={s.width}
-                height={s.height}
-                className="acm-sublogo"
-              />
+              <span className="acm-sublogo-plate" key={s.src}>
+                <Image
+                  src={s.src}
+                  alt={s.alt}
+                  width={s.width}
+                  height={s.height}
+                  className="acm-sublogo"
+                />
+              </span>
             ))}
           </div>
         </RevealBlock>
@@ -95,9 +98,11 @@ export default function ACM() {
         .acm {
           position: relative;
           width: 100%;
-          color: #0f1623;
-          padding-top: clamp(10rem, 22vh, 16rem);
-          padding-bottom: clamp(8rem, 16vh, 12rem);
+          color: #EEF5E6;
+          /* Same tightening as the sections above — this one ran even wider
+             (22vh) and left the biggest hole in the run. */
+          padding-top: clamp(5rem, 11vh, 8.5rem);
+          padding-bottom: clamp(5.5rem, 12vh, 9rem);
           overflow: hidden;
           z-index: 1;
           background: transparent;
@@ -133,6 +138,9 @@ export default function ACM() {
         .acm-marquee-track {
           display: flex;
           width: max-content;
+          will-change: transform;
+          transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
         }
 
         .acm-marquee-track span {
@@ -143,7 +151,7 @@ export default function ACM() {
           line-height: 0.85;
           letter-spacing: -0.02em;
           text-transform: uppercase;
-          color: rgba(15, 22, 35, 0.04);
+          color: rgba(226, 244, 208, 0.045);
           padding: 0 1vw;
         }
 
@@ -156,13 +164,13 @@ export default function ACM() {
         }
 
         @keyframes acm-scroll-left {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(-50%, 0, 0); }
         }
 
         @keyframes acm-scroll-right {
-          0% { transform: translateX(-50%); }
-          100% { transform: translateX(0); }
+          0% { transform: translate3d(-50%, 0, 0); }
+          100% { transform: translate3d(0, 0, 0); }
         }
 
         /* ─────────────────────────────────────────
@@ -186,7 +194,7 @@ export default function ACM() {
         .acm-rule-top {
           width: clamp(2rem, 6vw, 4rem);
           height: 1.5px;
-          background: rgba(15, 22, 35, 0.18);
+          background: rgba(190, 224, 168, 0.28);
           margin-bottom: clamp(2.5rem, 5vh, 3.5rem);
         }
 
@@ -194,7 +202,7 @@ export default function ACM() {
           width: 100%;
           max-width: 40rem;
           height: 1px;
-          background: rgba(15, 22, 35, 0.1);
+          background: rgba(190, 224, 168, 0.14);
           margin-top: clamp(2rem, 4vh, 3rem);
         }
 
@@ -206,16 +214,23 @@ export default function ACM() {
           justify-content: center;
         }
 
+        /* The chapter and accreditation marks are brand-coloured artwork on
+           transparency — navy, maroon, teal. Against the night field they sink,
+           so each one sits on its own light plate instead of being recoloured. */
+        .acm-logo-plate {
+          display: inline-flex;
+          padding: clamp(1rem, 2.4vw, 1.5rem) clamp(1.4rem, 3vw, 2.1rem);
+          border-radius: var(--radius-lg);
+          background: rgba(241, 246, 234, 0.95);
+          box-shadow:
+            0 26px 64px -34px rgba(0, 0, 0, 0.95),
+            inset 0 0 0 1px rgba(190, 224, 168, 0.28);
+        }
+
         .acm-main-logo {
           width: auto;
           height: clamp(64px, 10vw, 96px);
           object-fit: contain;
-          opacity: 0.96;
-          transition: opacity 200ms ease;
-        }
-
-        .acm-main-logo:hover {
-          opacity: 1;
         }
 
         /* ─────────────────────────────────────────
@@ -233,18 +248,27 @@ export default function ACM() {
           gap: clamp(1.4rem, 3vw, 2.5rem);
         }
 
+        .acm-sublogo-plate {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.5rem 0.85rem;
+          border-radius: 12px;
+          background: rgba(241, 246, 234, 0.9);
+          box-shadow: inset 0 0 0 1px rgba(190, 224, 168, 0.22);
+          opacity: 0.82;
+          transition: opacity 180ms ease, transform 180ms ease;
+        }
+
+        .acm-sublogo-plate:hover {
+          opacity: 1;
+          transform: translateY(-2px);
+        }
+
         .acm-sublogo {
           width: auto;
           height: clamp(22px, 3vw, 28px);
           object-fit: contain;
-          opacity: 0.55;
-          filter: grayscale(35%);
-          transition: opacity 180ms ease, filter 180ms ease;
-        }
-
-        .acm-sublogo:hover {
-          opacity: 0.9;
-          filter: grayscale(0%);
         }
 
         /* ─────────────────────────────────────────
@@ -264,7 +288,7 @@ export default function ACM() {
           font-weight: 400;
           line-height: 1.82;
           letter-spacing: -0.008em;
-          color: rgba(15, 22, 35, 0.65);
+          color: rgba(214, 232, 202, 0.6);
           text-align: center;
           text-wrap: balance;
         }
@@ -282,7 +306,7 @@ export default function ACM() {
           font-weight: 500;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: rgba(15, 22, 35, 0.38);
+          color: rgba(200, 226, 185, 0.4);
           margin: 0;
         }
       `}</style>
