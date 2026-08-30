@@ -259,6 +259,15 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       });
 
       ctx.restore();
+
+      // Tint every drawn pixel to a muted sage green using source-atop,
+      // which only paints over existing opaque pixels (the peep shapes)
+      // and leaves the transparent background untouched.
+      ctx.save();
+      ctx.globalCompositeOperation = 'source-atop';
+      ctx.fillStyle = '#b4cda0';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
     };
 
     const resize = () => {
@@ -305,6 +314,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     <canvas
       ref={canvasRef}
       className="absolute bottom-0 h-full w-full pointer-events-none"
+      style={{ opacity: 0.14 }}
     />
   );
 };
@@ -314,7 +324,7 @@ export default function Footer() {
   const isHomePage = pathname === "/";
 
   return (
-    <footer className="relative h-screen w-full bg-transparent text-[#142617] overflow-hidden select-none">
+    <footer className="relative h-screen w-full bg-[#010301] text-[#EEF5E6] overflow-hidden select-none">
       {/* ── Top Atmospheric Gradient: seamlessly dissolves the straight line between .night/ACM and Footer ── */}
       {isHomePage && <div className="footer-seam-blend" aria-hidden="true" />}
 
@@ -322,7 +332,7 @@ export default function Footer() {
       <div className="absolute top-[24%] sm:top-[26%] left-0 right-0 z-10 flex justify-center items-center px-4 pointer-events-auto">
         <WarpText
           text={EVENT.name}
-          color="#142617"
+          color="#EEF5E6"
           warpStrength={0.08}
           warpScale={1.7}
           speed={0.55}
@@ -354,16 +364,11 @@ export default function Footer() {
           top: -2px;
           left: 0;
           right: 0;
-          height: clamp(180px, 28vh, 360px);
+          height: clamp(120px, 18vh, 240px);
           background: linear-gradient(
             180deg,
             var(--color-night) 0%,
-            rgba(1, 3, 1, 0.94) 18%,
-            rgba(6, 14, 8, 0.76) 38%,
-            rgba(16, 32, 20, 0.48) 58%,
-            rgba(36, 62, 42, 0.22) 76%,
-            rgba(88, 118, 86, 0.06) 90%,
-            transparent 100%
+            var(--color-night) 100%
           );
           pointer-events: none;
           z-index: 5;
