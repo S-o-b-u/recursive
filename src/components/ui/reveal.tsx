@@ -74,7 +74,7 @@ export function RevealWords({
             trigger: root,
             start,
             end,
-            scrub: 1,
+            scrub: 0.5,
             invalidateOnRefresh: true,
           },
         }
@@ -157,9 +157,9 @@ export function RevealHeading({
         {
           yPercent: 0,
           ease: "expo.out",
-          duration: 1.5,
+          duration: 1.75,
           delay,
-          stagger: 0.11,
+          stagger: 0.13,
           scrollTrigger: { trigger: root, start: "top 88%", once: true },
         }
       );
@@ -234,8 +234,8 @@ export function RevealBlock({
         {
           opacity: 1,
           y: 0,
-          ease: "power3.out",
-          duration: 1.1,
+          ease: "expo.out",
+          duration: 1.45,
           delay,
           stagger,
           scrollTrigger: { trigger: root, start: "top 86%", once: true },
@@ -307,7 +307,7 @@ export function ParallaxY({
             trigger: root,
             start,
             end,
-            scrub: 1,
+            scrub: 0.5,
             invalidateOnRefresh: true,
           },
         }
@@ -335,7 +335,7 @@ export function ParallaxY({
 export function RuleDraw({
   className = "",
   delay = 0,
-  duration = 1.6,
+  duration = 1.85,
 }: {
   className?: string;
   delay?: number;

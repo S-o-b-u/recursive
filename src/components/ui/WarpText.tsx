@@ -640,10 +640,14 @@ export const WarpText: React.FC<WarpTextProps> = ({
     intersectionObserver = new IntersectionObserver(
       ([entry]) => {
         visible = entry.isIntersecting;
-        if (visible && pageVisible && !raf) raf = requestAnimationFrame(loop);
-        if (!visible && raf) {
-          cancelAnimationFrame(raf);
-          raf = 0;
+        if (visible) {
+          resize();
+          if (pageVisible && !raf) raf = requestAnimationFrame(loop);
+        } else {
+          if (raf) {
+            cancelAnimationFrame(raf);
+            raf = 0;
+          }
         }
       },
       { threshold: 0 }

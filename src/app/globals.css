@@ -11,6 +11,10 @@
   --color-bg-alt: #E4EBDD;
   --color-bg-sage: #C9D6C2;
   --color-bg-deep: #101B12;
+  /* Night field — matches the last row of /valley.png so the two never seam. */
+  --color-night: #010301;
+  --color-night-text: #EEF5E6;
+  --color-night-dim: rgba(222, 235, 212, 0.6);
 
   --color-text: #16241A;
   --color-text-secondary: #566A55;
@@ -127,11 +131,6 @@ html {
 
 body {
   background-color: var(--color-bg);
-  background-image: url("/cloud.jpg");
-  background-size: cover;
-  background-position: center top;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
   color: var(--color-text);
   font-family: var(--font-dm-sans), var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   font-size: var(--font-size-base);
@@ -139,6 +138,24 @@ body {
   letter-spacing: var(--tracking-normal);
   font-weight: 400;
   overflow-x: hidden;
+  position: relative;
+}
+
+/* GPU-accelerated fixed background plate — replaces CPU-thrashing background-attachment: fixed */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -99;
+  background-image: url("/images/cloud.jpg");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
 }
 
 /* ─── Typography ─── */
@@ -235,6 +252,59 @@ a { color: inherit; text-decoration: none; }
   text-transform: uppercase;
   color: var(--color-text-secondary);
 }
+
+/* ─── Night field ───
+   The valley plate closing the countdown fades to #010301 on its last row.
+   Everything below it runs on that exact value so the two meet with no seam,
+   and the fixed cloud photograph on <body> stops showing through. Wrap the
+   sections in `.night`; sections themselves stay `background: transparent`.
+*/
+
+.night {
+  position: relative;
+  isolation: isolate;
+  background: var(--color-night);
+  color: var(--color-night-text);
+  /* Pull up over the countdown's bottom edge. That section clips the valley
+     plate with `overflow: hidden`, and a clipped layer's edge lands on a
+     fractional device-pixel row, which composites against whatever is behind
+     it — the body's cloud photograph. That leaked through as a pale hairline.
+     Overlapping puts black under that row instead. `.cd` carries `z-index: 1`
+     so this slides *behind* the plate rather than over it. */
+  margin-top: -2px;
+}
+
+/* A slow wash of moss light off the horizon, so the field is not flat ink. */
+.night::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 46% at 50% 0%, rgba(52, 88, 38, 0.36) 0%, rgba(52, 88, 38, 0) 62%),
+    radial-gradient(80% 40% at 84% 62%, rgba(28, 62, 44, 0.2) 0%, rgba(28, 62, 44, 0) 70%);
+  /* Ramp the wash in below the seam. At full strength on row one it meets the
+     valley's near-black last row as a step, which is the one thing this field
+     exists to avoid. */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 clamp(180px, 24vw, 420px));
+  mask-image: linear-gradient(180deg, transparent 0, #000 clamp(180px, 24vw, 420px));
+}
+
+.night ::selection {
+  background-color: rgba(143, 196, 90, 0.28);
+  color: #F1F7E9;
+}
+
+/* Empty MediaSlot placeholders inside the night field. */
+.night .ms {
+  background: rgba(226, 244, 208, 0.05);
+}
+.night .ms[data-filled="false"] {
+  border-color: rgba(190, 224, 168, 0.24);
+}
+.night .ms-empty { color: rgba(206, 226, 194, 0.45); }
+.night .ms-label { color: rgba(226, 240, 216, 0.72); }
 
 /* ─── Liquid glass material ─── */
 
@@ -349,6 +419,47 @@ a { color: inherit; text-decoration: none; }
     transparent
   );
   border: none;
+}
+
+/* ─── Automatic Scroll Expand Animation ─── */
+.scroll-expand-target {
+  will-change: transform, opacity, filter;
+}
+
+.is-scroll-expanded {
+  position: relative;
+}
+
+.is-scroll-expanded::after {
+  content: "";
+  position: absolute;
+  inset: -8% -4%;
+  pointer-events: none;
+  z-index: 10;
+  border-radius: var(--radius-xl);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(143, 196, 90, 0.16) 0%,
+    rgba(92, 140, 58, 0.05) 45%,
+    transparent 72%
+  );
+  opacity: 0;
+  animation: scroll-expand-glow 1.2s var(--ease-out) forwards;
+}
+
+@keyframes scroll-expand-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.01);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
 }
 
 /* ─── Accessibility fallbacks ─── */

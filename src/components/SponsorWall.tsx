@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import Link from "next/link";
 import { SPONSOR_SLOTS, EVENT } from "@/data/hackathon";
 import {
   RevealHeading,
@@ -11,43 +12,7 @@ import {
 import MediaSlot from "@/components/ui/MediaSlot";
 import SponsorRevealCard from "@/components/ui/SponsorRevealCard";
 import SponsorVeil from "@/components/ui/SponsorVeil";
-
-/**
- * Botanical Symmetrical Motif for Sponsors.
- */
-function BotanicalMotif({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 160 36"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-hidden="true"
-    >
-      <path
-        d="M80 4C80 4 76 13 66 16C56 18 42 14 32 19C24 23 20 31 12 33C7 34 3 32 0 30"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <path
-        d="M80 4C80 4 84 13 94 16C104 18 118 14 128 19C136 23 140 31 148 33C153 34 157 32 160 30"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <path
-        d="M80 1C77 4 74 7 74 10C74 13 77 14.5 80 14.5C83 14.5 86 13 86 10C86 7 83 4 80 1Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      <circle cx="80" cy="20" r="1.7" fill="currentColor" />
-      <circle cx="80" cy="27" r="1.2" fill="currentColor" />
-      <circle cx="80" cy="33" r="0.9" fill="currentColor" />
-    </svg>
-  );
-}
+import Ornament from "@/components/ui/Ornament";
 
 /**
  * SPONSOR WALL — a broken mosaic on six columns.
@@ -72,7 +37,7 @@ export default function SponsorWall() {
         {/* ── Top Botanical Ornament ── */}
         <RevealBlock y={14}>
           <div className="sp-ornament-wrap">
-            <BotanicalMotif className="sp-motif" />
+            <Ornament tone="night" className="sp-motif" />
           </div>
         </RevealBlock>
 
@@ -94,19 +59,33 @@ export default function SponsorWall() {
           </RevealBlock>
           <RevealBlock y={14} delay={0.1}>
             <div className="sp-cta-wrap">
-              <a href={`mailto:${EVENT.email}`} className="sp-link">
-                <span>Partner with this edition</span>
-                <svg viewBox="0 0 24 24" aria-hidden="true" className="sp-arrow">
-                  <path
-                    d="M5 12h14M13 6l6 6-6 6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </a>
+              <button
+                type="button"
+                className="sp-link"
+                aria-label="Partner with this edition - Currently Locked"
+                disabled
+              >
+                <span className="sp-link-text-slot">
+                  <span className="sp-link-text-default">Partner with this edition</span>
+                  <span className="sp-link-text-hover">Locked · Revealing Soon</span>
+                </span>
+                <span className="sp-link-icon-slot" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" className="sp-arrow">
+                    <path
+                      d="M5 12h14M13 6l6 6-6 6"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sp-lock-icon">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                </span>
+              </button>
             </div>
           </RevealBlock>
         </div>
@@ -151,8 +130,8 @@ export default function SponsorWall() {
           position: relative;
           width: 100%;
           background: transparent;
-          color: #111a12;
-          padding-block: clamp(5.5rem, 13vh, 10rem);
+          color: #EEF5E6;
+          padding-block: clamp(3.25rem, 7.5vh, 6rem);
           overflow: hidden;
           z-index: 1;
         }
@@ -175,10 +154,10 @@ export default function SponsorWall() {
         }
 
         .sp-motif {
-          width: clamp(110px, 14vw, 150px);
+          width: clamp(190px, 22vw, 260px);
           height: auto;
-          color: #2F5527;
-          opacity: 0.85;
+          color: #7FB84E;
+          opacity: 0.62;
         }
 
         .sp-head-wrap {
@@ -188,21 +167,21 @@ export default function SponsorWall() {
 
         .sp-eyebrow {
           font-family: var(--font-geist-mono), monospace;
-          font-size: 0.76rem;
-          font-weight: 550;
-          letter-spacing: 0.08em;
-          color: #5C8C3A;
+          font-size: 0.72rem;
+          font-weight: 500;
+          letter-spacing: 0.2em;
+          color: #8FC45A;
           text-transform: uppercase;
         }
 
         .sp-heading {
-          margin-top: 0.5rem;
+          margin-top: 0.7rem;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
           font-weight: 500;
           font-size: clamp(2.4rem, 5.2vw, 4rem);
           line-height: 1.15;
           letter-spacing: -0.028em;
-          color: #111a12;
+          color: #F1F7E9;
           text-align: center;
         }
 
@@ -218,7 +197,7 @@ export default function SponsorWall() {
           font-size: clamp(1.02rem, 1.5vw, 1.2rem);
           font-weight: 400;
           line-height: 1.6;
-          color: #334731;
+          color: rgba(222, 235, 212, 0.6);
         }
 
         .sp-cta-wrap {
@@ -231,36 +210,99 @@ export default function SponsorWall() {
           display: inline-flex;
           align-items: center;
           gap: 0.45rem;
+          padding: 0;
+          padding-bottom: 2px;
+          background: transparent;
+          border: none;
+          border-bottom: 1.5px solid rgba(143, 196, 90, 0.34);
           font-family: var(--font-dm-sans), sans-serif;
           font-size: 0.88rem;
           font-weight: 600;
-          color: #2F5527;
-          padding-bottom: 2px;
-          border-bottom: 1.5px solid rgba(47, 85, 39, 0.35);
+          color: #B8DE8C;
+          cursor: not-allowed;
+          user-select: none;
           transition: gap 220ms ease, color 220ms ease, border-color 220ms ease;
         }
 
+        .sp-link-text-slot {
+          display: inline-grid;
+          grid-template-areas: "text";
+          align-items: center;
+        }
+
+        .sp-link-text-default {
+          grid-area: text;
+          display: inline-block;
+          transition: opacity 200ms ease, transform 200ms ease;
+        }
+
+        .sp-link-text-hover {
+          grid-area: text;
+          display: inline-block;
+          opacity: 0;
+          transform: translateY(4px);
+          color: #FFDE7A;
+          white-space: nowrap;
+          transition: opacity 200ms ease, transform 200ms ease;
+        }
+
+        .sp-link-icon-slot {
+          display: inline-grid;
+          place-items: center;
+          width: 0.95rem;
+          height: 0.95rem;
+          flex-shrink: 0;
+        }
+
         .sp-arrow {
+          grid-area: 1 / 1;
           width: 0.88rem;
           height: 0.88rem;
-          transition: transform 220ms ease;
+          opacity: 1;
+          transform: scale(1);
+          transition: opacity 200ms ease, transform 200ms ease;
+        }
+
+        .sp-lock-icon {
+          grid-area: 1 / 1;
+          width: 0.88rem;
+          height: 0.88rem;
+          color: #FFDE7A;
+          opacity: 0;
+          transform: scale(0.7);
+          transition: opacity 200ms ease, transform 200ms ease;
         }
 
         .sp-link:hover {
-          color: #5C8C3A;
-          border-color: #5C8C3A;
-          gap: 0.7rem;
+          color: #FFDE7A;
+          border-color: rgba(255, 222, 122, 0.6);
+        }
+
+        .sp-link:hover .sp-link-text-default {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+
+        .sp-link:hover .sp-link-text-hover {
+          opacity: 1;
+          transform: translateY(0);
         }
 
         .sp-link:hover .sp-arrow {
-          transform: translateX(2px);
+          opacity: 0;
+          transform: scale(0.7);
+        }
+
+        .sp-link:hover .sp-lock-icon {
+          opacity: 1;
+          transform: scale(1);
         }
 
         .sp-rule {
           width: 100%;
           max-width: 72rem;
           margin-top: clamp(2rem, 4vh, 3.25rem);
-          background: rgba(47, 85, 39, 0.18);
+          background: rgba(190, 224, 168, 0.16);
         }
 
         .sp-wall-wrap {
@@ -287,6 +329,55 @@ export default function SponsorWall() {
         .sp-cell {
           grid-column: var(--c);
           grid-row: var(--r);
+        }
+
+        /* ── Night re-ink ──
+           SponsorRevealCard and SponsorVeil were drawn for the sage sections
+           above the valley: cream plates, pine ink. Below the valley that is a
+           field of bright rectangles on black. Re-inking them here, scoped to
+           .sp, keeps both components working unchanged on the light pages. */
+        .sp .spc {
+          background:
+            radial-gradient(120% 78% at 50% 4%, rgba(92, 140, 58, 0.24) 0%, rgba(92, 140, 58, 0) 54%),
+            linear-gradient(170deg, #16240F 0%, #080F06 100%);
+          box-shadow:
+            inset 0 1px 0 rgba(214, 240, 190, 0.14),
+            inset 0 0 0 1px rgba(190, 224, 168, 0.14),
+            0 18px 40px -24px rgba(0, 0, 0, 0.9);
+        }
+        .sp .spc::after {
+          box-shadow:
+            0 0 0 1px rgba(190, 224, 168, 0.16),
+            inset 0 1px 0 rgba(214, 240, 190, 0.08);
+        }
+        .sp .spc-plate {
+          background:
+            radial-gradient(85% 62% at 50% 26%, rgba(143, 196, 90, 0.15), rgba(143, 196, 90, 0) 72%),
+            radial-gradient(130% 120% at 50% 122%, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 58%);
+        }
+        /* CSS wins over the stop-color presentation attribute in the SVG. */
+        .sp .spc-figure stop:first-child { stop-color: rgba(143, 196, 90, 0.36); }
+        .sp .spc-figure stop:last-child  { stop-color: rgba(143, 196, 90, 0.08); }
+        .sp .spc-veil {
+          background: linear-gradient(180deg, rgba(8, 16, 6, 0.08) 0%, rgba(5, 11, 4, 0.5) 100%);
+        }
+        .sp .spc-q text { fill: rgba(200, 232, 172, 0.32); }
+        .sp .spc-sprig { color: #8FC45A; opacity: 0.5; }
+        .sp .spc-grain { opacity: 0.34; }
+
+        .sp .sp-veil-tint {
+          background: radial-gradient(70% 62% at 50% 48%,
+            rgba(4, 10, 3, 0.5) 0%,
+            rgba(4, 10, 3, 0.28) 46%,
+            rgba(4, 10, 3, 0) 82%);
+        }
+        .sp .sp-veil-word span {
+          color: #DDF0BF;
+          -webkit-text-stroke: 1px rgba(221, 240, 191, 0.85);
+          text-shadow:
+            0 2px 0 rgba(0, 0, 0, 0.45),
+            0 0 26px rgba(24, 46, 16, 0.9),
+            0 0 60px rgba(10, 24, 6, 0.85);
         }
 
         @media (max-width: 780px) {

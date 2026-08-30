@@ -1,257 +1,315 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
 import { JUDGES, EVENT } from "@/data/hackathon";
-import { RevealHeading, RevealBlock } from "@/components/ui/reveal";
-import MorphSlider, { MorphSliderItem } from "@/components/ui/MorphSlider";
+import { RevealHeading, RevealBlock, ParallaxY } from "@/components/ui/reveal";
+import Ornament from "@/components/ui/Ornament";
+import FlipCard from "@/components/ui/FlipCard";
 import Seal from "@/components/ui/Seal";
 
-/**
- * Botanical Crown Flourish Motif.
- */
-function BotanicalMotif({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 160 36"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-hidden="true"
-    >
-      <path
-        d="M80 4C80 4 76 13 66 16C56 18 42 14 32 19C24 23 20 31 12 33C7 34 3 32 0 30"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <path
-        d="M80 4C80 4 84 13 94 16C104 18 118 14 128 19C136 23 140 31 148 33C153 34 157 32 160 30"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <path
-        d="M80 1C77 4 74 7 74 10C74 13 77 14.5 80 14.5C83 14.5 86 13 86 10C86 7 83 4 80 1Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      <circle cx="80" cy="20" r="1.7" fill="currentColor" />
-      <circle cx="80" cy="27" r="1.2" fill="currentColor" />
-      <circle cx="80" cy="33" r="0.9" fill="currentColor" />
-    </svg>
-  );
-}
+const GRAIN =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E";
 
-const MENTOR_SLIDES: (MorphSliderItem & {
-  tag: string;
-  name: string;
-  role: string;
-  desc: string;
-  stat1: { val: string; label: string };
-  stat2: { val: string; label: string };
-  stat3: { val: string; label: string };
-})[] = [
+/** Head-and-shoulders bust, one path, no seam. viewBox 0 0 240 262. */
+const BUST =
+  "M120 40c26 0 47 21 47 47 0 17-9 32-23 40 34 7 60 30 68 62 3 12 4 25 4 39l0 34-186 0 0-34c0-14 1-27 4-39 8-32 34-55 68-62-14-8-23-23-23-40 0-26 21-47 47-47z";
+
+/**
+ * What each seat on the panel covers.
+ *
+ * The names are still sealed — `JUDGES` carries six empty entries until each
+ * person confirms — but the domains are locked, so the back of every card has
+ * something real on it rather than six copies of "TBA". Index-matched to
+ * `JUDGES`; fill a judge's `name`/`role`/`photo.src` and the front face swaps
+ * from the sealed print to the portrait on its own.
+ */
+const SEATS = [
   {
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop",
-    caption: "Systems Architecture",
-    tag: "TECHNICAL ARCHITECTURE",
-    name: "Distributed & Scalable Systems",
-    role: "Full-Stack & Cloud Mentors",
-    desc: "Hands-on guidance on systems design, backend performance, local-first sync protocols, and real-time infrastructure.",
-    stat1: { val: "8h", label: "Live Support" },
-    stat2: { val: "1:1", label: "Mentor Sessions" },
-    stat3: { val: "4x", label: "Tracks" },
+    tag: "Technical architecture",
+    domain: "Distributed & scalable systems",
+    role: "Full-stack, cloud & infrastructure",
+    desc: "Systems design, backend performance, local-first sync protocols, and the real-time infrastructure underneath it all.",
+    stats: [
+      { val: "8h", label: "On the floor" },
+      { val: "1:1", label: "Mentor slots" },
+    ],
   },
   {
-    image: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?q=80&w=1200&auto=format&fit=crop",
-    caption: "AI & Generative Pipelines",
-    tag: "INTELLIGENT AGENTS",
-    name: "AI, Agents & Machine Learning",
-    role: "ML & Applied Intelligence",
-    desc: "Refining agentic workflows, prompt engineering, vector search, and procedural generation for complex systems.",
-    stat1: { val: "24/7", label: "Lab Access" },
-    stat2: { val: "100%", label: "Hands-on" },
-    stat3: { val: "6+", label: "Specialists" },
+    tag: "Intelligent agents",
+    domain: "AI, agents & machine learning",
+    role: "Applied ML & research",
+    desc: "Agentic workflows, retrieval and vector search, evaluation loops, and procedural generation for systems that refine their own output.",
+    stats: [
+      { val: "24/7", label: "Lab access" },
+      { val: "6+", label: "Specialists" },
+    ],
   },
   {
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop",
-    caption: "Interface & Interaction",
-    tag: "PRODUCT & DESIGN",
-    name: "UI/UX, Craft & Typography",
-    role: "Creative Technologists",
-    desc: "Elevating interface polish, WebGL shaders, kinetic typography, and fluid micro-interactions for demo presentation.",
-    stat1: { val: "Top Tier", label: "Design Polish" },
-    stat2: { val: "3D / WebGL", label: "Shader Help" },
-    stat3: { val: "Demo Ready", label: "Pitch Prep" },
+    tag: "Product & design",
+    domain: "Interface, craft & typography",
+    role: "Creative technologists",
+    desc: "Interface polish, WebGL and shader work, kinetic typography, and the fluid micro-interactions that carry a demo.",
+    stats: [
+      { val: "3D", label: "Shader help" },
+      { val: "Demo", label: "Pitch prep" },
+    ],
   },
   {
-    image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1200&auto=format&fit=crop",
-    caption: "Hardware & Edge Compute",
-    tag: "EMBEDDED SYSTEMS",
-    name: "IoT & Hardware Prototyping",
-    role: "Hardware & Sensor Lab",
-    desc: "Assisting with low-power microcontrollers, sensor arrays, firmware debugging, and physical computing.",
-    stat1: { val: "Onsite", label: "Hardware Kits" },
-    stat2: { val: "ESP32 / Pi", label: "Test Rigs" },
-    stat3: { val: "Live Demos", label: "Stage Ready" },
+    tag: "Embedded systems",
+    domain: "IoT & hardware prototyping",
+    role: "Hardware & sensor lab",
+    desc: "Low-power microcontrollers, sensor arrays, firmware debugging, and physical computing you can put on a table.",
+    stats: [
+      { val: "Kits", label: "On site" },
+      { val: "ESP32", label: "Test rigs" },
+    ],
+  },
+  {
+    tag: "Trust & security",
+    domain: "Security, privacy & resilience",
+    role: "Security engineering",
+    desc: "Threat modelling, auth and key handling, dependency hygiene, and the failure modes that only show up under load.",
+    stats: [
+      { val: "Audit", label: "Walkthroughs" },
+      { val: "0-day", label: "War stories" },
+    ],
+  },
+  {
+    tag: "Story & venture",
+    domain: "Pitching, product & venture",
+    role: "Founders & operators",
+    desc: "Framing the problem, cutting scope honestly, and telling the judges in two minutes why any of it matters.",
+    stats: [
+      { val: "2 min", label: "Pitch drills" },
+      { val: "Top 6", label: "Stage coaching" },
+    ],
+  },
+  {
+    tag: "Bio & Climate",
+    domain: "Climate tech & bio-computation",
+    role: "Regenerative systems & data",
+    desc: "Low-power sensing arrays, emissions accounting, carbon transparency protocols, and environmental data models.",
+    stats: [
+      { val: "Field", label: "Sensor kits" },
+      { val: "Open", label: "Climate data" },
+    ],
+  },
+  {
+    tag: "Open web & tools",
+    domain: "Devtools, protocols & compilers",
+    role: "Core infrastructure engineering",
+    desc: "Local-first sync, edge runtimes, custom DSLs, debugging tools, and peer-to-peer protocols for resilient apps.",
+    stats: [
+      { val: "CRDTs", label: "Sync patterns" },
+      { val: "Wasm", label: "Toolchain" },
+    ],
+  },
+  {
+    tag: "Autonomous systems",
+    domain: "Vision, robotics & edge compute",
+    role: "Applied robotics & perception",
+    desc: "Camera pipelines, spatial tracking, edge inference models, and physical computing that reacts in real-time.",
+    stats: [
+      { val: "Edge", label: "Inference GPUs" },
+      { val: "0.2s", label: "Control loops" },
+    ],
   },
 ];
 
+/**
+ * Per-card scroll drift, alternating direction so the grid shears past itself
+ * on the way down — the same trick the sponsor wall uses on its mosaic.
+ */
+const DRIFT = [72, -58, 80, -66, 62, -74, 68, -54, 76] as const;
+
+function SealedFront({ index, seat }: { index: number; seat: (typeof SEATS)[number] }) {
+  const qShift = ((index % 3) - 1) * 6;
+  const gid = `jdp${index}`;
+
+  return (
+    <span className="jd-front">
+      <svg className="jd-front-figure" viewBox="0 0 240 262" aria-hidden="true">
+        <defs>
+          <linearGradient id={`${gid}m`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="rgba(143,196,90,0.34)" />
+            <stop offset="1" stopColor="rgba(143,196,90,0.06)" />
+          </linearGradient>
+          <filter id={`${gid}s`} x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2.8" />
+          </filter>
+        </defs>
+        <path d={BUST} fill={`url(#${gid}m)`} filter={`url(#${gid}s)`} />
+      </svg>
+
+      <span className="jd-front-q" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <text x={50 + qShift} y="74" textAnchor="middle">
+            ?
+          </text>
+        </svg>
+      </span>
+
+      <span
+        className="jd-grain"
+        aria-hidden="true"
+        style={{ backgroundImage: `url("${GRAIN}")` }}
+      />
+
+      <span className="jd-front-meta">
+        <span className="jd-front-seat">
+          Seat {String(index + 1).padStart(2, "0")}
+        </span>
+        <span className="jd-front-domain">{seat.domain}</span>
+      </span>
+
+      <span className="jd-stamp">Sealed</span>
+    </span>
+  );
+}
+
+function PhotoFront({
+  index,
+  judge,
+}: {
+  index: number;
+  judge: (typeof JUDGES)[number];
+}) {
+  return (
+    <span className="jd-front jd-front-filled">
+      <Image
+        src={judge.photo.src as string}
+        alt={judge.name}
+        fill
+        sizes="(max-width: 620px) 90vw, (max-width: 1000px) 44vw, 30vw"
+        className="jd-front-photo"
+      />
+      <span className="jd-front-scrim" aria-hidden="true" />
+      <span className="jd-front-meta">
+        <span className="jd-front-seat">
+          Seat {String(index + 1).padStart(2, "0")}
+        </span>
+        <span className="jd-front-domain">{judge.name}</span>
+        <span className="jd-front-role">{judge.role}</span>
+      </span>
+    </span>
+  );
+}
+
+function SeatBack({ seat }: { seat: (typeof SEATS)[number] }) {
+  return (
+    <span className="jd-back">
+      <span className="jd-back-tag">{seat.tag}</span>
+      <span className="jd-back-title">{seat.domain}</span>
+      <span className="jd-back-rule" aria-hidden="true" />
+      <span className="jd-back-role">{seat.role}</span>
+      <span className="jd-back-desc">{seat.desc}</span>
+
+      <span className="jd-back-stats">
+        {seat.stats.map((s) => (
+          <span className="jd-back-stat" key={s.label}>
+            <span className="jd-back-val">{s.val}</span>
+            <span className="jd-back-lbl">{s.label}</span>
+          </span>
+        ))}
+      </span>
+    </span>
+  );
+}
+
 export default function Judges() {
-  const [activeSlide, setActiveSlide] = useState(0);
-
-  // When all judge names are empty, the entire panel is sealed
+  // Every name still blank means the whole panel is under wraps.
   const sealed = JUDGES.every((j) => j.name.trim().length === 0 && !j.photo.src);
-
-  const current = MENTOR_SLIDES[activeSlide] || MENTOR_SLIDES[0];
 
   return (
     <section id="judges" className="jd" aria-label="Mentors and Judges">
       <div className="jd-inner">
-        {/* ── Top Botanical Ornament ── */}
         <RevealBlock y={14}>
           <div className="jd-ornament-wrap">
-            <BotanicalMotif className="jd-motif" />
+            <Ornament tone="night" className="jd-motif" />
           </div>
         </RevealBlock>
 
-        {/* ── Centered Header ── */}
         <div className="jd-head-wrap">
           <RevealBlock y={10}>
-            <span className="jd-eyebrow">005 · THE PANEL & MENTORS</span>
+            <span className="jd-eyebrow">005 · The panel &amp; mentors</span>
           </RevealBlock>
-          <RevealHeading
-            className="jd-heading"
-            lines={["Mentors & Judges"]}
-          />
+
+          <RevealHeading className="jd-heading" lines={["Mentors & Judges"]} />
+
           <RevealBlock y={12} delay={0.06}>
             <p className="jd-lede">
               {sealed
-                ? "The mentors and judging panel are locked. Individual profiles remain sealed until the official reveal."
+                ? "Nine seats, nine domains — locked. Turn a card to see what each seat covers; the names stay sealed until the official reveal."
                 : "Experienced builders, designers, and researchers guiding teams through the 8-hour sprint."}
             </p>
           </RevealBlock>
         </div>
 
-        {/* ── Layered Morph Carousel Stage ── */}
-        <div className="jd-carousel-wrapper" data-sealed={sealed ? "true" : "false"}>
-          {/* Peeking Background Card Left */}
-          <div className="jd-peek-card jd-peek-left" aria-hidden="true" />
+        {/* ── Nine flip cards (3x3 grid), one per seat ── */}
+        <RevealBlock
+          y={24}
+          delay={0.1}
+          stagger={0.07}
+          selector=".jd-cell"
+          className="jd-grid-reveal"
+        >
+          <div className="jd-grid-wrap" data-sealed={sealed ? "true" : "false"}>
+            <div className="jd-grid">
+                {JUDGES.map((judge, i) => {
+                const seat = SEATS[i % SEATS.length];
+                const filled = judge.name.trim().length > 0 && !!judge.photo.src;
 
-          {/* Peeking Background Card Right */}
-          <div className="jd-peek-card jd-peek-right" aria-hidden="true" />
-
-          {/* Main Active Center Card */}
-          <div className="jd-main-card">
-            {/* Left: WebGL Morph Slider Shader Box */}
-            <div className="jd-slider-box">
-              <MorphSlider
-                items={MENTOR_SLIDES}
-                startIndex={0}
-                transition="melt"
-                intensity={0.55}
-                aberration={0.35}
-                drift={0.4}
-                autoplay={!sealed}
-                autoplayDelay={5}
-                radius={22}
-                showCaptions={true}
-                showControls={false}
-                showIndicators={false}
-                onSlideChange={setActiveSlide}
-                className="jd-morph-stage"
-              />
-            </div>
-
-            {/* Right: Mentor Details & Impact Metrics */}
-            <div className="jd-info-box">
-              <div className="jd-info-header">
-                <span className="jd-tag">{current.tag}</span>
-                <h3 className="jd-title">{current.name}</h3>
-                <p className="jd-role-text">{current.role}</p>
-              </div>
-
-              <p className="jd-desc">{current.desc}</p>
-
-              <div className="jd-action-row">
-                <a
-                  href={EVENT.discordUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="jd-read-link"
-                >
-                  <span>Connect with Mentors</span>
-                  <svg viewBox="0 0 24 24" aria-hidden="true" className="jd-arrow">
-                    <path
-                      d="M5 12h14M13 6l6 6-6 6"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                return (
+                  <ParallaxY
+                    className="jd-cell"
+                    distance={DRIFT[i % DRIFT.length]}
+                    key={judge.photo.expect}
+                  >
+                    <FlipCard
+                      ratio="4 / 5"
+                      label={`${seat.domain} — seat ${i + 1}. Turn the card for details.`}
+                      front={
+                        filled ? (
+                          <PhotoFront index={i} judge={judge} />
+                        ) : (
+                          <SealedFront index={i} seat={seat} />
+                        )
+                      }
+                      back={<SeatBack seat={seat} />}
                     />
-                  </svg>
-                </a>
-              </div>
-
-              {/* Stats Row */}
-              <div className="jd-stats-row">
-                <div className="jd-stat-item">
-                  <span className="jd-stat-val">{current.stat1.val}</span>
-                  <span className="jd-stat-lbl">{current.stat1.label}</span>
-                </div>
-                <div className="jd-stat-divider" />
-                <div className="jd-stat-item">
-                  <span className="jd-stat-val">{current.stat2.val}</span>
-                  <span className="jd-stat-lbl">{current.stat2.label}</span>
-                </div>
-                <div className="jd-stat-divider" />
-                <div className="jd-stat-item">
-                  <span className="jd-stat-val">{current.stat3.val}</span>
-                  <span className="jd-stat-lbl">{current.stat3.label}</span>
-                </div>
-              </div>
+                  </ParallaxY>
+                );
+              })}
             </div>
+
+            {/* Barrier tape and wax over the whole panel: the seats are set,
+                the names are not. The seal is pointer-events: none, so cards
+                underneath still turn. */}
+            {sealed && <Seal word="PANEL SEALED" />}
           </div>
+        </RevealBlock>
 
-          {/* ── Keep Seal on this Page when Sealed ── */}
-          {sealed && <Seal word="PANEL SEALED" />}
-        </div>
-
-        {/* ── Bottom Carousel Pagination & Explore Button ── */}
         <RevealBlock y={14} delay={0.12}>
           <div className="jd-foot-wrap">
-            <div className="jd-dots-row">
-              {MENTOR_SLIDES.map((_, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  aria-label={`Slide ${idx + 1}`}
-                  className={`jd-dot ${idx === activeSlide ? "is-active" : ""}`}
-                  onClick={() => setActiveSlide(idx)}
-                />
-              ))}
-            </div>
+            <p className="jd-foot-note">
+              Hover a card — or tap it on a phone — to read the seat.
+            </p>
 
-            <a
-              href={EVENT.devfolioUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
               className="jd-explore-btn"
+              aria-label="Explore all mentors and judges - Currently Locked"
+              disabled
             >
-              <span>Explore All Mentors & Judges</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true" className="jd-explore-arrow">
-                <path
-                  d="M5 12h14M13 6l6 6-6 6"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </a>
+              <span className="jd-btn-icon-wrap" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="jd-lock-icon">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </span>
+              <span className="jd-btn-text-default">Explore all mentors &amp; judges</span>
+              <span className="jd-btn-text-hover">Locked · Revealing Soon</span>
+            </button>
           </div>
         </RevealBlock>
       </div>
@@ -261,15 +319,17 @@ export default function Judges() {
           position: relative;
           width: 100%;
           background: transparent;
-          color: #111a12;
-          padding-block: clamp(5.5rem, 13vh, 10rem);
+          color: #EEF5E6;
+          /* Stacked with the neighbouring sections' padding this is the whole
+             gap between them, so it is half of what reads on screen. */
+          padding-block: clamp(3.25rem, 7.5vh, 6rem);
           overflow: hidden;
           z-index: 1;
         }
 
         .jd-inner {
           position: relative;
-          max-width: 76rem;
+          max-width: 78rem;
           margin-inline: auto;
           padding-inline: var(--padding-x);
           text-align: center;
@@ -285,327 +345,470 @@ export default function Judges() {
         }
 
         .jd-motif {
-          width: clamp(110px, 14vw, 150px);
+          width: clamp(190px, 22vw, 260px);
           height: auto;
-          color: #2F5527;
-          opacity: 0.85;
+          color: #7FB84E;
+          opacity: 0.62;
         }
 
-        .jd-head-wrap {
-          width: 100%;
-          text-align: center;
-        }
+        .jd-head-wrap { width: 100%; }
 
         .jd-eyebrow {
           font-family: var(--font-geist-mono), monospace;
-          font-size: 0.76rem;
-          font-weight: 550;
-          letter-spacing: 0.08em;
-          color: #5C8C3A;
+          font-size: 0.72rem;
+          font-weight: 500;
+          letter-spacing: 0.2em;
           text-transform: uppercase;
+          color: #8FC45A;
         }
 
         .jd-heading {
-          margin-top: 0.5rem;
+          margin-top: 0.7rem;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
           font-weight: 500;
           font-size: clamp(2.2rem, 5vw, 3.6rem);
           line-height: 1.15;
           letter-spacing: -0.028em;
-          color: #111a12;
-          text-align: center;
+          color: #F1F7E9;
         }
-
-        .jd-heading .rh-line {
-          display: flex;
-          justify-content: center;
-        }
+        .jd-heading .rh-line { display: flex; justify-content: center; }
 
         .jd-lede {
-          margin: clamp(0.75rem, 1.8vh, 1.25rem) auto 0;
+          margin: clamp(0.85rem, 1.8vh, 1.25rem) auto 0;
           max-width: 44rem;
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: clamp(1.02rem, 1.5vw, 1.2rem);
-          font-weight: 400;
-          line-height: 1.6;
-          color: #334731;
+          font-size: clamp(1rem, 1.45vw, 1.15rem);
+          line-height: 1.62;
+          color: rgba(222, 235, 212, 0.6);
+          text-wrap: pretty;
         }
 
-        /* ── Carousel Wrapper & 3D Layering ── */
-        .jd-carousel-wrapper {
+        /* ── Grid ── */
+        .jd-grid-reveal {
+          width: 100%;
+          margin-top: clamp(2.75rem, 6vh, 4.5rem);
+        }
+
+        /* Seal renders as the last child of this, so it needs to be the
+           positioned ancestor. */
+        .jd-grid-wrap {
           position: relative;
           width: 100%;
-          max-width: 68rem;
-          margin-top: clamp(2.5rem, 5vh, 4rem);
-          display: flex;
-          justify-content: center;
-          align-items: center;
         }
 
-        .jd-peek-card {
-          position: absolute;
-          top: 50%;
-          width: 90%;
-          height: 82%;
-          border-radius: 28px;
-          background: rgba(255, 255, 255, 0.42);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(47, 85, 39, 0.12);
-          box-shadow: 0 10px 30px rgba(22, 45, 26, 0.06);
-          pointer-events: none;
-          z-index: 0;
-          transition: transform 0.4s ease, opacity 0.4s ease;
-        }
-
-        .jd-peek-left {
-          left: -4%;
-          transform: translateY(-50%) scale(0.94);
-          opacity: 0.6;
-        }
-
-        .jd-peek-right {
-          right: -4%;
-          transform: translateY(-50%) scale(0.94);
-          opacity: 0.6;
-        }
-
-        /* ── Main Active Card ── */
-        .jd-main-card {
-          position: relative;
-          z-index: 1;
-          width: 100%;
+        .jd-grid {
           display: grid;
-          grid-template-columns: minmax(280px, 340px) 1fr;
-          gap: clamp(1.5rem, 3vw, 2.5rem);
-          padding: clamp(1.25rem, 2.5vw, 2rem);
-          border-radius: 28px;
-          background: rgba(255, 255, 255, 0.78);
-          backdrop-filter: blur(16px) saturate(180%);
-          -webkit-backdrop-filter: blur(16px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.9);
-          box-shadow:
-            0 20px 50px rgba(22, 45, 26, 0.1),
-            inset 0 1px 2px rgba(255, 255, 255, 0.95);
-          text-align: left;
-          align-items: center;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: clamp(1rem, 2.4vw, 1.9rem);
         }
 
-        /* ── Left: Morph Slider Container ── */
-        .jd-slider-box {
-          position: relative;
-          width: 100%;
-          aspect-ratio: 1 / 1;
-          min-height: 280px;
-          border-radius: 22px;
+        /* Set the panel back behind the tape and wax: a light defocus plus a
+           knock-down in brightness. It clears on hover or keyboard focus, so
+           the cards are still readable and still turn — only the names are
+           sealed, not the seats. No pointer-events lock for the same reason. */
+        /* The defocus sits on .px-in — the element ParallaxY transforms — and
+           NOT on .jd-grid above it. A filter on an ancestor of moving children
+           has to re-blur the whole grid every scroll frame; on the moving
+           element itself the blur rasterises once and the drift is a plain
+           composited translate. Same look, a fraction of the cost. */
+        .jd-grid-wrap[data-sealed="true"] .jd-cell .px-in {
+          filter: blur(3.4px) saturate(0.9) brightness(0.78);
+          transition: filter 450ms var(--ease-out);
+        }
+        .jd-grid-wrap[data-sealed="true"]:hover .jd-cell .px-in,
+        .jd-grid-wrap[data-sealed="true"]:focus-within .jd-cell .px-in {
+          filter: blur(0px) saturate(1) brightness(0.98);
+        }
+
+        /* Seal was drawn for the sage sections: its vignette is a pale wash
+           that would ring the panel in light on the night field. */
+        .jd .jseal::before {
+          background: radial-gradient(130% 100% at 50% 44%,
+            rgba(1, 3, 1, 0) 46%,
+            rgba(1, 3, 1, 0.72) 100%);
+        }
+
+        /* ── Front face: the print that has not developed ── */
+        .jd-front {
+          position: absolute;
+          inset: 0;
+          display: block;
+          border-radius: var(--radius-lg);
           overflow: hidden;
-          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+          background:
+            radial-gradient(118% 76% at 50% 6%, rgba(78, 122, 52, 0.34) 0%, rgba(78, 122, 52, 0) 56%),
+            linear-gradient(168deg, #16240F 0%, #080F06 100%);
+          box-shadow:
+            inset 0 0 0 1px rgba(190, 224, 168, 0.14),
+            inset 0 1px 0 rgba(214, 240, 190, 0.16);
         }
 
-        .jd-morph-stage {
-          width: 100%;
-          height: 100%;
-          border-radius: 22px;
+        .jd-front-figure {
+          position: absolute;
+          left: 50%;
+          bottom: -2%;
+          width: 76%;
+          transform: translateX(-50%);
+          animation: jd-breathe 7.5s ease-in-out infinite;
         }
 
-        /* ── Right: Details & Stats ── */
-        .jd-info-box {
-          display: flex;
-          flex-direction: column;
-          gap: clamp(0.75rem, 1.5vh, 1.25rem);
-          padding-right: 0.5rem;
+        @keyframes jd-breathe {
+          0%, 100% { opacity: 0.9; transform: translateX(-50%) scale(1); }
+          50%      { opacity: 1;   transform: translateX(-50%) scale(1.015); }
         }
 
-        .jd-tag {
-          font-family: var(--font-geist-mono), monospace;
-          font-size: 0.72rem;
-          font-weight: 600;
-          color: #5C8C3A;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
+        .jd-front-q {
+          position: absolute;
+          inset: 0 0 22% 0;
+          display: grid;
+          place-items: center;
+          pointer-events: none;
+        }
+        .jd-front-q svg { width: 32%; filter: blur(0.4px); }
+        .jd-front-q text {
+          font-family: var(--font-hiruko), var(--font-display), Georgia, serif;
+          font-weight: 700;
+          font-size: 78px;
+          fill: rgba(200, 232, 172, 0.3);
         }
 
-        .jd-title {
-          margin: 0.3rem 0 0;
-          font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-size: clamp(1.25rem, 2vw, 1.65rem);
-          font-weight: 500;
-          letter-spacing: -0.02em;
-          color: #111A12;
-          line-height: 1.25;
-        }
-
-        .jd-role-text {
-          margin: 0.2rem 0 0;
-          font-family: var(--font-dm-sans), sans-serif;
-          font-size: 0.88rem;
-          font-weight: 500;
-          color: #566A55;
-        }
-
-        .jd-desc {
-          margin: 0;
-          font-family: var(--font-dm-sans), sans-serif;
-          font-size: 0.92rem;
-          font-weight: 400;
-          line-height: 1.58;
-          color: #2F3E31;
-        }
-
-        .jd-action-row {
-          margin-top: 0.25rem;
-        }
-
-        .jd-read-link {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.45rem;
-          font-family: var(--font-dm-sans), sans-serif;
-          font-size: 0.88rem;
-          font-weight: 600;
-          color: #2F5527;
-          border-bottom: 1.5px solid rgba(47, 85, 39, 0.35);
-          padding-bottom: 2px;
-          transition: color 200ms ease, border-color 200ms ease, gap 200ms ease;
-        }
-
-        .jd-arrow {
-          width: 0.88rem;
-          height: 0.88rem;
-          transition: transform 200ms ease;
-        }
-
-        .jd-read-link:hover {
-          color: #5C8C3A;
-          border-color: #5C8C3A;
-          gap: 0.65rem;
-        }
-
-        .jd-read-link:hover .jd-arrow {
-          transform: translateX(2px);
-        }
-
-        /* ── Stats Grid ── */
-        .jd-stats-row {
-          display: flex;
-          align-items: center;
-          gap: clamp(0.75rem, 2vw, 1.5rem);
-          padding-top: 1rem;
-          border-top: 1px solid rgba(47, 85, 39, 0.12);
-        }
-
-        .jd-stat-item {
-          display: flex;
-          flex-direction: column;
-          gap: 0.15rem;
-        }
-
-        .jd-stat-val {
-          font-family: var(--font-bebas), sans-serif;
-          font-size: clamp(1.4rem, 2.2vw, 1.85rem);
-          font-weight: 400;
-          letter-spacing: 0.02em;
-          color: #111A12;
-          line-height: 1;
-        }
-
-        .jd-stat-lbl {
-          font-family: var(--font-dm-sans), sans-serif;
-          font-size: 0.72rem;
-          font-weight: 500;
-          color: #566A55;
-          text-transform: uppercase;
-          letter-spacing: 0.04em;
-        }
-
-        .jd-stat-divider {
-          width: 1px;
-          height: 28px;
-          background: rgba(47, 85, 39, 0.15);
-        }
-
-        /* ── Sealed State ── */
-        .jd-carousel-wrapper[data-sealed="true"] .jd-main-card {
-          filter: blur(2px) saturate(0.85);
-          opacity: 0.85;
+        .jd-grain {
+          position: absolute;
+          inset: 0;
+          opacity: 0.4;
+          mix-blend-mode: soft-light;
           pointer-events: none;
         }
 
-        /* ── Bottom Controls & Dots ── */
+        /* real portrait, once one exists */
+        .jd-front-photo { object-fit: cover; }
+        .jd-front-scrim {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, rgba(3, 8, 2, 0) 42%, rgba(3, 8, 2, 0.88) 100%);
+        }
+
+        .jd-front-meta {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 0.28rem;
+          padding: clamp(0.9rem, 2vw, 1.25rem);
+          background: linear-gradient(180deg, rgba(4, 10, 3, 0) 0%, rgba(4, 10, 3, 0.82) 46%);
+        }
+
+        .jd-front-seat {
+          font-family: var(--font-geist-mono), monospace;
+          font-size: 0.62rem;
+          font-weight: 500;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: rgba(143, 196, 90, 0.9);
+        }
+
+        .jd-front-domain {
+          font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
+          font-size: clamp(0.92rem, 1.3vw, 1.06rem);
+          font-weight: 500;
+          line-height: 1.24;
+          letter-spacing: -0.018em;
+          color: #F1F7E9;
+          text-wrap: balance;
+        }
+
+        .jd-front-role {
+          font-family: var(--font-dm-sans), sans-serif;
+          font-size: 0.8rem;
+          color: rgba(214, 232, 202, 0.62);
+        }
+
+        .jd-stamp {
+          position: absolute;
+          top: clamp(0.75rem, 1.6vw, 1rem);
+          right: clamp(0.75rem, 1.6vw, 1rem);
+          padding: 0.24rem 0.6rem;
+          border-radius: var(--radius-pill);
+          font-family: var(--font-geist-mono), monospace;
+          font-size: 0.56rem;
+          font-weight: 500;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: rgba(214, 240, 190, 0.72);
+          border: 1px solid rgba(190, 224, 168, 0.24);
+          background: rgba(8, 18, 6, 0.55);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+        }
+
+        /* ── Back face: the seat brief ── */
+        .jd-back {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          flex-direction: column;
+          padding: clamp(1.1rem, 2.4vw, 1.6rem);
+          border-radius: var(--radius-lg);
+          background:
+            radial-gradient(110% 70% at 12% 0%, rgba(92, 140, 58, 0.3) 0%, rgba(92, 140, 58, 0) 58%),
+            linear-gradient(165deg, #1B2E16 0%, #070E05 100%);
+          box-shadow:
+            inset 0 0 0 1px rgba(190, 224, 168, 0.18),
+            inset 0 1px 0 rgba(214, 240, 190, 0.2);
+        }
+
+        .jd-back-tag {
+          font-family: var(--font-geist-mono), monospace;
+          font-size: 0.6rem;
+          font-weight: 500;
+          letter-spacing: 0.19em;
+          text-transform: uppercase;
+          color: #9FD066;
+        }
+
+        .jd-back-title {
+          margin-top: 0.55rem;
+          font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
+          font-size: clamp(1rem, 1.5vw, 1.2rem);
+          font-weight: 500;
+          line-height: 1.2;
+          letter-spacing: -0.02em;
+          color: #F2F8EA;
+          text-wrap: balance;
+        }
+
+        .jd-back-rule {
+          display: block;
+          width: 2.25rem;
+          height: 1px;
+          margin: 0.8rem 0;
+          background: rgba(143, 196, 90, 0.45);
+        }
+
+        .jd-back-role {
+          font-family: var(--font-dm-sans), sans-serif;
+          font-size: 0.8rem;
+          font-weight: 500;
+          color: rgba(200, 226, 185, 0.72);
+        }
+
+        .jd-back-desc {
+          margin-top: 0.6rem;
+          font-family: var(--font-dm-sans), sans-serif;
+          font-size: clamp(0.79rem, 1.02vw, 0.87rem);
+          line-height: 1.58;
+          color: rgba(206, 226, 194, 0.6);
+        }
+
+        .jd-back-stats {
+          display: flex;
+          gap: clamp(0.9rem, 2vw, 1.5rem);
+          margin-top: auto;
+          padding-top: 1rem;
+          border-top: 1px solid rgba(190, 224, 168, 0.16);
+        }
+
+        .jd-back-stat {
+          display: flex;
+          flex-direction: column;
+          gap: 0.1rem;
+        }
+
+        .jd-back-val {
+          font-family: var(--font-bebas), sans-serif;
+          font-size: clamp(1.25rem, 1.9vw, 1.55rem);
+          line-height: 1;
+          letter-spacing: 0.02em;
+          color: #F2F8EA;
+        }
+
+        .jd-back-lbl {
+          font-family: var(--font-dm-sans), sans-serif;
+          font-size: 0.66rem;
+          font-weight: 500;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          color: rgba(200, 226, 185, 0.55);
+        }
+
+        /* ── Footer ── */
         .jd-foot-wrap {
-          margin-top: clamp(2rem, 4vh, 3.5rem);
+          margin-top: clamp(2.25rem, 4.5vh, 3.5rem);
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 1.25rem;
+          gap: 1.15rem;
         }
 
-        .jd-dots-row {
-          display: flex;
-          align-items: center;
-          gap: 0.55rem;
-        }
-
-        .jd-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 999px;
-          background: rgba(47, 85, 39, 0.25);
-          border: none;
-          padding: 0;
-          cursor: pointer;
-          transition: width 0.3s ease, background 0.3s ease;
-        }
-
-        .jd-dot.is-active {
-          width: 24px;
-          background: #2F5527;
+        .jd-foot-note {
+          font-family: var(--font-geist-mono), monospace;
+          font-size: 0.66rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: rgba(206, 226, 194, 0.42);
         }
 
         .jd-explore-btn {
+          position: relative;
           display: inline-flex;
           align-items: center;
-          gap: 0.55rem;
-          padding: 0.65rem 1.5rem;
+          justify-content: center;
+          gap: 0.65rem;
+          padding: 0.72rem 1.75rem;
           border-radius: var(--radius-pill);
-          background: rgba(255, 255, 255, 0.6);
+          background: rgba(226, 244, 208, 0.07);
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
-          border: 1px solid rgba(47, 85, 39, 0.18);
+          border: 1px solid rgba(190, 224, 168, 0.22);
           font-family: var(--font-dm-sans), sans-serif;
           font-size: 0.88rem;
           font-weight: 600;
-          color: #16241A;
-          box-shadow: 0 4px 16px rgba(22, 45, 26, 0.05);
-          transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
+          color: #E9F4DE;
+          cursor: not-allowed;
+          user-select: none;
+          overflow: hidden;
+          min-width: 17rem;
+          transition: transform 200ms ease, background 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
         }
 
-        .jd-explore-arrow {
-          width: 0.9rem;
-          height: 0.9rem;
-          transition: transform 200ms ease;
+        .jd-btn-icon-wrap {
+          display: grid;
+          place-items: center;
+          width: 1.25rem;
+          height: 1.25rem;
+          color: #9FD066;
+          transition: color 220ms ease, transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .jd-lock-icon {
+          width: 0.95rem;
+          height: 0.95rem;
+        }
+
+        .jd-btn-text-default {
+          display: inline-block;
+          transition: opacity 200ms ease, transform 200ms ease;
+        }
+
+        .jd-btn-text-hover {
+          position: absolute;
+          left: 3.2rem;
+          opacity: 0;
+          transform: translateY(8px);
+          color: #FFDE7A;
+          font-weight: 600;
+          letter-spacing: 0.02em;
+          transition: opacity 200ms ease, transform 200ms ease;
+          white-space: nowrap;
         }
 
         .jd-explore-btn:hover {
-          transform: translateY(-2px);
-          background: rgba(255, 255, 255, 0.85);
-          box-shadow: 0 8px 24px rgba(22, 45, 26, 0.1);
+          background: rgba(235, 175, 45, 0.12);
+          border-color: rgba(255, 215, 90, 0.45);
+          box-shadow: 0 0 20px rgba(240, 190, 60, 0.16);
+          transform: translateY(-1px);
         }
 
-        .jd-explore-btn:hover .jd-explore-arrow {
-          transform: translateX(3px);
+        .jd-explore-btn:hover .jd-btn-icon-wrap {
+          color: #FFDE7A;
+          transform: scale(1.18);
         }
 
-        @media (max-width: 820px) {
-          .jd-main-card {
-            grid-template-columns: 1fr;
+        .jd-explore-btn:hover .jd-btn-text-default {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+
+        .jd-explore-btn:hover .jd-btn-text-hover {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        @media (max-width: 960px) {
+          .jd-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: clamp(0.5rem, 1.6vw, 1.2rem);
           }
-          .jd-slider-box {
-            min-height: 240px;
+          .jd-front-domain {
+            font-size: clamp(0.72rem, 1.6vw, 0.95rem);
           }
-          .jd-peek-card {
-            display: none;
+          .jd-back-title {
+            font-size: clamp(0.72rem, 1.6vw, 0.98rem);
           }
+        }
+
+        @media (max-width: 680px) {
+          .jd-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: clamp(0.6rem, 2.8vw, 1.15rem);
+          }
+          /* Flatten parallax drift on mobile so 2-column layout stays neatly aligned */
+          .jd-cell .px-in {
+            transform: none !important;
+          }
+          .jd-front-meta {
+            padding: clamp(0.65rem, 2.4vw, 1rem);
+            gap: 0.2rem;
+          }
+          .jd-front-seat {
+            font-size: clamp(0.52rem, 1.8vw, 0.62rem);
+            letter-spacing: 0.15em;
+          }
+          .jd-front-domain {
+            font-size: clamp(0.78rem, 2.7vw, 0.98rem);
+            line-height: 1.2;
+          }
+          .jd-front-role {
+            font-size: clamp(0.62rem, 2.2vw, 0.75rem);
+          }
+          .jd-stamp {
+            top: clamp(0.5rem, 2vw, 0.75rem);
+            right: clamp(0.5rem, 2vw, 0.75rem);
+            padding: 0.16rem 0.45rem;
+            font-size: clamp(0.48rem, 1.6vw, 0.55rem);
+            letter-spacing: 0.14em;
+          }
+          .jd-back {
+            padding: clamp(0.75rem, 2.6vw, 1.2rem);
+          }
+          .jd-back-tag {
+            font-size: clamp(0.52rem, 1.8vw, 0.6rem);
+            letter-spacing: 0.15em;
+          }
+          .jd-back-title {
+            margin-top: 0.35rem;
+            font-size: clamp(0.78rem, 2.6vw, 1.05rem);
+            line-height: 1.2;
+          }
+          .jd-back-rule {
+            margin: 0.45rem 0;
+            width: 1.6rem;
+          }
+          .jd-back-role {
+            font-size: clamp(0.62rem, 2.2vw, 0.75rem);
+          }
+          .jd-back-desc {
+            margin-top: 0.35rem;
+            font-size: clamp(0.62rem, 2.1vw, 0.78rem);
+            line-height: 1.45;
+          }
+          .jd-back-stats {
+            margin-top: auto;
+            padding-top: 0.5rem;
+            gap: clamp(0.6rem, 2.2vw, 1rem);
+          }
+          .jd-back-val {
+            font-size: clamp(1.1rem, 4.2vw, 1.4rem);
+          }
+          .jd-back-lbl {
+            font-size: clamp(0.52rem, 1.7vw, 0.62rem);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .jd-front-figure { animation: none; }
         }
       `}</style>
     </section>

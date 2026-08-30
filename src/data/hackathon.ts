@@ -143,6 +143,9 @@ export const JUDGES: Judge[] = [
   { name: "", role: "", photo: { label: "Judge 04", expect: "/images/judges/04.jpg", src: "" } },
   { name: "", role: "", photo: { label: "Judge 05", expect: "/images/judges/05.jpg", src: "" } },
   { name: "", role: "", photo: { label: "Judge 06", expect: "/images/judges/06.jpg", src: "" } },
+  { name: "", role: "", photo: { label: "Judge 07", expect: "/images/judges/07.jpg", src: "" } },
+  { name: "", role: "", photo: { label: "Judge 08", expect: "/images/judges/08.jpg", src: "" } },
+  { name: "", role: "", photo: { label: "Judge 09", expect: "/images/judges/09.jpg", src: "" } },
 ];
 
 /** Sponsor logo wall. Add a slot per signed sponsor, drop the logo in, set `src`. */

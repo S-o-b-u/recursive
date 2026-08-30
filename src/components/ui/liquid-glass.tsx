@@ -153,6 +153,9 @@ export function LiquidGlassCard({
         borderTop: getBorderTop(),
         borderBottom: getBorderBottom(),
         color: (isDark || isClear || isGreen) ? "#EFF3EB" : undefined,
+        transform: "translate3d(0, 0, 0)",
+        WebkitBackfaceVisibility: "hidden",
+        backfaceVisibility: "hidden",
       }}
     >
       {/* ── 1. Refraction: warps whatever sits behind the pane ── */}

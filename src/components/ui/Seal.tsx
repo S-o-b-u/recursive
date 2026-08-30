@@ -189,8 +189,8 @@ export default function Seal({ word = "SEALED" }: { word?: string }) {
           position: absolute;
           left: 50%;
           top: 44%;
-          width: 210%;
-          margin-left: -105%;
+          width: 250%;
+          margin-left: -125%;
           height: clamp(40px, 5.2vw, 56px);
           display: flex;
           align-items: center;
@@ -203,8 +203,8 @@ export default function Seal({ word = "SEALED" }: { word?: string }) {
           mask-image: linear-gradient(180deg, transparent 0%, #000 15%, #000 85%, transparent 100%);
           filter: drop-shadow(0 14px 26px rgba(12, 26, 12, 0.5));
         }
-        .jseal-tape-a { transform: translateY(-50%) rotate(-23deg); }
-        .jseal-tape-b { transform: translateY(-50%) rotate(21deg); }
+        .jseal-tape-a { transform: translateY(-50%) rotate(-35deg); }
+        .jseal-tape-b { transform: translateY(-50%) rotate(33deg); }
 
         .jseal-track { display: flex; flex: none; animation: jseal-scroll 34s linear infinite; }
         .jseal-track--rev { animation-direction: reverse; }
@@ -278,11 +278,35 @@ export default function Seal({ word = "SEALED" }: { word?: string }) {
           100% { opacity: 1; transform: translate(-50%, -50%) rotate(-4deg) scale(1); }
         }
 
-        @media (max-width: 640px) {
-          .jseal-tape-a { transform: translateY(-50%) rotate(-18deg); }
-          .jseal-tape-b { transform: translateY(-50%) rotate(16deg); }
-          .jseal-wax { width: clamp(130px, 34vw, 160px); }
+        @media (max-width: 1024px) {
+          .jseal-tape {
+            width: 300%;
+            margin-left: -150%;
+          }
+          .jseal-tape-a { transform: translateY(-50%) rotate(-45deg); }
+          .jseal-tape-b { transform: translateY(-50%) rotate(43deg); }
         }
+
+        @media (max-width: 768px) {
+          .jseal-tape {
+            width: 360%;
+            margin-left: -180%;
+            height: clamp(38px, 6.2vw, 48px);
+          }
+          .jseal-tape-a { transform: translateY(-50%) rotate(-54deg); }
+          .jseal-tape-b { transform: translateY(-50%) rotate(52deg); }
+          .jseal-wax { width: clamp(120px, 30vw, 150px); }
+        }
+
+        @media (max-width: 480px) {
+          .jseal-tape {
+            width: 400%;
+            margin-left: -200%;
+          }
+          .jseal-tape-a { transform: translateY(-50%) rotate(-58deg); }
+          .jseal-tape-b { transform: translateY(-50%) rotate(56deg); }
+        }
+
         @media (prefers-reduced-motion: reduce) {
           .jseal-track,
           .jseal-gloss,

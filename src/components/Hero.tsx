@@ -8,6 +8,7 @@ import { EVENT } from "@/data/hackathon";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import WarpText from "@/components/ui/WarpText";
+import CornerBadge from "@/components/ui/CornerBadge";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -66,6 +67,8 @@ export default function Hero() {
 
   return (
     <section id="hero" className="hero" ref={sectionRef}>
+      {/* ── Top-Left Corner Badge exclusively in Hero ── */}
+      <CornerBadge />
       {/* ── 100% Crisp, Pure Video Background (Zero filters, no blur/jitter transforms) ── */}
       <div className="hero-video-wrap">
         <video
@@ -90,7 +93,7 @@ export default function Hero() {
         transition={{ duration: 0.8, ease: EASE_OUT }}
       >
         <WarpText
-          src="/logo.png"
+          src="/images/logo.png"
           color="#111a12"
           warpStrength={0.08}
           warpScale={1.7}
@@ -145,7 +148,7 @@ export default function Hero() {
       {/* ── Mossy Log Natural Divider Over Seam ── */}
       <div className="hero-log-divider" aria-hidden="true">
         <img
-          src="/log.png"
+          src="/images/log.png"
           alt=""
           className="hero-log-img"
           loading="eager"
@@ -411,7 +414,16 @@ export default function Hero() {
           height: 1.15rem;
         }
 
+        @media (max-width: 1024px) {
+          .hero-center-content {
+            top: clamp(18%, 22vh, 26%);
+          }
+        }
+
         @media (max-width: 860px) {
+          .hero-center-content {
+            top: clamp(20%, 25vh, 29%);
+          }
           .hero-chair-annotation {
             display: none;
           }
@@ -425,7 +437,7 @@ export default function Hero() {
 
         @media (max-width: 600px) {
           .hero-center-content {
-            top: 20%;
+            top: clamp(22%, 28vh, 32%);
           }
           .hero-wordmark {
             font-size: clamp(2.8rem, 14vw, 4.5rem);
@@ -451,6 +463,12 @@ export default function Hero() {
           }
           .hero-bottom-area {
             bottom: clamp(3rem, 6vh, 4.5rem);
+          }
+        }
+
+        @media (max-width: 480px) {
+          .hero-center-content {
+            top: clamp(24%, 30vh, 34%);
           }
         }
       `}</style>

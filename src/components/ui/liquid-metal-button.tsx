@@ -96,6 +96,7 @@ export function LiquidMetalButton({
       document.head.appendChild(style);
     }
 
+    let observer: IntersectionObserver | null = null;
     const loadShader = async () => {
       try {
         if (shaderRef.current) {
@@ -122,6 +123,16 @@ export function LiquidMetalButton({
             undefined,
             0.6,
           );
+
+          observer = new IntersectionObserver(
+            ([entry]) => {
+              if (shaderMount.current?.setSpeed) {
+                shaderMount.current.setSpeed(entry.isIntersecting ? 0.6 : 0);
+              }
+            },
+            { rootMargin: "100px" }
+          );
+          observer.observe(shaderRef.current);
         }
       } catch (error) {
         console.error("[v0] Failed to load shader:", error);
@@ -131,6 +142,7 @@ export function LiquidMetalButton({
     loadShader();
 
     return () => {
+      observer?.disconnect();
       if (shaderMount.current?.destroy) {
         shaderMount.current.destroy();
         shaderMount.current = null;
@@ -191,7 +203,7 @@ export function LiquidMetalButton({
             height: `${dimensions.height}px`,
             transformStyle: "preserve-3d",
             transition:
-              "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s ease, height 0.4s ease",
+              "transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s ease, opacity 0.2s ease",
             transform: "none",
           }}
         >
@@ -208,7 +220,7 @@ export function LiquidMetalButton({
               gap: "6px",
               transformStyle: "preserve-3d",
               transition:
-                "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s ease, height 0.4s ease, gap 0.4s ease",
+                "transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.2s ease",
               transform: "translateZ(20px)",
               zIndex: 30,
               pointerEvents: "none",
@@ -221,7 +233,6 @@ export function LiquidMetalButton({
                   style={{
                     color: "#ffffff",
                     filter: "drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.5))",
-                    transition: "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)",
                     transform: "scale(1)",
                   }}
                 />
@@ -234,7 +245,6 @@ export function LiquidMetalButton({
                   color: "#f3f8ee",
                   fontWeight: 600,
                   textShadow: "0px 1px 2px rgba(0, 0, 0, 0.7)",
-                  transition: "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)",
                   transform: "scale(1)",
                   whiteSpace: "nowrap",
                   display: "inline-flex",
@@ -257,7 +267,7 @@ export function LiquidMetalButton({
               height: `${dimensions.height}px`,
               transformStyle: "preserve-3d",
               transition:
-                "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s ease, height 0.4s ease",
+                "transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s ease, opacity 0.2s ease",
               transform: `translateZ(10px) ${isPressed ? "translateY(1px) scale(0.98)" : "translateY(0) scale(1)"}`,
               zIndex: 20,
             }}
@@ -287,7 +297,7 @@ export function LiquidMetalButton({
               height: `${dimensions.height}px`,
               transformStyle: "preserve-3d",
               transition:
-                "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s ease, height 0.4s ease",
+                "transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s ease, opacity 0.2s ease",
               transform: `translateZ(0px) ${isPressed ? "translateY(1px) scale(0.98)" : "translateY(0) scale(1)"}`,
               zIndex: 10,
             }}
@@ -299,7 +309,7 @@ export function LiquidMetalButton({
                 borderRadius: "100px",
                 boxShadow: "none",
                 transition:
-                  "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s ease, height 0.4s ease",
+                  "transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s ease, opacity 0.2s ease",
                 background: "rgb(0 0 0 / 0)",
               }}
             >
@@ -344,7 +354,7 @@ export function LiquidMetalButton({
                 transformStyle: "preserve-3d",
                 transform: "translateZ(25px)",
                 transition:
-                  "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s ease, height 0.4s ease",
+                  "transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s ease, opacity 0.2s ease",
                 overflow: "hidden",
                 borderRadius: "100px",
                 textDecoration: "none",

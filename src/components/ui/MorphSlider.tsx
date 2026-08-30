@@ -14,6 +14,13 @@ export interface MorphSliderItem {
   [key: string]: any;
 }
 
+/** Imperative handle handed to `apiRef` so a parent can drive the slider. */
+export interface MorphSliderApi {
+  next: () => void;
+  prev: () => void;
+  goToIndex: (index: number) => void;
+}
+
 export interface MorphSliderProps {
   items?: MorphSliderItem[];
   startIndex?: number;
@@ -34,6 +41,8 @@ export interface MorphSliderProps {
   showIndicators?: boolean;
   className?: string;
   onSlideChange?: (index: number) => void;
+  /** Filled with { next, prev, goToIndex } once the engine is mounted. */
+  apiRef?: { current: MorphSliderApi | null };
   [key: string]: any;
 }
 
@@ -263,6 +272,10 @@ class MorphEngine {
   resizeObserver: any;
   boundLoop: any;
   raf: any;
+  visible: boolean;
+  intersectionObserver: any;
+  /** A goToIndex asked for while a morph was already running. */
+  pending: number | null;
 
   constructor(container: HTMLElement, { items, startIndex = 0, reducedMotion = false, getOptions, onIndexChange, dprCap = 2 }: any) {
     this.container = container;
@@ -277,6 +290,7 @@ class MorphEngine {
     this.dragDir = 0;
     this.shownIndex = startIndex;
     this.tween = null;
+    this.pending = null;
 
     this.renderer = new Renderer({
       alpha: false,
@@ -328,6 +342,18 @@ class MorphEngine {
     this.resizeObserver.observe(container);
     this.resize();
 
+    this.visible = true;
+    this.intersectionObserver = new IntersectionObserver(([entry]) => {
+      this.visible = entry.isIntersecting;
+      if (this.visible && !this.raf) {
+        this.raf = requestAnimationFrame(this.boundLoop);
+      } else if (!this.visible && this.raf) {
+        cancelAnimationFrame(this.raf);
+        this.raf = 0;
+      }
+    }, { rootMargin: "150px" });
+    this.intersectionObserver.observe(container);
+
     this.loadTextures();
 
     this.boundLoop = this.loop.bind(this);
@@ -372,6 +398,10 @@ class MorphEngine {
   }
 
   loop(t: number) {
+    if (!this.visible) {
+      this.raf = 0;
+      return;
+    }
     this.program.uniforms.uTime.value = t * 0.001;
     if (!this.dragging && !this.animating) this.syncOptions();
     this.renderer.render({ scene: this.mesh });
@@ -383,8 +413,8 @@ class MorphEngine {
     return ((i % n) + n) % n;
   }
 
-  prepareNext(dir: number) {
-    const target = this.wrap(this.current + dir);
+  /** Point the shader at `target` as the incoming frame, travelling `dir`. */
+  prepareTarget(target: number, dir: number) {
     this.program.uniforms.tCurrent.value = this.textures[this.current];
     this.program.uniforms.uCurrentSize.value = this.sizes[this.current];
     this.program.uniforms.tNext.value = this.textures[target];
@@ -393,15 +423,15 @@ class MorphEngine {
     return target;
   }
 
-  goTo(dir: number) {
-    if (this.animating || this.dragging || this.items.length < 2) return;
+  prepareNext(dir: number) {
+    return this.prepareTarget(this.wrap(this.current + dir), dir);
+  }
+
+  /** Run one morph from `current` to `target`, whatever the gap between them. */
+  transitionTo(target: number, dir: number) {
     const opts = this.getOptions();
-    if (!opts.loop) {
-      const raw = this.current + dir;
-      if (raw < 0 || raw > this.items.length - 1) return;
-    }
     this.syncOptions();
-    const target = this.prepareNext(dir);
+    this.prepareTarget(target, dir);
     this.animating = true;
     this.announce(target);
     const duration = this.reducedMotion ? Math.min(opts.duration, 0.4) : opts.duration;
@@ -415,6 +445,35 @@ class MorphEngine {
         onComplete: () => this.commit(target)
       }
     );
+  }
+
+  goTo(dir: number) {
+    if (this.animating || this.dragging || this.items.length < 2) return;
+    const opts = this.getOptions();
+    if (!opts.loop) {
+      const raw = this.current + dir;
+      if (raw < 0 || raw > this.items.length - 1) return;
+    }
+    this.transitionTo(this.wrap(this.current + dir), dir);
+  }
+
+  /**
+   * Jump straight to a slide. Tabbed layouts need this — stepping goTo(±1)
+   * repeatedly to reach slide four only ever moves one frame, because each
+   * call bails while the previous tween is still animating.
+   */
+  goToIndex(target: number) {
+    if (this.items.length < 2) return;
+    const wrapped = this.wrap(target);
+    // Autoplay morphs run for over a second at a time, so a tab click landing
+    // mid-transition used to be dropped on the floor. Hold it and run it the
+    // moment the current one commits.
+    if (this.animating || this.dragging) {
+      this.pending = wrapped;
+      return;
+    }
+    if (wrapped === this.current) return;
+    this.transitionTo(wrapped, wrapped > this.current ? 1 : -1);
   }
 
   announce(index: number) {
@@ -431,6 +490,10 @@ class MorphEngine {
     this.animating = false;
     this.tween = null;
     this.announce(target);
+
+    const queued = this.pending;
+    this.pending = null;
+    if (queued !== null && queued !== this.current) this.goToIndex(queued);
   }
 
   next() {
@@ -510,8 +573,10 @@ class MorphEngine {
 
   destroy() {
     cancelAnimationFrame(this.raf);
+    this.pending = null;
     if (this.tween) this.tween.kill();
     this.resizeObserver.disconnect();
+    if (this.intersectionObserver) this.intersectionObserver.disconnect();
     this.canvas.removeEventListener("webglcontextlost", this.boundContextLost);
     this.textures.forEach(tex => {
       if (tex && tex.texture) this.gl.deleteTexture(tex.texture);
@@ -543,6 +608,7 @@ export default function MorphSlider({
   showIndicators = true,
   className = "",
   onSlideChange,
+  apiRef,
   ...props
 }: MorphSliderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -573,11 +639,20 @@ export default function MorphSlider({
     engineRef.current = engine;
     setIndex(startIndex);
 
+    if (apiRef) {
+      apiRef.current = {
+        next: () => engineRef.current?.next(),
+        prev: () => engineRef.current?.prev(),
+        goToIndex: (i: number) => engineRef.current?.goToIndex(i)
+      };
+    }
+
     return () => {
       engine.destroy();
       engineRef.current = null;
+      if (apiRef) apiRef.current = null;
     };
-  }, [items, startIndex, handleIndexChange]);
+  }, [items, startIndex, handleIndexChange, apiRef]);
 
   const handleNext = useCallback(() => engineRef.current?.next(), []);
   const handlePrev = useCallback(() => engineRef.current?.prev(), []);
@@ -726,11 +801,7 @@ export default function MorphSlider({
               aria-selected={i === index}
               aria-label={`Go to slide ${i + 1}`}
               className={`morph-slider-dot ${i === index ? "is-active" : ""}`}
-              onClick={() => {
-                const engine = engineRef.current;
-                if (!engine || i === index) return;
-                engine.goTo(i > index ? 1 : -1);
-              }}
+              onClick={() => engineRef.current?.goToIndex(i)}
             />
           ))}
         </div>

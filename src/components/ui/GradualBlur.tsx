@@ -193,6 +193,11 @@ export default function GradualBlur({
         .gb-layer {
           position: absolute;
           inset: 0;
+          pointer-events: none;
+          transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+          will-change: transform;
         }
         /* A blur ramp is decoration. If the user has asked the OS for less
            transparency, drop it rather than fight the preference. */
