@@ -1,7 +1,6 @@
 "use client";
 
 import { gsap } from "gsap";
-import { usePathname } from "next/navigation";
 import React, { useEffect, useRef } from "react";
 import { EVENT } from "@/data/hackathon";
 import WarpText from "@/components/ui/WarpText";
@@ -310,19 +309,16 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
 };
 
 export default function Footer() {
-  const pathname = usePathname();
-  const isHomePage = pathname === "/";
 
   return (
     <footer className="relative h-screen w-full bg-transparent text-[#142617] overflow-hidden select-none">
       {/* ── Top Atmospheric Gradient: seamlessly dissolves the straight line between .night/ACM and Footer ── */}
-      {isHomePage && <div className="footer-seam-blend" aria-hidden="true" />}
 
       {/* ── Giant WebGL WarpText Wordmark across the upper section ── */}
       <div className="absolute top-[24%] sm:top-[26%] left-0 right-0 z-10 flex justify-center items-center px-4 pointer-events-auto">
         <WarpText
           text={EVENT.name}
-          color="#142617"
+          color="#2F5527"
           warpStrength={0.08}
           warpScale={1.7}
           speed={0.55}
@@ -343,30 +339,31 @@ export default function Footer() {
         />
       </div>
 
+      <div className="footer-ground" aria-hidden="true" />
+
       {/* ── OpenPeeps Animated Crowd Canvas ── */}
       <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
         <CrowdCanvas src="/images/peeps/all-peeps.png" rows={15} cols={7} />
       </div>
 
       <style>{`
-        .footer-seam-blend {
+        /* A whisper of ground under the crowd, so they are standing on
+           something rather than floating in the sky. This replaces the old
+           seam blend, which faded from black — it existed to join a dark ACM to
+           a dark footer, and once the sponsor stage handed the page back to
+           daylight it was painting a wall across the top of the cloud. */
+        .footer-ground {
           position: absolute;
-          top: -2px;
-          left: 0;
-          right: 0;
-          height: clamp(180px, 28vh, 360px);
+          inset: auto 0 0 0;
+          height: 46%;
+          z-index: 0;
+          pointer-events: none;
           background: linear-gradient(
             180deg,
-            var(--color-night) 0%,
-            rgba(1, 3, 1, 0.94) 18%,
-            rgba(6, 14, 8, 0.76) 38%,
-            rgba(16, 32, 20, 0.48) 58%,
-            rgba(36, 62, 42, 0.22) 76%,
-            rgba(88, 118, 86, 0.06) 90%,
-            transparent 100%
+            rgba(200, 214, 194, 0) 0%,
+            rgba(190, 206, 182, 0.18) 58%,
+            rgba(176, 194, 166, 0.3) 100%
           );
-          pointer-events: none;
-          z-index: 5;
         }
       `}</style>
     </footer>

@@ -98,7 +98,7 @@ export default function ACM() {
         .acm {
           position: relative;
           width: 100%;
-          color: #EEF5E6;
+          color: #0f1623;
           /* Same tightening as the sections above — this one ran even wider
              (22vh) and left the biggest hole in the run. */
           padding-top: clamp(5rem, 11vh, 8.5rem);
@@ -126,6 +126,18 @@ export default function ACM() {
           width: 100vw;
           left: 50%;
           transform: translateX(-50%);
+          /* Hollow out the middle and both ends: the rows read as a band top
+             and bottom, and the panel sits in clear air between them. */
+          mask-image:
+            radial-gradient(ellipse 68% 58% at 50% 50%, transparent 56%, black 94%),
+            linear-gradient(90deg, transparent 0%, black 14%, black 86%, transparent 100%);
+          -webkit-mask-image:
+            radial-gradient(ellipse 68% 58% at 50% 50%, transparent 56%, black 94%),
+            linear-gradient(90deg, transparent 0%, black 14%, black 86%, transparent 100%);
+          mask-composite: intersect;
+          -webkit-mask-composite: source-in;
+          justify-content: space-between;
+          padding-block: clamp(1rem, 4vh, 3rem);
         }
 
         .acm-marquee {
@@ -147,12 +159,13 @@ export default function ACM() {
           display: inline-block;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
           font-weight: 700;
-          font-size: clamp(6rem, 18vw, 16rem);
-          line-height: 0.85;
-          letter-spacing: -0.02em;
+          font-size: clamp(4rem, 11vw, 9.5rem);
+          line-height: 0.9;
+          letter-spacing: 0.01em;
           text-transform: uppercase;
-          color: rgba(226, 244, 208, 0.045);
-          padding: 0 1vw;
+          color: transparent;
+          -webkit-text-stroke: 1.2px rgba(28, 48, 26, 0.14);
+          padding: 0 2vw;
         }
 
         .acm-marquee-left .acm-marquee-track {
@@ -194,7 +207,7 @@ export default function ACM() {
         .acm-rule-top {
           width: clamp(2rem, 6vw, 4rem);
           height: 1.5px;
-          background: rgba(190, 224, 168, 0.28);
+          background: rgba(15, 22, 35, 0.18);
           margin-bottom: clamp(2.5rem, 5vh, 3.5rem);
         }
 
@@ -202,7 +215,7 @@ export default function ACM() {
           width: 100%;
           max-width: 40rem;
           height: 1px;
-          background: rgba(190, 224, 168, 0.14);
+          background: rgba(15, 22, 35, 0.1);
           margin-top: clamp(2rem, 4vh, 3rem);
         }
 
@@ -288,7 +301,7 @@ export default function ACM() {
           font-weight: 400;
           line-height: 1.82;
           letter-spacing: -0.008em;
-          color: rgba(214, 232, 202, 0.6);
+          color: rgba(15, 22, 35, 0.65);
           text-align: center;
           text-wrap: balance;
         }
@@ -306,7 +319,7 @@ export default function ACM() {
           font-weight: 500;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: rgba(200, 226, 185, 0.4);
+          color: rgba(15, 22, 35, 0.38);
           margin: 0;
         }
       `}</style>

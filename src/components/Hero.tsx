@@ -1,19 +1,12 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useRef } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { EVENT } from "@/data/hackathon";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import WarpText from "@/components/ui/WarpText";
 import CornerBadge from "@/components/ui/CornerBadge";
-
-gsap.registerPlugin(ScrollTrigger);
-
-const useIsomorphicLayoutEffect =
-  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
@@ -23,47 +16,6 @@ export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const centerRef = useRef<HTMLDivElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
-
-  useIsomorphicLayoutEffect(() => {
-    const section = sectionRef.current;
-    const center = centerRef.current;
-    const dock = dockRef.current;
-
-    if (!section || !center || !dock || reduced) return;
-
-    const ctx = gsap.context(() => {
-      // Cinematic scroll: wordmark & buttons lift & fade, video subtly scales into the bottom blend
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
-      });
-
-      tl.to(
-        center,
-        {
-          y: -50,
-          opacity: 0,
-          ease: "none",
-        },
-        0
-      )
-      .to(
-        dock,
-        {
-          y: -30,
-          opacity: 0,
-          ease: "none",
-        },
-        0
-      );
-    }, section);
-
-    return () => ctx.revert();
-  }, [reduced]);
 
   return (
     <section id="hero" className="hero" ref={sectionRef}>
@@ -234,7 +186,7 @@ export default function Hero() {
         /* ── Top Center Block: Wordmark with WebGL Warp ── */
         .hero-center-content {
           position: absolute;
-          top: clamp(8%, 12vh, 16%);
+          top: clamp(4rem, 6.5vh, 6rem);
           left: 0;
           right: 0;
           width: 100%;
@@ -416,13 +368,13 @@ export default function Hero() {
 
         @media (max-width: 1024px) {
           .hero-center-content {
-            top: clamp(18%, 22vh, 26%);
+            top: clamp(4.5rem, 10vh, 6.5rem);
           }
         }
 
         @media (max-width: 860px) {
           .hero-center-content {
-            top: clamp(20%, 25vh, 29%);
+            top: clamp(4.5rem, 11vh, 7rem);
           }
           .hero-chair-annotation {
             display: none;
@@ -437,7 +389,7 @@ export default function Hero() {
 
         @media (max-width: 600px) {
           .hero-center-content {
-            top: clamp(22%, 28vh, 32%);
+            top: clamp(4.5rem, 12vh, 7.5rem);
           }
           .hero-wordmark {
             font-size: clamp(2.8rem, 14vw, 4.5rem);
@@ -468,7 +420,7 @@ export default function Hero() {
 
         @media (max-width: 480px) {
           .hero-center-content {
-            top: clamp(24%, 30vh, 34%);
+            top: clamp(4.5rem, 13vh, 8rem);
           }
         }
       `}</style>
