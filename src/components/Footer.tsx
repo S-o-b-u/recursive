@@ -328,11 +328,7 @@ export default function Footer() {
       <div className="absolute top-[24%] sm:top-[26%] left-0 right-0 z-10 flex justify-center items-center px-4 pointer-events-auto">
         <WarpText
           text={EVENT.name}
-<<<<<<< HEAD
-          color="#2F5527"
-=======
           color="#EEF5E6"
->>>>>>> f1f6e6301a1cab9d9d8fdfbfd327d62bc7cd20cc
           warpStrength={0.08}
           warpScale={1.7}
           speed={0.55}
@@ -368,7 +364,6 @@ export default function Footer() {
            daylight it was painting a wall across the top of the cloud. */
         .footer-ground {
           position: absolute;
-<<<<<<< HEAD
           inset: auto 0 0 0;
           height: 46%;
           z-index: 0;
@@ -378,16 +373,6 @@ export default function Footer() {
             rgba(200, 214, 194, 0) 0%,
             rgba(190, 206, 182, 0.18) 58%,
             rgba(176, 194, 166, 0.3) 100%
-=======
-          top: -2px;
-          left: 0;
-          right: 0;
-          height: clamp(120px, 18vh, 240px);
-          background: linear-gradient(
-            180deg,
-            var(--color-night) 0%,
-            var(--color-night) 100%
->>>>>>> f1f6e6301a1cab9d9d8fdfbfd327d62bc7cd20cc
           );
         }
       `}</style>
