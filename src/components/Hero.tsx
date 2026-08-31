@@ -6,6 +6,7 @@ import { EVENT } from "@/data/hackathon";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import WarpText from "@/components/ui/WarpText";
+import logoImg from "../../public/images/logo.png";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
@@ -81,7 +82,7 @@ export default function Hero() {
       >
         <div className="hero-warp-wrap">
           <WarpText
-            src="/images/logo.png"
+            src={logoImg.src}
             color="#111a12"
             warpStrength={0.08}
             warpScale={1.7}
