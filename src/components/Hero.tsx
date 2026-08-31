@@ -260,11 +260,11 @@ export default function Hero() {
         /* ── Top Center Block: Wordmark with WebGL Warp ── */
         .hero-center-content {
           position: absolute;
-          top: clamp(4.25rem, 14vh, 11.5rem);
+          top: clamp(3.2rem, 9.5vh, 7.5rem);
           left: 0;
           right: 0;
           width: 100%;
-          max-width: 1800px;
+          max-width: 1920px;
           margin-inline: auto;
           display: flex;
           flex-direction: column;
@@ -273,14 +273,14 @@ export default function Hero() {
           z-index: 10;
           pointer-events: auto;
           will-change: transform, opacity;
-          padding-inline: clamp(0.5rem, 2vw, 1.5rem);
+          padding-inline: clamp(0.5rem, 1.5vw, 1.2rem);
         }
 
         .hero-warp-wrap {
           position: relative;
           width: 100%;
-          max-width: min(96vw, 1600px);
-          height: min(clamp(200px, 32vw, 420px), 40vh);
+          max-width: min(98vw, 1800px);
+          height: min(clamp(240px, 38vw, 540px), 48vh);
           display: flex;
           justify-content: center;
           align-items: center;
@@ -462,19 +462,20 @@ export default function Hero() {
 
         @media (max-width: 1024px) {
           .hero-center-content {
-            top: clamp(5.6rem, 12.5vh, 8.5rem);
+            top: clamp(4.5rem, 10vh, 6.8rem);
           }
           .hero-warp-wrap {
-            height: min(clamp(160px, 30vw, 320px), 34vh);
+            max-width: 98vw;
+            height: min(clamp(200px, 36vw, 400px), 42vh);
           }
         }
 
         @media (max-width: 860px) {
           .hero-center-content {
-            top: clamp(6.8rem, 14.5vh, 9.5rem);
+            top: clamp(5.2rem, 11.5vh, 7.8rem);
           }
           .hero-warp-wrap {
-            height: clamp(150px, 32vw, 240px);
+            height: clamp(180px, 38vw, 300px);
             max-width: 98vw;
           }
           .hero-chair-annotation {
