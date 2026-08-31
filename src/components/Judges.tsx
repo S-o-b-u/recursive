@@ -486,22 +486,11 @@ export default function Judges() {
         .jd .jseal-tape-a { transform: translateY(-50%) rotate(-42deg); }
         .jd .jseal-tape-b { transform: translateY(-50%) rotate(40deg); }
 
-        /* Set the panel back behind the tape and wax: a light defocus plus a
-           knock-down in brightness. It clears on hover or keyboard focus, so
-           the cards are still readable and still turn — only the names are
-           sealed, not the seats. No pointer-events lock for the same reason. */
-        /* The defocus sits on .px-in — the element ParallaxY transforms — and
-           NOT on .jd-grid above it. A filter on an ancestor of moving children
-           has to re-blur the whole grid every scroll frame; on the moving
-           element itself the blur rasterises once and the drift is a plain
-           composited translate. Same look, a fraction of the cost. */
-        .jd-grid-wrap[data-sealed="true"] .jd-cell .px-in {
+        /* When sealed, the cards stay locked and permanently blurred behind the wax seal,
+           even when hovered or focused. */
+        .jd-grid-wrap[data-sealed="true"] .jd-cell .px-in,
+        .jd-grid-wrap[data-sealed="true"] .jd-marquee-card {
           filter: blur(3.4px) saturate(0.9) brightness(0.78);
-          transition: filter 450ms var(--ease-out);
-        }
-        .jd-grid-wrap[data-sealed="true"]:hover .jd-cell .px-in,
-        .jd-grid-wrap[data-sealed="true"]:focus-within .jd-cell .px-in {
-          filter: blur(0px) saturate(1) brightness(0.98);
         }
 
         /* Seal was drawn for the sage sections: its vignette is a pale wash
