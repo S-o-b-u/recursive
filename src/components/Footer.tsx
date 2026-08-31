@@ -403,12 +403,6 @@ export default function Footer() {
         />
       </div>
 
-      {/* ── Transparent gradient below the recursive logo ── */}
-      <div className="footer-logo-gradient" aria-hidden="true" />
-
-      {/* ── Whisper of ground under crowd ── */}
-      <div className="footer-ground" aria-hidden="true" />
-
       {/* ── OpenPeeps Animated Crowd Canvas (z-20 in front of the giant letters) ── */}
       <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
         <CrowdCanvas src="/images/peeps/all-peeps.png" rows={15} cols={7} />
@@ -420,7 +414,7 @@ export default function Footer() {
           type="button"
           onClick={scrollToTop}
           aria-label="Back to top"
-          className="group w-10 h-10 rounded-full bg-white/60 hover:bg-white/90 backdrop-blur-md border border-black/[0.08] hover:border-[#5C8C3A]/40 flex items-center justify-center text-[#142617] transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer shadow-xs"
+          className="group w-10 h-10 rounded-full bg-white/90 border border-black/[0.12] hover:border-[#5C8C3A]/60 flex items-center justify-center text-[#142617] transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer shadow-sm"
         >
           <svg
             width="14"
@@ -481,7 +475,7 @@ export default function Footer() {
           }
         }
 
-        /* Luminous radial glow and aura behind the letters */
+        /* Luminous radial glow behind the letters */
         .footer-aurora {
           position: absolute;
           inset: auto 0 0 0;
@@ -494,41 +488,10 @@ export default function Footer() {
             radial-gradient(ellipse 50% 40% at 85% 80%, rgba(180, 215, 170, 0.24) 0%, transparent 68%);
         }
 
-        /* Transparent fading gradient directly below the logo letters */
-        .footer-logo-gradient {
-          position: absolute;
-          inset: auto 0 0 0;
-          height: 35%;
-          z-index: 12;
-          pointer-events: none;
-          background: linear-gradient(
-            180deg,
-            transparent 0%,
-            rgba(215, 228, 208, 0.08) 60%,
-            rgba(188, 209, 180, 0.18) 100%
-          );
-        }
-
         /* Open sky between the panel above and the crowd, so the footer
            arrives as its own beat rather than butting straight onto ACM. */
         .footer-shell {
           margin-top: clamp(3rem, 8vh, 6.5rem);
-        }
-
-        /* A whisper of ground under the crowd, so they are standing on
-           something rather than floating in the sky. */
-        .footer-ground {
-          position: absolute;
-          inset: auto 0 0 0;
-          height: 25%;
-          z-index: 15;
-          pointer-events: none;
-          background: linear-gradient(
-            180deg,
-            transparent 0%,
-            rgba(190, 206, 182, 0.08) 50%,
-            rgba(176, 194, 166, 0.18) 100%
-          );
         }
       `}</style>
     </footer>
