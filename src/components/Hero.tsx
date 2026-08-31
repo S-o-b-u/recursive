@@ -126,12 +126,12 @@ export default function Hero() {
           <WarpText
             src={logoImg.src || "/images/logo.png"}
             color="#000000"
-            warpStrength={0.06}
-            warpScale={1.6}
-            speed={0.5}
-            pointerInfluence={0.45}
-            pointerStrength={0.4}
-            refraction={0.016}
+            warpStrength={0.035}
+            warpScale={1.5}
+            speed={0.35}
+            pointerInfluence={0.22}
+            pointerStrength={0.10}
+            refraction={0.005}
             ripple
             style={{
               width: "100%",
