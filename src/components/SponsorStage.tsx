@@ -46,15 +46,25 @@ gsap.registerPlugin(ScrollTrigger);
 
 const RATIO = "16 / 9";
 
-const CARD_POSITIONS = [
-  { top: "5%", left: "8%", width: "240px", height: "140px", theme: "white", rotation: -3, label: "PLATINUM SPONSOR" },
-  { top: "0%", left: "38%", width: "260px", height: "150px", theme: "green", rotation: 2, label: "PLATINUM SPONSOR" },
-  { top: "35%", left: "2%", width: "260px", height: "160px", theme: "green", rotation: -2, label: "PLATINUM SPONSOR" },
-  { top: "42%", right: "2%", width: "240px", height: "140px", theme: "white", rotation: 4, label: "COMMUNITY PARTNER" },
-  { bottom: "8%", left: "16%", width: "210px", height: "130px", theme: "white", rotation: -4, label: "OFFICIAL PARTNER" },
-  { bottom: "-5%", left: "38%", width: "190px", height: "150px", theme: "green", rotation: 3, label: "COMMUNITY PARTNER" },
-  { bottom: "5%", left: "55%", width: "200px", height: "120px", theme: "white", rotation: -2, label: "SUPPORTING PARTNER" },
-  { bottom: "10%", right: "10%", width: "210px", height: "130px", theme: "white", rotation: 2, label: "SUPPORTING SPONSOR" },
+type CardLayer = "front" | "back";
+
+const CARD_POSITIONS: Array<{ top?: string, bottom?: string, left?: string, right?: string, width: string, height: string, theme: "white" | "green", layer: CardLayer, label: string }> = [
+  // Microsoft
+  { top: "15%", left: "22%", width: "240px", height: "130px", theme: "white", layer: "back", label: "PLATINUM SPONSOR" },
+  // Devfolio
+  { top: "15%", left: "52%", width: "240px", height: "130px", theme: "green", layer: "back", label: "PLATINUM SPONSOR" },
+  // GitHub
+  { top: "45%", left: "6%", width: "220px", height: "130px", theme: "green", layer: "front", label: "PLATINUM SPONSOR" },
+  // GDG
+  { top: "45%", right: "6%", width: "220px", height: "130px", theme: "white", layer: "front", label: "COMMUNITY PARTNER" },
+  // MLH
+  { bottom: "12%", left: "22%", width: "200px", height: "120px", theme: "white", layer: "front", label: "OFFICIAL PARTNER" },
+  // Angelhack
+  { bottom: "12%", left: "42%", width: "190px", height: "120px", theme: "green", layer: "back", label: "COMMUNITY PARTNER" },
+  // Twilio
+  { bottom: "12%", left: "58%", width: "180px", height: "120px", theme: "white", layer: "back", label: "SUPPORTING PARTNER" },
+  // Polygon
+  { bottom: "12%", right: "12%", width: "180px", height: "120px", theme: "white", layer: "front", label: "SUPPORTING SPONSOR" },
 ];
 
 export default function SponsorStage() {
@@ -254,65 +264,156 @@ export default function SponsorStage() {
               <h2 className="sxp-preview-title">OUR SPONSORS</h2>
             </div>
 
-            <div ref={bodyRef} className="sxp-body">
-              <div className="sxp-inner relative flex flex-col items-center justify-center w-full h-full max-w-[1200px]">
+            <div ref={bodyRef} className="sxp-body" style={{ backgroundColor: '#f5f7f3' }}>
+              <div className="sxp-inner relative flex flex-col items-center justify-center w-full h-full max-w-[1400px]">
                 
-                {/* Headings */}
-                <div className="flex flex-col items-center z-20 mb-8 md:mb-12 text-center pointer-events-none">
-                  <h3 className="font-heading font-black text-[1.7rem] sm:text-3xl md:text-5xl lg:text-[3.5rem] tracking-tight text-[#1a2f20] uppercase leading-none">
+                {/* ── Background Accents ── */}
+                <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+                  {/* Left Side Text */}
+                  <div className="hidden lg:flex absolute top-[35%] left-[5%] flex-col text-sm font-heading font-semibold tracking-[0.15em] uppercase leading-relaxed text-[#2A3B28]">
+                    <span>INNOVATE.</span>
+                    <span>COLLABORATE.</span>
+                    <span className="text-[#659F54]">CREATE IMPACT.</span>
+                  </div>
+                  {/* Left Lines */}
+                  <div className="hidden lg:block absolute top-[38%] left-[2%] w-[100px] h-[60px] border-l-[1.5px] border-b-[1.5px] border-[#2A3B28] opacity-80" />
+                  <div className="hidden lg:block absolute top-[22%] left-[18%] w-[40px] h-[80px] border-l-[1.5px] border-t-[1.5px] border-[#2A3B28] opacity-80" />
+                  <div className="hidden lg:block absolute top-[10%] left-[20%] text-[#659F54] text-3xl font-black rotate-[-15deg] font-mono leading-none">
+                    -`<br/>&nbsp;-
+                  </div>
+
+                  {/* Right Side Text */}
+                  <div className="hidden lg:flex absolute bottom-[20%] right-[3%] items-center gap-3 text-sm font-heading font-semibold tracking-[0.15em] uppercase leading-tight text-[#2A3B28]">
+                    <div className="text-right">AND MANY<br/><span className="text-[#659F54]">MORE!</span></div>
+                    <div className="flex flex-col gap-1.5 mt-1">
+                       <div className="w-0 h-0 border-t-[5px] border-t-transparent border-l-[8px] border-l-[#2A3B28] border-b-[5px] border-b-transparent"></div>
+                       <div className="w-0 h-0 border-t-[5px] border-t-transparent border-l-[8px] border-l-[#2A3B28] border-b-[5px] border-b-transparent"></div>
+                    </div>
+                  </div>
+                  {/* Right Side Stacked Squares */}
+                  <div className="hidden lg:flex absolute top-[30%] right-[8%] flex-col gap-3">
+                     <div className="w-6 h-6 border-[1.5px] border-[#2A3B28] opacity-80" />
+                     <div className="w-6 h-6 border-[1.5px] border-[#2A3B28] opacity-80" />
+                     <div className="w-6 h-6 border-[1.5px] border-[#2A3B28] opacity-80" />
+                  </div>
+                  <div className="hidden lg:block absolute top-[45%] right-[5%] w-[80px] h-[1.5px] bg-[#2A3B28] opacity-80" />
+
+                  {/* Geometric Circles */}
+                  <div className="absolute top-[15%] left-[42%] w-[250px] h-[250px] rounded-full bg-gradient-to-br from-[#85bd76] to-[#59944a] opacity-80 blur-[2px]" />
+                  <div className="absolute bottom-[0%] right-[15%] w-[180px] h-[180px] rounded-full bg-gradient-to-br from-[#85bd76] to-[#59944a] opacity-80 blur-[2px]" />
+                  <div className="absolute bottom-[-10%] left-[5%] w-[350px] h-[350px] rounded-full bg-[#dbe8d6] opacity-60 blur-[4px]" />
+                </div>
+
+                {/* ── Headings ── */}
+                <div className="flex flex-col items-center z-20 mb-8 md:mb-12 text-center pointer-events-none mt-4 md:mt-10">
+                  <h3 className="font-bebas text-[2.5rem] sm:text-5xl md:text-7xl lg:text-[6rem] tracking-wide text-[#232623] uppercase leading-none" style={{ fontFamily: "var(--font-bebas), sans-serif", textShadow: "0 2px 10px rgba(255,255,255,0.8)" }}>
                     Thank You To Our
                   </h3>
-                  <h2 className="font-heading font-black text-3xl sm:text-4xl md:text-6xl lg:text-[4.5rem] tracking-tight text-[#57975c] uppercase leading-none mt-1 sm:mt-2">
+                  <h2 className="font-bebas text-5xl sm:text-6xl md:text-8xl lg:text-[7rem] tracking-wide text-[#59944a] uppercase leading-none mt-1 sm:mt-2" style={{ fontFamily: "var(--font-bebas), sans-serif", textShadow: "0 2px 10px rgba(255,255,255,0.8)" }}>
                     Amazing Sponsors!
                   </h2>
-                  <p className="font-mono text-[0.55rem] sm:text-[0.65rem] md:text-xs font-semibold tracking-[0.1em] sm:tracking-[0.2em] uppercase text-[#2A3B28] mt-4 sm:mt-6">
+                  <p className="font-heading font-bold text-[0.6rem] sm:text-[0.7rem] md:text-sm tracking-widest uppercase text-[#232623] mt-4 sm:mt-6">
                     Powering Innovation. Building the future.
                   </p>
                 </div>
 
-                {/* The main Gratitude + Cards area */}
-                <div className="relative w-full h-[300px] sm:h-[400px] md:h-[600px] flex items-center justify-center mt-0 sm:mt-[-2rem] md:mt-[-4rem]">
-                   {/* Giant GRATITUDE Text */}
-                   <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                      <h1 
-                        className="font-heading font-black text-[22vw] md:text-[14rem] tracking-tighter text-white uppercase leading-none select-none opacity-95 scale-y-[1.3] md:scale-y-[1.5] origin-center"
-                        style={{ textShadow: "0 20px 40px rgba(0,0,0,0.15), 0 4px 10px rgba(0,0,0,0.1), inset 0 2px 0 rgba(255,255,255,0.5)" }}
-                      >
-                        GRATITUDE
-                      </h1>
-                   </div>
-
-                   {/* Floating Sponsor Cards */}
-                   <div className="absolute inset-0 z-20 w-full h-full pointer-events-none">
-                     {CARD_POSITIONS.map((pos, i) => (
+                {/* ── The main Gratitude + Cards area ── */}
+                <div className="relative w-full h-[450px] sm:h-[550px] md:h-[650px] flex items-center justify-center mt-0 sm:mt-[-2rem] md:mt-[-4rem]">
+                   
+                   {/* Back Layer Cards */}
+                   <div className="absolute inset-0 z-10 w-full h-full pointer-events-none hidden sm:block">
+                     {CARD_POSITIONS.filter(c => c.layer === "back").map((pos, i) => (
                        <div 
-                         key={i} 
-                         className={`sponsor-card absolute flex flex-col items-center justify-center p-3 sm:p-4 shadow-xl border rounded sm:rounded-md ${pos.theme === 'green' ? 'bg-[#122c19] text-white border-white/10' : 'bg-white text-[#111a12] border-black/5'}`}
+                         key={`back-${i}`} 
+                         className={`sponsor-card absolute flex flex-col items-center justify-center p-3 sm:p-4 shadow-xl sm:rounded-none ${pos.theme === 'green' ? 'bg-[#15341d] text-white border-white/5' : 'bg-white text-[#111a12] border-black/5'}`}
                          style={{ 
-                           top: pos.top, 
-                           left: pos.left, 
-                           right: pos.right, 
-                           bottom: pos.bottom,
-                           width: `clamp(90px, 16vw, ${pos.width})`,
-                           height: `clamp(60px, 10vw, ${pos.height})`,
+                           top: pos.top, left: pos.left, right: pos.right, bottom: pos.bottom,
+                           width: `clamp(90px, 16vw, ${pos.width})`, height: `clamp(60px, 10vw, ${pos.height})`,
+                           border: pos.theme === 'green' ? 'none' : '1px solid rgba(0,0,0,0.05)'
                          }}
-                         data-rot={pos.rotation}
                        >
                          <div className="flex-1 flex items-center justify-center">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-20 md:opacity-30 md:w-8 md:h-8">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-30 md:w-10 md:h-10">
                               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                             </svg>
                          </div>
-                         <div className={`text-[0.4rem] sm:text-[0.55rem] md:text-[0.65rem] font-mono tracking-widest uppercase mt-auto ${pos.theme === 'green' ? 'text-white/60' : 'text-black/40'} text-center leading-tight`}>
+                         <div className={`text-[0.45rem] sm:text-[0.55rem] md:text-[0.65rem] font-heading font-medium tracking-wide uppercase mt-auto ${pos.theme === 'green' ? 'text-white/60' : 'text-black/60'} text-center leading-tight`}>
                            {pos.label}
                          </div>
                        </div>
                      ))}
                    </div>
+
+                   {/* Giant GRATITUDE Text (z-20) */}
+                   <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                      <h1 
+                        className="font-bebas text-[28vw] md:text-[18rem] lg:text-[22rem] tracking-tight text-white uppercase leading-none select-none origin-center"
+                        style={{ 
+                          fontFamily: "var(--font-bebas), sans-serif",
+                          textShadow: "0 25px 40px rgba(0,0,0,0.3), 0 5px 15px rgba(0,0,0,0.1), inset 0 2px 5px rgba(255,255,255,0.8)",
+                          WebkitTextStroke: "1px rgba(0,0,0,0.05)"
+                        }}
+                      >
+                        GRATITUDE
+                      </h1>
+                   </div>
+
+                   {/* Paper Airplane (z-25) */}
+                   <div className="absolute z-[25] top-[55%] left-[32%] md:top-[60%] md:left-[36%] -rotate-[12deg] pointer-events-none">
+                      <svg width="60" height="40" viewBox="0 0 24 24" fill="#659F54" className="drop-shadow-lg w-10 md:w-16">
+                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                      </svg>
+                   </div>
+
+                   {/* Front Layer Cards (z-30) */}
+                   <div className="absolute inset-0 z-30 w-full h-full pointer-events-none hidden sm:block">
+                     {CARD_POSITIONS.filter(c => c.layer === "front").map((pos, i) => (
+                       <div 
+                         key={`front-${i}`} 
+                         className={`sponsor-card absolute flex flex-col items-center justify-center p-3 sm:p-4 shadow-xl sm:rounded-none ${pos.theme === 'green' ? 'bg-[#15341d] text-white border-white/5' : 'bg-white text-[#111a12] border-black/5'}`}
+                         style={{ 
+                           top: pos.top, left: pos.left, right: pos.right, bottom: pos.bottom,
+                           width: `clamp(90px, 16vw, ${pos.width})`, height: `clamp(60px, 10vw, ${pos.height})`,
+                           border: pos.theme === 'green' ? 'none' : '1px solid rgba(0,0,0,0.05)'
+                         }}
+                       >
+                         <div className="flex-1 flex items-center justify-center">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-30 md:w-10 md:h-10">
+                              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                         </div>
+                         <div className={`text-[0.45rem] sm:text-[0.55rem] md:text-[0.65rem] font-heading font-medium tracking-wide uppercase mt-auto ${pos.theme === 'green' ? 'text-white/60' : 'text-black/60'} text-center leading-tight`}>
+                           {pos.label}
+                         </div>
+                       </div>
+                     ))}
+                   </div>
+
+                   {/* Mobile fallback layout (all cards on top) */}
+                   <div className="absolute inset-0 z-30 w-full h-full pointer-events-none sm:hidden flex flex-wrap items-center justify-center gap-2 px-4 mt-8">
+                      {CARD_POSITIONS.map((pos, i) => (
+                         <div 
+                           key={`mob-${i}`} 
+                           className={`sponsor-card flex flex-col items-center justify-center p-2 shadow-lg border rounded ${pos.theme === 'green' ? 'bg-[#15341d] text-white' : 'bg-white text-[#111a12]'}`}
+                           style={{ width: '45%', height: '80px' }}
+                         >
+                           <div className="flex-1 flex items-center justify-center">
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-30">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                              </svg>
+                           </div>
+                           <div className={`text-[0.4rem] font-heading font-medium tracking-wide uppercase mt-auto ${pos.theme === 'green' ? 'text-white/60' : 'text-black/60'} text-center leading-tight`}>
+                             {pos.label}
+                           </div>
+                         </div>
+                      ))}
+                   </div>
                 </div>
                 
-                <div className="sxp-cta-wrap z-30 mt-6 sm:mt-8 md:mt-0 relative">
+                <div className="sxp-cta-wrap z-[40] mt-12 sm:mt-16 md:mt-0 relative">
                   <LiquidMetalButton
                     label="Partner with this edition"
                     href={`mailto:${EVENT.email}`}
