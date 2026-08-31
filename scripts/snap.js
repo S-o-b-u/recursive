@@ -56,19 +56,47 @@ async function main() {
           `
         });
         
-        await new Promise(r => setTimeout(r, 1200));
+        await new Promise(r => setTimeout(r, 1000));
 
         await send('Runtime.evaluate', { 
           expression: `
-            window.scrollTo(0, 0);
+            const el = document.querySelector('#faq');
+            if (el) {
+              const y = el.getBoundingClientRect().top + window.scrollY - 80;
+              window.scrollTo(0, y);
+            }
           `
         });
         
         await new Promise(r => setTimeout(r, 1200));
         
-        const screenshot = await send('Page.captureScreenshot', { format: 'png' });
-        fs.writeFileSync('hero-mobile-snap.png', Buffer.from(screenshot.data, 'base64'));
-        console.log('Saved screenshot to hero-mobile-snap.png');
+        // 1. Mobile Snapshot
+        let screenshot = await send('Page.captureScreenshot', { format: 'png' });
+        fs.writeFileSync('faq-centered-snap.png', Buffer.from(screenshot.data, 'base64'));
+        console.log('Saved centered FAQ snapshot to faq-centered-snap.png');
+
+        // Desktop Snapshot
+        await send('Emulation.setDeviceMetricsOverride', {
+          width: 1440,
+          height: 900,
+          deviceScaleFactor: 1.5,
+          mobile: false
+        });
+        await send('Runtime.evaluate', { 
+          expression: `
+            const faqBtn = Array.from(document.querySelectorAll('a')).find(a => a.textContent.trim() === 'FAQ');
+            if (faqBtn) {
+              faqBtn.click();
+            } else {
+              document.querySelector('#faq')?.scrollIntoView();
+            }
+          `
+        });
+        await new Promise(r => setTimeout(r, 2000));
+        screenshot = await send('Page.captureScreenshot', { format: 'png' });
+        fs.writeFileSync('faq-desktop-wide.png', Buffer.from(screenshot.data, 'base64'));
+        console.log('Saved desktop screenshot to faq-desktop-wide.png');
+
         edge.kill();
         process.exit(0);
       })();

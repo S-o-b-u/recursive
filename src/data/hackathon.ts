@@ -320,4 +320,5 @@ export const NAV_LINKS = [
   { label: "Themes", href: "/#themes" },
   { label: "Judges", href: "/#judges" },
   { label: "Sponsors", href: "/#sponsors" },
+  { label: "FAQ", href: "/#faq" },
 ];

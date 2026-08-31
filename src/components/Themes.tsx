@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { TRACKS } from "@/data/hackathon";
-import { RevealHeading, RevealBlock } from "@/components/ui/reveal";
+import { RevealHeading, RevealBlock, RevealWords } from "@/components/ui/reveal";
 import Ornament from "@/components/ui/Ornament";
 import MorphSlider, {
   type MorphSliderApi,
@@ -14,6 +14,21 @@ import { buildTrackTextures } from "@/lib/track-textures";
 
 /** Autoplay dwell, shared by the slider and the rail's progress bar. */
 const DWELL = 6;
+const HEADING_LINES = ["Four directions", "to build in."];
+
+/** Word-by-word reveal helper matching the RevealWords animation in Story of the Chair */
+function SplitWords({ text, className = "" }: { text: string; className?: string }) {
+  const words = text.split(/\s+/).filter(Boolean);
+  return (
+    <span className={`th-words ${className}`}>
+      {words.map((word, i) => (
+        <span key={i} className="th-word-slot">
+          <span className="th-word">{word}</span>{" "}
+        </span>
+      ))}
+    </span>
+  );
+}
 
 export default function Themes() {
   const [active, setActive] = useState(0);
@@ -32,14 +47,8 @@ export default function Themes() {
   }, []);
 
   /**
-   * Re-play the brief on every slide change in the site's own reveal language,
-   * rather than the generic fade-up this had before.
-   *
-   * The numbers are lifted straight from `reveal.tsx` so the swap is
-   * indistinguishable from a RevealHeading / RevealBlock firing on scroll:
-   * the title rides a line mask at yPercent 112 -> 0 on expo.out, the rule
-   * draws itself on scaleX, and the supporting copy lifts and fades on
-   * power3.out. Change them there and change them here.
+   * Word-by-word illumination animation matching "The Story of the Chair"
+   * on every slide change / active track switch.
    */
   useEffect(() => {
     const root = brief.current;
@@ -49,27 +58,87 @@ export default function Themes() {
     if (reduce) return;
 
     const ctx = gsap.context(() => {
+      // 1. Seat badge lift
+      gsap.fromTo(
+        ".th-brief-seat",
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, ease: "expo.out", duration: 1.1 }
+      );
+
+      // 2. Title mask reveal
       gsap.fromTo(
         ".th-brief-title .th-mask-inner",
         { yPercent: 112 },
-        { yPercent: 0, ease: "expo.out", duration: 1.45 },
+        { yPercent: 0, ease: "expo.out", duration: 1.35, delay: 0.05 }
       );
+
+      // 3. Hairline divider rule draw
       gsap.fromTo(
         ".th-brief-rule i",
         { scaleX: 0 },
-        { scaleX: 1, ease: "expo.out", duration: 1.65, delay: 0.08 },
+        { scaleX: 1, ease: "expo.out", duration: 1.45, delay: 0.1 }
       );
+
+      // 4. Punchline words reveal
       gsap.fromTo(
-        ".th-brief-lift",
-        { opacity: 0, y: 20 },
+        ".th-brief-line .th-word",
+        { opacity: 0.12, y: 6 },
         {
           opacity: 1,
           y: 0,
+          ease: "power2.out",
+          duration: 0.75,
+          stagger: 0.038,
+          delay: 0.12,
+        }
+      );
+
+      // 5. Summary words reveal
+      gsap.fromTo(
+        ".th-brief-summary .th-word",
+        { opacity: 0.12, y: 6 },
+        {
+          opacity: 1,
+          y: 0,
+          ease: "power2.out",
+          duration: 0.75,
+          stagger: 0.018,
+          delay: 0.22,
+        }
+      );
+
+      // 6. Prompts list items + word reveal
+      gsap.fromTo(
+        ".th-prompts li",
+        { opacity: 0, x: -10 },
+        {
+          opacity: 1,
+          x: 0,
           ease: "expo.out",
-          duration: 1.45,
-          stagger: 0.07,
-          delay: 0.04,
-        },
+          duration: 1.0,
+          stagger: 0.1,
+          delay: 0.32,
+        }
+      );
+
+      gsap.fromTo(
+        ".th-prompts .th-word",
+        { opacity: 0.12, y: 5 },
+        {
+          opacity: 1,
+          y: 0,
+          ease: "power2.out",
+          duration: 0.65,
+          stagger: 0.024,
+          delay: 0.36,
+        }
+      );
+
+      // 7. Brief action button
+      gsap.fromTo(
+        ".th-brief-link",
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, ease: "expo.out", duration: 1.1, delay: 0.48 }
       );
     }, root);
 
@@ -90,20 +159,25 @@ export default function Themes() {
 
         <div className="th-head-wrap">
           <RevealBlock y={10}>
-            <span className="th-eyebrow">004 · The four tracks</span>
+            <span className="th-eyebrow">The four tracks</span>
           </RevealBlock>
 
           <RevealHeading
             className="th-heading"
-            lines={["Four directions", "to build in."]}
+            lines={HEADING_LINES}
           />
 
-          <RevealBlock y={12} delay={0.06}>
-            <p className="th-lede">
-              One seat at the table for each. Pick the one you cannot stop
-              thinking about — every track is judged on the same four criteria.
-            </p>
-          </RevealBlock>
+          <div className="th-lede-wrap">
+            <RevealWords
+              paragraphs={[
+                "One seat at the table for each. Pick the one you cannot stop thinking about — every track is judged on the same four criteria.",
+              ]}
+              className="th-lede-words"
+              start="top 88%"
+              end="bottom 50%"
+              dim={0.16}
+            />
+          </div>
         </div>
 
         {/* ── Stage: morphing plate on the left, the brief on the right ── */}
@@ -144,7 +218,7 @@ export default function Themes() {
             </div>
 
             <div className="th-brief" ref={brief}>
-              <span className="th-brief-seat th-brief-lift">{track.seat}</span>
+              <span className="th-brief-seat">{track.seat}</span>
 
               {/* Same two-span mask RevealHeading uses, so the title lifts out
                   of a clipped line instead of just fading in. */}
@@ -158,25 +232,30 @@ export default function Themes() {
                 <i />
               </span>
 
-              <p className="th-brief-line th-brief-lift">{track.line}</p>
-              <p className="th-brief-summary th-brief-lift">{track.summary}</p>
+              <p className="th-brief-line">
+                <SplitWords text={track.line} />
+              </p>
+
+              <p className="th-brief-summary">
+                <SplitWords text={track.summary} />
+              </p>
 
               <ul className="th-prompts">
-                {track.prompts.map((prompt) => (
-                  <li key={prompt} className="th-brief-lift">
+                {track.prompts.map((prompt, pIdx) => (
+                  <li key={`${track.title}-${pIdx}`}>
                     <svg viewBox="0 0 12 14" aria-hidden="true">
                       <path d="M6 13.4V4.6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                       <path d="M6.2 7.6C10 7 11.4 4 11.6 0.4C7.8 0.6 6 4 6.2 7.6Z" fill="currentColor" />
                       <path d="M5.6 10.6C2.4 10.2 1 8 0.6 5C3.8 5.2 5.4 7.6 5.6 10.6Z" fill="currentColor" />
                     </svg>
-                    <span>{prompt}</span>
+                    <SplitWords text={prompt} />
                   </li>
                 ))}
               </ul>
 
               <button
                 type="button"
-                className="th-brief-link th-brief-lift"
+                className="th-brief-link"
                 aria-label="Read the full brief - Currently Locked"
                 disabled
               >
@@ -287,13 +366,18 @@ export default function Themes() {
         }
         .th-heading .rh-line { display: flex; justify-content: center; }
 
-        .th-lede {
+        .th-lede-wrap {
           margin: clamp(0.85rem, 1.8vh, 1.25rem) auto 0;
-          max-width: 42rem;
+          max-width: 44rem;
+        }
+
+        .th-lede-words .rw-para {
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: clamp(1rem, 1.45vw, 1.15rem);
+          font-size: clamp(1rem, 1.45vw, 1.2rem);
+          font-weight: 400;
           line-height: 1.62;
-          color: rgba(222, 235, 212, 0.6);
+          color: rgba(222, 235, 212, 0.9);
+          text-align: center;
           text-wrap: pretty;
         }
 
@@ -421,6 +505,19 @@ export default function Themes() {
           height: 100%;
           background: rgba(143, 196, 90, 0.34);
           transform-origin: left center;
+        }
+
+        .th-words {
+          display: inline;
+        }
+
+        .th-word-slot {
+          display: inline-block;
+        }
+
+        .th-word {
+          display: inline-block;
+          will-change: opacity, transform;
         }
 
         .th-brief-line {
