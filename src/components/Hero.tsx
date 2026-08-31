@@ -173,10 +173,10 @@ export default function Hero() {
         </svg>
 
         <a href="#about" className="chair-note" aria-label="Scroll to learn about the chair">
-          <p className="chair-text">
+          <p className="chair-text" style={{ color: "#000000", textShadow: "none" }}>
             bro put a plastic chair on a hill<br />and called it a hackathon 
           </p>
-          <span className="chair-sub">scroll for lore ↓</span>
+          <span className="chair-sub" style={{ color: "#000000", textShadow: "none" }}>scroll for lore ↓</span>
         </a>
       </div>
 
@@ -272,11 +272,11 @@ export default function Hero() {
         }
 
         .chair-arrow {
-          color: #000000;
+          color: #000000 !important;
           flex-shrink: 0;
-          opacity: 1;
+          opacity: 1 !important;
           margin-top: 0.2rem;
-          filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.9));
+          filter: none !important;
         }
 
         .chair-note {
@@ -296,9 +296,9 @@ export default function Hero() {
           font-weight: 700;
           line-height: 1.32;
           letter-spacing: -0.015em;
-          color: #000000;
+          color: #000000 !important;
           margin: 0;
-          text-shadow: 0 1px 12px rgba(255, 255, 255, 0.95), 0 0 4px #ffffff;
+          text-shadow: none !important;
           transition: opacity 150ms ease;
         }
 
@@ -306,9 +306,9 @@ export default function Hero() {
           font-family: var(--font-geist-mono), monospace;
           font-size: 0.68rem;
           font-weight: 700;
-          color: #000000;
+          color: #000000 !important;
           letter-spacing: 0.02em;
-          text-shadow: 0 1px 8px rgba(255, 255, 255, 0.9);
+          text-shadow: none !important;
         }
 
         /* ── Mossy Log Natural Divider Over Seam ── */
@@ -504,24 +504,24 @@ export default function Hero() {
             height: 44px;
             margin-top: 0.05rem;
             transform: rotate(-90deg);
-            opacity: 1;
-            color: #000000;
-            filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.95));
+            opacity: 1 !important;
+            color: #000000 !important;
+            filter: none !important;
           }
           .chair-text {
-            font-size: 0.84rem;
-            font-weight: 700;
-            line-height: 1.25;
-            color: #000000;
-            text-align: center;
-            text-shadow: 0 1px 12px rgba(255, 255, 255, 0.95), 0 0 6px #ffffff;
+            font-size: 0.84rem !important;
+            font-weight: 700 !important;
+            line-height: 1.25 !important;
+            color: #000000 !important;
+            text-align: center !important;
+            text-shadow: none !important;
           }
           .chair-sub {
-            font-size: 0.68rem;
-            font-weight: 700;
-            color: #000000;
-            text-align: center;
-            text-shadow: 0 1px 8px rgba(255, 255, 255, 0.9);
+            font-size: 0.68rem !important;
+            font-weight: 700 !important;
+            color: #000000 !important;
+            text-align: center !important;
+            text-shadow: none !important;
           }
           .hero-action-dock-split {
             flex-direction: column;
