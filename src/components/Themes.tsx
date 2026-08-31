@@ -173,8 +173,8 @@ export default function Themes() {
                 "One seat at the table for each. Pick the one you cannot stop thinking about — every track is judged on the same four criteria.",
               ]}
               className="th-lede-words"
-              start="top 84%"
-              end="bottom 72%"
+              start="top 88%"
+              end="bottom 50%"
               dim={0.16}
             />
           </div>

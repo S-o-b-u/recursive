@@ -33,12 +33,22 @@ function refreshOnFonts() {
    Animates opacity + a 6px lift only. No colour tweens, no blur, no
    text-shadow — those are what make scrubbed text stutter.
    ──────────────────────────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────
+   RevealWords — the word-by-word illumination, scrubbed to scroll.
+
+   Deliberately NOT pinned: the block scrolls at normal speed and the
+   words light up as it passes, so the page never grabs the scroll.
+   Anchored `start`/`end` guarantee the words smoothly illuminate
+   while the passage passes through the viewport.
+
+   Animates opacity + a 6px lift only.
+   ──────────────────────────────────────────────────────────────── */
 export function RevealWords({
   paragraphs,
   className = "",
-  start = "top 78%",
-  end = "bottom 70%",
-  dim = 0.13,
+  start = "top 86%",
+  end = "bottom 52%",
+  dim = 0.15,
 }: {
   paragraphs: string[];
   className?: string;
@@ -68,8 +78,8 @@ export function RevealWords({
           opacity: 1,
           y: 0,
           ease: "none",
-          duration: 1.6,
-          stagger: 0.4,
+          duration: 1.2,
+          stagger: 0.25,
           scrollTrigger: {
             trigger: root,
             start,
@@ -81,9 +91,14 @@ export function RevealWords({
       );
     }, root);
 
+    const raf = requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+    });
+
     const cancel = refreshOnFonts();
     return () => {
       cancel();
+      cancelAnimationFrame(raf);
       ctx.revert();
     };
   }, [paragraphs, start, end, dim]);
@@ -117,7 +132,10 @@ export function RevealWords({
           letter-spacing: -0.012em;
           text-wrap: pretty;
         }
-        .rw-word { display: inline-block; }
+        .rw-word {
+          display: inline-block;
+          will-change: opacity, transform;
+        }
       `}</style>
     </div>
   );
@@ -137,21 +155,16 @@ export function RevealHeading({
   delay?: number;
 }) {
   const rootRef = useRef<HTMLHeadingElement>(null);
-  const animatedRef = useRef(false);
 
   useIso(() => {
     const root = rootRef.current;
     if (!root) return;
-
-    // Once played, never reset or re-play when parent re-renders
-    if (animatedRef.current) return;
 
     const inners = gsap.utils.toArray<HTMLElement>(".rh-inner", root);
     if (!inners.length) return;
 
     if (reduced()) {
       gsap.set(inners, { yPercent: 0, opacity: 1 });
-      animatedRef.current = true;
       return;
     }
 
@@ -169,9 +182,6 @@ export function RevealHeading({
             trigger: root,
             start: "top 88%",
             once: true,
-            onEnter: () => {
-              animatedRef.current = true;
-            },
           },
         }
       );
@@ -224,14 +234,10 @@ export function RevealBlock({
   selector?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const animatedRef = useRef(false);
 
   useIso(() => {
     const root = rootRef.current;
     if (!root) return;
-
-    // Once played, never reset or re-play when parent re-renders
-    if (animatedRef.current) return;
 
     const targets = selector
       ? gsap.utils.toArray<HTMLElement>(selector, root)
@@ -240,7 +246,6 @@ export function RevealBlock({
 
     if (reduced()) {
       gsap.set(targets, { opacity: 1, y: 0 });
-      animatedRef.current = true;
       return;
     }
 
@@ -257,11 +262,8 @@ export function RevealBlock({
           stagger,
           scrollTrigger: {
             trigger: root,
-            start: "top 86%",
+            start: "top 88%",
             once: true,
-            onEnter: () => {
-              animatedRef.current = true;
-            },
           },
         }
       );

@@ -89,8 +89,8 @@ export default function ACM() {
           <RevealWords
             paragraphs={STORY_PARAGRAPHS}
             className="acm-story-words"
-            start="top 80%"
-            end="bottom 68%"
+            start="top 88%"
+            end="bottom 50%"
             dim={0.16}
           />
         </div>
