@@ -41,16 +41,16 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     // What should stay constant is how much of the wordmark the crowd covers,
     // not the crowd's share of the footer. On a phone the letters are width-
     // limited, so the band depth matches the desktop marking exactly.
-    const crowdBand = () => (stage.width < 620 ? 0.44 : stage.width < 1024 ? 0.42 : 0.42);
+    const crowdBand = () => (stage.width < 620 ? 0.52 : stage.width < 1024 ? 0.46 : 0.42);
     const fitFor = (peepH: number) =>
-      Math.min(1, Math.max(0.16, (stage.height * crowdBand()) / peepH));
+      Math.min(1, Math.max(0.24, (stage.height * crowdBand()) / peepH));
 
     // TWEEN FACTORIES
     const resetPeep = ({ stage, peep }: { stage: any; peep: any }) => {
       const direction = Math.random() > 0.5 ? 1 : -1;
       const fit = fitFor(peep.height);
 
-      const offsetY = (60 - 180 * gsap.parseEase("power2.in")(Math.random())) * fit;
+      const offsetY = (40 - 150 * gsap.parseEase("power2.in")(Math.random())) * fit;
       const startY = stage.height - peep.height * fit + offsetY;
       let startX: number;
       let endX: number;
@@ -209,14 +209,14 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     // Peeps shrink with the footer, so a head-count based on width alone
     // leaves gaps on short screens. Base it on how wide each peep actually
     // draws, and the wall stays equally packed at every size.
-    const CROWD_DENSITY = 11.5;
+    const CROWD_DENSITY = 14;
 
     const initCrowd = () => {
       const sample = allPeeps[0];
       const drawnWidth = sample ? sample.width * fitFor(sample.height) : 120;
       const target = Math.min(
         allPeeps.length,
-        Math.max(stage.width < 620 ? 32 : 26, Math.round((CROWD_DENSITY * stage.width) / drawnWidth)),
+        Math.max(stage.width < 620 ? 38 : 28, Math.round((CROWD_DENSITY * stage.width) / drawnWidth)),
       );
       while (availablePeeps.length && crowd.length < target) {
         addPeepToCrowd().walk.progress(Math.random());
@@ -382,18 +382,18 @@ export default function Footer() {
         <WarpText
           text={EVENT.name}
           color="linear-gradient(180deg, #070e08 0%, #0f1c12 36%, #1a301e 72%, #2c4e30 100%)"
-          warpStrength={0.07}
+          warpStrength={0.06}
           warpScale={1.6}
           speed={0.5}
           pointerInfluence={0.45}
           pointerStrength={0.4}
           refraction={0.016}
           ripple
-          fontSize="min(clamp(6rem, 30vw, 38rem), 48vh)"
+          fontSize="min(clamp(7.5rem, 34vw, 42rem), 60vh)"
           fontWeight={900}
-          fontFamily="var(--font-heading), var(--font-dm-sans), sans-serif"
-          letterSpacing="0.02em"
-          lineHeight={0.88}
+          fontFamily="var(--font-bebas), var(--font-heading), sans-serif"
+          letterSpacing="0.01em"
+          lineHeight={0.82}
           style={{
             width: "100%",
             maxWidth: "100vw",
@@ -445,8 +445,6 @@ export default function Footer() {
           position: absolute;
           inset-inline: 0;
           bottom: clamp(0.5rem, 4vh, 2.75rem);
-          /* Capped against the footer itself: the vh term alone lets the px
-             floor push the letters out of the top of a short footer. */
           height: min(clamp(280px, 56vh, 640px), 90%);
           z-index: 10;
           display: flex;
@@ -457,35 +455,28 @@ export default function Footer() {
           padding-inline: clamp(0.2rem, 1.2vw, 1rem);
         }
 
-        /* ── Sub-desktop footer (phone → small laptop) ──
-           Everything here is sized in vw so it tracks the width-limited
-           wordmark, not the viewport height. That keeps the footer one tight,
-           composed panel at every width instead of a tall band of empty sky
-           over a buried mark. footer.footer-shell (element + class) outranks
-           the Tailwind height utilities. */
         @media (max-width: 1024px) {
           footer.footer-shell {
-            min-height: clamp(220px, 40vw, 420px);
-            height: clamp(220px, 40vw, 420px);
+            min-height: clamp(240px, 44vw, 440px);
+            height: clamp(240px, 44vw, 440px);
             margin-top: clamp(1rem, 3vh, 2.5rem);
           }
           .footer-wordmark-wrap {
-            /* Box hugs the letters and sits right with the crowd */
-            bottom: clamp(1rem, 3.5vw, 2.5rem);
-            height: clamp(120px, 30vw, 280px);
+            bottom: clamp(0.5rem, 2vw, 1.5rem);
+            height: 92%;
             padding-inline: 1vw;
           }
         }
 
         @media (max-width: 620px) {
           footer.footer-shell {
-            min-height: clamp(170px, 45vw, 240px);
-            height: clamp(170px, 45vw, 240px);
-            margin-top: clamp(0.75rem, 2vh, 1.8rem);
+            min-height: clamp(200px, 54vw, 290px);
+            height: clamp(200px, 54vw, 290px);
+            margin-top: clamp(0.5rem, 1.5vh, 1.5rem);
           }
           .footer-wordmark-wrap {
-            bottom: clamp(0.4rem, 2vw, 1rem);
-            height: clamp(120px, 38vw, 200px);
+            bottom: clamp(0.2rem, 1.5vw, 0.8rem);
+            height: 94%;
             padding-inline: 0;
           }
         }
@@ -507,15 +498,14 @@ export default function Footer() {
         .footer-logo-gradient {
           position: absolute;
           inset: auto 0 0 0;
-          height: min(clamp(120px, 20vh, 240px), 34%);
+          height: 35%;
           z-index: 12;
           pointer-events: none;
           background: linear-gradient(
             180deg,
             transparent 0%,
-            rgba(239, 243, 235, 0.03) 25%,
-            rgba(215, 228, 208, 0.18) 65%,
-            rgba(188, 209, 180, 0.32) 100%
+            rgba(215, 228, 208, 0.08) 60%,
+            rgba(188, 209, 180, 0.18) 100%
           );
         }
 
@@ -530,14 +520,14 @@ export default function Footer() {
         .footer-ground {
           position: absolute;
           inset: auto 0 0 0;
-          height: 32%;
+          height: 25%;
           z-index: 15;
           pointer-events: none;
           background: linear-gradient(
             180deg,
-            rgba(200, 214, 194, 0) 0%,
-            rgba(190, 206, 182, 0.12) 50%,
-            rgba(176, 194, 166, 0.26) 100%
+            transparent 0%,
+            rgba(190, 206, 182, 0.08) 50%,
+            rgba(176, 194, 166, 0.18) 100%
           );
         }
       `}</style>
