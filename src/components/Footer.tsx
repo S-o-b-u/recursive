@@ -41,16 +41,20 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     // What should stay constant is how much of the wordmark the crowd covers,
     // not the crowd's share of the footer. On a phone the letters are width-
     // limited, so the band depth matches the desktop marking exactly.
-    const crowdBand = () => (stage.width < 620 ? 0.52 : stage.width < 1024 ? 0.46 : 0.42);
+    const crowdBand = () => (stage.width < 620 ? 0.35 : stage.width < 1024 ? 0.38 : 0.42);
     const fitFor = (peepH: number) =>
-      Math.min(1, Math.max(0.24, (stage.height * crowdBand()) / peepH));
+      Math.min(1, Math.max(0.14, (stage.height * crowdBand()) / peepH));
 
     // TWEEN FACTORIES
     const resetPeep = ({ stage, peep }: { stage: any; peep: any }) => {
       const direction = Math.random() > 0.5 ? 1 : -1;
       const fit = fitFor(peep.height);
 
-      const offsetY = (40 - 150 * gsap.parseEase("power2.in")(Math.random())) * fit;
+      // On phones, anchor them right above the bottom edge so full bodies are visible
+      const isMobile = stage.width < 620;
+      const offsetY = isMobile
+        ? (-4 - 25 * gsap.parseEase("power2.in")(Math.random())) * fit
+        : (15 - 90 * gsap.parseEase("power2.in")(Math.random())) * fit;
       const startY = stage.height - peep.height * fit + offsetY;
       let startX: number;
       let endX: number;
@@ -408,6 +412,9 @@ export default function Footer() {
         <CrowdCanvas src="/images/peeps/all-peeps.png" rows={15} cols={7} />
       </div>
 
+      {/* ── Subtle dark ground shadow underneath the people's feet ── */}
+      <div className="footer-ground-gradient" aria-hidden="true" />
+
       {/* ── Floating Back to Top Button ── */}
       <div className="absolute bottom-6 right-6 pointer-events-auto" style={{ zIndex: 110 }}>
         <button
@@ -492,6 +499,21 @@ export default function Footer() {
            arrives as its own beat rather than butting straight onto ACM. */
         .footer-shell {
           margin-top: clamp(3rem, 8vh, 6.5rem);
+        }
+
+        /* Subtle dark ground shadow right under the feet at the very bottom edge */
+        .footer-ground-gradient {
+          position: absolute;
+          inset: auto 0 0 0;
+          height: clamp(28px, 14%, 56px);
+          z-index: 25;
+          pointer-events: none;
+          background: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(8, 20, 10, 0.28) 50%,
+            rgba(4, 12, 6, 0.65) 100%
+          );
         }
       `}</style>
     </footer>
