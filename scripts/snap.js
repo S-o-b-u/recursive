@@ -84,18 +84,18 @@ async function main() {
         });
         await send('Runtime.evaluate', { 
           expression: `
-            const el = document.querySelector('#faq');
-            if (window.lenis && el) {
-              window.lenis.scrollTo(el.offsetTop + 400, { immediate: true, force: true });
-            } else if (el) {
-              window.scrollTo(0, el.offsetTop + 400);
+            const faqBtn = Array.from(document.querySelectorAll('a')).find(a => a.textContent.trim() === 'FAQ');
+            if (faqBtn) {
+              faqBtn.click();
+            } else {
+              document.querySelector('#faq')?.scrollIntoView();
             }
           `
         });
-        await new Promise(r => setTimeout(r, 1500));
+        await new Promise(r => setTimeout(r, 2000));
         screenshot = await send('Page.captureScreenshot', { format: 'png' });
-        fs.writeFileSync('faq-desktop-exact.png', Buffer.from(screenshot.data, 'base64'));
-        console.log('Saved desktop screenshot to faq-desktop-exact.png');
+        fs.writeFileSync('faq-desktop-wide.png', Buffer.from(screenshot.data, 'base64'));
+        console.log('Saved desktop screenshot to faq-desktop-wide.png');
 
         edge.kill();
         process.exit(0);

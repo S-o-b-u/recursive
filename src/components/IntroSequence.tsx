@@ -296,6 +296,42 @@ export default function IntroSequence() {
       } catch {}
     };
 
+    // Both plates are paused on the same frame for the crossfade. The hero's
+    // needs to be moving again by the time it is the only one on screen --
+    // finish() used to do that, but it does not run until the bloom has fully
+    // receded, which left the grass frozen for two thirds of a second right
+    // after the reveal. Restarting the plate is separable from releasing
+    // scroll, so it happens under the tail of the dissolve instead.
+    const resumeHeroPlate = () => {
+      const heroVid = heroVideo();
+      if (!heroVid || !heroVid.paused) return;
+      try {
+        const p = heroVid.play();
+        if (p && typeof p.catch === "function") p.catch(() => {});
+      } catch {}
+    };
+
+    // Give scroll back the moment the scene is gone rather than at the end of
+    // the bloom. finish() cannot be brought forward for this because it also
+    // sets phase to "done", and the component returns null in that phase --
+    // which would cut the bloom recede off mid-fade.
+    let released = false;
+    const releaseScroll = () => {
+      if (released || doneRef.current) return;
+      released = true;
+      if (GUTTER_STABLE) {
+        document.documentElement.style.overflow = "";
+        document.body.style.overflow = "";
+      }
+      const l = getLenis();
+      if (l) {
+        l.scrollTo(0, { immediate: true, force: true });
+        l.start();
+      } else {
+        window.scrollTo(0, 0);
+      }
+    };
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         defaults: { ease: "power2.out", force3D: true },
@@ -407,7 +443,9 @@ export default function IntroSequence() {
         if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("recursive-intro-done"));
       }, undefined, 7.5);
       tl.to(scene, { autoAlpha: 0, duration: 0.9, ease: "sine.inOut" }, 7.55);
+      tl.call(resumeHeroPlate, undefined, 8.05);
       tl.set(root, { pointerEvents: "none" }, 7.9);
+      tl.call(releaseScroll, undefined, 8.45);
 
       // 5. Glow recedes over the settled landing page.
       tl.to(bloom, { opacity: 0, scale: 1.04, duration: 1.15, ease: "power1.inOut" }, 7.95);
@@ -494,7 +532,9 @@ export default function IntroSequence() {
       );
       q.call(freezePlates, undefined, 0.62);
       q.to(scene, { autoAlpha: 0, duration: 0.6, ease: "sine.inOut" }, 0.66);
+      q.call(resumeHeroPlate, undefined, 1.02);
       q.set(root, { pointerEvents: "none" }, 1.0);
+      q.call(releaseScroll, undefined, 1.26);
       q.to(bloom, { opacity: 0, scale: 1.04, duration: 0.65, ease: "power1.inOut" }, 1.05);
     };
 
