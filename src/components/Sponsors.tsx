@@ -49,13 +49,14 @@ export default function Sponsors({ detailed = true }: { detailed?: boolean }) {
   return (
     <section id="sponsors-tiers" className="sp-section" aria-label="Sponsorship Tiers and Packages">
       <div className="sp-inner">
-        {/* ── Section Motif ── */}
-        <div className="sp-ornament-wrap">
-          <Ornament className="sp-motif" />
-        </div>
-
         <div className="sp-header">
           <span className="sp-eyebrow">PARTNERSHIP TIERS</span>
+          
+          {/* ── Section Motif ── */}
+          <div className="sp-ornament-wrap">
+            <Ornament className="sp-motif" />
+          </div>
+
           <h2 className="sp-title">Empower the builders on the hill.</h2>
           <p className="sp-subtitle">
             Every rupee of sponsorship goes directly toward the event: feeding four hundred builders, funding travel grants, and providing hardware rigs. We publish a full breakdown after the hackathon.

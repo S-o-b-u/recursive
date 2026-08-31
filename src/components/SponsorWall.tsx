@@ -33,19 +33,19 @@ export default function SponsorWall() {
 
   return (
     <section id="sponsors" className="sp" aria-label="Sponsors">
-      <div className="sp-inner">
-        {/* ── Top Botanical Ornament ── */}
-        <RevealBlock y={14}>
-          <div className="sp-ornament-wrap">
-            <Ornament tone="night" className="sp-motif" />
-          </div>
-        </RevealBlock>
-
         {/* ── Centered Header ── */}
         <div className="sp-head-wrap">
           <RevealBlock y={10}>
             <span className="sp-eyebrow">006 · SUPPORTERS & PARTNERS</span>
           </RevealBlock>
+
+          {/* ── Top Botanical Ornament ── */}
+          <RevealBlock y={14}>
+            <div className="sp-ornament-wrap">
+              <Ornament tone="night" className="sp-motif" />
+            </div>
+          </RevealBlock>
+
           <RevealHeading
             className="sp-heading"
             lines={["Our Sponsors"]}
@@ -150,7 +150,8 @@ export default function SponsorWall() {
         .sp-ornament-wrap {
           display: flex;
           justify-content: center;
-          margin-bottom: clamp(1rem, 2vh, 1.5rem);
+          margin-top: clamp(0.6rem, 1.4vh, 1rem);
+          margin-bottom: clamp(1.2rem, 2.4vh, 1.8rem);
         }
 
         .sp-motif {
@@ -167,11 +168,12 @@ export default function SponsorWall() {
 
         .sp-eyebrow {
           font-family: var(--font-geist-mono), monospace;
-          font-size: 0.72rem;
+          font-size: clamp(0.76rem, 0.95vw, 0.88rem);
           font-weight: 500;
-          letter-spacing: 0.2em;
+          letter-spacing: 0.22em;
           color: #8FC45A;
           text-transform: uppercase;
+          display: inline-block;
         }
 
         .sp-heading {

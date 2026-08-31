@@ -228,8 +228,8 @@ export default function SponsorStage() {
 
             <div ref={bodyRef} className="sxp-body">
               <div className="sxp-inner">
-                <Ornament className="sxp-motif" />
                 <span className="sxp-eyebrow">Supporters &amp; partners</span>
+                <Ornament className="sxp-motif" />
                 <h2 className="sxp-heading">Our Sponsors</h2>
                 <p className="sxp-lede">
                   {sealed
@@ -531,27 +531,28 @@ export default function SponsorStage() {
           position: relative;
           z-index: 1;
           width: 100%;
-          max-width: 62rem;
+          max-width: 68rem;
           display: flex;
           flex-direction: column;
           align-items: center;
           text-align: center;
-          gap: clamp(0.35rem, 0.9vh, 0.65rem);
+          gap: clamp(0.6rem, 1.4vh, 1.1rem);
         }
 
         .sxp-motif {
-          width: clamp(78px, 36.13px + 11.63vw, 185px);
+          width: clamp(96px, 46px + 13.5vw, 215px);
           height: auto;
           color: #2F5527;
           opacity: 0.92;
-          margin-bottom: 0.15rem;
+          margin-top: 0.15rem;
+          margin-bottom: 0.25rem;
         }
 
         .sxp-eyebrow {
           font-family: var(--font-geist-mono), monospace;
-          font-size: clamp(0.7rem, 0.95vw, 0.82rem);
+          font-size: clamp(0.78rem, 1.05vw, 0.92rem);
           font-weight: 600;
-          letter-spacing: 0.22em;
+          letter-spacing: 0.24em;
           text-transform: uppercase;
           color: #3D6B22;
         }
@@ -560,7 +561,7 @@ export default function SponsorStage() {
           margin: 0.15rem 0 0;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
           font-weight: 500;
-          font-size: clamp(1.581rem, 9.53px + 4.38vw, 4.1rem);
+          font-size: clamp(1.8rem, 12px + 4.8vw, 4.4rem);
           line-height: 1.05;
           letter-spacing: -0.028em;
           color: #111a12;
@@ -568,10 +569,10 @@ export default function SponsorStage() {
 
         .sxp-lede {
           margin: 0;
-          max-width: 44rem;
+          max-width: 48rem;
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: clamp(0.95rem, 1.35vw, 1.15rem);
-          line-height: 1.5;
+          font-size: clamp(1rem, 1.45vw, 1.25rem);
+          line-height: 1.6;
           color: #2A3B28;
           text-wrap: pretty;
         }
@@ -582,14 +583,14 @@ export default function SponsorStage() {
           display: grid;
           place-items: center;
           width: 100%;
-          margin-top: clamp(0.4rem, 1.2vh, 1rem);
+          margin-top: clamp(0.8rem, 2.2vh, 1.8rem);
         }
 
         .sxp-seal-q {
           grid-area: 1 / 1;
           font-family: var(--font-hiruko), var(--font-display), Georgia, serif;
           font-weight: 700;
-          font-size: clamp(8.5rem, 24vh, 15rem);
+          font-size: clamp(10rem, 28vh, 17rem);
           line-height: 0.75;
           color: rgba(38, 70, 32, 0.32);
           filter: blur(7px);
@@ -601,9 +602,9 @@ export default function SponsorStage() {
           grid-area: 1 / 1;
           font-family: var(--font-hiruko), var(--font-display), sans-serif;
           font-weight: 900;
-          font-size: clamp(1.6rem, 4.4vw, 3.1rem);
+          font-size: clamp(1.85rem, 5vw, 3.5rem);
           line-height: 1;
-          letter-spacing: 0.19em;
+          letter-spacing: 0.22em;
           text-transform: uppercase;
           color: #16300F;
           text-shadow:
@@ -619,14 +620,14 @@ export default function SponsorStage() {
         .sxp-wall {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: clamp(0.7rem, 1.6vw, 1.35rem);
+          gap: clamp(1.1rem, 2.4vw, 2rem);
           width: 100%;
-          max-width: 62rem;
-          margin-top: clamp(0.8rem, 2vh, 1.6rem);
+          max-width: 68rem;
+          margin-top: clamp(1.2rem, 2.8vh, 2.2rem);
         }
 
         .sxp-cta-wrap {
-          margin-top: clamp(0.7rem, 1.8vh, 1.4rem);
+          margin-top: clamp(1.2rem, 2.6vh, 2rem);
           display: flex;
           justify-content: center;
           align-items: center;
