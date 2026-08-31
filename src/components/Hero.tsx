@@ -269,7 +269,7 @@ export default function Hero() {
           left: calc(50% + 72px);
           top: 53.5%;
           transform: translateY(-50%);
-          z-index: 20;
+          z-index: 30;
           display: flex;
           align-items: center;
           gap: 0.55rem;
@@ -277,10 +277,11 @@ export default function Hero() {
         }
 
         .chair-arrow {
-          color: #1a291c;
+          color: #111a12;
           flex-shrink: 0;
-          opacity: 0.7;
+          opacity: 0.9;
           margin-top: 0.2rem;
+          filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.8));
         }
 
         .chair-note {
@@ -291,27 +292,28 @@ export default function Hero() {
           cursor: pointer;
         }
         .chair-note:hover .chair-text {
-          opacity: 0.7;
+          opacity: 0.75;
         }
 
         .chair-text {
           font-family: var(--font-dm-sans), var(--font-display), sans-serif;
           font-size: 0.88rem;
-          font-weight: 600;
+          font-weight: 700;
           line-height: 1.32;
           letter-spacing: -0.015em;
           color: #111a12;
           margin: 0;
-          white-space: nowrap;
+          text-shadow: 0 1px 12px rgba(255, 255, 255, 0.9), 0 0 4px #ffffff;
           transition: opacity 150ms ease;
         }
 
         .chair-sub {
           font-family: var(--font-geist-mono), monospace;
           font-size: 0.68rem;
-          font-weight: 500;
-          color: #566a55;
-          letter-spacing: -0.01em;
+          font-weight: 600;
+          color: #2b4923;
+          letter-spacing: 0.02em;
+          text-shadow: 0 1px 8px rgba(255, 255, 255, 0.9);
         }
 
         /* ── Mossy Log Natural Divider Over Seam ── */
@@ -482,29 +484,49 @@ export default function Hero() {
 
         @media (max-width: 600px) {
           .hero-center-content {
-            top: clamp(6.2rem, 12vh, 8.2rem);
+            top: clamp(5.4rem, 11vh, 7.2rem);
             padding-inline: 0;
           }
           .hero-warp-wrap {
-            height: clamp(160px, 38vw, 240px);
+            height: clamp(140px, 34vw, 210px);
             max-width: 100vw;
           }
           .hero-chair-annotation {
-            top: clamp(43%, 47vh, 52%);
-            gap: 0.2rem;
+            left: 50%;
+            top: clamp(40%, 44vh, 48%);
+            bottom: auto;
+            transform: translateX(-50%);
+            gap: 0.3rem;
+            max-width: calc(100vw - 2rem);
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
           }
           .chair-arrow {
-            width: 36px;
+            width: 38px;
             height: 44px;
             margin-top: 0.05rem;
             transform: rotate(-90deg);
+            opacity: 0.95;
+            color: #111a12;
+            filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.9));
           }
           .chair-text {
-            font-size: 0.72rem;
-            line-height: 1.22;
+            font-size: 0.84rem;
+            font-weight: 700;
+            line-height: 1.25;
+            color: #111a12;
+            text-align: center;
+            text-shadow: 0 1px 12px rgba(255, 255, 255, 0.95), 0 0 6px #ffffff;
           }
           .chair-sub {
-            font-size: 0.6rem;
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: #233e1c;
+            text-align: center;
+            text-shadow: 0 1px 8px rgba(255, 255, 255, 0.9);
           }
           .hero-action-dock-split {
             flex-direction: column;
@@ -532,15 +554,18 @@ export default function Hero() {
 
         @media (max-width: 480px) {
           .hero-center-content {
-            top: clamp(5.8rem, 11.5vh, 7.6rem);
+            top: clamp(5rem, 10.5vh, 6.8rem);
             padding-inline: 0;
           }
           .hero-warp-wrap {
-            height: clamp(150px, 36vw, 220px);
+            height: clamp(135px, 32vw, 195px);
             max-width: 100vw;
           }
           .hero-chair-annotation {
-            top: clamp(44%, 48vh, 52%);
+            top: clamp(39%, 43vh, 47%);
+          }
+          .chair-text {
+            font-size: 0.8rem;
           }
         }
       `}</style>
