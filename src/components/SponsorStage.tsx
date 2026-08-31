@@ -48,23 +48,23 @@ const RATIO = "16 / 9";
 
 type CardLayer = "front" | "back";
 
-const CARD_POSITIONS: Array<{ top?: string, bottom?: string, left?: string, right?: string, width: string, height: string, theme: "white" | "green", layer: CardLayer, label: string }> = [
+const CARD_POSITIONS: Array<{ top?: string, bottom?: string, left?: string, right?: string, width: string, height: string, theme: "white" | "green", layer: CardLayer, label: string, isRevealed?: boolean, name?: string, color?: string }> = [
   // Microsoft
-  { top: "15%", left: "22%", width: "240px", height: "130px", theme: "white", layer: "back", label: "PLATINUM SPONSOR" },
+  { top: "15%", left: "22%", width: "240px", height: "130px", theme: "white", layer: "back", label: "PLATINUM SPONSORS", isRevealed: true, name: "Microsoft", color: "#5e656b" },
   // Devfolio
-  { top: "15%", left: "52%", width: "240px", height: "130px", theme: "green", layer: "back", label: "PLATINUM SPONSOR" },
+  { top: "15%", left: "52%", width: "240px", height: "130px", theme: "green", layer: "back", label: "PLATINUM SPONSORS", isRevealed: true, name: "devfolio", color: "#ffffff" },
   // GitHub
-  { top: "45%", left: "6%", width: "220px", height: "130px", theme: "green", layer: "front", label: "PLATINUM SPONSOR" },
+  { top: "45%", left: "6%", width: "220px", height: "130px", theme: "green", layer: "front", label: "PLATINUM SPONSORS", isRevealed: true, name: "GitHub", color: "#ffffff" },
   // GDG
-  { top: "45%", right: "6%", width: "220px", height: "130px", theme: "white", layer: "front", label: "COMMUNITY PARTNER" },
-  // MLH
-  { bottom: "12%", left: "22%", width: "200px", height: "120px", theme: "white", layer: "front", label: "OFFICIAL PARTNER" },
-  // Angelhack
-  { bottom: "12%", left: "42%", width: "190px", height: "120px", theme: "green", layer: "back", label: "COMMUNITY PARTNER" },
-  // Twilio
-  { bottom: "12%", left: "58%", width: "180px", height: "120px", theme: "white", layer: "back", label: "SUPPORTING PARTNER" },
-  // Polygon
-  { bottom: "12%", right: "12%", width: "180px", height: "120px", theme: "white", layer: "front", label: "SUPPORTING SPONSOR" },
+  { top: "45%", right: "6%", width: "220px", height: "130px", theme: "white", layer: "front", label: "COMMUNITY PARTNER", isRevealed: true, name: "GDG", color: "#616161" },
+  // MLH (Unrevealed / Placeholder)
+  { bottom: "12%", left: "22%", width: "200px", height: "120px", theme: "white", layer: "front", label: "MORE SPONSORS", isRevealed: false },
+  // Angelhack (Unrevealed / Placeholder)
+  { bottom: "12%", left: "42%", width: "190px", height: "120px", theme: "green", layer: "back", label: "COMING SOON", isRevealed: false },
+  // Twilio (Unrevealed / Placeholder)
+  { bottom: "12%", left: "58%", width: "180px", height: "120px", theme: "white", layer: "back", label: "MORE SPONSORS", isRevealed: false },
+  // Polygon (Unrevealed / Placeholder)
+  { bottom: "12%", right: "12%", width: "180px", height: "120px", theme: "white", layer: "front", label: "COMING SOON", isRevealed: false },
 ];
 
 export default function SponsorStage() {
@@ -306,13 +306,10 @@ export default function SponsorStage() {
 
                 {/* ── Headings ── */}
                 <div className="flex flex-col items-center z-20 mb-8 md:mb-12 text-center pointer-events-none mt-4 md:mt-10">
-                  <h3 className="font-bebas text-[2.5rem] sm:text-5xl md:text-7xl lg:text-[6rem] tracking-wide text-[#232623] uppercase leading-none" style={{ fontFamily: "var(--font-bebas), sans-serif", textShadow: "0 2px 10px rgba(255,255,255,0.8)" }}>
-                    Thank You To Our
+                  <h3 className="font-bebas text-5xl sm:text-6xl md:text-8xl lg:text-[7.5rem] tracking-wide text-[#232623] uppercase leading-none" style={{ fontFamily: "var(--font-bebas), sans-serif", textShadow: "0 2px 10px rgba(255,255,255,0.8)" }}>
+                    OUR AMAZING SPONSORS
                   </h3>
-                  <h2 className="font-bebas text-5xl sm:text-6xl md:text-8xl lg:text-[7rem] tracking-wide text-[#59944a] uppercase leading-none mt-1 sm:mt-2" style={{ fontFamily: "var(--font-bebas), sans-serif", textShadow: "0 2px 10px rgba(255,255,255,0.8)" }}>
-                    Amazing Sponsors!
-                  </h2>
-                  <p className="font-heading font-bold text-[0.6rem] sm:text-[0.7rem] md:text-sm tracking-widest uppercase text-[#232623] mt-4 sm:mt-6">
+                  <p className="font-heading font-bold text-[0.65rem] sm:text-[0.75rem] md:text-sm tracking-widest uppercase text-[#232623] mt-4 sm:mt-6">
                     Powering Innovation. Building the future.
                   </p>
                 </div>
@@ -333,10 +330,16 @@ export default function SponsorStage() {
                          }}
                        >
                          <div className="flex-1 flex items-center justify-center">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-30 md:w-10 md:h-10">
-                              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                            </svg>
+                            {pos.isRevealed ? (
+                              <span className="font-heading font-black text-xl sm:text-2xl md:text-4xl tracking-tight" style={{ color: pos.color || 'inherit' }}>
+                                {pos.name}
+                              </span>
+                            ) : (
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-30 md:w-10 md:h-10">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                              </svg>
+                            )}
                          </div>
                          <div className={`text-[0.45rem] sm:text-[0.55rem] md:text-[0.65rem] font-heading font-medium tracking-wide uppercase mt-auto ${pos.theme === 'green' ? 'text-white/60' : 'text-black/60'} text-center leading-tight`}>
                            {pos.label}
@@ -379,10 +382,16 @@ export default function SponsorStage() {
                          }}
                        >
                          <div className="flex-1 flex items-center justify-center">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-30 md:w-10 md:h-10">
-                              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                            </svg>
+                            {pos.isRevealed ? (
+                              <span className="font-heading font-black text-xl sm:text-2xl md:text-4xl tracking-tight" style={{ color: pos.color || 'inherit' }}>
+                                {pos.name}
+                              </span>
+                            ) : (
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-30 md:w-10 md:h-10">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                              </svg>
+                            )}
                          </div>
                          <div className={`text-[0.45rem] sm:text-[0.55rem] md:text-[0.65rem] font-heading font-medium tracking-wide uppercase mt-auto ${pos.theme === 'green' ? 'text-white/60' : 'text-black/60'} text-center leading-tight`}>
                            {pos.label}
@@ -400,10 +409,16 @@ export default function SponsorStage() {
                            style={{ width: '45%', height: '80px' }}
                          >
                            <div className="flex-1 flex items-center justify-center">
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-30">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                              </svg>
+                              {pos.isRevealed ? (
+                                <span className="font-heading font-black text-xl tracking-tight" style={{ color: pos.color || 'inherit' }}>
+                                  {pos.name}
+                                </span>
+                              ) : (
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-30">
+                                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                              )}
                            </div>
                            <div className={`text-[0.4rem] font-heading font-medium tracking-wide uppercase mt-auto ${pos.theme === 'green' ? 'text-white/60' : 'text-black/60'} text-center leading-tight`}>
                              {pos.label}
