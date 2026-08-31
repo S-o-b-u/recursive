@@ -46,6 +46,17 @@ gsap.registerPlugin(ScrollTrigger);
 
 const RATIO = "16 / 9";
 
+const CARD_POSITIONS = [
+  { top: "5%", left: "8%", width: "240px", height: "140px", theme: "white", rotation: -3, label: "PLATINUM SPONSOR" },
+  { top: "0%", left: "38%", width: "260px", height: "150px", theme: "green", rotation: 2, label: "PLATINUM SPONSOR" },
+  { top: "35%", left: "2%", width: "260px", height: "160px", theme: "green", rotation: -2, label: "PLATINUM SPONSOR" },
+  { top: "42%", right: "2%", width: "240px", height: "140px", theme: "white", rotation: 4, label: "COMMUNITY PARTNER" },
+  { bottom: "8%", left: "16%", width: "210px", height: "130px", theme: "white", rotation: -4, label: "OFFICIAL PARTNER" },
+  { bottom: "-5%", left: "38%", width: "190px", height: "150px", theme: "green", rotation: 3, label: "COMMUNITY PARTNER" },
+  { bottom: "5%", left: "55%", width: "200px", height: "120px", theme: "white", rotation: -2, label: "SUPPORTING PARTNER" },
+  { bottom: "10%", right: "10%", width: "210px", height: "130px", theme: "white", rotation: 2, label: "SUPPORTING SPONSOR" },
+];
+
 export default function SponsorStage() {
   const trackRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -151,6 +162,23 @@ export default function SponsorStage() {
           pointerEvents: b > 0.05 ? "auto" : "none",
         });
 
+        // ── Animate the Sponsor Cards ──
+        if (body) {
+          const cards = body.querySelectorAll(".sponsor-card");
+          cards.forEach((card, i) => {
+            const cardEl = card as HTMLElement;
+            const start = PANEL_IN + (i * 0.012); 
+            const cardProg = easePanel(clamp01((t - start) / (PANEL_LEN - 0.05)));
+            const targetRot = parseFloat(cardEl.dataset.rot || "0");
+            gsap.set(cardEl, {
+              opacity: cardProg,
+              scale: 0.8 + (0.2 * cardProg),
+              y: 50 * (1 - cardProg),
+              rotation: targetRot * cardProg,
+            });
+          });
+        }
+
         // The frameless up arrow fades in as the stage opens and reaches full visibility
         if (scrollUpBtn) {
           const s = easePanel(clamp01((t - 0.28) / 0.18));
@@ -227,40 +255,64 @@ export default function SponsorStage() {
             </div>
 
             <div ref={bodyRef} className="sxp-body">
-              <div className="sxp-inner">
-                <Ornament className="sxp-motif" />
-                <span className="sxp-eyebrow">Supporters &amp; partners</span>
-                <h2 className="sxp-heading">Our Sponsors</h2>
-                <p className="sxp-lede">
-                  {sealed
-                    ? "The backers are lined up. Organization names stay sealed until the official reveal."
-                    : "Organizations and platforms empowering the builders on the hill."}
-                </p>
+              <div className="sxp-inner relative flex flex-col items-center justify-center w-full h-full max-w-[1200px]">
+                
+                {/* Headings */}
+                <div className="flex flex-col items-center z-20 mb-8 md:mb-12 text-center pointer-events-none">
+                  <h3 className="font-heading font-black text-[1.7rem] sm:text-3xl md:text-5xl lg:text-[3.5rem] tracking-tight text-[#1a2f20] uppercase leading-none">
+                    Thank You To Our
+                  </h3>
+                  <h2 className="font-heading font-black text-3xl sm:text-4xl md:text-6xl lg:text-[4.5rem] tracking-tight text-[#57975c] uppercase leading-none mt-1 sm:mt-2">
+                    Amazing Sponsors!
+                  </h2>
+                  <p className="font-mono text-[0.55rem] sm:text-[0.65rem] md:text-xs font-semibold tracking-[0.1em] sm:tracking-[0.2em] uppercase text-[#2A3B28] mt-4 sm:mt-6">
+                    Powering Innovation. Building the future.
+                  </p>
+                </div>
 
-                {sealed ? (
-                  <div className="sxp-seal">
-                    <span className="sxp-seal-q" aria-hidden="true">
-                      ?
-                    </span>
-                    <span className="sxp-seal-word">Yet to reveal</span>
-                  </div>
-                ) : (
-                  <div className="sxp-wall">
-                    {SPONSOR_SLOTS.map((slot) => (
-                      <div className="sxp-cell" key={slot.expect}>
-                        <MediaSlot
-                          slot={slot}
-                          ratio={RATIO}
-                          fit="contain"
-                          dither={false}
-                          sizes="(max-width: 700px) 44vw, 22vw"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {/* The main Gratitude + Cards area */}
+                <div className="relative w-full h-[300px] sm:h-[400px] md:h-[600px] flex items-center justify-center mt-0 sm:mt-[-2rem] md:mt-[-4rem]">
+                   {/* Giant GRATITUDE Text */}
+                   <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                      <h1 
+                        className="font-heading font-black text-[22vw] md:text-[14rem] tracking-tighter text-white uppercase leading-none select-none opacity-95 scale-y-[1.3] md:scale-y-[1.5] origin-center"
+                        style={{ textShadow: "0 20px 40px rgba(0,0,0,0.15), 0 4px 10px rgba(0,0,0,0.1), inset 0 2px 0 rgba(255,255,255,0.5)" }}
+                      >
+                        GRATITUDE
+                      </h1>
+                   </div>
 
-                <div className="sxp-cta-wrap">
+                   {/* Floating Sponsor Cards */}
+                   <div className="absolute inset-0 z-20 w-full h-full pointer-events-none">
+                     {CARD_POSITIONS.map((pos, i) => (
+                       <div 
+                         key={i} 
+                         className={`sponsor-card absolute flex flex-col items-center justify-center p-3 sm:p-4 shadow-xl border rounded sm:rounded-md ${pos.theme === 'green' ? 'bg-[#122c19] text-white border-white/10' : 'bg-white text-[#111a12] border-black/5'}`}
+                         style={{ 
+                           top: pos.top, 
+                           left: pos.left, 
+                           right: pos.right, 
+                           bottom: pos.bottom,
+                           width: `clamp(90px, 16vw, ${pos.width})`,
+                           height: `clamp(60px, 10vw, ${pos.height})`,
+                         }}
+                         data-rot={pos.rotation}
+                       >
+                         <div className="flex-1 flex items-center justify-center">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-20 md:opacity-30 md:w-8 md:h-8">
+                              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                         </div>
+                         <div className={`text-[0.4rem] sm:text-[0.55rem] md:text-[0.65rem] font-mono tracking-widest uppercase mt-auto ${pos.theme === 'green' ? 'text-white/60' : 'text-black/40'} text-center leading-tight`}>
+                           {pos.label}
+                         </div>
+                       </div>
+                     ))}
+                   </div>
+                </div>
+                
+                <div className="sxp-cta-wrap z-30 mt-6 sm:mt-8 md:mt-0 relative">
                   <LiquidMetalButton
                     label="Partner with this edition"
                     href={`mailto:${EVENT.email}`}
