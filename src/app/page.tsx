@@ -6,6 +6,7 @@ import Countdown from "@/components/Countdown";
 import Themes from "@/components/Themes";
 import Judges from "@/components/Judges";
 import SponsorStage from "@/components/SponsorStage";
+import HomeFAQ from "@/components/HomeFAQ";
 
 export default function Home() {
   return (
@@ -26,8 +27,9 @@ export default function Home() {
       {/* The way back out. A window opens on the black field and what is behind
           it is the sky — the sponsors sit inside it, on cloud. By the time the
           window fills the viewport it is painting the same pixels as the page
-          backdrop, so ACM below simply continues on that background. */}
+          backdrop, so FAQ and ACM below simply continue on that background. */}
       <SponsorStage />
+      <HomeFAQ />
       <ACM />
     </main>
   );

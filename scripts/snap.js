@@ -56,19 +56,20 @@ async function main() {
           `
         });
         
-        await new Promise(r => setTimeout(r, 1200));
+        await new Promise(r => setTimeout(r, 1000));
 
         await send('Runtime.evaluate', { 
           expression: `
-            window.scrollTo(0, 0);
+            const faq = document.querySelector('#faq');
+            if (faq) faq.scrollIntoView({ block: 'center' });
           `
         });
         
-        await new Promise(r => setTimeout(r, 1200));
+        await new Promise(r => setTimeout(r, 2000));
         
         const screenshot = await send('Page.captureScreenshot', { format: 'png' });
-        fs.writeFileSync('hero-mobile-snap.png', Buffer.from(screenshot.data, 'base64'));
-        console.log('Saved screenshot to hero-mobile-snap.png');
+        fs.writeFileSync('faq-snap.png', Buffer.from(screenshot.data, 'base64'));
+        console.log('Saved screenshot to faq-snap.png');
         edge.kill();
         process.exit(0);
       })();
