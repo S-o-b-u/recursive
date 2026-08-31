@@ -172,11 +172,11 @@ export default function Hero() {
           />
         </svg>
 
-        <a href="#about" className="chair-note" aria-label="Scroll to learn about the chair">
-          <p className="chair-text" style={{ color: "#000000", textShadow: "none" }}>
+        <a href="#about" className="chair-note" aria-label="Scroll to learn about the chair" style={{ color: "#000000", textDecoration: "none" }}>
+          <p className="chair-text" style={{ color: "#000000", WebkitTextFillColor: "#000000", opacity: 1, textShadow: "none" }}>
             bro put a plastic chair on a hill<br />and called it a hackathon 
           </p>
-          <span className="chair-sub" style={{ color: "#000000", textShadow: "none" }}>scroll for lore ↓</span>
+          <span className="chair-sub" style={{ color: "#000000", WebkitTextFillColor: "#000000", opacity: 1, textShadow: "none" }}>scroll for lore ↓</span>
         </a>
       </div>
 
@@ -285,21 +285,27 @@ export default function Hero() {
           gap: 0.2rem;
           text-decoration: none;
           cursor: pointer;
+          color: #000000 !important;
+          -webkit-text-fill-color: #000000 !important;
+          opacity: 1 !important;
         }
-        .chair-note:hover .chair-text {
-          opacity: 0.75;
+        @media (hover: hover) {
+          .chair-note:hover .chair-text {
+            opacity: 0.8;
+          }
         }
 
         .chair-text {
           font-family: var(--font-dm-sans), var(--font-display), sans-serif;
           font-size: 0.88rem;
-          font-weight: 700;
+          font-weight: 800;
           line-height: 1.32;
           letter-spacing: -0.015em;
           color: #000000 !important;
+          -webkit-text-fill-color: #000000 !important;
+          opacity: 1 !important;
           margin: 0;
           text-shadow: none !important;
-          transition: opacity 150ms ease;
         }
 
         .chair-sub {
@@ -307,6 +313,8 @@ export default function Hero() {
           font-size: 0.68rem;
           font-weight: 700;
           color: #000000 !important;
+          -webkit-text-fill-color: #000000 !important;
+          opacity: 1 !important;
           letter-spacing: 0.02em;
           text-shadow: none !important;
         }
@@ -451,23 +459,30 @@ export default function Hero() {
             height: 52px;
             margin-top: 0.1rem;
             transform: rotate(-90deg);
-            opacity: 0.88;
+            opacity: 1 !important;
+            color: #000000 !important;
+            filter: none !important;
             flex-shrink: 0;
           }
           .chair-arrow path {
             stroke-width: 6;
           }
           .chair-text {
-            font-size: 0.78rem;
-            line-height: 1.25;
-            text-align: center;
-            text-shadow: 0 1px 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.5);
+            font-size: 0.84rem !important;
+            font-weight: 800 !important;
+            line-height: 1.25 !important;
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-align: center !important;
+            text-shadow: none !important;
           }
           .chair-sub {
-            font-size: 0.62rem;
-            color: #3b5a32;
-            text-align: center;
-            text-shadow: 0 1px 6px rgba(255, 255, 255, 0.6);
+            font-size: 0.68rem !important;
+            font-weight: 700 !important;
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-align: center !important;
+            text-shadow: none !important;
           }
           .hero-log-img {
             width: clamp(950px, 130vw, 1500px);
