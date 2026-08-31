@@ -137,16 +137,21 @@ export function RevealHeading({
   delay?: number;
 }) {
   const rootRef = useRef<HTMLHeadingElement>(null);
+  const animatedRef = useRef(false);
 
   useIso(() => {
     const root = rootRef.current;
     if (!root) return;
+
+    // Once played, never reset or re-play when parent re-renders
+    if (animatedRef.current) return;
 
     const inners = gsap.utils.toArray<HTMLElement>(".rh-inner", root);
     if (!inners.length) return;
 
     if (reduced()) {
       gsap.set(inners, { yPercent: 0, opacity: 1 });
+      animatedRef.current = true;
       return;
     }
 
@@ -160,13 +165,20 @@ export function RevealHeading({
           duration: 1.75,
           delay,
           stagger: 0.13,
-          scrollTrigger: { trigger: root, start: "top 88%", once: true },
+          scrollTrigger: {
+            trigger: root,
+            start: "top 88%",
+            once: true,
+            onEnter: () => {
+              animatedRef.current = true;
+            },
+          },
         }
       );
     }, root);
 
     return () => ctx.revert();
-  }, [lines, delay]);
+  }, [delay]);
 
   return (
     <h2 ref={rootRef} className={`rh ${className}`}>
@@ -212,10 +224,14 @@ export function RevealBlock({
   selector?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const animatedRef = useRef(false);
 
   useIso(() => {
     const root = rootRef.current;
     if (!root) return;
+
+    // Once played, never reset or re-play when parent re-renders
+    if (animatedRef.current) return;
 
     const targets = selector
       ? gsap.utils.toArray<HTMLElement>(selector, root)
@@ -224,6 +240,7 @@ export function RevealBlock({
 
     if (reduced()) {
       gsap.set(targets, { opacity: 1, y: 0 });
+      animatedRef.current = true;
       return;
     }
 
@@ -238,7 +255,14 @@ export function RevealBlock({
           duration: 1.45,
           delay,
           stagger,
-          scrollTrigger: { trigger: root, start: "top 86%", once: true },
+          scrollTrigger: {
+            trigger: root,
+            start: "top 86%",
+            once: true,
+            onEnter: () => {
+              animatedRef.current = true;
+            },
+          },
         }
       );
     }, root);

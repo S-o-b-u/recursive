@@ -14,6 +14,7 @@ import { buildTrackTextures } from "@/lib/track-textures";
 
 /** Autoplay dwell, shared by the slider and the rail's progress bar. */
 const DWELL = 6;
+const HEADING_LINES = ["Four directions", "to build in."];
 
 export default function Themes() {
   const [active, setActive] = useState(0);
@@ -95,7 +96,7 @@ export default function Themes() {
 
           <RevealHeading
             className="th-heading"
-            lines={["Four directions", "to build in."]}
+            lines={HEADING_LINES}
           />
 
           <RevealBlock y={12} delay={0.06}>
