@@ -151,13 +151,13 @@ export default function SponsorStage() {
           pointerEvents: b > 0.05 ? "auto" : "none",
         });
 
-        // The scroll up button only appears once the stage has opened/scrolled down
+        // The up arrow button only appears once the stage has fully opened
         if (scrollUpBtn) {
-          const s = easePanel(clamp01((t - 0.22) / 0.18));
+          const s = easePanel(clamp01((t - WINDOW_END) / 0.12));
           gsap.set(scrollUpBtn, {
             opacity: s,
-            y: (1 - s) * -12,
-            pointerEvents: s > 0.1 ? "auto" : "none",
+            y: (1 - s) * -14,
+            pointerEvents: s > 0.15 ? "auto" : "none",
           });
         }
       };
@@ -305,15 +305,29 @@ export default function SponsorStage() {
               because both read it off the stage. */}
           <span className="sxp-keyline" aria-hidden="true" />
 
-          {/* ── Scroll Up to Go Back (Beside Nav Bar) ── */}
+          {/* ── Scroll Navigation to Exit Frame (Beside Nav Bar) ── */}
           <div ref={scrollUpRef} className="sxp-scrollup-wrap">
             <button
               type="button"
               onClick={scrollUp}
               aria-label="Scroll up to previous section"
               className="sxp-scrollup-btn"
+              title="Scroll up"
             >
-              <span className="sxp-scrollup-text">Scroll up</span>
+              <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="sxp-arrow-icon"
+                aria-hidden="true"
+              >
+                <path d="M12 19V5M5 12l7-7 7 7" />
+              </svg>
             </button>
           </div>
         </div>
@@ -657,12 +671,15 @@ export default function SponsorStage() {
           z-index: 10;
         }
 
-        /* ── Scroll Up to Go Back Button ── */
+        /* ── Scroll Navigation to Exit Frame (Beside Nav Bar) ── */
         .sxp-scrollup-wrap {
           position: absolute;
           top: clamp(1.25rem, 3.2vh, 2.25rem);
           right: clamp(1rem, 3.5vw, 2.2rem);
           z-index: 105;
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
           opacity: 0;
           pointer-events: none;
           will-change: transform, opacity;
@@ -672,38 +689,41 @@ export default function SponsorStage() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 0.45rem 0.8rem;
-          min-height: 32px;
-          border-radius: 9999px;
-          background: rgba(255, 255, 255, 0.58);
+          width: 36px;
+          height: 36px;
+          padding: 0;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.65);
           backdrop-filter: blur(20px) saturate(180%);
           -webkit-backdrop-filter: blur(20px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.8);
+          border: 1px solid rgba(255, 255, 255, 0.85);
           color: #142617;
-          font-family: var(--font-geist-mono), monospace;
-          font-size: 0.68rem;
-          font-weight: 600;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
           cursor: pointer;
           box-shadow:
-            0 2px 10px rgba(0, 0, 0, 0.06),
+            0 2px 10px rgba(0, 0, 0, 0.08),
             inset 0 1px 0 rgba(255, 255, 255, 0.95);
-          transition: all 250ms cubic-bezier(0.23, 1, 0.32, 1);
+          transition: all 220ms cubic-bezier(0.23, 1, 0.32, 1);
         }
 
         .sxp-scrollup-btn:hover {
-          background: rgba(255, 255, 255, 0.92);
-          border-color: rgba(92, 140, 58, 0.45);
+          background: rgba(255, 255, 255, 0.95);
+          border-color: rgba(92, 140, 58, 0.5);
           color: #2b541d;
-          transform: translateY(-1.5px);
           box-shadow:
-            0 4px 16px rgba(0, 0, 0, 0.1),
+            0 4px 16px rgba(0, 0, 0, 0.12),
             inset 0 1px 0 #ffffff;
         }
 
+        .sxp-scrollup-btn:hover .sxp-arrow-icon {
+          transform: translateY(-2px);
+        }
+
+        .sxp-arrow-icon {
+          transition: transform 200ms ease;
+        }
+
         .sxp-scrollup-btn:active {
-          transform: translateY(0) scale(0.95);
+          transform: scale(0.92);
         }
 
         /* ── Narrower viewports ── */
@@ -727,8 +747,9 @@ export default function SponsorStage() {
             right: clamp(0.6rem, 2.5vw, 1rem);
           }
           .sxp-scrollup-btn {
-            padding: 0.42rem 0.7rem;
-            font-size: 0.66rem;
+            width: 32px;
+            height: 32px;
+            padding: 0;
           }
           .sxp { --sxp-track: 260vh; }
           .sxp-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
