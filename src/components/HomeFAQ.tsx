@@ -251,21 +251,28 @@ export default function HomeFAQ() {
         /* Tablet */
         @media (min-width: 641px) {
           .faq-sheet {
-            max-width: 44rem;
+            max-width: 48rem;
           }
         }
 
         /* Desktop */
         @media (min-width: 1025px) {
           .faq-sheet {
-            max-width: 58rem;
+            max-width: 70rem;
           }
         }
 
         /* Wide Desktop */
         @media (min-width: 1280px) {
           .faq-sheet {
-            max-width: 64rem;
+            max-width: 78rem;
+          }
+        }
+
+        /* Ultra-wide Screens */
+        @media (min-width: 1536px) {
+          .faq-sheet {
+            max-width: 84rem;
           }
         }
 
