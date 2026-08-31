@@ -228,7 +228,7 @@ const buildTextCanvas = ({
       if (props.color && props.color !== "original") {
         ctx.globalCompositeOperation = "source-in";
         ctx.fillStyle = props.color;
-        ctx.fillRect(drawX, drawY, drawW, drawH);
+        ctx.fillRect(0, 0, width, height);
         ctx.globalCompositeOperation = "source-over";
       }
 
@@ -425,7 +425,6 @@ export const WarpText: React.FC<WarpTextProps> = ({
 
     if (effectiveSrc) {
       const img = new window.Image();
-      img.crossOrigin = "anonymous";
       const onLoaded = () => {
         loadedImageRef.current = img;
         if (contextRef.current) {
@@ -433,6 +432,9 @@ export const WarpText: React.FC<WarpTextProps> = ({
         }
       };
       img.onload = onLoaded;
+      img.onerror = (e) => {
+        console.warn("WarpText: Image load error:", effectiveSrc, e);
+      };
       img.src = effectiveSrc;
       if (img.complete && img.naturalWidth > 0) {
         onLoaded();
@@ -784,11 +786,32 @@ export const WarpText: React.FC<WarpTextProps> = ({
     <div
       ref={containerRef}
       className={`warp-text ${className}`.trim()}
-      style={style}
+      style={{ position: "relative", ...style }}
       role="heading"
       aria-level={2}
       aria-label={typeof text === "string" ? text : "heading"}
-    />
+    >
+      {effectiveSrc && (
+        <img
+          src={effectiveSrc}
+          alt={typeof text === "string" ? text : "Recursive Logo"}
+          className="warp-text-fallback-img"
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            objectPosition: "center center",
+            pointerEvents: "none",
+            filter: color === "#111a12" ? "invert(1) brightness(0.1)" : undefined,
+            userSelect: "none",
+          }}
+          loading="eager"
+          decoding="async"
+        />
+      )}
+    </div>
   );
 };
 
