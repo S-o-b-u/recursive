@@ -271,7 +271,7 @@ export default function Navigation() {
         )}
       </AnimatePresence>
 
-      <style>{`
+      <style href="navigation-style" precedence="default" suppressHydrationWarning>{`
         .nav-root {
           position: fixed;
           top: clamp(0.75rem, 2.2vh, 1.5rem);

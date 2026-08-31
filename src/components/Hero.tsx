@@ -54,7 +54,7 @@ export default function Hero() {
           style={{
             width: "100%",
             maxWidth: "min(98vw, 1750px)",
-            height: "clamp(230px, 34vw, 450px)",
+            height: "min(clamp(230px, 34vw, 450px), 42vh)",
             pointerEvents: "auto",
           }}
         />
@@ -145,7 +145,7 @@ export default function Hero() {
         </a>
       </motion.div>
 
-      <style>{`
+      <style href="hero-style" precedence="default" suppressHydrationWarning>{`
         .hero {
           position: relative;
           height: 100svh;
@@ -183,7 +183,9 @@ export default function Hero() {
         /* ── Top Center Block: Wordmark with WebGL Warp ── */
         .hero-center-content {
           position: absolute;
-          top: clamp(7.5rem, 12vh, 10.5rem);
+          /* The floor used to be 7.5rem, which on a 375px-tall landscape phone
+             spent a third of the screen before the logo even started. */
+          top: clamp(3.25rem, 12vh, 10.5rem);
           left: 0;
           right: 0;
           width: 100%;

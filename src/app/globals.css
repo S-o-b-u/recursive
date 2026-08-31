@@ -511,3 +511,30 @@ a { color: inherit; text-decoration: none; }
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Mobile compositing budget.
+
+   backdrop-filter is the most expensive thing a phone GPU does: the
+   backdrop has to be re-read and re-blurred every frame the layer moves.
+   The page-level GradualBlur stacks three of them, fixed to the viewport,
+   so they recomposite for the entire scroll. The gradient mask on its own
+   still softens the bottom edge, so the blur is what goes.
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .gradual-blur,
+  .gradual-blur * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* Anyone who has asked for less motion should not be paying for any of the
+   decorative compositing either. */
+@media (prefers-reduced-motion: reduce) {
+  .gradual-blur,
+  .gradual-blur * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
