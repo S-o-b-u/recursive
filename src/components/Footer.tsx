@@ -414,6 +414,9 @@ export default function Footer() {
         <CrowdCanvas src="/images/peeps/all-peeps.png" rows={15} cols={7} />
       </div>
 
+      {/* ── Dark gradient concealing the straight bottom cut-edge of the crowd ── */}
+      <div className="footer-cutout-fade" aria-hidden="true" />
+
       {/* ── Floating Back to Top Button ── */}
       <div className="absolute bottom-6 right-6 pointer-events-auto" style={{ zIndex: 110 }}>
         <button
@@ -498,6 +501,22 @@ export default function Footer() {
            arrives as its own beat rather than butting straight onto ACM. */
         .footer-shell {
           margin-top: clamp(3rem, 8vh, 6.5rem);
+        }
+
+        /* Pure rich dark gradient concealing the bottom cut edge of people */
+        .footer-cutout-fade {
+          position: absolute;
+          inset: auto 0 0 0;
+          height: clamp(24px, 8.5%, 52px);
+          z-index: 25;
+          pointer-events: none;
+          background: linear-gradient(
+            180deg,
+            rgba(6, 15, 8, 0) 0%,
+            rgba(6, 15, 8, 0.35) 35%,
+            rgba(6, 15, 8, 0.78) 72%,
+            #060f08 100%
+          );
         }
       `}</style>
     </footer>
