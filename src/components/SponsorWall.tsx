@@ -154,7 +154,7 @@ export default function SponsorWall() {
         }
 
         .sp-motif {
-          width: clamp(190px, 22vw, 260px);
+          width: clamp(114px, 56.87px + 15.87vw, 260px);
           height: auto;
           color: #7FB84E;
           opacity: 0.62;

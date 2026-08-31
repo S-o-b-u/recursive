@@ -47,14 +47,13 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     // biome-ignore lint/suspicious/noExplicitAny: External tween data
     const resetPeep = ({ stage, peep }: { stage: any; peep: any }) => {
       const direction = Math.random() > 0.5 ? 1 : -1;
-      // Multi-layer depth distribution:
-      // depth 0 = front row (firmly overlaps the bottom floor)
-      // depth 1 = back row (stands elevated behind the front row)
-      const depth = Math.pow(Math.random(), 1.25);
-      const scale = 1.02 + (1 - depth * 0.3) * 0.22;
-
-      // Ground the front row deeply so they seamlessly meet and cross the bottom of the screen (+32px),
-      // with back rows elevated by up to 72px so their heads rise up without exposing any cutoffs.
+      const depth = Math.random();
+      // Peep sprites have a fixed pixel size, so on a short footer they grow to
+      // fill the whole thing and swallow the wordmark behind them. Normalise
+      // against the stage so the crowd always occupies the same bottom band.
+      const CROWD_BAND = 0.4;
+      const fit = Math.min(1, Math.max(0.2, (stage.height * CROWD_BAND) / (peep.height * 1.2)));
+      const scale = (0.95 + (1 - depth) * 0.25) * fit;
       const startY = stage.height - peep.height * scale + 32 - depth * 72;
       let startX: number;
       let endX: number;
@@ -104,7 +103,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
           duration: yDuration,
           repeat: Math.round(xDuration / yDuration),
           yoyo: true,
-          y: startY - 8,
+          y: startY - 10,
         },
         0,
       );
@@ -258,13 +257,6 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       });
 
       ctx.restore();
-
-      // Tint every drawn pixel to deep botanical dark green using source-atop
-      ctx.save();
-      ctx.globalCompositeOperation = 'source-atop';
-      ctx.fillStyle = '#1c301c';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.restore();
     };
 
     const resize = () => {
@@ -298,8 +290,29 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     const handleResize = () => resize();
     window.addEventListener("resize", handleResize);
 
+    // window.resize does not fire for container-only changes (a pane being
+    // dragged, a scrollbar appearing, browser zoom). Without this the walk
+    // tweens keep the stage width they were built with and the crowd bunches
+    // up on one side of a now-wider footer.
+    let ro: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== "undefined") {
+      let w = 0;
+      let h = 0;
+      ro = new ResizeObserver(() => {
+        if (!canvas) return;
+        const nw = canvas.clientWidth;
+        const nh = canvas.clientHeight;
+        if (Math.abs(nw - w) < 2 && Math.abs(nh - h) < 2) return;
+        w = nw;
+        h = nh;
+        resize();
+      });
+      ro.observe(canvas);
+    }
+
     return () => {
       window.removeEventListener("resize", handleResize);
+      ro?.disconnect();
       gsap.ticker.remove(render);
       crowd.forEach((peep) => {
         if (peep.walk) peep.walk.kill();
@@ -311,61 +324,132 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     <canvas
       ref={canvasRef}
       className="absolute bottom-0 h-full w-full pointer-events-none"
-      style={{ opacity: 0.2 }}
     />
   );
 };
 
 export default function Footer() {
+  const scrollToTop = () => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   return (
-    <footer className="relative h-screen w-full bg-transparent text-[#16241A] overflow-hidden select-none">
+    <footer className="footer-shell relative min-h-[clamp(240px,52vh,580px)] h-[clamp(240px,52vh,580px)] w-full bg-transparent text-[#142617] overflow-hidden select-none flex flex-col justify-end">
+      {/* ── Soft luminous atmospheric aura & gradient lighting behind the wordmark ── */}
+      <div className="footer-aurora" aria-hidden="true" />
 
-      {/* ── Giant WebGL WarpText Wordmark across the upper section ── */}
-      <div className="absolute top-[24%] sm:top-[26%] left-0 right-0 z-10 flex justify-center items-center px-4 pointer-events-auto">
+      {/* ── Giant WebGL WarpText Wordmark behind the walking people with Rich Gradient ── */}
+      <div className="absolute inset-x-0 bottom-[32%] sm:bottom-[29%] md:bottom-[26%] z-10 flex justify-center items-end pointer-events-auto select-none px-2">
         <WarpText
           text={EVENT.name}
-          color="#142617"
-          warpStrength={0.08}
-          warpScale={1.7}
-          speed={0.55}
-          pointerInfluence={0.42}
-          pointerStrength={0.38}
-          refraction={0.018}
+          color="linear-gradient(180deg, #09120b 0%, #132216 40%, #203a25 78%, #365e3b 100%)"
+          warpStrength={0.07}
+          warpScale={1.6}
+          speed={0.5}
+          pointerInfluence={0.4}
+          pointerStrength={0.35}
+          refraction={0.015}
           ripple
-          fontSize="clamp(4.2rem, 14.5vw, 13rem)"
+          fontSize="min(clamp(6.5rem, 23.5vw, 26rem), 16.8vh)"
           fontWeight={900}
-          fontFamily="var(--font-hiruko), sans-serif"
+          fontFamily="var(--font-heading), var(--font-dm-sans), sans-serif"
           letterSpacing="-0.015em"
           style={{
             width: "100%",
-            maxWidth: "92rem",
-            height: "clamp(150px, 22vw, 280px)",
+            maxWidth: "100vw",
+            height: "min(clamp(240px, 42vw, 540px), 30vh)",
             pointerEvents: "auto",
           }}
         />
       </div>
 
+      {/* ── Transparent gradient below the recursive logo ── */}
+      <div className="footer-logo-gradient" aria-hidden="true" />
+
+      {/* ── Whisper of ground under crowd ── */}
       <div className="footer-ground" aria-hidden="true" />
 
-      {/* ── OpenPeeps Animated Crowd Canvas ── */}
+      {/* ── OpenPeeps Animated Crowd Canvas (z-20 in front of the giant letters) ── */}
       <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
         <CrowdCanvas src="/images/peeps/all-peeps.png" rows={15} cols={7} />
       </div>
 
+      {/* ── Floating Back to Top Button ── */}
+      <div className="absolute bottom-6 right-6 pointer-events-auto" style={{ zIndex: 110 }}>
+        <button
+          type="button"
+          onClick={scrollToTop}
+          aria-label="Back to top"
+          className="group w-10 h-10 rounded-full bg-white/60 hover:bg-white/90 backdrop-blur-md border border-black/[0.08] hover:border-[#5C8C3A]/40 flex items-center justify-center text-[#142617] transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer shadow-xs"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="transition-transform duration-300 group-hover:-translate-y-0.5"
+            aria-hidden="true"
+          >
+            <path d="M12 19V5M5 12l7-7 7 7" />
+          </svg>
+        </button>
+      </div>
+
       <style>{`
-        /* A whisper of meadow ground under the crowd */
+        /* Luminous radial glow and aura behind the letters */
+        .footer-aurora {
+          position: absolute;
+          inset: auto 0 0 0;
+          height: 65%;
+          z-index: 2;
+          pointer-events: none;
+          background:
+            radial-gradient(ellipse 70% 55% at 50% 90%, rgba(143, 196, 90, 0.18) 0%, rgba(92, 140, 58, 0.05) 50%, transparent 80%),
+            radial-gradient(ellipse 45% 35% at 20% 82%, rgba(200, 224, 180, 0.22) 0%, transparent 65%),
+            radial-gradient(ellipse 45% 35% at 80% 82%, rgba(180, 215, 170, 0.22) 0%, transparent 65%);
+        }
+
+        /* Transparent fading gradient directly below the logo letters */
+        .footer-logo-gradient {
+          position: absolute;
+          inset: auto 0 0 0;
+          height: clamp(140px, 22vh, 260px);
+          z-index: 4;
+          pointer-events: none;
+          background: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(239, 243, 235, 0.04) 20%,
+            rgba(215, 228, 208, 0.2) 65%,
+            rgba(188, 209, 180, 0.38) 100%
+          );
+        }
+
+        /* Open sky between the panel above and the crowd, so the footer
+           arrives as its own beat rather than butting straight onto ACM. */
+        .footer-shell {
+          margin-top: clamp(3rem, 8vh, 6.5rem);
+        }
+
+        /* A whisper of ground under the crowd, so they are standing on
+           something rather than floating in the sky. */
         .footer-ground {
           position: absolute;
           inset: auto 0 0 0;
-          height: 46%;
-          z-index: 0;
+          height: 38%;
+          z-index: 3;
           pointer-events: none;
           background: linear-gradient(
             180deg,
             rgba(200, 214, 194, 0) 0%,
-            rgba(190, 206, 182, 0.24) 55%,
-            rgba(168, 188, 158, 0.42) 100%
+            rgba(190, 206, 182, 0.15) 50%,
+            rgba(176, 194, 166, 0.32) 100%
           );
         }
       `}</style>

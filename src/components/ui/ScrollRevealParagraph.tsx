@@ -132,14 +132,14 @@ export function ScrollRevealParagraph({
             <WarpText
               text={heading}
               color={tone === "dark" ? "#EFF3EB" : "#16241A"}
-              fontSize="clamp(2.2rem, 5.5vw, 3.8rem)"
+              fontSize="clamp(1.4375rem, 8.21px + 4.109vw, 3.8rem)"
               fontWeight={700}
               fontFamily="var(--font-display), Georgia, serif"
               letterSpacing="-0.035em"
               style={{
                 width: "100%",
                 maxWidth: "24ch",
-                height: "clamp(54px, 7vw, 84px)",
+                height: "clamp(32px, 11.65px + 5.652vw, 84px)",
                 pointerEvents: "auto",
               }}
             />
@@ -237,8 +237,8 @@ export function ScrollRevealParagraph({
         }
 
         .scroll-reveal-para {
-          font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-          font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+          font-family: var(--font-dm-sans), system-ui, -apple-system, sans-serif;
+          font-size: clamp(1.0rem, 12.56px + 0.957vw, 1.55rem);
           font-weight: 350;
           line-height: 1.68;
           letter-spacing: -0.015em;

@@ -21,6 +21,7 @@ export default function FlipCard({
   ratio = "4 / 5",
   label,
   className = "",
+  disabled = false,
 }: {
   front: ReactNode;
   back: ReactNode;
@@ -28,20 +29,26 @@ export default function FlipCard({
   /** Announced to screen readers as the button's purpose. */
   label: string;
   className?: string;
+  disabled?: boolean;
 }) {
   const [pinned, setPinned] = useState(false);
 
   return (
     <div
-      className={`fcd ${pinned ? "is-flipped" : ""} ${className}`.trim()}
+      className={`fcd ${!disabled && pinned ? "is-flipped" : ""} ${disabled ? "is-disabled" : ""} ${className}`.trim()}
       style={{ aspectRatio: ratio } as CSSProperties}
     >
       <button
         type="button"
         className="fcd-shell"
-        aria-pressed={pinned}
+        aria-pressed={!disabled && pinned}
         aria-label={label}
-        onClick={() => setPinned((p) => !p)}
+        disabled={disabled}
+        onClick={() => {
+          if (!disabled) {
+            setPinned((p) => !p);
+          }
+        }}
       >
         <span className="fcd-face fcd-front">{front}</span>
         <span className="fcd-face fcd-back">{back}</span>
@@ -68,16 +75,20 @@ export default function FlipCard({
           -webkit-tap-highlight-color: transparent;
         }
 
-        .fcd.is-flipped .fcd-shell,
-        .fcd-shell:focus-visible {
+        .fcd.is-disabled .fcd-shell {
+          cursor: not-allowed;
+        }
+
+        .fcd:not(.is-disabled).is-flipped .fcd-shell,
+        .fcd:not(.is-disabled) .fcd-shell:focus-visible {
           transform: rotateY(180deg);
         }
 
         @media (hover: hover) {
-          .fcd:hover .fcd-shell { transform: rotateY(180deg); }
+          .fcd:not(.is-disabled):hover .fcd-shell { transform: rotateY(180deg); }
         }
 
-        .fcd-shell:focus-visible {
+        .fcd:not(.is-disabled) .fcd-shell:focus-visible {
           outline: 2px solid rgba(143, 196, 90, 0.75);
           outline-offset: 6px;
         }

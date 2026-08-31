@@ -207,8 +207,8 @@ const buildTextCanvas = ({
   // If rendering an image (e.g. logo.png)
   if (loadedImage && loadedImage.complete && loadedImage.naturalWidth > 0) {
     const imgRatio = loadedImage.naturalWidth / loadedImage.naturalHeight;
-    const maxWidth = width * 0.96;
-    const maxHeight = height * 0.94;
+    const maxWidth = width;
+    const maxHeight = height;
     let drawW = maxWidth;
     let drawH = maxWidth / imgRatio;
 
@@ -255,7 +255,10 @@ const buildTextCanvas = ({
   container.appendChild(probe);
   const computed = window.getComputedStyle(probe);
   let fontSizePx = parseFloat(computed.fontSize) || 64;
-  const fontFamily = computed.fontFamily || "sans-serif";
+  let fontFamily = computed.fontFamily || "sans-serif";
+  if (fontFamily.includes("var(")) {
+    fontFamily = "sans-serif";
+  }
   const fontWeight = computed.fontWeight || String(props.fontWeight ?? 800);
   let letterSpacing =
     computed.letterSpacing === "normal"
@@ -271,7 +274,6 @@ const buildTextCanvas = ({
 
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
-  ctx.fillStyle = props.color || "#f8f5ff";
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 
@@ -299,6 +301,28 @@ const buildTextCanvas = ({
   }
 
   const startY = height / 2 - (lineHeight * (lines.length - 1)) / 2;
+
+  if (props.color && props.color.includes("gradient")) {
+    const textTop = Math.max(0, startY - fontSizePx * 0.65);
+    const textBottom = Math.min(height, startY + (lines.length - 1) * lineHeight + fontSizePx * 0.65);
+    const grad = ctx.createLinearGradient(0, textTop, 0, textBottom);
+    const matches = Array.from(
+      props.color.matchAll(/(#[a-fA-F0-9]+|rgba?\([^)]+\)|hsla?\([^)]+\))\s*(\d+%)?/g)
+    );
+    if (matches.length > 0) {
+      matches.forEach((m, idx) => {
+        const col = m[1];
+        const stop = m[2] ? parseFloat(m[2]) / 100 : idx / Math.max(1, matches.length - 1);
+        grad.addColorStop(Math.min(1, Math.max(0, stop)), col);
+      });
+      ctx.fillStyle = grad;
+    } else {
+      ctx.fillStyle = props.color;
+    }
+  } else {
+    ctx.fillStyle = props.color || "#f8f5ff";
+  }
+
   lines.forEach((line, index) =>
     drawLine(
       ctx,
@@ -473,6 +497,16 @@ export const WarpText: React.FC<WarpTextProps> = ({
       gl = renderer.gl;
     } catch (error) {
       console.warn("WarpText: WebGL could not be initialized.", error);
+      if (propsRef.current.src || propsRef.current.imageSrc) {
+        const img = document.createElement("img");
+        img.src = (propsRef.current.src || propsRef.current.imageSrc)!;
+        img.alt = propsRef.current.text || "Logo";
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.objectFit = "contain";
+        img.style.objectPosition = "center bottom";
+        container.appendChild(img);
+      }
       return undefined;
     }
 

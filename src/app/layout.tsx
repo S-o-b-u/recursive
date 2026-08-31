@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { display, geist, geistMono, hiruko, dmSans, headingNow, bebasNeue } from "./fonts";
+import { display, geistMono, hiruko, dmSans, headingNow, bebasNeue } from "./fonts";
 import SmoothScroll from "@/components/SmoothScroll";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -20,7 +20,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geist.variable} ${geistMono.variable} ${display.variable} ${hiruko.variable} ${dmSans.variable} ${headingNow.variable} ${bebasNeue.variable}`}
+      className={`${geistMono.variable} ${display.variable} ${hiruko.variable} ${dmSans.variable} ${headingNow.variable} ${bebasNeue.variable}`}
     >
       <body>
         <SmoothScroll>

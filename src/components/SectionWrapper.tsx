@@ -44,14 +44,14 @@ export default function SectionWrapper({
                     text={heading}
                     align="left"
                     color={headingColor}
-                    fontSize="clamp(1.75rem, 3.8vw, 2.75rem)"
+                    fontSize="clamp(1.375rem, 13.39px + 2.391vw, 2.75rem)"
                     fontWeight={350}
                     fontFamily="var(--font-display), Georgia, serif"
                     letterSpacing="-0.03em"
                     style={{
                       width: "100%",
                       maxWidth: "40ch",
-                      height: "clamp(46px, 5.5vw, 68px)",
+                      height: "clamp(34px, 20.7px + 3.696vw, 68px)",
                       pointerEvents: "auto",
                     }}
                   />

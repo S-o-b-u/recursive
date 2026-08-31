@@ -223,7 +223,7 @@ export default function Seal({ word = "SEALED" }: { word?: string }) {
           position: absolute;
           left: 50%;
           top: 44%;
-          width: clamp(152px, 19vw, 216px);
+          width: clamp(91px, 42.37px + 13.565vw, 216px);
           aspect-ratio: 1;
           transform: translate(-50%, -50%) rotate(-4deg);
           animation: jseal-press 760ms var(--ease-out) both;

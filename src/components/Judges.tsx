@@ -120,7 +120,7 @@ const SEATS = [
  * Per-card scroll drift, alternating direction so the grid shears past itself
  * on the way down — the same trick the sponsor wall uses on its mosaic.
  */
-const DRIFT = [72, -58, 80, -66, 62, -74, 68, -54, 76] as const;
+const DRIFT = [45, -45, 45, -45, 45, -45, 45, -45, 45] as const;
 
 function SealedFront({ index, seat }: { index: number; seat: (typeof SEATS)[number] }) {
   const qShift = ((index % 3) - 1) * 6;
@@ -239,7 +239,7 @@ export default function Judges() {
           <RevealBlock y={12} delay={0.06}>
             <p className="jd-lede">
               {sealed
-                ? "Nine seats, nine domains — locked. Turn a card to see what each seat covers; the names stay sealed until the official reveal."
+                ? "Nine seats, nine domains — locked. The mentor & judge lineup stays sealed until the official reveal."
                 : "Experienced builders, designers, and researchers guiding teams through the 8-hour sprint."}
             </p>
           </RevealBlock>
@@ -266,8 +266,13 @@ export default function Judges() {
                     key={judge.photo.expect}
                   >
                     <FlipCard
-                      ratio="4 / 5"
-                      label={`${seat.domain} — seat ${i + 1}. Turn the card for details.`}
+                      ratio="var(--jd-ratio, 4 / 5)"
+                      disabled={!filled}
+                      label={
+                        filled
+                          ? `${judge.name} — ${judge.role}. Turn the card for details.`
+                          : `${seat.domain} — seat ${i + 1}. Locked.`
+                      }
                       front={
                         filled ? (
                           <PhotoFront index={i} judge={judge} />
@@ -283,8 +288,7 @@ export default function Judges() {
             </div>
 
             {/* Barrier tape and wax over the whole panel: the seats are set,
-                the names are not. The seal is pointer-events: none, so cards
-                underneath still turn. */}
+                the names are not. */}
             {sealed && <Seal word="PANEL SEALED" />}
           </div>
         </RevealBlock>
@@ -292,7 +296,9 @@ export default function Judges() {
         <RevealBlock y={14} delay={0.12}>
           <div className="jd-foot-wrap">
             <p className="jd-foot-note">
-              Hover a card — or tap it on a phone — to read the seat.
+              {sealed
+                ? "Mentor & judge profiles are currently locked · Revealing soon"
+                : "Hover a card — or tap it on a phone — to read the seat."}
             </p>
 
             <button
@@ -345,7 +351,7 @@ export default function Judges() {
         }
 
         .jd-motif {
-          width: clamp(190px, 22vw, 260px);
+          width: clamp(114px, 56.87px + 15.87vw, 260px);
           height: auto;
           color: #7FB84E;
           opacity: 0.62;
@@ -394,13 +400,26 @@ export default function Judges() {
         .jd-grid-wrap {
           position: relative;
           width: 100%;
+          max-width: 86rem;
+          margin-inline: auto;
         }
 
         .jd-grid {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: clamp(1rem, 2.4vw, 1.9rem);
+          width: 100%;
+          gap: clamp(1.2rem, 2.8vw, 2.2rem);
         }
+
+        .jd .jseal {
+          position: absolute;
+          inset: clamp(-2.5rem, -4vw, -1.25rem) -9%;
+          z-index: 10;
+          pointer-events: none;
+        }
+
+        .jd .jseal-tape-a { transform: translateY(-50%) rotate(-42deg); }
+        .jd .jseal-tape-b { transform: translateY(-50%) rotate(40deg); }
 
         /* Set the panel back behind the tape and wax: a light defocus plus a
            knock-down in brightness. It clears on hover or keyboard focus, so
@@ -532,7 +551,7 @@ export default function Judges() {
           padding: 0.24rem 0.6rem;
           border-radius: var(--radius-pill);
           font-family: var(--font-geist-mono), monospace;
-          font-size: 0.56rem;
+          font-size: clamp(0.62rem, 0.9vw, 0.7rem);
           font-weight: 500;
           letter-spacing: 0.2em;
           text-transform: uppercase;
@@ -618,7 +637,7 @@ export default function Judges() {
 
         .jd-back-val {
           font-family: var(--font-bebas), sans-serif;
-          font-size: clamp(1.25rem, 1.9vw, 1.55rem);
+          font-size: clamp(1.0rem, 12.56px + 0.957vw, 1.55rem);
           line-height: 1;
           letter-spacing: 0.02em;
           color: #F2F8EA;
@@ -656,7 +675,7 @@ export default function Judges() {
           align-items: center;
           justify-content: center;
           gap: 0.65rem;
-          padding: 0.72rem 1.75rem;
+          padding: 0.72rem clamp(1.25rem, 16.87px + 0.87vw, 1.75rem);
           border-radius: var(--radius-pill);
           background: rgba(226, 244, 208, 0.07);
           backdrop-filter: blur(10px);
@@ -727,19 +746,40 @@ export default function Judges() {
         }
 
         @media (max-width: 960px) {
+          .jd-grid-wrap {
+            max-width: 48rem;
+          }
           .jd-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: clamp(0.5rem, 1.6vw, 1.2rem);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: clamp(1rem, 2.4vw, 1.8rem);
           }
           .jd-front-domain {
-            font-size: clamp(0.72rem, 1.6vw, 0.95rem);
+            font-size: clamp(0.85rem, 1.8vw, 1.05rem);
           }
           .jd-back-title {
-            font-size: clamp(0.72rem, 1.6vw, 0.98rem);
+            font-size: clamp(0.85rem, 1.8vw, 1.08rem);
+          }
+          .jd .jseal-tape-a { transform: translateY(-50%) rotate(-45deg); }
+          .jd .jseal-tape-b { transform: translateY(-50%) rotate(43deg); }
+        }
+
+        @media (max-width: 960px) {
+          .jd-grid-wrap {
+            max-width: 56rem;
+          }
+          .jd-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: clamp(0.9rem, 2.5vw, 1.6rem);
           }
         }
 
         @media (max-width: 680px) {
+          /* Two columns stay, but each card grows taller rather than shrinking
+             its type: the width is the scarce axis here, not the height. */
+          .jd-grid-wrap {
+            --jd-ratio: 3 / 4.2;
+            max-width: 100%;
+          }
           .jd-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: clamp(0.6rem, 2.8vw, 1.15rem);
@@ -753,33 +793,33 @@ export default function Judges() {
             gap: 0.2rem;
           }
           .jd-front-seat {
-            font-size: clamp(0.52rem, 1.8vw, 0.62rem);
+            font-size: clamp(0.64rem, 1.8vw, 0.72rem);
             letter-spacing: 0.15em;
           }
           .jd-front-domain {
-            font-size: clamp(0.78rem, 2.7vw, 0.98rem);
+            font-size: clamp(0.88rem, 2.7vw, 1.02rem);
             line-height: 1.2;
           }
           .jd-front-role {
-            font-size: clamp(0.62rem, 2.2vw, 0.75rem);
+            font-size: clamp(0.72rem, 2.2vw, 0.82rem);
           }
           .jd-stamp {
             top: clamp(0.5rem, 2vw, 0.75rem);
             right: clamp(0.5rem, 2vw, 0.75rem);
             padding: 0.16rem 0.45rem;
-            font-size: clamp(0.48rem, 1.6vw, 0.55rem);
+            font-size: clamp(0.66rem, 1.6vw, 0.72rem);
             letter-spacing: 0.14em;
           }
           .jd-back {
             padding: clamp(0.75rem, 2.6vw, 1.2rem);
           }
           .jd-back-tag {
-            font-size: clamp(0.52rem, 1.8vw, 0.6rem);
+            font-size: clamp(0.66rem, 1.8vw, 0.74rem);
             letter-spacing: 0.15em;
           }
           .jd-back-title {
             margin-top: 0.35rem;
-            font-size: clamp(0.78rem, 2.6vw, 1.05rem);
+            font-size: clamp(0.88rem, 2.6vw, 1.05rem);
             line-height: 1.2;
           }
           .jd-back-rule {
@@ -787,11 +827,11 @@ export default function Judges() {
             width: 1.6rem;
           }
           .jd-back-role {
-            font-size: clamp(0.62rem, 2.2vw, 0.75rem);
+            font-size: clamp(0.72rem, 2.2vw, 0.82rem);
           }
           .jd-back-desc {
             margin-top: 0.35rem;
-            font-size: clamp(0.62rem, 2.1vw, 0.78rem);
+            font-size: clamp(0.72rem, 2.1vw, 0.82rem);
             line-height: 1.45;
           }
           .jd-back-stats {
@@ -803,7 +843,49 @@ export default function Judges() {
             font-size: clamp(1.1rem, 4.2vw, 1.4rem);
           }
           .jd-back-lbl {
-            font-size: clamp(0.52rem, 1.7vw, 0.62rem);
+            font-size: clamp(0.66rem, 1.7vw, 0.74rem);
+          }
+          .jd .jseal-tape-a { transform: translateY(-50%) rotate(-48deg); }
+          .jd .jseal-tape-b { transform: translateY(-50%) rotate(46deg); }
+        }
+
+        @media (max-width: 520px) {
+          .jd-grid-wrap {
+            --jd-ratio: 3 / 4.7;
+            max-width: 100%;
+          }
+          .jd-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            max-width: 100%;
+            gap: clamp(0.45rem, 2vw, 0.75rem);
+          }
+          .jd-front-meta {
+            padding: 0.55rem 0.5rem;
+            gap: 0.15rem;
+          }
+          .jd-front-seat { font-size: 0.64rem; letter-spacing: 0.12em; }
+          .jd-front-domain { font-size: 0.88rem; line-height: 1.18; }
+          .jd-front-role { font-size: 0.72rem; }
+          .jd-stamp { font-size: 0.66rem; padding: 0.16rem 0.4rem; top: 0.35rem; right: 0.35rem; }
+          .jd-back { padding: 0.6rem 0.55rem; }
+          .jd-back-tag { font-size: 0.66rem; letter-spacing: 0.1em; }
+          .jd-back-title { font-size: 0.88rem; line-height: 1.18; margin-top: 0.15rem; }
+          .jd-back-rule { margin: 0.3rem 0; width: 1.2rem; }
+          .jd-back-role { font-size: 0.72rem; }
+          .jd-back-desc { font-size: 0.72rem; line-height: 1.36; margin-top: 0.25rem; }
+          .jd-back-stats { margin-top: auto; padding-top: 0.3rem; gap: 0.45rem; }
+          .jd-back-val { font-size: 1.05rem; }
+          .jd-back-lbl { font-size: 0.66rem; }
+
+          /* The crossed tape is always visible across the 2x2 grid */
+          .jd .jseal-tape { display: flex; height: clamp(32px, 5.5vw, 42px); }
+          .jd .jseal-tape-a { transform: translateY(-50%) rotate(-50deg); }
+          .jd .jseal-tape-b { transform: translateY(-50%) rotate(48deg); }
+          .jd .jseal-wax { width: clamp(92px, 24vw, 116px); }
+          .jd .jseal::before {
+            background: radial-gradient(120% 62% at 50% 44%,
+              rgba(1, 3, 1, 0) 40%,
+              rgba(1, 3, 1, 0.55) 100%);
           }
         }
 

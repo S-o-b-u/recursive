@@ -308,7 +308,7 @@ export default function Navigation() {
           padding: 3px 0.55rem 3px 3px;
         }
         .nav-wordmark {
-          font-family: var(--font-display), var(--font-geist-sans), sans-serif;
+          font-family: var(--font-display), var(--font-dm-sans), sans-serif;
           font-weight: 700;
           font-size: 0.98rem;
           letter-spacing: -0.01em;
@@ -538,7 +538,7 @@ export default function Navigation() {
         }
 
         .limelq-brand {
-          font-family: var(--font-display), var(--font-geist-sans), sans-serif;
+          font-family: var(--font-display), var(--font-dm-sans), sans-serif;
           font-size: clamp(1.45rem, 4.5vw, 1.85rem);
           font-weight: 700;
           letter-spacing: -0.01em;
@@ -609,7 +609,7 @@ export default function Navigation() {
         }
 
         .limelq-text {
-          font-family: var(--font-heading), var(--font-dm-sans), var(--font-geist-sans), sans-serif;
+          font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
           font-size: clamp(1.65rem, 5.5vw, 2.45rem);
           font-weight: 500;
           line-height: 1.15;
@@ -658,7 +658,7 @@ export default function Navigation() {
         }
 
         .limelq-foot-link {
-          font-family: var(--font-dm-sans), var(--font-geist-sans), sans-serif;
+          font-family: var(--font-dm-sans), sans-serif;
           font-size: clamp(0.88rem, 2.4vw, 1rem);
           font-weight: 500;
           color: #121A12;

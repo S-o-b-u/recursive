@@ -158,7 +158,7 @@ export default function MediaSlot({
         .ms-icon { width: 1.5rem; height: 1.5rem; opacity: 0.75; }
 
         .ms-label {
-          font-family: var(--font-geist-sans), sans-serif;
+          font-family: var(--font-dm-sans), sans-serif;
           font-size: 0.9rem;
           font-weight: 500;
           letter-spacing: -0.015em;

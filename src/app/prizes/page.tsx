@@ -40,14 +40,14 @@ export default function PrizesPage() {
               text="Judging criteria"
               align="left"
               color="#16241A"
-              fontSize="clamp(1.75rem, 3.5vw, 2.5rem)"
+              fontSize="clamp(1.375rem, 14.96px + 1.957vw, 2.5rem)"
               fontWeight={350}
               fontFamily="var(--font-display), Georgia, serif"
               letterSpacing="-0.03em"
               style={{
                 width: "100%",
                 maxWidth: "30ch",
-                height: "clamp(44px, 5vw, 64px)",
+                height: "clamp(35px, 23.65px + 3.152vw, 64px)",
                 pointerEvents: "auto",
               }}
             />
@@ -58,7 +58,7 @@ export default function PrizesPage() {
                 <p className="text-[var(--font-size-lg)] font-light tracking-[var(--tracking-snug)]">
                   {c.name}
                 </p>
-                <p className="mt-1.5 text-[var(--font-size-sm)] text-[var(--color-text-secondary)]">
+                <p className="mt-1.5 text-[length:var(--font-size-sm)] text-[color:var(--color-text-secondary)]">
                   {c.note}
                 </p>
                 <p className="mt-4 eyebrow text-[var(--color-accent)]">25%</p>

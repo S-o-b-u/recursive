@@ -45,10 +45,10 @@
   --font-size-sm: 0.8125rem;
   --font-size-base: 0.9375rem;
   --font-size-lg: 1.0625rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: clamp(1.75rem, 3vw, 2.35rem);
-  --font-size-display: clamp(1.75rem, 4vw, 3rem);
+  --font-size-xl: clamp(1.125rem, 17.22px + 0.217vw, 1.25rem);
+  --font-size-2xl: clamp(1.25rem, 18.43px + 0.435vw, 1.5rem);
+  --font-size-3xl: clamp(1.5rem, 18.68px + 1.478vw, 2.35rem);
+  --font-size-display: clamp(1.75rem, 20.17px + 2.174vw, 3rem);
 
   /* Tracking */
   --tracking-tight: -0.035em;
@@ -64,8 +64,8 @@
   --leading-relaxed: 1.7;
 
   /* Spacing */
-  --space-section: clamp(5rem, 11vw, 9.5rem);
-  --space-block: clamp(2rem, 4vw, 3.5rem);
+  --space-section: clamp(3.5rem, 18.43px + 10.435vw, 9.5rem);
+  --space-block: clamp(1.5rem, 11.48px + 3.478vw, 3.5rem);
   --space-element: 1.25rem;
 
   /* Layout */
@@ -85,6 +85,28 @@
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
+/* ─── Type roles ───
+   Seven faces were loaded and picked ad hoc, which is why the page read as a
+   mix rather than a system. Five roles, each with one owner:
+
+     wordmark  Hiruko Black      the RECURSIVE mark, and nothing else
+     display   MADE Okine Bold   oversized editorial lines
+     heading   HeadingNow        every section heading
+     body      DM Sans           all running copy, all UI labels
+     label     Geist Mono        eyebrows, meta, tabular detail
+     numeral   Bebas Neue        large figures
+
+   NOTE: the heading face is a trial cut with NO NUMERALS — digits set in it
+   render as .notdef boxes. Anything with a number in it uses --font-numeral.
+   Geist Sans was retired: it duplicated DM Sans and only padded fallbacks. */
+
+:root {
+  --font-wordmark: var(--font-hiruko);
+  --font-body: var(--font-dm-sans);
+  --font-label: var(--font-geist-mono);
+  --font-numeral: var(--font-bebas);
+}
+
 /* ─── Register tokens with Tailwind v4 ─── */
 
 @theme inline {
@@ -99,7 +121,7 @@
   --color-accent: var(--color-accent);
   --color-accent-bright: var(--color-accent-bright);
   --color-accent-soft: var(--color-accent-soft);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-dm-sans);
   --radius: var(--radius-md);
 }
 
@@ -132,7 +154,7 @@ html {
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
-  font-family: var(--font-dm-sans), var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-dm-sans), var(--font-dm-sans), system-ui, -apple-system, sans-serif;
   font-size: var(--font-size-base);
   line-height: var(--leading-normal);
   letter-spacing: var(--tracking-normal);
