@@ -482,15 +482,15 @@ export default function Hero() {
 
         @media (max-width: 600px) {
           .hero-center-content {
-            top: clamp(5rem, 10vh, 6.8rem);
-            padding-inline: 0.5rem;
+            top: clamp(6.2rem, 12vh, 8.2rem);
+            padding-inline: 0;
           }
           .hero-warp-wrap {
-            height: clamp(125px, 28vw, 190px);
-            max-width: 98vw;
+            height: clamp(160px, 38vw, 240px);
+            max-width: 100vw;
           }
           .hero-chair-annotation {
-            top: clamp(39%, 43vh, 47%);
+            top: clamp(43%, 47vh, 52%);
             gap: 0.2rem;
           }
           .chair-arrow {
@@ -532,15 +532,15 @@ export default function Hero() {
 
         @media (max-width: 480px) {
           .hero-center-content {
-            top: clamp(4.8rem, 9.5vh, 6rem);
-            padding-inline: 0.25rem;
+            top: clamp(5.8rem, 11.5vh, 7.6rem);
+            padding-inline: 0;
           }
           .hero-warp-wrap {
-            height: clamp(115px, 26vw, 165px);
+            height: clamp(150px, 36vw, 220px);
             max-width: 100vw;
           }
           .hero-chair-annotation {
-            top: clamp(40%, 43vh, 46%);
+            top: clamp(44%, 48vh, 52%);
           }
         }
       `}</style>
