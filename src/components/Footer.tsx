@@ -414,9 +414,6 @@ export default function Footer() {
         <CrowdCanvas src="/images/peeps/all-peeps.png" rows={15} cols={7} />
       </div>
 
-      {/* ── Subtle dark ground shadow underneath the people's feet ── */}
-      <div className="footer-ground-gradient" aria-hidden="true" />
-
       {/* ── Floating Back to Top Button ── */}
       <div className="absolute bottom-6 right-6 pointer-events-auto" style={{ zIndex: 110 }}>
         <button
@@ -501,38 +498,6 @@ export default function Footer() {
            arrives as its own beat rather than butting straight onto ACM. */
         .footer-shell {
           margin-top: clamp(3rem, 8vh, 6.5rem);
-        }
-
-        /* Dark blur and grounded gradient along the lower baseline across all screen sizes */
-        .footer-ground-gradient {
-          position: absolute;
-          inset: auto 0 0 0;
-          height: clamp(48px, 22%, 140px);
-          z-index: 25;
-          pointer-events: none;
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
-          mask-image: linear-gradient(
-            180deg,
-            transparent 0%,
-            rgba(0, 0, 0, 0.3) 30%,
-            rgba(0, 0, 0, 0.75) 65%,
-            rgba(0, 0, 0, 1) 100%
-          );
-          -webkit-mask-image: linear-gradient(
-            180deg,
-            transparent 0%,
-            rgba(0, 0, 0, 0.3) 30%,
-            rgba(0, 0, 0, 0.75) 65%,
-            rgba(0, 0, 0, 1) 100%
-          );
-          background: linear-gradient(
-            180deg,
-            transparent 0%,
-            rgba(6, 16, 8, 0.2) 25%,
-            rgba(4, 12, 6, 0.55) 60%,
-            rgba(2, 6, 3, 0.88) 100%
-          );
         }
       `}</style>
     </footer>
