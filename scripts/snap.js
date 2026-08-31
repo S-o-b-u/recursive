@@ -60,12 +60,15 @@ async function main() {
 
         await send('Runtime.evaluate', { 
           expression: `
-            const faq = document.querySelector('#faq');
-            if (faq) faq.scrollIntoView({ block: 'start' });
+            const el = document.querySelector('#faq');
+            if (el) {
+              const y = el.getBoundingClientRect().top + window.scrollY - 80;
+              window.scrollTo(0, y);
+            }
           `
         });
         
-        await new Promise(r => setTimeout(r, 1500));
+        await new Promise(r => setTimeout(r, 1200));
         
         // 1. Mobile Snapshot
         let screenshot = await send('Page.captureScreenshot', { format: 'png' });
