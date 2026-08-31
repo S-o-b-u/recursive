@@ -50,48 +50,70 @@ export default function HomeFAQ() {
           scroll-margin-top: 7rem;
         }
 
-        /* ── The sheet ── */
+        /* ── The sheet (Liquid Glass Frame) ── */
         .faq-sheet {
           position: relative;
           width: 100%;
           max-width: 34rem;
           display: flex;
           flex-direction: column;
-          padding: clamp(1.35rem, 3.13px + 3.7vw, 3rem);
-          border-radius: clamp(26px, 15.57px + 2.9vw, 44px);
+          padding: clamp(1.5rem, 3.13px + 3.7vw, 3.5rem);
+          border-radius: clamp(28px, 15.57px + 2.9vw, 48px);
           overflow: hidden;
           isolation: isolate;
 
           background:
+            radial-gradient(130% 90% at 15% 8%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.35) 32%, transparent 65%),
+            radial-gradient(100% 80% at 88% 92%, rgba(210, 245, 200, 0.42) 0%, transparent 60%),
             linear-gradient(
-              158deg,
-              rgba(255, 255, 255, 0.82) 0%,
-              rgba(248, 251, 245, 0.66) 46%,
-              rgba(238, 245, 234, 0.6) 100%
+              152deg,
+              rgba(255, 255, 255, 0.88) 0%,
+              rgba(246, 251, 244, 0.72) 46%,
+              rgba(235, 246, 232, 0.65) 100%
             );
-          backdrop-filter: blur(28px) saturate(165%);
-          -webkit-backdrop-filter: blur(28px) saturate(165%);
-          border: 1px solid rgba(255, 255, 255, 0.72);
+          backdrop-filter: blur(36px) saturate(185%) contrast(104%);
+          -webkit-backdrop-filter: blur(36px) saturate(185%) contrast(104%);
+          border: 1.5px solid rgba(255, 255, 255, 0.85);
           box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.9),
-            inset 0 -1px 0 rgba(22, 36, 26, 0.06),
-            0 30px 70px -28px rgba(20, 38, 23, 0.3),
-            0 2px 10px -4px rgba(20, 38, 23, 0.12);
+            inset 0 2px 6px rgba(255, 255, 255, 0.98),
+            inset 0 -2px 8px rgba(22, 36, 26, 0.08),
+            inset 0 0 40px rgba(255, 255, 255, 0.5),
+            0 35px 85px -25px rgba(18, 38, 22, 0.32),
+            0 12px 28px -8px rgba(18, 38, 22, 0.16);
+          transition: box-shadow 400ms ease, border-color 400ms ease;
         }
 
-        /* The specular streak that makes glass read as glass. */
+        /* Fluid liquid specular caustics overlay */
         .faq-sheet-sheen {
           position: absolute;
           inset: 0;
           z-index: 0;
           pointer-events: none;
           background: linear-gradient(
-            118deg,
-            rgba(255, 255, 255, 0) 26%,
-            rgba(255, 255, 255, 0.5) 42%,
-            rgba(255, 255, 255, 0) 58%
+            115deg,
+            rgba(255, 255, 255, 0) 22%,
+            rgba(255, 255, 255, 0.75) 44%,
+            rgba(220, 248, 215, 0.35) 52%,
+            rgba(255, 255, 255, 0.7) 58%,
+            rgba(255, 255, 255, 0) 78%
           );
-          opacity: 0.55;
+          opacity: 0.75;
+          animation: faq-liquid-glow 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes faq-liquid-glow {
+          0% {
+            opacity: 0.55;
+            transform: scale(1) translate3d(0, 0, 0);
+          }
+          50% {
+            opacity: 0.85;
+            transform: scale(1.03) translate3d(1%, -1%, 0);
+          }
+          100% {
+            opacity: 0.6;
+            transform: scale(1) translate3d(-1%, 1%, 0);
+          }
         }
 
         .faq-sheet > *:not(.faq-sheet-sheen) {
