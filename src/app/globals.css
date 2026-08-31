@@ -586,8 +586,32 @@ a { color: inherit; text-decoration: none; }
 }
 
 .scroller-mask {
-  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.02) 2%,
+    rgba(0, 0, 0, 0.25) 6%,
+    rgba(0, 0, 0, 0.7) 12%,
+    black 20%,
+    black 80%,
+    rgba(0, 0, 0, 0.7) 88%,
+    rgba(0, 0, 0, 0.25) 94%,
+    rgba(0, 0, 0, 0.02) 98%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.02) 2%,
+    rgba(0, 0, 0, 0.25) 6%,
+    rgba(0, 0, 0, 0.7) 12%,
+    black 20%,
+    black 80%,
+    rgba(0, 0, 0, 0.7) 88%,
+    rgba(0, 0, 0, 0.25) 94%,
+    rgba(0, 0, 0, 0.02) 98%,
+    transparent 100%
+  );
 }
 
 .scroller-mask:hover .animate-scroll-horizontal,
