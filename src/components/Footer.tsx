@@ -30,45 +30,32 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     // UTILS
     const randomRange = (min: number, max: number) =>
       min + Math.random() * (max - min);
-    // biome-ignore lint/suspicious/noExplicitAny: External tween data
     const randomIndex = (array: any[]) => randomRange(0, array.length) | 0;
-    // biome-ignore lint/suspicious/noExplicitAny: External tween data
     const removeFromArray = (array: any[], i: number) => array.splice(i, 1)[0];
-    // biome-ignore lint/suspicious/noExplicitAny: External tween data
     const removeItemFromArray = (array: any[], item: any) =>
       removeFromArray(array, array.indexOf(item));
-    // biome-ignore lint/suspicious/noExplicitAny: External tween data
     const removeRandomFromArray = (array: any[]) =>
       removeFromArray(array, randomIndex(array));
-    // biome-ignore lint/suspicious/noExplicitAny: External tween data
     const getRandomFromArray = (array: any[]) => array[randomIndex(array) | 0];
 
     // TWEEN FACTORIES
-    // biome-ignore lint/suspicious/noExplicitAny: External tween data
     const resetPeep = ({ stage, peep }: { stage: any; peep: any }) => {
       const direction = Math.random() > 0.5 ? 1 : -1;
-      const depth = Math.random();
-      // Peep sprites have a fixed pixel size, so on a short footer they grow to
-      // fill the whole thing and swallow the wordmark behind them. Normalise
-      // against the stage so the crowd always occupies the same bottom band.
-      const CROWD_BAND = 0.4;
-      const fit = Math.min(1, Math.max(0.2, (stage.height * CROWD_BAND) / (peep.height * 1.2)));
-      const scale = (0.95 + (1 - depth) * 0.25) * fit;
-      const startY = stage.height - peep.height * scale + 32 - depth * 72;
+      const offsetY = 100 - 250 * gsap.parseEase("power2.in")(Math.random());
+      const startY = stage.height - peep.height + offsetY;
       let startX: number;
       let endX: number;
 
       if (direction === 1) {
-        startX = -peep.width * scale - Math.random() * 80;
-        endX = stage.width + peep.width * scale + Math.random() * 80;
-        peep.scaleX = scale;
+        startX = -peep.width;
+        endX = stage.width;
+        peep.scaleX = 1;
       } else {
-        startX = stage.width + peep.width * scale + Math.random() * 80;
-        endX = -peep.width * scale - Math.random() * 80;
-        peep.scaleX = -scale;
+        startX = stage.width + peep.width;
+        endX = 0;
+        peep.scaleX = -1;
       }
 
-      peep.scaleY = scale;
       peep.x = startX;
       peep.y = startY;
       peep.anchorY = startY;
@@ -80,14 +67,13 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       };
     };
 
-    // biome-ignore lint/suspicious/noExplicitAny: External tween data
     const normalWalk = ({ peep, props }: { peep: any; props: any }) => {
       const { startX, startY, endX } = props;
       const xDuration = 10;
       const yDuration = 0.25;
 
       const tl = gsap.timeline();
-      tl.timeScale(randomRange(0.6, 1.4));
+      tl.timeScale(randomRange(0.5, 1.5));
       tl.to(
         peep,
         {
@@ -119,14 +105,11 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       rect: number[];
       width: number;
       height: number;
-      // biome-ignore lint/suspicious/noExplicitAny: Draw arguments
       drawArgs: any[];
       x: number;
       y: number;
       anchorY: number;
       scaleX: number;
-      scaleY?: number;
-      // biome-ignore lint/suspicious/noExplicitAny: Tween
       walk: any;
       setRect: (rect: number[]) => void;
       render: (ctx: CanvasRenderingContext2D) => void;
@@ -150,7 +133,6 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
         y: 0,
         anchorY: 0,
         scaleX: 1,
-        scaleY: 1,
         walk: null,
         setRect: (rect: number[]) => {
           peep.rect = rect;
@@ -161,7 +143,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
         render: (ctx: CanvasRenderingContext2D) => {
           ctx.save();
           ctx.translate(peep.x, peep.y);
-          ctx.scale(peep.scaleX, peep.scaleY || Math.abs(peep.scaleX));
+          ctx.scale(peep.scaleX, 1);
           ctx.drawImage(
             peep.image,
             peep.rect[0],
@@ -250,7 +232,8 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       if (!canvas) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
-      ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+      const dpr = window.devicePixelRatio || 1;
+      ctx.scale(dpr, dpr);
 
       crowd.forEach((peep) => {
         peep.render(ctx);
@@ -290,10 +273,6 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     const handleResize = () => resize();
     window.addEventListener("resize", handleResize);
 
-    // window.resize does not fire for container-only changes (a pane being
-    // dragged, a scrollbar appearing, browser zoom). Without this the walk
-    // tweens keep the stage width they were built with and the crowd bunches
-    // up on one side of a now-wider footer.
     let ro: ResizeObserver | undefined;
     if (typeof ResizeObserver !== "undefined") {
       let w = 0;
@@ -336,30 +315,31 @@ export default function Footer() {
   };
 
   return (
-    <footer className="footer-shell relative min-h-[clamp(240px,52vh,580px)] h-[clamp(240px,52vh,580px)] w-full bg-transparent text-[#142617] overflow-hidden select-none flex flex-col justify-end">
+    <footer className="footer-shell relative min-h-[clamp(320px,58vh,660px)] h-[clamp(320px,58vh,660px)] w-full bg-transparent text-[#142617] overflow-hidden select-none flex flex-col justify-end">
       {/* ── Soft luminous atmospheric aura & gradient lighting behind the wordmark ── */}
       <div className="footer-aurora" aria-hidden="true" />
 
       {/* ── Giant WebGL WarpText Wordmark behind the walking people with Rich Gradient ── */}
-      <div className="absolute inset-x-0 bottom-[32%] sm:bottom-[29%] md:bottom-[26%] z-10 flex justify-center items-end pointer-events-auto select-none px-2">
+      <div className="footer-wordmark-wrap">
         <WarpText
           text={EVENT.name}
-          color="linear-gradient(180deg, #09120b 0%, #132216 40%, #203a25 78%, #365e3b 100%)"
+          color="linear-gradient(180deg, #070e08 0%, #0f1c12 36%, #1a301e 72%, #2c4e30 100%)"
           warpStrength={0.07}
           warpScale={1.6}
           speed={0.5}
-          pointerInfluence={0.4}
-          pointerStrength={0.35}
-          refraction={0.015}
+          pointerInfluence={0.45}
+          pointerStrength={0.4}
+          refraction={0.016}
           ripple
-          fontSize="min(clamp(6.5rem, 23.5vw, 26rem), 16.8vh)"
+          fontSize="clamp(5.5rem, 25.5vw, 36rem)"
           fontWeight={900}
           fontFamily="var(--font-heading), var(--font-dm-sans), sans-serif"
-          letterSpacing="-0.015em"
+          letterSpacing="0.02em"
+          lineHeight={0.88}
           style={{
             width: "100%",
             maxWidth: "100vw",
-            height: "min(clamp(240px, 42vw, 540px), 30vh)",
+            height: "100%",
             pointerEvents: "auto",
           }}
         />
@@ -402,32 +382,47 @@ export default function Footer() {
       </div>
 
       <style>{`
+        /* ── Giant Wordmark behind the walking people ── */
+        .footer-wordmark-wrap {
+          position: absolute;
+          inset-inline: 0;
+          bottom: clamp(0.5rem, 4vh, 2.75rem);
+          height: clamp(260px, 50vh, 580px);
+          z-index: 10;
+          display: flex;
+          justify-content: center;
+          align-items: flex-end;
+          pointer-events: auto;
+          user-select: none;
+          padding-inline: clamp(0.2rem, 1.2vw, 1rem);
+        }
+
         /* Luminous radial glow and aura behind the letters */
         .footer-aurora {
           position: absolute;
           inset: auto 0 0 0;
-          height: 65%;
+          height: 75%;
           z-index: 2;
           pointer-events: none;
           background:
-            radial-gradient(ellipse 70% 55% at 50% 90%, rgba(143, 196, 90, 0.18) 0%, rgba(92, 140, 58, 0.05) 50%, transparent 80%),
-            radial-gradient(ellipse 45% 35% at 20% 82%, rgba(200, 224, 180, 0.22) 0%, transparent 65%),
-            radial-gradient(ellipse 45% 35% at 80% 82%, rgba(180, 215, 170, 0.22) 0%, transparent 65%);
+            radial-gradient(ellipse 80% 60% at 50% 88%, rgba(143, 196, 90, 0.22) 0%, rgba(92, 140, 58, 0.06) 55%, transparent 85%),
+            radial-gradient(ellipse 50% 40% at 15% 80%, rgba(200, 224, 180, 0.24) 0%, transparent 68%),
+            radial-gradient(ellipse 50% 40% at 85% 80%, rgba(180, 215, 170, 0.24) 0%, transparent 68%);
         }
 
         /* Transparent fading gradient directly below the logo letters */
         .footer-logo-gradient {
           position: absolute;
           inset: auto 0 0 0;
-          height: clamp(140px, 22vh, 260px);
-          z-index: 4;
+          height: clamp(120px, 20vh, 240px);
+          z-index: 12;
           pointer-events: none;
           background: linear-gradient(
             180deg,
             transparent 0%,
-            rgba(239, 243, 235, 0.04) 20%,
-            rgba(215, 228, 208, 0.2) 65%,
-            rgba(188, 209, 180, 0.38) 100%
+            rgba(239, 243, 235, 0.03) 25%,
+            rgba(215, 228, 208, 0.18) 65%,
+            rgba(188, 209, 180, 0.32) 100%
           );
         }
 
@@ -442,14 +437,14 @@ export default function Footer() {
         .footer-ground {
           position: absolute;
           inset: auto 0 0 0;
-          height: 38%;
-          z-index: 3;
+          height: 32%;
+          z-index: 15;
           pointer-events: none;
           background: linear-gradient(
             180deg,
             rgba(200, 214, 194, 0) 0%,
-            rgba(190, 206, 182, 0.15) 50%,
-            rgba(176, 194, 166, 0.32) 100%
+            rgba(190, 206, 182, 0.12) 50%,
+            rgba(176, 194, 166, 0.26) 100%
           );
         }
       `}</style>
