@@ -910,8 +910,20 @@ export default function Judges() {
           .jd-grid-reveal {
             margin-top: clamp(1.75rem, 4.5vh, 2.75rem);
           }
-          .jd-grid-wrap .jseal {
-            display: none;
+          .jd .jseal {
+            position: absolute;
+            inset: -1rem -4vw;
+            z-index: 20;
+            pointer-events: none;
+            display: block;
+          }
+          .jd .jseal-tape {
+            height: clamp(34px, 5.5vw, 44px);
+          }
+          .jd .jseal-tape-a { transform: translateY(-50%) rotate(-32deg); }
+          .jd .jseal-tape-b { transform: translateY(-50%) rotate(30deg); }
+          .jd .jseal-wax {
+            width: clamp(105px, 28vw, 135px);
           }
           .jd-front-meta {
             padding: 0.55rem 0.5rem;
