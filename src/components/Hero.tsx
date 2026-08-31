@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { EVENT } from "@/data/hackathon";
+import { prefersLiteMedia } from "@/lib/device";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import WarpText from "@/components/ui/WarpText";
@@ -16,6 +17,14 @@ export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const centerRef = useRef<HTMLDivElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
+
+  // The 56 MB 4K loop is a progressive enhancement. Phones, tablets, data-saver
+  // and reduced-motion keep the still poster and never fetch it. Starts false so
+  // SSR + hydration render the poster; the effect upgrades capable clients.
+  const [useVideo, setUseVideo] = useState(false);
+  useEffect(() => {
+    setUseVideo(!prefersLiteMedia());
+  }, []);
 
   const [introFinished, setIntroFinished] = useState(() => {
     if (typeof window === "undefined") return true;
@@ -59,17 +68,31 @@ export default function Hero() {
     <section id="hero" className="hero" ref={sectionRef}>
       {/* ── 100% Crisp, Pure Video Background (Zero filters, no blur/jitter transforms) ── */}
       <div className="hero-video-wrap">
-        <video
-          ref={videoRef}
-          className="hero-video"
-          src="/bg/hero_bg.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
+        {/* The still poster is always painted first: it is the hero background
+            on phones / data-saver / reduced-motion (where the 4K loop never
+            loads), and the instant, crisp paint under the video everywhere
+            else — so the hero is never a flat empty plate. */}
+        <img
+          className="hero-video hero-poster"
+          src="/images/hero_poster.jpg"
+          alt=""
           aria-hidden="true"
+          draggable={false}
         />
+        {useVideo && (
+          <video
+            ref={videoRef}
+            className="hero-video"
+            src="/bg/hero_bg.mp4"
+            poster="/images/hero_poster.jpg"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            aria-hidden="true"
+          />
+        )}
       </div>
 
       {/* ── Main Wordmark with WebGL WarpText ── */}

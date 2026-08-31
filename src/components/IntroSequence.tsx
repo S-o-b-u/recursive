@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import GradualBlur from "@/components/ui/GradualBlur";
 import { getLenis } from "@/lib/lenis";
+import { prefersLiteMedia } from "@/lib/device";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -96,6 +97,10 @@ export default function IntroSequence() {
   // Shader-backed skip button + the backdrop-filter ramp are mounted a beat
   // late so their compositing cost never lands on the opening frames.
   const [showChrome, setShowChrome] = useState(false);
+  // On phones / data-saver the cold-open plays over the still poster instead of
+  // the 4K plate — same climb, focus-rack and grade, none of the 56 MB. The
+  // frame-synced hand-off simply no-ops (there is no hero <video> to sync to).
+  const [liteMedia, setLiteMedia] = useState(false);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -167,6 +172,7 @@ export default function IntroSequence() {
   // Runs before paint. Until it resolves, the component renders a bare dark
   // plate (see the "pending" branch below), so the hero never flashes.
   useLayoutEffect(() => {
+    setLiteMedia(prefersLiteMedia());
     const params = new URLSearchParams(window.location.search);
     const force = params.get("intro");
 
@@ -646,16 +652,26 @@ export default function IntroSequence() {
         <div className="intro-media-clip">
           <div ref={mediaRef} className="intro-media">
             <div ref={focusRef} className="intro-focus">
-              <video
-                ref={videoRef}
-                src="/bg/hero_bg.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="auto"
-                aria-hidden="true"
-              />
+              {liteMedia ? (
+                <img
+                  src="/images/hero_poster.jpg"
+                  alt=""
+                  aria-hidden="true"
+                  draggable={false}
+                />
+              ) : (
+                <video
+                  ref={videoRef}
+                  src="/bg/hero_bg.mp4"
+                  poster="/images/hero_poster.jpg"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="auto"
+                  aria-hidden="true"
+                />
+              )}
             </div>
           </div>
         </div>
@@ -757,7 +773,8 @@ export default function IntroSequence() {
           inset: 0;
           will-change: filter;
         }
-        .intro-media video {
+        .intro-media video,
+        .intro-media img {
           position: absolute;
           inset: 0;
           width: 100%;
