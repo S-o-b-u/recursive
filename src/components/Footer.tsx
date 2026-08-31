@@ -38,19 +38,19 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       removeFromArray(array, randomIndex(array));
     const getRandomFromArray = (array: any[]) => array[randomIndex(array) | 0];
 
-    // On mobile screens, scale the peeps down so they don't overpower the footer mark
-    const crowdBand = () => (stage.width < 620 ? 0.28 : stage.width < 1024 ? 0.35 : 0.42);
-    const fitFor = (peepH: number) => {
-      const scaleFactor = stage.width < 620 ? 0.68 : stage.width < 1024 ? 0.85 : 1.0;
-      return Math.min(1, Math.max(0.1, ((stage.height * crowdBand()) / peepH) * scaleFactor));
-    };
+    // What should stay constant is how much of the wordmark the crowd covers,
+    // not the crowd's share of the footer. On a phone the letters are width-
+    // limited, so the band depth matches the desktop marking exactly.
+    const crowdBand = () => (stage.width < 620 ? 0.44 : stage.width < 1024 ? 0.42 : 0.42);
+    const fitFor = (peepH: number) =>
+      Math.min(1, Math.max(0.16, (stage.height * crowdBand()) / peepH));
 
     // TWEEN FACTORIES
     const resetPeep = ({ stage, peep }: { stage: any; peep: any }) => {
       const direction = Math.random() > 0.5 ? 1 : -1;
       const fit = fitFor(peep.height);
 
-      const offsetY = (100 - 250 * gsap.parseEase("power2.in")(Math.random())) * fit;
+      const offsetY = (60 - 180 * gsap.parseEase("power2.in")(Math.random())) * fit;
       const startY = stage.height - peep.height * fit + offsetY;
       let startX: number;
       let endX: number;
@@ -209,14 +209,14 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     // Peeps shrink with the footer, so a head-count based on width alone
     // leaves gaps on short screens. Base it on how wide each peep actually
     // draws, and the wall stays equally packed at every size.
-    const CROWD_DENSITY = 9.2;
+    const CROWD_DENSITY = 11.5;
 
     const initCrowd = () => {
       const sample = allPeeps[0];
       const drawnWidth = sample ? sample.width * fitFor(sample.height) : 120;
       const target = Math.min(
         allPeeps.length,
-        Math.max(26, Math.round((CROWD_DENSITY * stage.width) / drawnWidth)),
+        Math.max(stage.width < 620 ? 32 : 26, Math.round((CROWD_DENSITY * stage.width) / drawnWidth)),
       );
       while (availablePeeps.length && crowd.length < target) {
         addPeepToCrowd().walk.progress(Math.random());
@@ -457,29 +457,36 @@ export default function Footer() {
           padding-inline: clamp(0.2rem, 1.2vw, 1rem);
         }
 
+        /* ── Sub-desktop footer (phone → small laptop) ──
+           Everything here is sized in vw so it tracks the width-limited
+           wordmark, not the viewport height. That keeps the footer one tight,
+           composed panel at every width instead of a tall band of empty sky
+           over a buried mark. footer.footer-shell (element + class) outranks
+           the Tailwind height utilities. */
         @media (max-width: 1024px) {
           footer.footer-shell {
-            min-height: clamp(260px, 52vh, 520px);
-            height: clamp(260px, 52vh, 520px);
-            margin-top: clamp(2rem, 5vh, 4rem);
+            min-height: clamp(220px, 40vw, 420px);
+            height: clamp(220px, 40vw, 420px);
+            margin-top: clamp(1rem, 3vh, 2.5rem);
           }
           .footer-wordmark-wrap {
-            bottom: clamp(0.5rem, 3vh, 2rem);
-            height: min(clamp(200px, 46vh, 440px), 88%);
-            padding-inline: 2vw;
+            /* Box hugs the letters and sits right with the crowd */
+            bottom: clamp(1rem, 3.5vw, 2.5rem);
+            height: clamp(120px, 30vw, 280px);
+            padding-inline: 1vw;
           }
         }
 
         @media (max-width: 620px) {
           footer.footer-shell {
-            min-height: clamp(280px, 54vh, 480px);
-            height: clamp(280px, 54vh, 480px);
-            margin-top: clamp(2rem, 5vh, 3.5rem);
+            min-height: clamp(170px, 45vw, 240px);
+            height: clamp(170px, 45vw, 240px);
+            margin-top: clamp(0.75rem, 2vh, 1.8rem);
           }
           .footer-wordmark-wrap {
-            bottom: clamp(0.25rem, 2vh, 1.5rem);
-            height: min(clamp(220px, 48vh, 420px), 88%);
-            padding-inline: 1vw;
+            bottom: clamp(0.4rem, 2vw, 1rem);
+            height: clamp(120px, 38vw, 200px);
+            padding-inline: 0;
           }
         }
 
