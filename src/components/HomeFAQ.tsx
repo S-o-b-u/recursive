@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FAQS, EVENT } from "@/data/hackathon";
+import { FAQS } from "@/data/hackathon";
 
 export default function HomeFAQ() {
   return (
@@ -9,41 +9,11 @@ export default function HomeFAQ() {
       <div className="faq-sheet">
         <span className="faq-sheet-sheen" aria-hidden="true" />
 
-        {/* ── Header: title + count on the left, the way out on the right ── */}
+        {/* ── Header: Centered "FAQ" title ── */}
         <div className="faq-head">
-          <div className="faq-head-text">
-            <h2 id="faq-title" className="faq-title">
-              FAQs
-            </h2>
-            <span className="faq-count">
-              ( {String(FAQS.length).padStart(2, "0")} )
-            </span>
-          </div>
-
-          <a
-            href={EVENT.discordUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Ask a question in Discord"
-            title="Ask in Discord"
-            className="faq-jump"
-          >
-            <span className="faq-jump-sheen" aria-hidden="true" />
-            <svg
-              viewBox="0 0 24 24"
-              width="21"
-              height="21"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.1"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <line x1="7" y1="17" x2="17" y2="7" />
-              <polyline points="7 7 17 7 17 17" />
-            </svg>
-          </a>
+          <h2 id="faq-title" className="faq-title">
+            FAQ
+          </h2>
         </div>
 
         {/* ── The stack. Each card is a dark glass slab carrying a light
@@ -132,98 +102,22 @@ export default function HomeFAQ() {
         /* ── Header ── */
         .faq-head {
           display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
-          gap: 1rem;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          width: 100%;
           margin-bottom: clamp(1.5rem, 2.61px + 3.26vw, 3rem);
-        }
-
-        .faq-head-text {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
         }
 
         .faq-title {
           margin: 0;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-size: clamp(2.5rem, 30.61px + 2.609vw, 4rem);
+          font-size: clamp(2.5rem, 30.61px + 2.609vw, 4.2rem);
           font-weight: 700;
-          line-height: 0.92;
+          line-height: 1;
           letter-spacing: -0.035em;
           color: #16241A;
-        }
-
-        .faq-count {
-          margin-top: clamp(0.55rem, 1.2vh, 0.9rem);
-          font-family: var(--font-geist-mono), monospace;
-          font-size: clamp(0.8125rem, 12.22px + 0.217vw, 0.9375rem);
-          letter-spacing: 0.2em;
-          color: rgba(22, 36, 26, 0.6);
-        }
-
-        /* ── The circular way out ── */
-        .faq-jump {
-          position: relative;
-          flex-shrink: 0;
-          width: clamp(44px, 36.17px + 2.17vw, 56px);
-          height: clamp(44px, 36.17px + 2.17vw, 56px);
-          margin-top: 0.35rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 50%;
-          overflow: hidden;
-          color: #16241A;
-          text-decoration: none;
-
-          background: linear-gradient(
-            150deg,
-            rgba(255, 255, 255, 0.78) 0%,
-            rgba(236, 244, 231, 0.5) 100%
-          );
-          backdrop-filter: blur(14px) saturate(170%);
-          -webkit-backdrop-filter: blur(14px) saturate(170%);
-          border: 1px solid rgba(22, 36, 26, 0.22);
-          box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.85),
-            0 8px 20px -10px rgba(20, 38, 23, 0.35);
-          transition:
-            transform 380ms cubic-bezier(0.22, 1, 0.36, 1),
-            background 380ms ease,
-            color 300ms ease,
-            box-shadow 380ms ease;
-        }
-
-        .faq-jump-sheen {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-          background: linear-gradient(
-            125deg,
-            rgba(255, 255, 255, 0) 30%,
-            rgba(255, 255, 255, 0.6) 48%,
-            rgba(255, 255, 255, 0) 64%
-          );
-        }
-
-        .faq-jump svg {
-          position: relative;
-          z-index: 1;
-          transition: transform 380ms cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        .faq-jump:hover {
-          transform: translateY(-2px);
-          background: linear-gradient(150deg, #1B2E1F 0%, #0E1A10 100%);
-          color: #EFF5EA;
-          box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.18),
-            0 14px 30px -12px rgba(20, 38, 23, 0.55);
-        }
-
-        .faq-jump:hover svg {
-          transform: rotate(45deg);
+          text-align: center;
         }
 
         /* ── The stack ── */
