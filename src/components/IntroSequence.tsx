@@ -139,6 +139,13 @@ export default function IntroSequence() {
       window.scrollTo(0, 0);
     }
 
+    if (typeof document !== "undefined") {
+      document.documentElement.dataset.intro = "done";
+    }
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("recursive-intro-done"));
+    }
+
     setPhase("done");
     requestAnimationFrame(() => {
       const l = getLenis();
@@ -165,6 +172,7 @@ export default function IntroSequence() {
 
     if (force === "0") {
       doneRef.current = true;
+      if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
       setPhase("done");
       return;
     }
@@ -179,10 +187,12 @@ export default function IntroSequence() {
 
     if (force !== "1" && (reduce || seen)) {
       doneRef.current = true;
+      if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
       setPhase("done");
       return;
     }
 
+    if (typeof document !== "undefined") document.documentElement.dataset.intro = "playing";
     setPhase("playing");
   }, []);
 
@@ -494,6 +504,10 @@ export default function IntroSequence() {
       tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 7.4);
       tl.set(focus, { clearProps: "filter" }, 7.4);
       tl.call(freezePlates, undefined, 7.4);
+      tl.call(() => {
+        if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
+        if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("recursive-intro-done"));
+      }, undefined, 7.5);
       tl.to(scene, { autoAlpha: 0, duration: 0.9, ease: "sine.inOut" }, 7.55);
       tl.set(root, { pointerEvents: "none" }, 7.9);
 
@@ -699,7 +713,7 @@ export default function IntroSequence() {
 
       <div ref={bloomRef} className="intro-bloom" aria-hidden="true" />
 
-      <style>{`
+      <style href="intro-sequence" precedence="default" suppressHydrationWarning>{`
         .intro-root {
           position: fixed;
           inset: 0;

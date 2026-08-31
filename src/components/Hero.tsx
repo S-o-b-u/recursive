@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { EVENT } from "@/data/hackathon";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
@@ -15,6 +15,44 @@ export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const centerRef = useRef<HTMLDivElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
+
+  const [introFinished, setIntroFinished] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return (
+      document.documentElement.dataset.intro === "done" ||
+      (!document.querySelector(".intro-scene") && !document.querySelector(".intro-root"))
+    );
+  });
+
+  useEffect(() => {
+    if (introFinished) return;
+    const onIntroDone = () => setIntroFinished(true);
+    window.addEventListener("recursive-intro-done", onIntroDone);
+
+    const observer = new MutationObserver(() => {
+      if (
+        document.documentElement.dataset.intro === "done" ||
+        !document.querySelector(".intro-root")
+      ) {
+        setIntroFinished(true);
+      }
+    });
+
+    if (typeof document !== "undefined") {
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-intro"],
+      });
+    }
+
+    const fallbackTimer = setTimeout(() => setIntroFinished(true), 8500);
+
+    return () => {
+      window.removeEventListener("recursive-intro-done", onIntroDone);
+      observer.disconnect();
+      clearTimeout(fallbackTimer);
+    };
+  }, [introFinished]);
 
   return (
     <section id="hero" className="hero" ref={sectionRef}>
@@ -37,27 +75,28 @@ export default function Hero() {
       <motion.div
         className="hero-center-content"
         ref={centerRef}
-        initial={reduced ? false : { opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: EASE_OUT }}
+        initial={reduced ? false : { opacity: 0, y: 22 }}
+        animate={introFinished ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 }}
+        transition={{ duration: 0.85, ease: EASE_OUT, delay: 0.08 }}
       >
-        <WarpText
-          src="/images/logo.png"
-          color="#111a12"
-          warpStrength={0.08}
-          warpScale={1.7}
-          speed={0.55}
-          pointerInfluence={0.42}
-          pointerStrength={0.38}
-          refraction={0.018}
-          ripple
-          style={{
-            width: "100%",
-            maxWidth: "min(98vw, 1750px)",
-            height: "min(clamp(230px, 34vw, 450px), 42vh)",
-            pointerEvents: "auto",
-          }}
-        />
+        <div className="hero-warp-wrap">
+          <WarpText
+            src="/images/logo.png"
+            color="#111a12"
+            warpStrength={0.08}
+            warpScale={1.7}
+            speed={0.55}
+            pointerInfluence={0.42}
+            pointerStrength={0.38}
+            refraction={0.018}
+            ripple
+            style={{
+              width: "100%",
+              height: "100%",
+              pointerEvents: "auto",
+            }}
+          />
+        </div>
       </motion.div>
 
       {/* ── Bottom Floating Pill Dock ── */}
@@ -65,8 +104,8 @@ export default function Hero() {
         className="hero-bottom-area"
         ref={dockRef}
         initial={reduced ? false : { opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.15, ease: EASE_OUT }}
+        animate={introFinished ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+        transition={{ duration: 0.85, delay: 0.22, ease: EASE_OUT }}
       >
         <div className="hero-action-dock-split">
           <LiquidMetalButton
@@ -109,9 +148,9 @@ export default function Hero() {
       {/* ── Simple Clean Chair Annotation (No Box, No Glow) ── */}
       <motion.div
         className="hero-chair-annotation"
-        initial={reduced ? false : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.3, ease: EASE_OUT }}
+        initial={reduced ? false : { opacity: 0, scale: 0.95 }}
+        animate={introFinished ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.75, delay: 0.35, ease: EASE_OUT }}
       >
         <svg
           className="chair-arrow"
@@ -199,6 +238,16 @@ export default function Hero() {
           pointer-events: auto;
           will-change: transform, opacity;
           padding-inline: clamp(0.5rem, 2vw, 1.5rem);
+        }
+
+        .hero-warp-wrap {
+          position: relative;
+          width: 100%;
+          max-width: min(96vw, 1600px);
+          height: min(clamp(200px, 32vw, 420px), 40vh);
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
 
         .hero-wordmark {
@@ -367,17 +416,23 @@ export default function Hero() {
 
         @media (max-width: 1024px) {
           .hero-center-content {
-            top: clamp(6.8rem, 11vh, 9.2rem);
+            top: clamp(4.5rem, 10.5vh, 7.2rem);
+          }
+          .hero-warp-wrap {
+            height: min(clamp(150px, 28vw, 300px), 32vh);
           }
         }
 
         @media (max-width: 860px) {
           .hero-center-content {
-            top: clamp(6.2rem, 10vh, 8.5rem);
+            top: clamp(4.2rem, 9.5vh, 6.4rem);
+          }
+          .hero-warp-wrap {
+            height: clamp(125px, 26vw, 220px);
           }
           .hero-chair-annotation {
             left: 50%;
-            top: clamp(37%, 40vh, 44%);
+            top: clamp(42%, 46vh, 50%);
             bottom: auto;
             transform: translateX(-50%);
             gap: 0.25rem;
@@ -426,18 +481,18 @@ export default function Hero() {
 
         @media (max-width: 600px) {
           .hero-center-content {
-            top: clamp(5.6rem, 9.5vh, 7.8rem);
+            top: clamp(3.8rem, 8vh, 5.4rem);
           }
-          .hero-wordmark {
-            font-size: clamp(2.8rem, 14vw, 4.5rem);
+          .hero-warp-wrap {
+            height: clamp(105px, 24vw, 160px);
           }
           .hero-chair-annotation {
-            top: clamp(36%, 39vh, 42%);
+            top: clamp(38%, 41vh, 45%);
             gap: 0.2rem;
           }
           .chair-arrow {
-            width: 38px;
-            height: 46px;
+            width: 36px;
+            height: 44px;
             margin-top: 0.05rem;
             transform: rotate(-90deg);
           }
@@ -468,16 +523,19 @@ export default function Hero() {
             transform: translate(-50%, 50%);
           }
           .hero-bottom-area {
-            bottom: clamp(4.25rem, 8vh, 5.75rem);
+            bottom: clamp(3.6rem, 7vh, 5.2rem);
           }
         }
 
         @media (max-width: 480px) {
           .hero-center-content {
-            top: clamp(5.4rem, 9vh, 7.2rem);
+            top: clamp(3.4rem, 7vh, 4.8rem);
+          }
+          .hero-warp-wrap {
+            height: clamp(90px, 22vw, 135px);
           }
           .hero-chair-annotation {
-            top: clamp(36%, 39vh, 42%);
+            top: clamp(37%, 40vh, 44%);
           }
         }
       `}</style>
