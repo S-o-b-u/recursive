@@ -38,6 +38,9 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     });
     lenisRef.current = lenis;
     setLenis(lenis);
+    if (typeof window !== 'undefined') {
+      (window as any).lenis = lenis;
+    }
 
     lenis.on('scroll', ScrollTrigger.update);
 

@@ -41,9 +41,9 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     // What should stay constant is how much of the wordmark the crowd covers,
     // not the crowd's share of the footer. On a phone the letters are width-
     // limited, so the band depth matches the desktop marking exactly.
-    const crowdBand = () => (stage.width < 620 ? 0.35 : stage.width < 1024 ? 0.38 : 0.42);
+    const crowdBand = () => (stage.width < 620 ? 0.48 : stage.width < 1024 ? 0.44 : 0.42);
     const fitFor = (peepH: number) =>
-      Math.min(1, Math.max(0.14, (stage.height * crowdBand()) / peepH));
+      Math.min(1, Math.max(0.18, (stage.height * crowdBand()) / peepH));
 
     // TWEEN FACTORIES
     const resetPeep = ({ stage, peep }: { stage: any; peep: any }) => {
@@ -53,8 +53,8 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       // On phones, anchor them right above the bottom edge so full bodies are visible
       const isMobile = stage.width < 620;
       const offsetY = isMobile
-        ? (-4 - 25 * gsap.parseEase("power2.in")(Math.random())) * fit
-        : (15 - 90 * gsap.parseEase("power2.in")(Math.random())) * fit;
+        ? (-2 - 18 * gsap.parseEase("power2.in")(Math.random())) * fit
+        : (10 - 45 * gsap.parseEase("power2.in")(Math.random())) * fit;
       const startY = stage.height - peep.height * fit + offsetY;
       let startX: number;
       let endX: number;
@@ -124,6 +124,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       y: number;
       anchorY: number;
       scaleX: number;
+      scaleY: number;
       walk: any;
       setRect: (rect: number[]) => void;
       render: (ctx: CanvasRenderingContext2D) => void;
@@ -147,6 +148,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
         y: 0,
         anchorY: 0,
         scaleX: 1,
+        scaleY: 1,
         walk: null,
         setRect: (rect: number[]) => {
           peep.rect = rect;
@@ -157,7 +159,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
         render: (ctx: CanvasRenderingContext2D) => {
           ctx.save();
           ctx.translate(peep.x, peep.y);
-          ctx.scale(peep.scaleX, 1);
+          ctx.scale(peep.scaleX, peep.scaleY);
           ctx.drawImage(
             peep.image,
             peep.rect[0],
