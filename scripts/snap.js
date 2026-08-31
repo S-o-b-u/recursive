@@ -60,9 +60,9 @@ async function main() {
 
         await send('Runtime.evaluate', { 
           expression: `
-            const el = document.querySelector('#faq');
+            const el = document.querySelector('.ab-crown') || document.querySelector('.ab-ornament-wrap');
             if (el) {
-              const y = el.getBoundingClientRect().top + window.scrollY - 80;
+              const y = el.getBoundingClientRect().top + window.scrollY - 100;
               window.scrollTo(0, y);
             }
           `
@@ -72,8 +72,8 @@ async function main() {
         
         // 1. Mobile Snapshot
         let screenshot = await send('Page.captureScreenshot', { format: 'png' });
-        fs.writeFileSync('faq-mobile.png', Buffer.from(screenshot.data, 'base64'));
-        console.log('Saved mobile screenshot to faq-mobile.png');
+        fs.writeFileSync('ornament-snap.png', Buffer.from(screenshot.data, 'base64'));
+        console.log('Saved ornament snapshot to ornament-snap.png');
 
         // Desktop Snapshot
         await send('Emulation.setDeviceMetricsOverride', {
