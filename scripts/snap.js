@@ -61,15 +61,53 @@ async function main() {
         await send('Runtime.evaluate', { 
           expression: `
             const faq = document.querySelector('#faq');
-            if (faq) faq.scrollIntoView({ block: 'center' });
+            if (faq) faq.scrollIntoView({ block: 'start' });
           `
         });
         
-        await new Promise(r => setTimeout(r, 2000));
+        await new Promise(r => setTimeout(r, 1500));
         
-        const screenshot = await send('Page.captureScreenshot', { format: 'png' });
-        fs.writeFileSync('faq-snap.png', Buffer.from(screenshot.data, 'base64'));
-        console.log('Saved screenshot to faq-snap.png');
+        // 1. Mobile Snapshot
+        let screenshot = await send('Page.captureScreenshot', { format: 'png' });
+        fs.writeFileSync('faq-mobile.png', Buffer.from(screenshot.data, 'base64'));
+        console.log('Saved mobile screenshot to faq-mobile.png');
+
+        // 2. Tablet Snapshot
+        await send('Emulation.setDeviceMetricsOverride', {
+          width: 820,
+          height: 1000,
+          deviceScaleFactor: 2,
+          mobile: true
+        });
+        await send('Runtime.evaluate', { 
+          expression: `
+            const faq = document.querySelector('#faq');
+            if (faq) faq.scrollIntoView({ block: 'start' });
+          `
+        });
+        await new Promise(r => setTimeout(r, 1200));
+        screenshot = await send('Page.captureScreenshot', { format: 'png' });
+        fs.writeFileSync('faq-tablet.png', Buffer.from(screenshot.data, 'base64'));
+        console.log('Saved tablet screenshot to faq-tablet.png');
+
+        // 3. Desktop Snapshot
+        await send('Emulation.setDeviceMetricsOverride', {
+          width: 1440,
+          height: 900,
+          deviceScaleFactor: 1.5,
+          mobile: false
+        });
+        await send('Runtime.evaluate', { 
+          expression: `
+            const faq = document.querySelector('#faq');
+            if (faq) faq.scrollIntoView({ block: 'start' });
+          `
+        });
+        await new Promise(r => setTimeout(r, 1200));
+        screenshot = await send('Page.captureScreenshot', { format: 'png' });
+        fs.writeFileSync('faq-desktop.png', Buffer.from(screenshot.data, 'base64'));
+        console.log('Saved desktop screenshot to faq-desktop.png');
+
         edge.kill();
         process.exit(0);
       })();

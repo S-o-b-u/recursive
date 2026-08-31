@@ -257,111 +257,6 @@ export default function IntroSequence() {
     };
     window.addEventListener("keydown", blockKeys, { passive: false });
 
-    // ── Signature warp: a pointer lens + chromatic split on the live line ─────
-    const ptr = {
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-      tx: window.innerWidth / 2,
-      ty: window.innerHeight / 2,
-      on: 0,
-      onT: 0,
-    };
-    let activeLine = -1;
-    let centers: { el: HTMLElement; cx: number; cy: number }[] = [];
-
-    const activateLine = (i: number) => {
-      activeLine = i;
-      centers = Array.from(
-        lines[i].querySelectorAll<HTMLElement>(".intro-word-i"),
-      ).map((el) => {
-        const r = el.getBoundingClientRect();
-        return { el, cx: r.left + r.width / 2, cy: r.top + r.height / 2 };
-      });
-    };
-    const deactivateLines = () => {
-      activeLine = -1;
-      const els = centers.map((c) => c.el);
-      centers = [];
-      if (!els.length) return;
-      // The chromatic glow is subtle and the line fades right after — clearing it
-      // now is invisible. The *position* is what must not snap: a hard reset of a
-      // pointer-displaced word reads as a sideways slide, so ease it home.
-      els.forEach((el) => {
-        el.style.textShadow = el.dataset.accent ? "0 0 26px rgba(143,196,90,0.45)" : "";
-      });
-      gsap.to(els, {
-        x: 0,
-        y: 0,
-        scale: 1,
-        duration: 0.45,
-        ease: "power3.out",
-        overwrite: true,
-        onComplete: () => els.forEach((el) => (el.style.transform = "")),
-      });
-    };
-
-    const onMove = (e: PointerEvent) => {
-      if (e.pointerType === "touch") return;
-      ptr.tx = e.clientX;
-      ptr.ty = e.clientY;
-      ptr.onT = 1;
-    };
-    const onLeave = () => {
-      ptr.onT = 0;
-    };
-    window.addEventListener("pointermove", onMove, { passive: true });
-    document.addEventListener("pointerleave", onLeave);
-    window.addEventListener("blur", onLeave);
-
-    // Driven off GSAP's ticker — the same clock Lenis is pumped from — with
-    // frame-rate-independent smoothing so it stays buttery at any refresh rate.
-    const smooth = (dt: number, rate: number) => 1 - Math.pow(1 - rate, dt / 16.667);
-
-    const warpTick = (_t: number, dt: number) => {
-      const kp = smooth(dt, 0.16);
-      const ko = smooth(dt, 0.09);
-      ptr.x += (ptr.tx - ptr.x) * kp;
-      ptr.y += (ptr.ty - ptr.y) * kp;
-      ptr.on += (ptr.onT - ptr.on) * ko;
-      if (activeLine < 0 || !centers.length) return;
-
-      const now = performance.now() * 0.001;
-
-      for (let k = 0; k < centers.length; k++) {
-        const { el, cx, cy } = centers[k];
-        const dx = cx - ptr.x;
-        const dy = cy - ptr.y;
-        const d = Math.hypot(dx, dy) || 0.001;
-        const lin = Math.max(0, 1 - d / WARP_RADIUS) * ptr.on;
-        const s = lin * lin * (3 - 2 * lin); // smoothstep
-
-        // A near-imperceptible idle sway so the words feel alive between passes.
-        const idle = 0.6;
-        const ix = Math.sin(now * 0.9 + k * 0.7) * idle;
-        const iy = Math.cos(now * 0.75 + k * 0.9) * idle;
-
-        if (s < 0.0015) {
-          el.style.transform = `translate3d(${ix.toFixed(2)}px, ${iy.toFixed(2)}px, 0)`;
-          el.style.textShadow = el.dataset.accent ? "0 0 26px rgba(143,196,90,0.45)" : "";
-          continue;
-        }
-
-        const ux = dx / d;
-        const uy = dy / d;
-        const push = s * 10;
-        el.style.transform =
-          `translate3d(${(-ux * push + ix).toFixed(2)}px, ${(-uy * push + iy).toFixed(2)}px, 0) ` +
-          `scale(${(1 + s * 0.12).toFixed(3)})`;
-
-        const ca = s * 3.2;
-        el.style.textShadow =
-          (el.dataset.accent ? "0 0 26px rgba(143,196,90,0.45), " : "") +
-          `${ca.toFixed(2)}px 0 rgba(74,210,255,${(0.55 * s).toFixed(2)}), ` +
-          `${(-ca).toFixed(2)}px 0 rgba(255,74,120,${(0.5 * s).toFixed(2)})`;
-      }
-    };
-    gsap.ticker.add(warpTick);
-
     const heroVideo = () =>
       document.querySelector<HTMLVideoElement>("video.hero-video");
 
@@ -461,8 +356,6 @@ export default function IntroSequence() {
           },
           tin,
         );
-        tl.call(activateLine, [i], tin + 0.45);
-
         if (i < lines.length - 1) {
           tl.to(
             words,
@@ -482,7 +375,6 @@ export default function IntroSequence() {
       // ── Hand-off ──────────────────────────────────────────────────────────
       // 1. Warm the hero's plate ~1s ahead (playing, roughly aligned, buffered).
       tl.call(warmHeroPlate, undefined, 6.6);
-      tl.call(deactivateLines, undefined, 7.05);
 
       // 2. Last line eases out on its own (not yanked by the scene fade).
       const lastWords = lines[lines.length - 1].querySelectorAll<HTMLElement>(".intro-word");
@@ -567,7 +459,6 @@ export default function IntroSequence() {
       started = true;
       window.clearTimeout(warmTimer);
       tl.pause();
-      activeLine = -1;
 
       const words = root.querySelectorAll<HTMLElement>(".intro-word");
       const wordInners = root.querySelectorAll<HTMLElement>(".intro-word-i");
@@ -614,13 +505,9 @@ export default function IntroSequence() {
       root.removeEventListener("wheel", block);
       root.removeEventListener("touchmove", block);
       window.removeEventListener("keydown", blockKeys);
-      window.removeEventListener("pointermove", onMove);
-      document.removeEventListener("pointerleave", onLeave);
-      window.removeEventListener("blur", onLeave);
       window.removeEventListener("lenis:ready", onLenisReady);
       cancelAnimationFrame(lenisRaf);
-      gsap.ticker.remove(warpTick);
-        // If we unmount before the timeline releases scroll itself, undo the lock.
+      // If we unmount before the timeline releases scroll itself, undo the lock.
       if (lenisHooked && !doneRef.current) getLenis()?.start();
       try {
         history.scrollRestoration = prevRestoration;
