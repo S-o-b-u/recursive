@@ -389,7 +389,7 @@ export default function Footer() {
           pointerStrength={0.4}
           refraction={0.016}
           ripple
-          fontSize="min(clamp(5.5rem, 29vw, 36rem), 40vh)"
+          fontSize="min(clamp(6rem, 30vw, 38rem), 48vh)"
           fontWeight={900}
           fontFamily="var(--font-heading), var(--font-dm-sans), sans-serif"
           letterSpacing="0.02em"
@@ -447,7 +447,7 @@ export default function Footer() {
           bottom: clamp(0.5rem, 4vh, 2.75rem);
           /* Capped against the footer itself: the vh term alone lets the px
              floor push the letters out of the top of a short footer. */
-          height: min(clamp(260px, 50vh, 580px), 86%);
+          height: min(clamp(280px, 56vh, 640px), 90%);
           z-index: 10;
           display: flex;
           justify-content: center;
@@ -457,13 +457,29 @@ export default function Footer() {
           padding-inline: clamp(0.2rem, 1.2vw, 1rem);
         }
 
-        @media (max-width: 620px) {
-          .footer-wordmark-wrap {
-            bottom: 42%;
-            height: 40%;
+        @media (max-width: 1024px) {
+          footer.footer-shell {
+            min-height: clamp(260px, 52vh, 520px);
+            height: clamp(260px, 52vh, 520px);
+            margin-top: clamp(2rem, 5vh, 4rem);
           }
-          .footer-shell {
-            margin-top: clamp(1.5rem, 4.5vh, 3rem);
+          .footer-wordmark-wrap {
+            bottom: clamp(0.5rem, 3vh, 2rem);
+            height: min(clamp(200px, 46vh, 440px), 88%);
+            padding-inline: 2vw;
+          }
+        }
+
+        @media (max-width: 620px) {
+          footer.footer-shell {
+            min-height: clamp(280px, 54vh, 480px);
+            height: clamp(280px, 54vh, 480px);
+            margin-top: clamp(2rem, 5vh, 3.5rem);
+          }
+          .footer-wordmark-wrap {
+            bottom: clamp(0.25rem, 2vh, 1.5rem);
+            height: min(clamp(220px, 48vh, 420px), 88%);
+            padding-inline: 1vw;
           }
         }
 
