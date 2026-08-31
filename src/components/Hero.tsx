@@ -445,66 +445,66 @@ export default function Hero() {
 
         @media (max-width: 1024px) {
           .hero-center-content {
-            top: clamp(4.5rem, 10.5vh, 7.2rem);
+            top: clamp(4.8rem, 11vh, 7.5rem);
           }
           .hero-warp-wrap {
-            height: min(clamp(150px, 28vw, 300px), 32vh);
+            height: min(clamp(160px, 30vw, 320px), 34vh);
           }
         }
 
         @media (max-width: 860px) {
           .hero-center-content {
-            top: clamp(4.2rem, 9.5vh, 6.4rem);
+            top: clamp(5.8rem, 12vh, 8rem);
           }
           .hero-warp-wrap {
-            height: clamp(125px, 26vw, 220px);
+            height: clamp(150px, 32vw, 240px);
+            max-width: 98vw;
           }
           .hero-chair-annotation {
-            left: 50%;
-            top: clamp(42%, 46vh, 50%);
-            bottom: auto;
-            transform: translateX(-50%);
-            gap: 0.25rem;
-            max-width: calc(100vw - 2rem);
+            left: calc(50% + 24px);
+            top: 53%;
+            transform: translateY(-50%);
+            gap: 0.4rem;
             display: flex;
-            flex-direction: column-reverse;
+            flex-direction: row;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
           }
           .chair-note {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            text-align: center;
+            align-items: flex-start;
+            text-align: left;
           }
           .chair-arrow {
-            width: 44px;
-            height: 52px;
-            margin-top: 0.1rem;
-            transform: rotate(-90deg);
+            width: 54px;
+            height: 42px;
+            margin-top: 0;
+            transform: none;
             opacity: 1 !important;
             color: #000000 !important;
             filter: none !important;
             flex-shrink: 0;
           }
           .chair-arrow path {
-            stroke-width: 6;
+            stroke-width: 5.5;
           }
           .chair-text {
-            font-size: 0.84rem !important;
+            font-size: 0.78rem !important;
             font-weight: 800 !important;
             line-height: 1.25 !important;
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
-            text-align: center !important;
+            text-align: left !important;
             text-shadow: none !important;
+            white-space: nowrap;
           }
           .chair-sub {
-            font-size: 0.68rem !important;
+            font-size: 0.62rem !important;
             font-weight: 700 !important;
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
-            text-align: center !important;
+            text-align: left !important;
             text-shadow: none !important;
           }
           .hero-log-img {
@@ -517,48 +517,60 @@ export default function Hero() {
 
         @media (max-width: 600px) {
           .hero-center-content {
-            top: clamp(5.4rem, 11vh, 7.2rem);
+            top: clamp(6.2rem, 13vh, 8.6rem);
             padding-inline: 0;
           }
           .hero-warp-wrap {
-            height: clamp(140px, 34vw, 210px);
+            height: clamp(160px, 42vw, 240px);
             max-width: 100vw;
+            width: 100vw;
           }
           .hero-chair-annotation {
-            left: 50%;
-            top: clamp(40%, 44vh, 48%);
-            bottom: auto;
-            transform: translateX(-50%);
-            gap: 0.3rem;
-            max-width: calc(100vw - 2rem);
+            left: calc(50% + 10px);
+            top: 53.5%;
+            transform: translateY(-50%);
+            gap: 0.35rem;
+            max-width: calc(50vw - 12px);
             display: flex;
-            flex-direction: column-reverse;
+            flex-direction: row;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             z-index: 30;
           }
           .chair-arrow {
-            width: 38px;
-            height: 44px;
-            margin-top: 0.05rem;
-            transform: rotate(-90deg);
+            width: 44px;
+            height: 35px;
+            margin-top: 0;
+            transform: none;
             opacity: 1 !important;
             color: #000000 !important;
             filter: none !important;
+            flex-shrink: 0;
+          }
+          .chair-arrow path {
+            stroke-width: 6;
+          }
+          .chair-note {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
           }
           .chair-text {
-            font-size: 0.84rem !important;
-            font-weight: 700 !important;
-            line-height: 1.25 !important;
+            font-size: clamp(0.68rem, 2.3vw, 0.78rem) !important;
+            font-weight: 800 !important;
+            line-height: 1.22 !important;
             color: #000000 !important;
-            text-align: center !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-align: left !important;
             text-shadow: none !important;
           }
           .chair-sub {
-            font-size: 0.68rem !important;
+            font-size: clamp(0.55rem, 1.8vw, 0.62rem) !important;
             font-weight: 700 !important;
             color: #000000 !important;
-            text-align: center !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-align: left !important;
             text-shadow: none !important;
           }
           .hero-action-dock-split {
@@ -581,24 +593,34 @@ export default function Hero() {
             transform: translate(-50%, 50%);
           }
           .hero-bottom-area {
-            bottom: clamp(3.6rem, 7vh, 5.2rem);
+            bottom: clamp(3.2rem, 6.5vh, 4.8rem);
           }
         }
 
         @media (max-width: 480px) {
           .hero-center-content {
-            top: clamp(5rem, 10.5vh, 6.8rem);
+            top: clamp(6.4rem, 13.5vh, 8.8rem);
             padding-inline: 0;
           }
           .hero-warp-wrap {
-            height: clamp(135px, 32vw, 195px);
+            height: clamp(165px, 44vw, 235px);
             max-width: 100vw;
+            width: 100vw;
           }
           .hero-chair-annotation {
-            top: clamp(39%, 43vh, 47%);
+            left: calc(50% + 6px);
+            top: 53.5%;
+          }
+          .chair-arrow {
+            width: 38px;
+            height: 30px;
           }
           .chair-text {
-            font-size: 0.8rem;
+            font-size: 0.68rem !important;
+            line-height: 1.18 !important;
+          }
+          .chair-sub {
+            font-size: 0.55rem !important;
           }
         }
       `}</style>
