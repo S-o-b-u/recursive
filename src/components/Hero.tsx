@@ -241,9 +241,7 @@ export default function Hero() {
         /* ── Top Center Block: Wordmark with WebGL Warp ── */
         .hero-center-content {
           position: absolute;
-          /* The floor used to be 7.5rem, which on a 375px-tall landscape phone
-             spent a third of the screen before the logo even started. */
-          top: clamp(3.25rem, 12vh, 10.5rem);
+          top: clamp(4.25rem, 14vh, 11.5rem);
           left: 0;
           right: 0;
           width: 100%;
@@ -445,7 +443,7 @@ export default function Hero() {
 
         @media (max-width: 1024px) {
           .hero-center-content {
-            top: clamp(4.8rem, 11vh, 7.5rem);
+            top: clamp(5.6rem, 12.5vh, 8.5rem);
           }
           .hero-warp-wrap {
             height: min(clamp(160px, 30vw, 320px), 34vh);
@@ -454,7 +452,7 @@ export default function Hero() {
 
         @media (max-width: 860px) {
           .hero-center-content {
-            top: clamp(5.8rem, 12vh, 8rem);
+            top: clamp(6.8rem, 14.5vh, 9.5rem);
           }
           .hero-warp-wrap {
             height: clamp(150px, 32vw, 240px);
@@ -462,7 +460,7 @@ export default function Hero() {
           }
           .hero-chair-annotation {
             left: calc(50% + 24px);
-            top: 53%;
+            top: 53.5%;
             transform: translateY(-50%);
             gap: 0.4rem;
             display: flex;
@@ -517,7 +515,7 @@ export default function Hero() {
 
         @media (max-width: 600px) {
           .hero-center-content {
-            top: clamp(6.2rem, 13vh, 8.6rem);
+            top: clamp(7.8rem, 16.5vh, 10.5rem);
             padding-inline: 0;
           }
           .hero-warp-wrap {
@@ -527,7 +525,7 @@ export default function Hero() {
           }
           .hero-chair-annotation {
             left: calc(50% + 10px);
-            top: 53.5%;
+            top: 54%;
             transform: translateY(-50%);
             gap: 0.35rem;
             max-width: calc(50vw - 12px);
@@ -599,7 +597,7 @@ export default function Hero() {
 
         @media (max-width: 480px) {
           .hero-center-content {
-            top: clamp(6.4rem, 13.5vh, 8.8rem);
+            top: clamp(8rem, 17.5vh, 11rem);
             padding-inline: 0;
           }
           .hero-warp-wrap {
@@ -609,7 +607,7 @@ export default function Hero() {
           }
           .hero-chair-annotation {
             left: calc(50% + 6px);
-            top: 53.5%;
+            top: 54%;
           }
           .chair-arrow {
             width: 38px;
