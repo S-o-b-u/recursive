@@ -26,8 +26,22 @@ export default function Hero() {
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     setUseVideo(!reduceMotion);
 
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => {});
+    const video = videoRef.current;
+    if (video) {
+      video.play().catch(() => {});
+      if (typeof IntersectionObserver !== "undefined") {
+        const io = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              video.play().catch(() => {});
+            } else {
+              video.pause();
+            }
+          }
+        }, { threshold: 0.05 });
+        io.observe(video);
+        return () => io.disconnect();
+      }
     }
   }, []);
 
@@ -529,11 +543,11 @@ export default function Hero() {
             width: 100vw;
           }
           .hero-chair-annotation {
-            left: calc(50% + 12px);
-            top: 53.5%;
+            left: calc(50% + 36px);
+            top: 51.5%;
             transform: translateY(-50%);
             gap: 0.35rem;
-            max-width: calc(50vw - 12px);
+            max-width: 44vw;
             display: flex;
             flex-direction: row;
             align-items: center;
@@ -541,8 +555,8 @@ export default function Hero() {
             z-index: 30;
           }
           .chair-arrow {
-            width: 38px;
-            height: 30px;
+            width: 34px;
+            height: 26px;
             margin-top: 0;
             transform: none;
             opacity: 1 !important;
@@ -560,16 +574,17 @@ export default function Hero() {
             text-align: left;
           }
           .chair-text {
-            font-size: clamp(0.62rem, 2.1vw, 0.72rem) !important;
+            font-size: clamp(0.58rem, 2vw, 0.68rem) !important;
             font-weight: 800 !important;
             line-height: 1.22 !important;
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
             text-align: left !important;
             text-shadow: none !important;
+            white-space: normal;
           }
           .chair-sub {
-            font-size: clamp(0.5rem, 1.6vw, 0.58rem) !important;
+            font-size: clamp(0.48rem, 1.5vw, 0.56rem) !important;
             font-weight: 700 !important;
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
@@ -611,19 +626,19 @@ export default function Hero() {
             width: 100vw;
           }
           .hero-chair-annotation {
-            left: calc(50% + 8px);
-            top: 53.5%;
+            left: calc(50% + 32px);
+            top: 51.5%;
           }
           .chair-arrow {
-            width: 34px;
-            height: 26px;
+            width: 30px;
+            height: 24px;
           }
           .chair-text {
-            font-size: 0.62rem !important;
+            font-size: 0.58rem !important;
             line-height: 1.18 !important;
           }
           .chair-sub {
-            font-size: 0.5rem !important;
+            font-size: 0.48rem !important;
           }
         }
       `}</style>
