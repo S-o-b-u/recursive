@@ -507,15 +507,15 @@ export default function Footer() {
         .footer-cutout-fade {
           position: absolute;
           inset: auto 0 0 0;
-          height: clamp(24px, 8.5%, 52px);
+          height: clamp(34px, 12.5%, 72px);
           z-index: 25;
           pointer-events: none;
           background: linear-gradient(
             180deg,
-            rgba(6, 15, 8, 0) 0%,
-            rgba(6, 15, 8, 0.35) 35%,
-            rgba(6, 15, 8, 0.78) 72%,
-            #060f08 100%
+            rgba(4, 10, 5, 0) 0%,
+            rgba(4, 10, 5, 0.45) 30%,
+            rgba(3, 8, 4, 0.88) 65%,
+            #020603 100%
           );
         }
       `}</style>
