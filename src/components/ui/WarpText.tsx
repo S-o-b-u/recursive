@@ -205,32 +205,36 @@ const buildTextCanvas = ({
   ctx.clearRect(0, 0, width, height);
 
   // If rendering an image (e.g. logo.png)
-  if (loadedImage && loadedImage.complete && loadedImage.naturalWidth > 0) {
-    const imgRatio = loadedImage.naturalWidth / loadedImage.naturalHeight;
-    const maxWidth = width;
-    const maxHeight = height;
-    let drawW = maxWidth;
-    let drawH = maxWidth / imgRatio;
+  if (props.src || props.imageSrc) {
+    if (loadedImage && loadedImage.complete && loadedImage.naturalWidth > 0) {
+      const imgRatio = loadedImage.naturalWidth / loadedImage.naturalHeight;
+      const maxWidth = width;
+      const maxHeight = height;
+      let drawW = maxWidth;
+      let drawH = maxWidth / imgRatio;
 
-    if (drawH > maxHeight) {
-      drawH = maxHeight;
-      drawW = maxHeight * imgRatio;
+      if (drawH > maxHeight) {
+        drawH = maxHeight;
+        drawW = maxHeight * imgRatio;
+      }
+
+      const drawX = (width - drawW) / 2;
+      const drawY = (height - drawH) / 2;
+
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(loadedImage, drawX, drawY, drawW, drawH);
+
+      if (props.color && props.color !== "original") {
+        ctx.globalCompositeOperation = "source-in";
+        ctx.fillStyle = props.color;
+        ctx.fillRect(drawX, drawY, drawW, drawH);
+        ctx.globalCompositeOperation = "source-over";
+      }
+
+      return canvas;
     }
-
-    const drawX = (width - drawW) / 2;
-    const drawY = (height - drawH) / 2;
-
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
-    ctx.drawImage(loadedImage, drawX, drawY, drawW, drawH);
-
-    if (props.color && props.color !== "original") {
-      ctx.globalCompositeOperation = "source-in";
-      ctx.fillStyle = props.color;
-      ctx.fillRect(drawX, drawY, drawW, drawH);
-      ctx.globalCompositeOperation = "source-over";
-    }
-
+    // Image is still loading - return clean canvas rather than fallback dummy text
     return canvas;
   }
 
@@ -420,14 +424,19 @@ export const WarpText: React.FC<WarpTextProps> = ({
     };
 
     if (effectiveSrc) {
-      const img = new Image();
-      img.src = effectiveSrc;
-      img.onload = () => {
+      const img = new window.Image();
+      img.crossOrigin = "anonymous";
+      const onLoaded = () => {
         loadedImageRef.current = img;
         if (contextRef.current) {
           contextRef.current.rasterize();
         }
       };
+      img.onload = onLoaded;
+      img.src = effectiveSrc;
+      if (img.complete && img.naturalWidth > 0) {
+        onLoaded();
+      }
     } else {
       loadedImageRef.current = null;
     }
@@ -585,13 +594,19 @@ export const WarpText: React.FC<WarpTextProps> = ({
     };
 
     // Preload image if provided
-    if (propsRef.current.src || propsRef.current.imageSrc) {
-      const img = new Image();
-      img.src = (propsRef.current.src || propsRef.current.imageSrc)!;
-      img.onload = () => {
+    const targetSrc = propsRef.current.src || propsRef.current.imageSrc;
+    if (targetSrc) {
+      const img = new window.Image();
+      img.crossOrigin = "anonymous";
+      const onLoaded = () => {
         loadedImageRef.current = img;
         rasterize();
       };
+      img.onload = onLoaded;
+      img.src = targetSrc;
+      if (img.complete && img.naturalWidth > 0) {
+        onLoaded();
+      }
     }
 
     const resize = () => {
