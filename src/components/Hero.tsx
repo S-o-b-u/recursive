@@ -83,7 +83,7 @@ export default function Hero() {
         <div className="hero-warp-wrap">
           <WarpText
             src={logoImg.src || "/images/logo.png"}
-            color="#111a12"
+            color="#000000"
             warpStrength={0.08}
             warpScale={1.7}
             speed={0.55}

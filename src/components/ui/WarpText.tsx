@@ -519,8 +519,8 @@ export const WarpText: React.FC<WarpTextProps> = ({
         img.style.objectPosition = "center bottom";
         
         // If we are colorizing to dark, invert the white logo in fallback
-        if (propsRef.current.color === "#111a12") {
-          img.style.filter = "invert(1) brightness(0.1)";
+        if (propsRef.current.color !== "original" && propsRef.current.color !== "#ffffff") {
+          img.style.filter = "invert(1) brightness(0)";
         }
         
         container.appendChild(img);
@@ -635,8 +635,8 @@ export const WarpText: React.FC<WarpTextProps> = ({
         fallbackImg.style.height = "100%";
         fallbackImg.style.objectFit = "contain";
         fallbackImg.style.objectPosition = "center bottom";
-        if (propsRef.current.color === "#111a12") {
-          fallbackImg.style.filter = "invert(1) brightness(0.1)";
+        if (propsRef.current.color !== "original" && propsRef.current.color !== "#ffffff") {
+          fallbackImg.style.filter = "invert(1) brightness(0)";
         }
         container.appendChild(fallbackImg);
       };
@@ -804,7 +804,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
             objectFit: "contain",
             objectPosition: "center center",
             pointerEvents: "none",
-            filter: color === "#111a12" ? "invert(1) brightness(0.1)" : undefined,
+            filter: color !== "original" && color !== "#ffffff" ? "invert(1) brightness(0)" : undefined,
             userSelect: "none",
           }}
           loading="eager"
