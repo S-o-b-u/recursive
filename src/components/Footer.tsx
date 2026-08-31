@@ -38,13 +38,12 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       removeFromArray(array, randomIndex(array));
     const getRandomFromArray = (array: any[]) => array[randomIndex(array) | 0];
 
-    // What should stay constant is how much of the wordmark the crowd covers,
-    // not the crowd's share of the footer. On a phone the letters are width-
-    // limited and sit higher in the footer, so the band has to be deeper there
-    // to lap them the way it does on desktop.
-    const crowdBand = () => (stage.width < 620 ? 0.48 : 0.42);
-    const fitFor = (peepH: number) =>
-      Math.min(1, Math.max(0.18, (stage.height * crowdBand()) / peepH));
+    // On mobile screens, scale the peeps down so they don't overpower the footer mark
+    const crowdBand = () => (stage.width < 620 ? 0.28 : stage.width < 1024 ? 0.35 : 0.42);
+    const fitFor = (peepH: number) => {
+      const scaleFactor = stage.width < 620 ? 0.68 : stage.width < 1024 ? 0.85 : 1.0;
+      return Math.min(1, Math.max(0.1, ((stage.height * crowdBand()) / peepH) * scaleFactor));
+    };
 
     // TWEEN FACTORIES
     const resetPeep = ({ stage, peep }: { stage: any; peep: any }) => {
