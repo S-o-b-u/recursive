@@ -797,7 +797,7 @@ export default function IntroSequence() {
           margin: 0;
           max-width: 20ch;
           text-align: center;
-          font-family: var(--font-display), var(--font-geist-sans), sans-serif;
+          font-family: var(--font-display), var(--font-dm-sans), sans-serif;
           font-weight: 700;
           font-size: clamp(1.7rem, 5.4vw, 3.4rem);
           line-height: 1.12;

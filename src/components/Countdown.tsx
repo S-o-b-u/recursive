@@ -294,7 +294,7 @@ export default function Countdown() {
         }
 
         .cd-motif {
-          width: clamp(220px, 26vw, 310px);
+          width: clamp(132px, 62.35px + 19.348vw, 310px);
           height: auto;
           color: #2F5527;
           opacity: 0.8;
@@ -452,7 +452,7 @@ export default function Countdown() {
            flap digits below, so the plaque and the board agree. */
         .cd-plaque-date {
           font-family: var(--font-bebas), var(--font-dm-sans), sans-serif;
-          font-size: clamp(1.2rem, 2.2vw, 1.75rem);
+          font-size: clamp(1.0rem, 11.3px + 1.304vw, 1.75rem);
           font-weight: 400;
           letter-spacing: 0.15em;
           text-transform: uppercase;

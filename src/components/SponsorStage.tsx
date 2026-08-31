@@ -53,8 +53,24 @@ export default function SponsorStage() {
   const outroRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
+  const scrollUpRef = useRef<HTMLDivElement>(null);
 
   const sealed = SPONSOR_SLOTS.every((slot) => !slot.src);
+
+  const scrollUp = () => {
+    if (typeof window !== "undefined") {
+      const track = trackRef.current;
+      if (track) {
+        const trackTop = track.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({
+          top: Math.max(0, trackTop - window.innerHeight * 0.5),
+          behavior: "smooth",
+        });
+      } else {
+        window.scrollBy({ top: -window.innerHeight, behavior: "smooth" });
+      }
+    }
+  };
 
   useEffect(() => {
     const track = trackRef.current;
@@ -63,6 +79,7 @@ export default function SponsorStage() {
     const outro = outroRef.current;
     const preview = previewRef.current;
     const body = bodyRef.current;
+    const scrollUpBtn = scrollUpRef.current;
     if (!track || !stage || !intro || !outro || !body) return;
 
     const setP = (v: number) => stage.style.setProperty("--sxp-p", v.toFixed(4));
@@ -72,6 +89,7 @@ export default function SponsorStage() {
       gsap.set([intro, outro], { opacity: 0 });
       if (preview) gsap.set(preview, { opacity: 0 });
       gsap.set(body, { opacity: 1, y: 0 });
+      if (scrollUpBtn) gsap.set(scrollUpBtn, { opacity: 1, y: 0, pointerEvents: "auto" });
       return;
     }
 
@@ -103,10 +121,10 @@ export default function SponsorStage() {
 
       /** Sub-ranges of the pass, in progress units. */
       const WINDOW_END = 0.46;
-      const LABEL_END = 0.18;
-      const PREVIEW_END = 0.32;
-      const PANEL_IN = 0.34;
-      const PANEL_LEN = 0.28;
+      const LABEL_END = 0.16;
+      const PREVIEW_END = 0.20;
+      const PANEL_IN = 0.20;
+      const PANEL_LEN = 0.26;
 
       const apply = () => {
         const t = state.prog;
@@ -122,12 +140,26 @@ export default function SponsorStage() {
         // The preview title inside the closed window fades out as the window opens.
         if (preview) {
           const pr = clamp01(t / PREVIEW_END);
-          gsap.set(preview, { opacity: 1 - pr, scale: 1 + 0.12 * pr });
+          gsap.set(preview, { opacity: 1 - pr, scale: 1 + 0.08 * pr });
         }
 
         // The panel arrives once there is room for it.
         const b = easePanel(clamp01((t - PANEL_IN) / PANEL_LEN));
-        gsap.set(body, { opacity: b, y: 46 * (1 - b) });
+        gsap.set(body, {
+          opacity: b,
+          y: 36 * (1 - b),
+          pointerEvents: b > 0.05 ? "auto" : "none",
+        });
+
+        // The scroll up button only appears once the stage has opened/scrolled down
+        if (scrollUpBtn) {
+          const s = easePanel(clamp01((t - 0.22) / 0.18));
+          gsap.set(scrollUpBtn, {
+            opacity: s,
+            y: (1 - s) * -12,
+            pointerEvents: s > 0.1 ? "auto" : "none",
+          });
+        }
       };
 
       // Paint the closed state before the first scroll event arrives.
@@ -201,10 +233,10 @@ export default function SponsorStage() {
               <div className="sxp-hands" aria-hidden="true">
                 <Image
                   src="/images/sponsor.png"
-                  alt=""
+                  alt="Sponsor Handshake"
                   fill
                   sizes="100vw"
-                  priority={false}
+                  priority={true}
                 />
               </div>
 
@@ -272,6 +304,18 @@ export default function SponsorStage() {
           {/* Sibling of the frame, so the clip does not eat it. Same geometry,
               because both read it off the stage. */}
           <span className="sxp-keyline" aria-hidden="true" />
+
+          {/* ── Scroll Up to Go Back (Beside Nav Bar) ── */}
+          <div ref={scrollUpRef} className="sxp-scrollup-wrap">
+            <button
+              type="button"
+              onClick={scrollUp}
+              aria-label="Scroll up to previous section"
+              className="sxp-scrollup-btn"
+            >
+              <span className="sxp-scrollup-text">Scroll up</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -303,8 +347,8 @@ export default function SponsorStage() {
           --sxp-ix: calc((100% - var(--sxp-win-w)) / 2 * (1 - var(--sxp-p)));
           --sxp-r: calc(28px * (1 - var(--sxp-p)));
           /* One source of truth: natural 2.75:1 aspect ratio scaling (756 / 2079 = 36.4%) */
-          --sxp-hands-h: clamp(220px, 36.4vw, 720px);
-          --sxp-hands-lift: clamp(0.5rem, 2vh, 2rem);
+          --sxp-hands-h: min(clamp(280px, 36.4vw, 1400px), 66vh);
+          --sxp-hands-lift: clamp(0rem, 0.8vh, 1.2rem);
 
           position: sticky;
           top: 0;
@@ -384,7 +428,7 @@ export default function SponsorStage() {
 
         .sxp-intro-hint {
           font-family: var(--font-geist-mono), monospace;
-          font-size: 0.62rem;
+          font-size: 0.68rem;
           letter-spacing: 0.22em;
           text-transform: uppercase;
           color: rgba(206, 226, 194, 0.4);
@@ -480,9 +524,11 @@ export default function SponsorStage() {
           align-items: center;
           justify-content: flex-start;
           padding-inline: var(--padding-x);
-          /* Desktop: position lower down in the open sky */
-          padding-top: clamp(6.8rem, 13.5vh, 9.6rem);
-          padding-bottom: clamp(14rem, 28vh, 24rem);
+          /* Desktop: position naturally in the open sky */
+          padding-top: clamp(3.2rem, 9.5vh, 6.5rem);
+          padding-bottom: clamp(1rem, 2vh, 2.5rem);
+          opacity: 0;
+          pointer-events: none;
         }
 
         /* ── The mossy handshake ──
@@ -497,13 +543,11 @@ export default function SponsorStage() {
           height: var(--sxp-hands-h);
           z-index: 0;
           pointer-events: none;
-          -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 100%);
-          mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 100%);
         }
         .sxp-hands img {
           width: 100% !important;
           height: 100% !important;
-          object-fit: cover;
+          object-fit: contain;
           object-position: center bottom;
         }
 
@@ -520,7 +564,7 @@ export default function SponsorStage() {
         }
 
         .sxp-motif {
-          width: clamp(130px, 14vw, 185px);
+          width: clamp(78px, 36.13px + 11.63vw, 185px);
           height: auto;
           color: #2F5527;
           opacity: 0.92;
@@ -540,7 +584,7 @@ export default function SponsorStage() {
           margin: 0.15rem 0 0;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
           font-weight: 500;
-          font-size: clamp(2.4rem, 4.8vw, 4.1rem);
+          font-size: clamp(1.581rem, 9.53px + 4.38vw, 4.1rem);
           line-height: 1.05;
           letter-spacing: -0.028em;
           color: #111a12;
@@ -569,10 +613,10 @@ export default function SponsorStage() {
           grid-area: 1 / 1;
           font-family: var(--font-hiruko), var(--font-display), Georgia, serif;
           font-weight: 700;
-          font-size: clamp(5rem, 15vh, 9.2rem);
-          line-height: 0.8;
-          color: rgba(38, 70, 32, 0.28);
-          filter: blur(6px);
+          font-size: clamp(8.5rem, 24vh, 15rem);
+          line-height: 0.75;
+          color: rgba(38, 70, 32, 0.32);
+          filter: blur(7px);
           animation: sxp-seal-breathe 8s ease-in-out infinite;
           user-select: none;
         }
@@ -613,56 +657,124 @@ export default function SponsorStage() {
           z-index: 10;
         }
 
+        /* ── Scroll Up to Go Back Button ── */
+        .sxp-scrollup-wrap {
+          position: absolute;
+          top: clamp(1.25rem, 3.2vh, 2.25rem);
+          right: clamp(1rem, 3.5vw, 2.2rem);
+          z-index: 105;
+          opacity: 0;
+          pointer-events: none;
+          will-change: transform, opacity;
+        }
+
+        .sxp-scrollup-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.45rem 0.8rem;
+          min-height: 32px;
+          border-radius: 9999px;
+          background: rgba(255, 255, 255, 0.58);
+          backdrop-filter: blur(20px) saturate(180%);
+          -webkit-backdrop-filter: blur(20px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.8);
+          color: #142617;
+          font-family: var(--font-geist-mono), monospace;
+          font-size: 0.68rem;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          cursor: pointer;
+          box-shadow:
+            0 2px 10px rgba(0, 0, 0, 0.06),
+            inset 0 1px 0 rgba(255, 255, 255, 0.95);
+          transition: all 250ms cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .sxp-scrollup-btn:hover {
+          background: rgba(255, 255, 255, 0.92);
+          border-color: rgba(92, 140, 58, 0.45);
+          color: #2b541d;
+          transform: translateY(-1.5px);
+          box-shadow:
+            0 4px 16px rgba(0, 0, 0, 0.1),
+            inset 0 1px 0 #ffffff;
+        }
+
+        .sxp-scrollup-btn:active {
+          transform: translateY(0) scale(0.95);
+        }
+
         /* ── Narrower viewports ── */
         @media (max-width: 900px) {
           .sxp { --sxp-track: 280vh; }
           .sxp-stage {
             --sxp-win-w: min(88vw, 34rem);
-            --sxp-hands-h: clamp(150px, 36vw, 320px);
+            --sxp-hands-h: clamp(200px, 44vw, 380px);
+            --sxp-hands-lift: clamp(2.5rem, 6vh, 4.5rem);
           }
           .sxp-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); }
           .sxp-body {
-            padding-top: clamp(3.8rem, 8vh, 5rem);
+            padding-top: clamp(3.2rem, 7vh, 4.5rem);
             padding-bottom: clamp(9rem, 24vh, 15rem);
           }
         }
 
         @media (max-width: 620px) {
+          .sxp-scrollup-wrap {
+            top: clamp(1.2rem, 3vh, 1.85rem);
+            right: clamp(0.6rem, 2.5vw, 1rem);
+          }
+          .sxp-scrollup-btn {
+            padding: 0.42rem 0.7rem;
+            font-size: 0.66rem;
+          }
           .sxp { --sxp-track: 260vh; }
           .sxp-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .sxp-stage {
-            --sxp-hands-h: clamp(120px, 28vw, 190px);
-            --sxp-hands-lift: 0;
+            /* Hands carry the bottom edge on a narrow frame, lifted higher */
+            --sxp-hands-h: clamp(260px, 68vw, 420px);
+            --sxp-hands-lift: clamp(7rem, 16vh, 11rem);
+          }
+          .sxp-hands img {
+            object-fit: cover;
+            object-position: center bottom;
           }
           .sxp-body {
-            /* Position items high up under the mobile navbar with a wide open sky below */
-            padding-top: clamp(3.4rem, 7vh, 4.4rem);
-            padding-bottom: clamp(6rem, 16vh, 9rem);
+            /* Position the content so it meets the handshake naturally with minimal gap */
+            justify-content: flex-start;
+            padding-top: clamp(8.5rem, 19vh, 12.5rem);
+            padding-bottom: 0;
+          }
+          .sxp-inner {
+            gap: clamp(0.42rem, 1.1vh, 0.75rem);
           }
           .sxp-motif {
-            width: 90px;
-            margin-bottom: 0;
+            width: 100px;
+            margin-bottom: 0.1rem;
           }
           .sxp-heading {
-            font-size: 1.7rem;
+            font-size: 1.95rem;
           }
           .sxp-lede {
-            font-size: 0.8rem;
-            line-height: 1.38;
-            max-width: 20rem;
+            font-size: 0.86rem;
+            line-height: 1.4;
+            max-width: 22rem;
           }
           .sxp-seal {
-            margin-top: 0.2rem;
+            margin-top: clamp(0.35rem, 1.1vh, 0.65rem);
           }
           .sxp-seal-word {
-            font-size: 1.15rem;
+            font-size: 1.28rem;
           }
           .sxp-seal-q {
-            font-size: 3.5rem;
+            font-size: clamp(6rem, 24vw, 8.5rem);
+            filter: blur(6px);
           }
           .sxp-cta-wrap {
-            margin-top: 0.4rem;
-            transform: scale(0.92);
+            margin-top: clamp(0.45rem, 1.2vh, 0.8rem);
+            transform: scale(0.96);
           }
         }
 

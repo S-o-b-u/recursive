@@ -259,7 +259,7 @@ export default function Themes() {
         }
 
         .th-motif {
-          width: clamp(190px, 22vw, 260px);
+          width: clamp(114px, 56.87px + 15.87vw, 260px);
           height: auto;
           color: #7FB84E;
           opacity: 0.62;
@@ -366,7 +366,7 @@ export default function Themes() {
           bottom: clamp(0.9rem, 1.8vw, 1.3rem);
           z-index: 4;
           font-family: var(--font-geist-mono), monospace;
-          font-size: 0.62rem;
+          font-size: 0.68rem;
           letter-spacing: 0.18em;
           text-transform: uppercase;
           color: rgba(240, 250, 230, 0.42);
@@ -401,7 +401,7 @@ export default function Themes() {
         .th-brief-title {
           margin: 0.75rem 0 0;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-size: clamp(1.6rem, 3vw, 2.35rem);
+          font-size: clamp(1.25rem, 13.11px + 1.913vw, 2.35rem);
           font-weight: 500;
           line-height: 1.1;
           letter-spacing: -0.026em;
@@ -475,8 +475,10 @@ export default function Themes() {
           align-items: center;
           gap: 0.5rem;
           margin-top: clamp(1.3rem, 2.6vw, 1.9rem);
-          padding: 0;
-          padding-bottom: 3px;
+          /* The underline is the visual, but the hit area has to be bigger than
+             the text — this was a 26px-tall target on a touch screen. */
+          padding: 0.5rem 0 3px;
+          min-height: 40px;
           background: transparent;
           border: none;
           border-bottom: 1.5px solid rgba(143, 196, 90, 0.34);

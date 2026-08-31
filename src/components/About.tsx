@@ -78,7 +78,7 @@ export default function About() {
         }
 
         .ab-crown {
-          width: clamp(190px, 22vw, 260px);
+          width: clamp(114px, 56.87px + 15.87vw, 260px);
           height: auto;
           color: #2F5527;
           opacity: 0.85;
@@ -122,7 +122,7 @@ export default function About() {
           margin: 0 auto;
           max-width: 86rem;
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: clamp(1.4rem, 2.45vw, 2.1rem);
+          font-size: clamp(1.0rem, 9.11px + 1.913vw, 2.1rem);
           font-weight: 400;
           line-height: 1.76;
           letter-spacing: -0.012em;

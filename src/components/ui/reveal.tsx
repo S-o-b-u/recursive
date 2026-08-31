@@ -111,7 +111,7 @@ export function RevealWords({
         .rw-para {
           margin: 0;
           font-family: var(--font-dm-sans), system-ui, sans-serif;
-          font-size: clamp(1.2rem, 2.1vw, 1.65rem);
+          font-size: clamp(1.0rem, 11.93px + 1.13vw, 1.65rem);
           font-weight: 400;
           line-height: 1.68;
           letter-spacing: -0.012em;

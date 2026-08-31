@@ -56,7 +56,7 @@ export default function Experience() {
           overflow: hidden;
         }
         .experience-card {
-          padding: clamp(1.5rem, 3vw, 2.5rem);
+          padding: clamp(0.9rem, 4.38px + 2.783vw, 2.5rem);
           background-color: var(--color-bg);
         }
         .experience-number {

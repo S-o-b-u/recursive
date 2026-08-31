@@ -65,7 +65,7 @@ export default function RegisterCTA() {
         }
         .cta-eyebrow {
           margin: 0;
-          font-family: var(--font-dm-sans), var(--font-geist-sans), sans-serif;
+          font-family: var(--font-dm-sans), sans-serif;
           font-size: 0.8rem;
           font-weight: 500;
           letter-spacing: 0.06em;
@@ -83,7 +83,7 @@ export default function RegisterCTA() {
         }
         .cta-body {
           margin: 1rem 0 0;
-          font-family: var(--font-dm-sans), var(--font-geist-sans), sans-serif;
+          font-family: var(--font-dm-sans), sans-serif;
           font-size: clamp(0.9rem, 1.3vw, 1.05rem);
           font-weight: 400;
           line-height: 1.6;

@@ -40,14 +40,14 @@ export default function Timeline({ compact = false }: { compact?: boolean }) {
                       aria-hidden
                       className="absolute -left-[1.44rem] top-[0.5em] h-1.5 w-1.5 rounded-full bg-[var(--color-accent-bright)] ring-2 ring-[rgba(255,255,255,0.7)]"
                     />
-                    <p className="font-mono text-[var(--font-size-xs)] tracking-[var(--tracking-wide)] text-[var(--color-text-tertiary)]">
+                    <p className="font-mono text-[length:var(--font-size-xs)] tracking-[var(--tracking-wide)] text-[color:var(--color-text-tertiary)]">
                       {item.time}
                     </p>
                     <p className="mt-0.5 font-medium tracking-[var(--tracking-snug)]">
                       {item.title}
                     </p>
                     {item.note && (
-                      <p className="mt-0.5 text-[var(--font-size-sm)] text-[var(--color-text-secondary)]">
+                      <p className="mt-0.5 text-[length:var(--font-size-sm)] text-[color:var(--color-text-secondary)]">
                         {item.note}
                       </p>
                     )}
@@ -56,7 +56,7 @@ export default function Timeline({ compact = false }: { compact?: boolean }) {
               </ol>
 
               {compact && day.items.length > 4 && (
-                <p className="mt-5 text-[var(--font-size-sm)] text-[var(--color-text-tertiary)]">
+                <p className="mt-5 text-[length:var(--font-size-sm)] text-[color:var(--color-text-tertiary)]">
                   + {day.items.length - 4} more
                 </p>
               )}

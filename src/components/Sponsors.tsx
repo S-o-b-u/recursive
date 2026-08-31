@@ -189,7 +189,7 @@ export default function Sponsors({ detailed = true }: { detailed?: boolean }) {
         }
 
         .sp-motif {
-          width: clamp(160px, 18vw, 220px);
+          width: clamp(96px, 47.48px + 13.478vw, 220px);
           height: auto;
           color: #2F5527;
           opacity: 0.85;
@@ -214,7 +214,7 @@ export default function Sponsors({ detailed = true }: { detailed?: boolean }) {
         .sp-title {
           margin-top: 0.6rem;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+          font-size: clamp(1.45rem, 10.99px + 3.391vw, 3.4rem);
           font-weight: 500;
           line-height: 1.1;
           letter-spacing: -0.025em;
@@ -248,7 +248,7 @@ export default function Sponsors({ detailed = true }: { detailed?: boolean }) {
           position: relative;
           display: flex;
           flex-direction: column;
-          padding: clamp(1.75rem, 2.8vw, 2.4rem);
+          padding: clamp(1.05rem, 8.35px + 2.348vw, 2.4rem);
           border-radius: var(--radius-lg);
           background: rgba(255, 255, 255, 0.55);
           backdrop-filter: blur(18px) saturate(180%);
@@ -315,7 +315,7 @@ export default function Sponsors({ detailed = true }: { detailed?: boolean }) {
         .sp-tier-price {
           margin-top: 0.35rem;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-size: clamp(2rem, 3.2vw, 2.6rem);
+          font-size: clamp(1.562rem, 18.5px + 1.804vw, 2.6rem);
           font-weight: 500;
           line-height: 1;
           color: #111a12;
@@ -446,7 +446,7 @@ export default function Sponsors({ detailed = true }: { detailed?: boolean }) {
         .sp-alloc-title {
           margin-top: 0.5rem;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+          font-size: clamp(1.406rem, 15.65px + 1.902vw, 2.5rem);
           font-weight: 500;
           color: #111a12;
         }
@@ -485,7 +485,7 @@ export default function Sponsors({ detailed = true }: { detailed?: boolean }) {
 
         .sp-alloc-pct {
           font-family: var(--font-bebas), var(--font-heading), sans-serif;
-          font-size: 2.4rem;
+          font-size: clamp(1.5rem, 18.37px + 1.565vw, 2.4rem);
           line-height: 1;
           color: #2F5527;
         }
@@ -517,7 +517,7 @@ export default function Sponsors({ detailed = true }: { detailed?: boolean }) {
         .sp-custom-title {
           margin-top: 0.5rem;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+          font-size: clamp(1.25rem, 14.05px + 1.652vw, 2.2rem);
           font-weight: 500;
           color: #111a12;
         }

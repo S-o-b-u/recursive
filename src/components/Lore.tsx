@@ -219,8 +219,8 @@ export default function Lore() {
         }
 
         .lore-paragraph {
-          font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-          font-size: clamp(1.15rem, 2.3vw, 1.55rem);
+          font-family: var(--font-dm-sans), system-ui, -apple-system, sans-serif;
+          font-size: clamp(1.0rem, 12.56px + 0.957vw, 1.55rem);
           font-weight: 350;
           line-height: 1.68;
           letter-spacing: -0.015em;

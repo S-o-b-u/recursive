@@ -28,13 +28,16 @@ export default function Prizes({ detailed = false }: { detailed?: boolean }) {
             >
               <p className="eyebrow text-[var(--color-accent)]">{prize.place}</p>
               <p
-                className={`font-light tracking-[var(--tracking-tight)] ${
-                  prize.featured ? "text-[2.6rem]" : "text-[2rem]"
-                } leading-none`}
+                className="font-light leading-none tracking-[var(--tracking-tight)]"
+                style={{
+                  fontSize: prize.featured
+                    ? "clamp(1.625rem, 19.9px + 1.696vw, 2.6rem)"
+                    : "clamp(1.375rem, 18.09px + 1.087vw, 2rem)",
+                }}
               >
                 {prize.amount}
               </p>
-              <ul className="mt-auto space-y-1.5 text-[var(--font-size-sm)] text-[var(--color-text-secondary)]">
+              <ul className="mt-auto space-y-1.5 text-[length:var(--font-size-sm)] text-[color:var(--color-text-secondary)]">
                 {prize.perks.map((p) => (
                   <li key={p}>{p}</li>
                 ))}
@@ -51,9 +54,12 @@ export default function Prizes({ detailed = false }: { detailed?: boolean }) {
             <p className="eyebrow text-[var(--color-accent)]">{TRACK_PRIZE.label}</p>
             <p className="mt-1 text-[var(--color-text-secondary)]">{TRACK_PRIZE.note}</p>
           </div>
-          <p className="text-[1.75rem] font-light leading-none tracking-[var(--tracking-tight)]">
+          <p
+            className="font-light leading-none tracking-[var(--tracking-tight)]"
+            style={{ fontSize: "clamp(1.25rem, 16.87px + 0.87vw, 1.75rem)" }}
+          >
             {TRACK_PRIZE.amount}
-            <span className="ml-2 align-middle text-[var(--font-size-sm)] text-[var(--color-text-tertiary)]">
+            <span className="ml-2 align-middle text-[length:var(--font-size-sm)] text-[color:var(--color-text-tertiary)]">
               × 4
             </span>
           </p>
@@ -68,7 +74,7 @@ export default function Prizes({ detailed = false }: { detailed?: boolean }) {
               <Reveal key={s.title} delay={i * 0.06}>
                 <div className="glass p-5">
                   <p className="font-medium tracking-[var(--tracking-snug)]">{s.title}</p>
-                  <p className="mt-1 text-[var(--font-size-sm)] text-[var(--color-text-secondary)]">
+                  <p className="mt-1 text-[length:var(--font-size-sm)] text-[color:var(--color-text-secondary)]">
                     {s.note}
                   </p>
                 </div>

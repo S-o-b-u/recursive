@@ -1,5 +1,5 @@
 import localFont from "next/font/local";
-import { Geist, Geist_Mono, DM_Sans } from "next/font/google";
+import { Geist, Geist_Mono, DM_Sans, Syne } from "next/font/google";
 
 /** Bebas Neue face for numbers across the website. */
 export const bebasNeue = localFont({
@@ -28,11 +28,6 @@ export const display = localFont({
   variable: "--font-display",
 });
 
-export const geist = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist-sans",
-});
-
 export const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
@@ -44,10 +39,8 @@ export const dmSans = DM_Sans({
   variable: "--font-dm-sans",
 });
 
-export const hiruko = localFont({
-  src: "../../public/fonts/HirukoBlackAlternate.ttf",
-  weight: "900",
-  style: "normal",
-  display: "swap",
+export const hiruko = Syne({
+  subsets: ["latin"],
+  weight: ["700", "800"],
   variable: "--font-hiruko",
 });

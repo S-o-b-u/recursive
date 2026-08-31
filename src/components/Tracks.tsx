@@ -186,7 +186,7 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
         }
 
         .tr-motif {
-          width: clamp(160px, 18vw, 220px);
+          width: clamp(96px, 47.48px + 13.478vw, 220px);
           height: auto;
           color: #2F5527;
           opacity: 0.85;
@@ -211,7 +211,7 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
         .tr-title {
           margin-top: 0.6rem;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+          font-size: clamp(1.45rem, 10.99px + 3.391vw, 3.4rem);
           font-weight: 500;
           line-height: 1.1;
           letter-spacing: -0.025em;
@@ -242,7 +242,7 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
           position: relative;
           display: flex;
           flex-direction: column;
-          padding: clamp(1.75rem, 3vw, 2.5rem);
+          padding: clamp(1.05rem, 7.72px + 2.522vw, 2.5rem);
           border-radius: var(--radius-lg);
           background: rgba(255, 255, 255, 0.55);
           backdrop-filter: blur(18px) saturate(180%);
@@ -325,7 +325,7 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
 
         .tr-card-title {
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-size: clamp(1.5rem, 2.2vw, 1.95rem);
+          font-size: clamp(1.0rem, 10.05px + 1.652vw, 1.95rem);
           font-weight: 500;
           line-height: 1.15;
           letter-spacing: -0.02em;

@@ -6,7 +6,6 @@ import { EVENT } from "@/data/hackathon";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import WarpText from "@/components/ui/WarpText";
-import CornerBadge from "@/components/ui/CornerBadge";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
@@ -19,8 +18,6 @@ export default function Hero() {
 
   return (
     <section id="hero" className="hero" ref={sectionRef}>
-      {/* ── Top-Left Corner Badge exclusively in Hero ── */}
-      <CornerBadge />
       {/* ── 100% Crisp, Pure Video Background (Zero filters, no blur/jitter transforms) ── */}
       <div className="hero-video-wrap">
         <video
@@ -56,8 +53,8 @@ export default function Hero() {
           ripple
           style={{
             width: "100%",
-            maxWidth: "min(95vw, 1080px)",
-            height: "clamp(150px, 22vw, 260px)",
+            maxWidth: "min(98vw, 1750px)",
+            height: "clamp(230px, 34vw, 450px)",
             pointerEvents: "auto",
           }}
         />
@@ -186,11 +183,11 @@ export default function Hero() {
         /* ── Top Center Block: Wordmark with WebGL Warp ── */
         .hero-center-content {
           position: absolute;
-          top: clamp(4rem, 6.5vh, 6rem);
+          top: clamp(7.5rem, 12vh, 10.5rem);
           left: 0;
           right: 0;
           width: 100%;
-          max-width: 1250px;
+          max-width: 1800px;
           margin-inline: auto;
           display: flex;
           flex-direction: column;
@@ -199,12 +196,12 @@ export default function Hero() {
           z-index: 10;
           pointer-events: auto;
           will-change: transform, opacity;
-          padding-inline: 1rem;
+          padding-inline: clamp(0.5rem, 2vw, 1.5rem);
         }
 
         .hero-wordmark {
           margin: 0;
-          font-family: var(--font-display), var(--font-geist-sans), sans-serif;
+          font-family: var(--font-display), var(--font-dm-sans), sans-serif;
           font-weight: 800;
           font-size: clamp(3.8rem, 11.5vw, 7.8rem);
           line-height: 0.9;
@@ -246,10 +243,10 @@ export default function Hero() {
         }
 
         .chair-text {
-          font-family: var(--font-hiruko), var(--font-geist-sans), sans-serif;
-          font-size: 1rem;
-          font-weight: 900;
-          line-height: 1.35;
+          font-family: var(--font-dm-sans), var(--font-display), sans-serif;
+          font-size: 0.88rem;
+          font-weight: 600;
+          line-height: 1.32;
           letter-spacing: -0.015em;
           color: #111a12;
           margin: 0;
@@ -259,8 +256,8 @@ export default function Hero() {
 
         .chair-sub {
           font-family: var(--font-geist-mono), monospace;
-          font-size: 0.72rem;
-          font-weight: 450;
+          font-size: 0.68rem;
+          font-weight: 500;
           color: #566a55;
           letter-spacing: -0.01em;
         }
@@ -298,7 +295,7 @@ export default function Hero() {
         /* ── Bottom Unified Glass Dock ── */
         .hero-bottom-area {
           position: absolute;
-          bottom: clamp(4.25rem, 9.5vh, 6.25rem);
+          bottom: clamp(5rem, 11vh, 7rem);
           left: 0;
           right: 0;
           width: 100%;
@@ -368,16 +365,54 @@ export default function Hero() {
 
         @media (max-width: 1024px) {
           .hero-center-content {
-            top: clamp(4.5rem, 10vh, 6.5rem);
+            top: clamp(6.8rem, 11vh, 9.2rem);
           }
         }
 
         @media (max-width: 860px) {
           .hero-center-content {
-            top: clamp(4.5rem, 11vh, 7rem);
+            top: clamp(6.2rem, 10vh, 8.5rem);
           }
           .hero-chair-annotation {
-            display: none;
+            left: 50%;
+            top: clamp(37%, 40vh, 44%);
+            bottom: auto;
+            transform: translateX(-50%);
+            gap: 0.25rem;
+            max-width: calc(100vw - 2rem);
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            justify-content: center;
+          }
+          .chair-note {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+          }
+          .chair-arrow {
+            width: 44px;
+            height: 52px;
+            margin-top: 0.1rem;
+            transform: rotate(-90deg);
+            opacity: 0.88;
+            flex-shrink: 0;
+          }
+          .chair-arrow path {
+            stroke-width: 6;
+          }
+          .chair-text {
+            font-size: 0.78rem;
+            line-height: 1.25;
+            text-align: center;
+            text-shadow: 0 1px 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.5);
+          }
+          .chair-sub {
+            font-size: 0.62rem;
+            color: #3b5a32;
+            text-align: center;
+            text-shadow: 0 1px 6px rgba(255, 255, 255, 0.6);
           }
           .hero-log-img {
             width: clamp(950px, 130vw, 1500px);
@@ -389,10 +424,27 @@ export default function Hero() {
 
         @media (max-width: 600px) {
           .hero-center-content {
-            top: clamp(4.5rem, 12vh, 7.5rem);
+            top: clamp(5.6rem, 9.5vh, 7.8rem);
           }
           .hero-wordmark {
             font-size: clamp(2.8rem, 14vw, 4.5rem);
+          }
+          .hero-chair-annotation {
+            top: clamp(36%, 39vh, 42%);
+            gap: 0.2rem;
+          }
+          .chair-arrow {
+            width: 38px;
+            height: 46px;
+            margin-top: 0.05rem;
+            transform: rotate(-90deg);
+          }
+          .chair-text {
+            font-size: 0.72rem;
+            line-height: 1.22;
+          }
+          .chair-sub {
+            font-size: 0.6rem;
           }
           .hero-action-dock-split {
             flex-direction: column;
@@ -414,13 +466,16 @@ export default function Hero() {
             transform: translate(-50%, 50%);
           }
           .hero-bottom-area {
-            bottom: clamp(3rem, 6vh, 4.5rem);
+            bottom: clamp(4.25rem, 8vh, 5.75rem);
           }
         }
 
         @media (max-width: 480px) {
           .hero-center-content {
-            top: clamp(4.5rem, 13vh, 8rem);
+            top: clamp(5.4rem, 9vh, 7.2rem);
+          }
+          .hero-chair-annotation {
+            top: clamp(36%, 39vh, 42%);
           }
         }
       `}</style>
