@@ -231,7 +231,7 @@ export default function Judges() {
 
         <div className="jd-head-wrap">
           <RevealBlock y={10}>
-            <span className="jd-eyebrow">005 · The panel &amp; mentors</span>
+            <span className="jd-eyebrow">The panel &amp; mentors</span>
           </RevealBlock>
 
           <RevealHeading className="jd-heading" lines={["Mentors & Judges"]} />

@@ -90,7 +90,7 @@ export default function Themes() {
 
         <div className="th-head-wrap">
           <RevealBlock y={10}>
-            <span className="th-eyebrow">004 · The four tracks</span>
+            <span className="th-eyebrow">The four tracks</span>
           </RevealBlock>
 
           <RevealHeading
