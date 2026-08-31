@@ -18,12 +18,17 @@ export default function Hero() {
   const centerRef = useRef<HTMLDivElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
 
-  // The 56 MB 4K loop is a progressive enhancement. Phones, tablets, data-saver
-  // and reduced-motion keep the still poster and never fetch it. Starts false so
-  // SSR + hydration render the poster; the effect upgrades capable clients.
-  const [useVideo, setUseVideo] = useState(false);
+  // Enable video playback across devices unless reduced-motion is requested
+  const [useVideo, setUseVideo] = useState(true);
   useEffect(() => {
-    setUseVideo(!prefersLiteMedia());
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    setUseVideo(!reduceMotion);
+
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
   }, []);
 
   const [introFinished, setIntroFinished] = useState(() => {
@@ -524,8 +529,8 @@ export default function Hero() {
             width: 100vw;
           }
           .hero-chair-annotation {
-            left: calc(50% + 10px);
-            top: 54%;
+            left: calc(50% + 12px);
+            top: 53.5%;
             transform: translateY(-50%);
             gap: 0.35rem;
             max-width: calc(50vw - 12px);
@@ -536,8 +541,8 @@ export default function Hero() {
             z-index: 30;
           }
           .chair-arrow {
-            width: 44px;
-            height: 35px;
+            width: 38px;
+            height: 30px;
             margin-top: 0;
             transform: none;
             opacity: 1 !important;
@@ -555,7 +560,7 @@ export default function Hero() {
             text-align: left;
           }
           .chair-text {
-            font-size: clamp(0.68rem, 2.3vw, 0.78rem) !important;
+            font-size: clamp(0.62rem, 2.1vw, 0.72rem) !important;
             font-weight: 800 !important;
             line-height: 1.22 !important;
             color: #000000 !important;
@@ -564,7 +569,7 @@ export default function Hero() {
             text-shadow: none !important;
           }
           .chair-sub {
-            font-size: clamp(0.55rem, 1.8vw, 0.62rem) !important;
+            font-size: clamp(0.5rem, 1.6vw, 0.58rem) !important;
             font-weight: 700 !important;
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
@@ -606,19 +611,19 @@ export default function Hero() {
             width: 100vw;
           }
           .hero-chair-annotation {
-            left: calc(50% + 6px);
-            top: 54%;
+            left: calc(50% + 8px);
+            top: 53.5%;
           }
           .chair-arrow {
-            width: 38px;
-            height: 30px;
+            width: 34px;
+            height: 26px;
           }
           .chair-text {
-            font-size: 0.68rem !important;
+            font-size: 0.62rem !important;
             line-height: 1.18 !important;
           }
           .chair-sub {
-            font-size: 0.55rem !important;
+            font-size: 0.5rem !important;
           }
         }
       `}</style>
