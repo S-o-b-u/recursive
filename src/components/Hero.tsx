@@ -147,12 +147,7 @@ export default function Hero() {
       </div>
 
       {/* ── Simple Clean Chair Annotation (No Box, No Glow) ── */}
-      <motion.div
-        className="hero-chair-annotation"
-        initial={reduced ? false : { opacity: 0, scale: 0.95 }}
-        animate={introFinished ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.75, delay: 0.35, ease: EASE_OUT }}
-      >
+      <div className="hero-chair-annotation">
         <svg
           className="chair-arrow"
           width="96"
@@ -183,7 +178,7 @@ export default function Hero() {
           </p>
           <span className="chair-sub">scroll for lore ↓</span>
         </a>
-      </motion.div>
+      </div>
 
       <style href="hero-style" precedence="default" suppressHydrationWarning>{`
         .hero {
@@ -277,11 +272,11 @@ export default function Hero() {
         }
 
         .chair-arrow {
-          color: #111a12;
+          color: #000000;
           flex-shrink: 0;
-          opacity: 0.9;
+          opacity: 1;
           margin-top: 0.2rem;
-          filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.8));
+          filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.9));
         }
 
         .chair-note {
@@ -301,17 +296,17 @@ export default function Hero() {
           font-weight: 700;
           line-height: 1.32;
           letter-spacing: -0.015em;
-          color: #111a12;
+          color: #000000;
           margin: 0;
-          text-shadow: 0 1px 12px rgba(255, 255, 255, 0.9), 0 0 4px #ffffff;
+          text-shadow: 0 1px 12px rgba(255, 255, 255, 0.95), 0 0 4px #ffffff;
           transition: opacity 150ms ease;
         }
 
         .chair-sub {
           font-family: var(--font-geist-mono), monospace;
           font-size: 0.68rem;
-          font-weight: 600;
-          color: #2b4923;
+          font-weight: 700;
+          color: #000000;
           letter-spacing: 0.02em;
           text-shadow: 0 1px 8px rgba(255, 255, 255, 0.9);
         }
@@ -509,22 +504,22 @@ export default function Hero() {
             height: 44px;
             margin-top: 0.05rem;
             transform: rotate(-90deg);
-            opacity: 0.95;
-            color: #111a12;
-            filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.9));
+            opacity: 1;
+            color: #000000;
+            filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.95));
           }
           .chair-text {
             font-size: 0.84rem;
             font-weight: 700;
             line-height: 1.25;
-            color: #111a12;
+            color: #000000;
             text-align: center;
             text-shadow: 0 1px 12px rgba(255, 255, 255, 0.95), 0 0 6px #ffffff;
           }
           .chair-sub {
             font-size: 0.68rem;
-            font-weight: 600;
-            color: #233e1c;
+            font-weight: 700;
+            color: #000000;
             text-align: center;
             text-shadow: 0 1px 8px rgba(255, 255, 255, 0.9);
           }
