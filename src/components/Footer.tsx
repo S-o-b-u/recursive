@@ -503,18 +503,23 @@ export default function Footer() {
           margin-top: clamp(3rem, 8vh, 6.5rem);
         }
 
-        /* Subtle dark ground shadow right under the feet at the very bottom edge */
+        /* Subtle dark blur and shadow right under the feet at the very bottom edge */
         .footer-ground-gradient {
           position: absolute;
           inset: auto 0 0 0;
-          height: clamp(28px, 14%, 56px);
+          height: clamp(34px, 16%, 64px);
           z-index: 25;
           pointer-events: none;
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+          mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 1) 100%);
+          -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 1) 100%);
           background: linear-gradient(
             180deg,
             transparent 0%,
-            rgba(8, 20, 10, 0.28) 50%,
-            rgba(4, 12, 6, 0.65) 100%
+            rgba(6, 16, 8, 0.25) 35%,
+            rgba(4, 12, 6, 0.55) 70%,
+            rgba(2, 6, 3, 0.85) 100%
           );
         }
       `}</style>
