@@ -604,7 +604,6 @@ export const WarpText: React.FC<WarpTextProps> = ({
     const targetSrc = propsRef.current.src || propsRef.current.imageSrc;
     if (targetSrc) {
       const img = new window.Image();
-      img.crossOrigin = "anonymous";
       
       const onLoaded = () => {
         loadedImageRef.current = img;
