@@ -260,7 +260,7 @@ export default function Hero() {
         /* ── Top Center Block: Wordmark with WebGL Warp ── */
         .hero-center-content {
           position: absolute;
-          top: clamp(3.2rem, 9.5vh, 7.5rem);
+          top: clamp(1.8rem, 5.5vh, 4.8rem);
           left: 0;
           right: 0;
           width: 100%;
@@ -462,7 +462,7 @@ export default function Hero() {
 
         @media (max-width: 1024px) {
           .hero-center-content {
-            top: clamp(4.5rem, 10vh, 6.8rem);
+            top: clamp(3.2rem, 7.5vh, 5.2rem);
           }
           .hero-warp-wrap {
             max-width: 98vw;
@@ -472,7 +472,7 @@ export default function Hero() {
 
         @media (max-width: 860px) {
           .hero-center-content {
-            top: clamp(5.2rem, 11.5vh, 7.8rem);
+            top: clamp(4rem, 9vh, 6.2rem);
           }
           .hero-warp-wrap {
             height: clamp(180px, 38vw, 300px);
