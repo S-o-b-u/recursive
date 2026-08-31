@@ -72,25 +72,7 @@ async function main() {
         fs.writeFileSync('faq-mobile.png', Buffer.from(screenshot.data, 'base64'));
         console.log('Saved mobile screenshot to faq-mobile.png');
 
-        // 2. Tablet Snapshot
-        await send('Emulation.setDeviceMetricsOverride', {
-          width: 820,
-          height: 1000,
-          deviceScaleFactor: 2,
-          mobile: true
-        });
-        await send('Runtime.evaluate', { 
-          expression: `
-            const faq = document.querySelector('#faq');
-            if (faq) faq.scrollIntoView({ block: 'start' });
-          `
-        });
-        await new Promise(r => setTimeout(r, 1200));
-        screenshot = await send('Page.captureScreenshot', { format: 'png' });
-        fs.writeFileSync('faq-tablet.png', Buffer.from(screenshot.data, 'base64'));
-        console.log('Saved tablet screenshot to faq-tablet.png');
-
-        // 3. Desktop Snapshot
+        // Desktop Snapshot
         await send('Emulation.setDeviceMetricsOverride', {
           width: 1440,
           height: 900,
@@ -99,14 +81,18 @@ async function main() {
         });
         await send('Runtime.evaluate', { 
           expression: `
-            const faq = document.querySelector('#faq');
-            if (faq) faq.scrollIntoView({ block: 'start' });
+            const el = document.querySelector('#faq');
+            if (window.lenis && el) {
+              window.lenis.scrollTo(el.offsetTop + 400, { immediate: true, force: true });
+            } else if (el) {
+              window.scrollTo(0, el.offsetTop + 400);
+            }
           `
         });
-        await new Promise(r => setTimeout(r, 1200));
+        await new Promise(r => setTimeout(r, 1500));
         screenshot = await send('Page.captureScreenshot', { format: 'png' });
-        fs.writeFileSync('faq-desktop.png', Buffer.from(screenshot.data, 'base64'));
-        console.log('Saved desktop screenshot to faq-desktop.png');
+        fs.writeFileSync('faq-desktop-exact.png', Buffer.from(screenshot.data, 'base64'));
+        console.log('Saved desktop screenshot to faq-desktop-exact.png');
 
         edge.kill();
         process.exit(0);
