@@ -504,6 +504,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
         dpr: Math.min(window.devicePixelRatio || 1, 2),
       });
       gl = renderer.gl;
+      if (!gl) throw new Error("WebGL context creation failed");
     } catch (error) {
       console.warn("WarpText: WebGL could not be initialized.", error);
       if (propsRef.current.src || propsRef.current.imageSrc) {
@@ -514,6 +515,12 @@ export const WarpText: React.FC<WarpTextProps> = ({
         img.style.height = "100%";
         img.style.objectFit = "contain";
         img.style.objectPosition = "center bottom";
+        
+        // If we are colorizing to dark, invert the white logo in fallback
+        if (propsRef.current.color === "#111a12") {
+          img.style.filter = "invert(1) brightness(0.1)";
+        }
+        
         container.appendChild(img);
       }
       return undefined;
@@ -598,14 +605,49 @@ export const WarpText: React.FC<WarpTextProps> = ({
     if (targetSrc) {
       const img = new window.Image();
       img.crossOrigin = "anonymous";
+      
       const onLoaded = () => {
         loadedImageRef.current = img;
         rasterize();
       };
+
+      const onError = () => {
+        console.warn("WarpText: Failed to load image for WebGL, falling back to basic <img>", targetSrc);
+        // Clean up WebGL
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+        try {
+          if (texture?.texture) gl.deleteTexture(texture.texture);
+          geometry?.remove?.();
+          program?.remove?.();
+          gl.getExtension("WEBGL_lose_context")?.loseContext();
+        } catch {}
+        if (canvas && canvas.parentNode === container) {
+          container.removeChild(canvas);
+        }
+        
+        // Add fallback image
+        const fallbackImg = document.createElement("img");
+        fallbackImg.src = targetSrc;
+        fallbackImg.alt = propsRef.current.text || "Logo";
+        fallbackImg.style.width = "100%";
+        fallbackImg.style.height = "100%";
+        fallbackImg.style.objectFit = "contain";
+        fallbackImg.style.objectPosition = "center bottom";
+        if (propsRef.current.color === "#111a12") {
+          fallbackImg.style.filter = "invert(1) brightness(0.1)";
+        }
+        container.appendChild(fallbackImg);
+      };
+
       img.onload = onLoaded;
+      img.onerror = onError;
       img.src = targetSrc;
+      
       if (img.complete && img.naturalWidth > 0) {
         onLoaded();
+      } else if (img.complete && img.naturalWidth === 0) {
+        onError();
       }
     }
 
