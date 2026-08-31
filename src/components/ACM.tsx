@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { RevealBlock, RevealHeading } from "@/components/ui/reveal";
+import { RevealBlock, RevealHeading, RevealWords } from "@/components/ui/reveal";
 import Ornament from "@/components/ui/Ornament";
 import { COLLEGE } from "@/data/hackathon";
 
@@ -43,8 +43,10 @@ const SUBLOGOS = [
   },
 ];
 
-const STORY =
-  "The chapter brings together developers, designers, and builders from across Kolkata for eight hours of focused work and honest software craft. Rooted in student-led technical exploration, we provide the mentorship, infrastructure, and community for ideas to take shape.";
+const STORY_PARAGRAPHS = [
+  `In collaboration with the ${COLLEGE.collaboration}, ${COLLEGE.college}.`,
+  "The chapter brings together developers, designers, and builders from across Kolkata for eight hours of focused work and honest software craft. Rooted in student-led technical exploration, we provide the mentorship, infrastructure, and community for ideas to take shape.",
+];
 
 export default function ACM() {
   return (
@@ -82,18 +84,16 @@ export default function ACM() {
           </div>
         </RevealBlock>
 
-        {/* ── The narrative. Its tail fades into the page the way the
-               reference does, so the block ends without a hard stop. ── */}
-        <RevealBlock y={18} delay={0.14}>
-          <div className="acm-story">
-            <p className="acm-story-lead">
-              In collaboration with the{" "}
-              <span className="acm-story-strong">{COLLEGE.collaboration}</span>,{" "}
-              {COLLEGE.college}.
-            </p>
-            <p className="acm-story-body">{STORY}</p>
-          </div>
-        </RevealBlock>
+        {/* ── The narrative. Illuminates word-by-word with scroll (matching The Story of the Chair) ── */}
+        <div className="acm-story-wrap">
+          <RevealWords
+            paragraphs={STORY_PARAGRAPHS}
+            className="acm-story-words"
+            start="top 80%"
+            end="bottom 68%"
+            dim={0.16}
+          />
+        </div>
 
         {/* ── Everything else the institution stands on ── */}
         <RevealBlock y={18} delay={0.18}>
@@ -230,53 +230,28 @@ export default function ACM() {
           color: #4A6146;
         }
 
-        /* ── Narrative ── */
-        .acm-story {
-          margin-top: clamp(1.9rem, 4.5vh, 3.2rem);
+        /* ── Narrative (RevealWords with Scroll Scrub) ── */
+        .acm-story-wrap {
+          margin-top: clamp(2rem, 4.8vh, 3.5rem);
           max-width: 58ch;
+          margin-inline: auto;
         }
 
-        .acm-story-lead {
-          margin: 0;
+        .acm-story-words .rw-para {
           font-family: var(--font-dm-sans), system-ui, sans-serif;
-          font-size: clamp(1rem, 13.07px + 0.815vw, 1.28rem);
-          font-weight: 500;
-          line-height: 1.6;
-          letter-spacing: -0.012em;
-          color: #1B2C1E;
-          text-wrap: pretty;
-        }
-
-        .acm-story-strong {
-          font-weight: 700;
-          color: #2F5527;
-        }
-
-        /* The tail dissolves into the page rather than stopping dead. A mask
-           keeps the text selectable and searchable, unlike a clipped gradient. */
-        .acm-story-body {
-          margin: clamp(0.7rem, 1.6vh, 1.05rem) 0 0;
-          font-family: var(--font-dm-sans), system-ui, sans-serif;
-          font-size: clamp(0.95rem, 12.13px + 0.815vw, 1.2rem);
+          font-size: clamp(1.05rem, 13.07px + 0.815vw, 1.3rem);
           font-weight: 400;
-          line-height: 1.72;
-          letter-spacing: -0.008em;
-          color: #33473A;
+          line-height: 1.68;
+          letter-spacing: -0.01em;
+          color: #1B2C1E;
+          text-align: center;
           text-wrap: pretty;
-          -webkit-mask-image: linear-gradient(
-            180deg,
-            #000 0%,
-            #000 46%,
-            rgba(0, 0, 0, 0.72) 74%,
-            rgba(0, 0, 0, 0.38) 100%
-          );
-          mask-image: linear-gradient(
-            180deg,
-            #000 0%,
-            #000 46%,
-            rgba(0, 0, 0, 0.72) 74%,
-            rgba(0, 0, 0, 0.38) 100%
-          );
+        }
+
+        .acm-story-words .rw-para:first-child {
+          font-weight: 600;
+          color: #2F5527;
+          font-size: clamp(1.12rem, 14px + 0.9vw, 1.4rem);
         }
 
         /* ── Accreditation marks, below the story ── */

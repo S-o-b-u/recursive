@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { TRACKS } from "@/data/hackathon";
-import { RevealHeading, RevealBlock } from "@/components/ui/reveal";
+import { RevealHeading, RevealBlock, RevealWords } from "@/components/ui/reveal";
 import Ornament from "@/components/ui/Ornament";
 import MorphSlider, {
   type MorphSliderApi,
@@ -99,12 +99,17 @@ export default function Themes() {
             lines={HEADING_LINES}
           />
 
-          <RevealBlock y={12} delay={0.06}>
-            <p className="th-lede">
-              One seat at the table for each. Pick the one you cannot stop
-              thinking about — every track is judged on the same four criteria.
-            </p>
-          </RevealBlock>
+          <div className="th-lede-wrap">
+            <RevealWords
+              paragraphs={[
+                "One seat at the table for each. Pick the one you cannot stop thinking about — every track is judged on the same four criteria.",
+              ]}
+              className="th-lede-words"
+              start="top 84%"
+              end="bottom 72%"
+              dim={0.16}
+            />
+          </div>
         </div>
 
         {/* ── Stage: morphing plate on the left, the brief on the right ── */}
@@ -288,13 +293,18 @@ export default function Themes() {
         }
         .th-heading .rh-line { display: flex; justify-content: center; }
 
-        .th-lede {
+        .th-lede-wrap {
           margin: clamp(0.85rem, 1.8vh, 1.25rem) auto 0;
-          max-width: 42rem;
+          max-width: 44rem;
+        }
+
+        .th-lede-words .rw-para {
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: clamp(1rem, 1.45vw, 1.15rem);
+          font-size: clamp(1rem, 1.45vw, 1.2rem);
+          font-weight: 400;
           line-height: 1.62;
-          color: rgba(222, 235, 212, 0.6);
+          color: rgba(222, 235, 212, 0.9);
+          text-align: center;
           text-wrap: pretty;
         }
 
