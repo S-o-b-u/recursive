@@ -24,20 +24,26 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Avoid pin recalculation thrash when the mobile URL bar shows/hides.
+    // On mobile and touch screens, native momentum scrolling is handled by GPU compositor at 120Hz.
+    // We should NOT hijack touch scrolling with Lenis JS lerp on mobile.
+    const isTouch =
+      typeof window !== 'undefined' &&
+      ('ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth < 860);
+
     ScrollTrigger.config({ ignoreMobileResize: true });
 
-    // Lenis 1.x drives native window scroll (autoRaf defaults to false), so we
-    // pump it from GSAP's ticker and keep ScrollTrigger in sync on every frame.
     const lenis = new Lenis({
-      duration: 1.15,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Apple-style fluid exponential ease-out
-      smoothWheel: true,
-      wheelMultiplier: 1.0,
-      touchMultiplier: 1.5,
+      duration: isTouch ? 0 : 1.15,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: !isTouch,
+      syncTouch: false,
+      touchMultiplier: 1.0,
     });
     lenisRef.current = lenis;
     setLenis(lenis);
+    if (typeof window !== 'undefined') {
+      (window as any).lenis = lenis;
+    }
 
     lenis.on('scroll', ScrollTrigger.update);
 

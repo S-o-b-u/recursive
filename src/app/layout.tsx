@@ -4,7 +4,6 @@ import { display, geistMono, hiruko, dmSans, headingNow, bebasNeue } from "./fon
 import SmoothScroll from "@/components/SmoothScroll";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import GradualBlur from "@/components/ui/GradualBlur";
 import PageTransition from "@/components/PageTransition";
 import { EVENT } from "@/data/hackathon";
 
@@ -30,18 +29,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </SmoothScroll>
 
         <PageTransition />
-
-        <GradualBlur
-          target="page"
-          position="bottom"
-          height="5rem"
-          strength={1.6}
-          divCount={3}
-          curve="bezier"
-          exponential
-          opacity={0.95}
-          zIndex={0}
-        />
       </body>
     </html>
   );

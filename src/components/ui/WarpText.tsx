@@ -228,7 +228,7 @@ const buildTextCanvas = ({
       if (props.color && props.color !== "original") {
         ctx.globalCompositeOperation = "source-in";
         ctx.fillStyle = props.color;
-        ctx.fillRect(drawX, drawY, drawW, drawH);
+        ctx.fillRect(0, 0, width, height);
         ctx.globalCompositeOperation = "source-over";
       }
 
@@ -425,7 +425,6 @@ export const WarpText: React.FC<WarpTextProps> = ({
 
     if (effectiveSrc) {
       const img = new window.Image();
-      img.crossOrigin = "anonymous";
       const onLoaded = () => {
         loadedImageRef.current = img;
         if (contextRef.current) {
@@ -433,6 +432,9 @@ export const WarpText: React.FC<WarpTextProps> = ({
         }
       };
       img.onload = onLoaded;
+      img.onerror = (e) => {
+        console.warn("WarpText: Image load error:", effectiveSrc, e);
+      };
       img.src = effectiveSrc;
       if (img.complete && img.naturalWidth > 0) {
         onLoaded();
@@ -517,8 +519,8 @@ export const WarpText: React.FC<WarpTextProps> = ({
         img.style.objectPosition = "center bottom";
         
         // If we are colorizing to dark, invert the white logo in fallback
-        if (propsRef.current.color === "#111a12") {
-          img.style.filter = "invert(1) brightness(0.1)";
+        if (propsRef.current.color !== "original" && propsRef.current.color !== "#ffffff") {
+          img.style.filter = "invert(1) brightness(0)";
         }
         
         container.appendChild(img);
@@ -633,8 +635,8 @@ export const WarpText: React.FC<WarpTextProps> = ({
         fallbackImg.style.height = "100%";
         fallbackImg.style.objectFit = "contain";
         fallbackImg.style.objectPosition = "center bottom";
-        if (propsRef.current.color === "#111a12") {
-          fallbackImg.style.filter = "invert(1) brightness(0.1)";
+        if (propsRef.current.color !== "original" && propsRef.current.color !== "#ffffff") {
+          fallbackImg.style.filter = "invert(1) brightness(0)";
         }
         container.appendChild(fallbackImg);
       };
@@ -663,7 +665,6 @@ export const WarpText: React.FC<WarpTextProps> = ({
     };
 
     const onPointerMove = (event: PointerEvent) => {
-      if (event.pointerType === "touch") return;
       const rect = canvas.getBoundingClientRect();
       if (rect.width <= 0 || rect.height <= 0) return;
       pointer.tx = (event.clientX - rect.left) / rect.width;
@@ -784,11 +785,32 @@ export const WarpText: React.FC<WarpTextProps> = ({
     <div
       ref={containerRef}
       className={`warp-text ${className}`.trim()}
-      style={style}
+      style={{ position: "relative", ...style }}
       role="heading"
       aria-level={2}
       aria-label={typeof text === "string" ? text : "heading"}
-    />
+    >
+      {effectiveSrc && (
+        <img
+          src={effectiveSrc}
+          alt={typeof text === "string" ? text : "Recursive Logo"}
+          className="warp-text-fallback-img"
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            objectPosition: "center center",
+            pointerEvents: "none",
+            filter: color !== "original" && color !== "#ffffff" ? "invert(1) brightness(0)" : undefined,
+            userSelect: "none",
+          }}
+          loading="eager"
+          decoding="async"
+        />
+      )}
+    </div>
   );
 };
 

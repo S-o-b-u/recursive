@@ -19,6 +19,36 @@ const EASE =
 /** Same, for the layers whose box also resizes with `dimensions`. */
 const EASE_SIZE = `${EASE}, width 0.4s ease, height 0.4s ease`;
 
+/**
+ * Every button used to mount its own WebGL ShaderMount. A page with a dozen of
+ * them (hero, nav, about, themes, sponsors, footer…) opened 12+ live WebGL2
+ * contexts on top of the two WarpText canvases — past the browser's ~16-context
+ * ceiling, which evicts the oldest (the hero wordmark) and pins a phone GPU.
+ *
+ * So the shader is a progressive enhancement for devices that can actually spend
+ * it: a fine pointer, a roomy viewport, motion allowed, no Save-Data. Everywhere
+ * else the pill falls back to a pure-CSS liquid-metal surface (see the injected
+ * `.shader-container-exploded` background + `.is-lite` sheen) — visually close,
+ * zero GPU contexts.
+ */
+function preferLiteButton(): boolean {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    return true;
+  }
+  try {
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    const small = window.matchMedia("(max-width: 860px)").matches;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // biome-ignore lint/suspicious/noExplicitAny: navigator.connection is not typed
+    const conn = (navigator as any)?.connection;
+    const saveData = !!conn?.saveData;
+    const slow = typeof conn?.effectiveType === "string" && /2g/.test(conn.effectiveType);
+    return coarse || small || reduce || saveData || slow;
+  } catch {
+    return false;
+  }
+}
+
 export interface LiquidMetalButtonProps {
   label?: string;
   onClick?: () => void;
@@ -56,6 +86,10 @@ export function LiquidMetalButton({
   const rippleId = useRef(0);
   const visibleRef = useRef(true);
   const hoverRef = useRef(false);
+  // Resolved on the client in the mount effect. SSR + first paint render the
+  // CSS surface (lite=false → no is-lite class yet, no shader); the effect then
+  // decides. On lite devices the shader is never created at all.
+  const [lite, setLite] = useState(false);
 
   /**
    * What the shader should idle at right now.
@@ -110,6 +144,27 @@ export function LiquidMetalButton({
           left: 0 !important;
           border-radius: 100px !important;
         }
+        /* CSS liquid-metal base. On capable devices the WebGL canvas overlays
+           this; on phones/tablets (no shader) it IS the surface, so the pill
+           never renders flat. */
+        .shader-container-exploded {
+          background:
+            linear-gradient(135deg, #e2e6e9 0%, #b0b6bb 15%, #585d62 39%, #24272b 51%, #494e53 65%, #b9bfc4 88%, #e6eaed 100%);
+        }
+        .shader-container-exploded.is-lite::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: 100px;
+          background: linear-gradient(115deg, transparent 34%, rgba(255,255,255,0.55) 50%, transparent 66%);
+          background-size: 260% 100%;
+          animation: lm-sheen 3.6s linear infinite;
+          pointer-events: none;
+        }
+        @keyframes lm-sheen {
+          from { background-position: 150% 0; }
+          to { background-position: -170% 0; }
+        }
         @keyframes ripple-animation {
           0% {
             transform: translate(-50%, -50%) scale(0);
@@ -122,6 +177,14 @@ export function LiquidMetalButton({
         }
       `;
       document.head.appendChild(style);
+    }
+
+    // Decide once, on the client, whether this button spends a WebGL context.
+    const useLite = preferLiteButton();
+    setLite(useLite);
+    if (useLite) {
+      // Pure-CSS pill — the injected metallic background + sheen carry it.
+      return;
     }
 
     let observer: IntersectionObserver | null = null;
@@ -340,7 +403,7 @@ export function LiquidMetalButton({
             >
               <div
                 ref={shaderRef}
-                className="shader-container-exploded"
+                className={`shader-container-exploded${lite ? " is-lite" : ""}`}
                 style={{
                   borderRadius: "100px",
                   overflow: "hidden",

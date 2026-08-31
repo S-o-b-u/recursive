@@ -40,9 +40,8 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
 
     // What should stay constant is how much of the wordmark the crowd covers,
     // not the crowd's share of the footer. On a phone the letters are width-
-    // limited and sit higher in the footer, so the band has to be deeper there
-    // to lap them the way it does on desktop.
-    const crowdBand = () => (stage.width < 620 ? 0.48 : 0.42);
+    // limited, so the band depth matches the desktop marking exactly.
+    const crowdBand = () => (stage.width < 620 ? 0.48 : stage.width < 1024 ? 0.44 : 0.42);
     const fitFor = (peepH: number) =>
       Math.min(1, Math.max(0.18, (stage.height * crowdBand()) / peepH));
 
@@ -51,7 +50,11 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       const direction = Math.random() > 0.5 ? 1 : -1;
       const fit = fitFor(peep.height);
 
-      const offsetY = (100 - 250 * gsap.parseEase("power2.in")(Math.random())) * fit;
+      // On phones, anchor them right above the bottom edge so full bodies are visible
+      const isMobile = stage.width < 620;
+      const offsetY = isMobile
+        ? (-2 - 18 * gsap.parseEase("power2.in")(Math.random())) * fit
+        : (10 - 45 * gsap.parseEase("power2.in")(Math.random())) * fit;
       const startY = stage.height - peep.height * fit + offsetY;
       let startX: number;
       let endX: number;
@@ -121,6 +124,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       y: number;
       anchorY: number;
       scaleX: number;
+      scaleY: number;
       walk: any;
       setRect: (rect: number[]) => void;
       render: (ctx: CanvasRenderingContext2D) => void;
@@ -144,6 +148,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
         y: 0,
         anchorY: 0,
         scaleX: 1,
+        scaleY: 1,
         walk: null,
         setRect: (rect: number[]) => {
           peep.rect = rect;
@@ -154,7 +159,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
         render: (ctx: CanvasRenderingContext2D) => {
           ctx.save();
           ctx.translate(peep.x, peep.y);
-          ctx.scale(peep.scaleX, 1);
+          ctx.scale(peep.scaleX, peep.scaleY);
           ctx.drawImage(
             peep.image,
             peep.rect[0],
@@ -210,14 +215,14 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     // Peeps shrink with the footer, so a head-count based on width alone
     // leaves gaps on short screens. Base it on how wide each peep actually
     // draws, and the wall stays equally packed at every size.
-    const CROWD_DENSITY = 9.2;
+    const CROWD_DENSITY = 14;
 
     const initCrowd = () => {
       const sample = allPeeps[0];
       const drawnWidth = sample ? sample.width * fitFor(sample.height) : 120;
       const target = Math.min(
         allPeeps.length,
-        Math.max(26, Math.round((CROWD_DENSITY * stage.width) / drawnWidth)),
+        Math.max(stage.width < 620 ? 38 : 28, Math.round((CROWD_DENSITY * stage.width) / drawnWidth)),
       );
       while (availablePeeps.length && crowd.length < target) {
         addPeepToCrowd().walk.progress(Math.random());
@@ -383,18 +388,18 @@ export default function Footer() {
         <WarpText
           text={EVENT.name}
           color="linear-gradient(180deg, #070e08 0%, #0f1c12 36%, #1a301e 72%, #2c4e30 100%)"
-          warpStrength={0.07}
+          warpStrength={0.06}
           warpScale={1.6}
           speed={0.5}
           pointerInfluence={0.45}
           pointerStrength={0.4}
           refraction={0.016}
           ripple
-          fontSize="min(clamp(5.5rem, 29vw, 36rem), 40vh)"
+          fontSize="min(clamp(7.5rem, 34vw, 42rem), 60vh)"
           fontWeight={900}
-          fontFamily="var(--font-heading), var(--font-dm-sans), sans-serif"
-          letterSpacing="0.02em"
-          lineHeight={0.88}
+          fontFamily="var(--font-bebas), var(--font-heading), sans-serif"
+          letterSpacing="0.01em"
+          lineHeight={0.82}
           style={{
             width: "100%",
             maxWidth: "100vw",
@@ -404,16 +409,13 @@ export default function Footer() {
         />
       </div>
 
-      {/* ── Transparent gradient below the recursive logo ── */}
-      <div className="footer-logo-gradient" aria-hidden="true" />
-
-      {/* ── Whisper of ground under crowd ── */}
-      <div className="footer-ground" aria-hidden="true" />
-
       {/* ── OpenPeeps Animated Crowd Canvas (z-20 in front of the giant letters) ── */}
       <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
         <CrowdCanvas src="/images/peeps/all-peeps.png" rows={15} cols={7} />
       </div>
+
+      {/* ── Dark gradient concealing the straight bottom cut-edge of the crowd ── */}
+      <div className="footer-cutout-fade" aria-hidden="true" />
 
       {/* ── Floating Back to Top Button ── */}
       <div className="absolute bottom-6 right-6 pointer-events-auto" style={{ zIndex: 110 }}>
@@ -421,7 +423,7 @@ export default function Footer() {
           type="button"
           onClick={scrollToTop}
           aria-label="Back to top"
-          className="group w-10 h-10 rounded-full bg-white/60 hover:bg-white/90 backdrop-blur-md border border-black/[0.08] hover:border-[#5C8C3A]/40 flex items-center justify-center text-[#142617] transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer shadow-xs"
+          className="group w-10 h-10 rounded-full bg-white/90 border border-black/[0.12] hover:border-[#5C8C3A]/60 flex items-center justify-center text-[#142617] transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer shadow-sm"
         >
           <svg
             width="14"
@@ -446,9 +448,7 @@ export default function Footer() {
           position: absolute;
           inset-inline: 0;
           bottom: clamp(0.5rem, 4vh, 2.75rem);
-          /* Capped against the footer itself: the vh term alone lets the px
-             floor push the letters out of the top of a short footer. */
-          height: min(clamp(260px, 50vh, 580px), 86%);
+          height: min(clamp(280px, 56vh, 640px), 90%);
           z-index: 10;
           display: flex;
           justify-content: center;
@@ -458,17 +458,33 @@ export default function Footer() {
           padding-inline: clamp(0.2rem, 1.2vw, 1rem);
         }
 
-        @media (max-width: 620px) {
-          .footer-wordmark-wrap {
-            bottom: 42%;
-            height: 40%;
+        @media (max-width: 1024px) {
+          footer.footer-shell {
+            min-height: clamp(240px, 44vw, 440px);
+            height: clamp(240px, 44vw, 440px);
+            margin-top: clamp(1rem, 3vh, 2.5rem);
           }
-          .footer-shell {
-            margin-top: clamp(1.5rem, 4.5vh, 3rem);
+          .footer-wordmark-wrap {
+            bottom: clamp(0.5rem, 2vw, 1.5rem);
+            height: 92%;
+            padding-inline: 1vw;
           }
         }
 
-        /* Luminous radial glow and aura behind the letters */
+        @media (max-width: 620px) {
+          footer.footer-shell {
+            min-height: clamp(200px, 54vw, 290px);
+            height: clamp(200px, 54vw, 290px);
+            margin-top: clamp(0.5rem, 1.5vh, 1.5rem);
+          }
+          .footer-wordmark-wrap {
+            bottom: clamp(0.2rem, 1.5vw, 0.8rem);
+            height: 94%;
+            padding-inline: 0;
+          }
+        }
+
+        /* Luminous radial glow behind the letters */
         .footer-aurora {
           position: absolute;
           inset: auto 0 0 0;
@@ -481,41 +497,25 @@ export default function Footer() {
             radial-gradient(ellipse 50% 40% at 85% 80%, rgba(180, 215, 170, 0.24) 0%, transparent 68%);
         }
 
-        /* Transparent fading gradient directly below the logo letters */
-        .footer-logo-gradient {
-          position: absolute;
-          inset: auto 0 0 0;
-          height: min(clamp(120px, 20vh, 240px), 34%);
-          z-index: 12;
-          pointer-events: none;
-          background: linear-gradient(
-            180deg,
-            transparent 0%,
-            rgba(239, 243, 235, 0.03) 25%,
-            rgba(215, 228, 208, 0.18) 65%,
-            rgba(188, 209, 180, 0.32) 100%
-          );
-        }
-
         /* Open sky between the panel above and the crowd, so the footer
            arrives as its own beat rather than butting straight onto ACM. */
         .footer-shell {
           margin-top: clamp(3rem, 8vh, 6.5rem);
         }
 
-        /* A whisper of ground under the crowd, so they are standing on
-           something rather than floating in the sky. */
-        .footer-ground {
+        /* Pure rich dark gradient concealing the bottom cut edge of people */
+        .footer-cutout-fade {
           position: absolute;
           inset: auto 0 0 0;
-          height: 32%;
-          z-index: 15;
+          height: clamp(34px, 12.5%, 72px);
+          z-index: 25;
           pointer-events: none;
           background: linear-gradient(
             180deg,
-            rgba(200, 214, 194, 0) 0%,
-            rgba(190, 206, 182, 0.12) 50%,
-            rgba(176, 194, 166, 0.26) 100%
+            rgba(4, 10, 5, 0) 0%,
+            rgba(4, 10, 5, 0.45) 30%,
+            rgba(3, 8, 4, 0.88) 65%,
+            #020603 100%
           );
         }
       `}</style>

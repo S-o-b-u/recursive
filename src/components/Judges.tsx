@@ -287,6 +287,71 @@ export default function Judges() {
               })}
             </div>
 
+            {/* ── Mobile: Smooth Infinite Marquee Tracks with Hover/Touch Pause (< 680px) ── */}
+            <div className="jd-marquee-wrap" aria-label="Mentors and judges scrolling carousel">
+              {/* Row 1 — Seats 1 to 5 scrolling left */}
+              <div className="jd-marquee-track jd-marquee-track-1">
+                {[...JUDGES.slice(0, 5), ...JUDGES.slice(0, 5)].map((judge, idx) => {
+                  const originalIdx = idx % 5;
+                  const seat = SEATS[originalIdx];
+                  const filled = judge.name.trim().length > 0 && !!judge.photo.src;
+
+                  return (
+                    <div className="jd-marquee-card" key={`m1-${idx}-${judge.photo.expect}`}>
+                      <FlipCard
+                        ratio="3 / 4.4"
+                        disabled={!filled}
+                        label={
+                          filled
+                            ? `${judge.name} — ${judge.role}.`
+                            : `${seat.domain} — seat ${originalIdx + 1}.`
+                        }
+                        front={
+                          filled ? (
+                            <PhotoFront index={originalIdx} judge={judge} />
+                          ) : (
+                            <SealedFront index={originalIdx} seat={seat} />
+                          )
+                        }
+                        back={<SeatBack seat={seat} />}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Row 2 — Seats 6 to 9 scrolling right */}
+              <div className="jd-marquee-track jd-marquee-track-2">
+                {[...JUDGES.slice(5, 9), ...JUDGES.slice(5, 9), ...JUDGES.slice(5, 9)].map((judge, idx) => {
+                  const originalIdx = 5 + (idx % 4);
+                  const seat = SEATS[originalIdx];
+                  const filled = judge.name.trim().length > 0 && !!judge.photo.src;
+
+                  return (
+                    <div className="jd-marquee-card" key={`m2-${idx}-${judge.photo.expect}`}>
+                      <FlipCard
+                        ratio="3 / 4.4"
+                        disabled={!filled}
+                        label={
+                          filled
+                            ? `${judge.name} — ${judge.role}.`
+                            : `${seat.domain} — seat ${originalIdx + 1}.`
+                        }
+                        front={
+                          filled ? (
+                            <PhotoFront index={originalIdx} judge={judge} />
+                          ) : (
+                            <SealedFront index={originalIdx} seat={seat} />
+                          )
+                        }
+                        back={<SeatBack seat={seat} />}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Barrier tape and wax over the whole panel: the seats are set,
                 the names are not. */}
             {sealed && <Seal word="PANEL SEALED" />}
@@ -773,91 +838,92 @@ export default function Judges() {
           }
         }
 
-        @media (max-width: 680px) {
-          /* Two columns stay, but each card grows taller rather than shrinking
-             its type: the width is the scarce axis here, not the height. */
-          .jd-grid-wrap {
-            --jd-ratio: 3 / 4.2;
-            max-width: 100%;
-          }
-          .jd-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: clamp(0.6rem, 2.8vw, 1.15rem);
-          }
-          /* Flatten parallax drift on mobile so 2-column layout stays neatly aligned */
-          .jd-cell .px-in {
-            transform: none !important;
-          }
-          .jd-front-meta {
-            padding: clamp(0.65rem, 2.4vw, 1rem);
-            gap: 0.2rem;
-          }
-          .jd-front-seat {
-            font-size: clamp(0.64rem, 1.8vw, 0.72rem);
-            letter-spacing: 0.15em;
-          }
-          .jd-front-domain {
-            font-size: clamp(0.88rem, 2.7vw, 1.02rem);
-            line-height: 1.2;
-          }
-          .jd-front-role {
-            font-size: clamp(0.72rem, 2.2vw, 0.82rem);
-          }
-          .jd-stamp {
-            top: clamp(0.5rem, 2vw, 0.75rem);
-            right: clamp(0.5rem, 2vw, 0.75rem);
-            padding: 0.16rem 0.45rem;
-            font-size: clamp(0.66rem, 1.6vw, 0.72rem);
-            letter-spacing: 0.14em;
-          }
-          .jd-back {
-            padding: clamp(0.75rem, 2.6vw, 1.2rem);
-          }
-          .jd-back-tag {
-            font-size: clamp(0.66rem, 1.8vw, 0.74rem);
-            letter-spacing: 0.15em;
-          }
-          .jd-back-title {
-            margin-top: 0.35rem;
-            font-size: clamp(0.88rem, 2.6vw, 1.05rem);
-            line-height: 1.2;
-          }
-          .jd-back-rule {
-            margin: 0.45rem 0;
-            width: 1.6rem;
-          }
-          .jd-back-role {
-            font-size: clamp(0.72rem, 2.2vw, 0.82rem);
-          }
-          .jd-back-desc {
-            margin-top: 0.35rem;
-            font-size: clamp(0.72rem, 2.1vw, 0.82rem);
-            line-height: 1.45;
-          }
-          .jd-back-stats {
-            margin-top: auto;
-            padding-top: 0.5rem;
-            gap: clamp(0.6rem, 2.2vw, 1rem);
-          }
-          .jd-back-val {
-            font-size: clamp(1.1rem, 4.2vw, 1.4rem);
-          }
-          .jd-back-lbl {
-            font-size: clamp(0.66rem, 1.7vw, 0.74rem);
-          }
-          .jd .jseal-tape-a { transform: translateY(-50%) rotate(-48deg); }
-          .jd .jseal-tape-b { transform: translateY(-50%) rotate(46deg); }
+        /* ── Mobile Marquee Cards (< 680px) ── */
+        .jd-marquee-wrap {
+          display: none;
+          position: relative;
+          width: 100vw;
+          margin-left: calc(50% - 50vw);
+          margin-right: calc(50% - 50vw);
+          overflow: hidden;
+          padding-block: 0.25rem;
+          mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
         }
 
-        @media (max-width: 520px) {
-          .jd-grid-wrap {
-            --jd-ratio: 3 / 4.7;
-            max-width: 100%;
-          }
+        .jd-marquee-track {
+          display: flex;
+          width: max-content;
+          gap: 0.85rem;
+          padding-block: 0.35rem;
+          will-change: transform;
+          touch-action: pan-y;
+        }
+
+        .jd-marquee-track-1 {
+          animation: jd-marquee-scroll-left 28s linear infinite;
+        }
+
+        .jd-marquee-track-2 {
+          animation: jd-marquee-scroll-right 32s linear infinite;
+        }
+
+        .jd-marquee-wrap:hover .jd-marquee-track,
+        .jd-marquee-wrap:active .jd-marquee-track,
+        .jd-marquee-wrap:focus-within .jd-marquee-track,
+        .jd-marquee-track:hover,
+        .jd-marquee-track:active {
+          animation-play-state: paused !important;
+        }
+
+        .jd-marquee-card {
+          width: clamp(140px, 42vw, 185px);
+          flex-shrink: 0;
+          transition: transform 260ms cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .jd-marquee-card:hover,
+        .jd-marquee-card:active {
+          transform: scale(1.04);
+          z-index: 10;
+        }
+
+        @keyframes jd-marquee-scroll-left {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+
+        @keyframes jd-marquee-scroll-right {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
+        }
+
+        @media (max-width: 680px) {
           .jd-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            max-width: 100%;
-            gap: clamp(0.45rem, 2vw, 0.75rem);
+            display: none !important;
+          }
+          .jd-marquee-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+          }
+          .jd-grid-reveal {
+            margin-top: clamp(1.75rem, 4.5vh, 2.75rem);
+          }
+          .jd .jseal {
+            position: absolute;
+            inset: -1rem -4vw;
+            z-index: 20;
+            pointer-events: none;
+            display: block;
+          }
+          .jd .jseal-tape {
+            height: clamp(34px, 5.5vw, 44px);
+          }
+          .jd .jseal-tape-a { transform: translateY(-50%) rotate(-32deg); }
+          .jd .jseal-tape-b { transform: translateY(-50%) rotate(30deg); }
+          .jd .jseal-wax {
+            width: clamp(105px, 28vw, 135px);
           }
           .jd-front-meta {
             padding: 0.55rem 0.5rem;
@@ -876,21 +942,11 @@ export default function Judges() {
           .jd-back-stats { margin-top: auto; padding-top: 0.3rem; gap: 0.45rem; }
           .jd-back-val { font-size: 1.05rem; }
           .jd-back-lbl { font-size: 0.66rem; }
-
-          /* The crossed tape is always visible across the 2x2 grid */
-          .jd .jseal-tape { display: flex; height: clamp(32px, 5.5vw, 42px); }
-          .jd .jseal-tape-a { transform: translateY(-50%) rotate(-50deg); }
-          .jd .jseal-tape-b { transform: translateY(-50%) rotate(48deg); }
-          .jd .jseal-wax { width: clamp(92px, 24vw, 116px); }
-          .jd .jseal::before {
-            background: radial-gradient(120% 62% at 50% 44%,
-              rgba(1, 3, 1, 0) 40%,
-              rgba(1, 3, 1, 0.55) 100%);
-          }
         }
 
         @media (prefers-reduced-motion: reduce) {
           .jd-front-figure { animation: none; }
+          .jd-marquee-track { animation: none; }
         }
       `}</style>
     </section>

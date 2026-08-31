@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { EVENT } from "@/data/hackathon";
+import { prefersLiteMedia } from "@/lib/device";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import WarpText from "@/components/ui/WarpText";
@@ -16,6 +17,33 @@ export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const centerRef = useRef<HTMLDivElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
+
+  // Enable video playback across devices unless reduced-motion is requested
+  const [useVideo, setUseVideo] = useState(true);
+  useEffect(() => {
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    setUseVideo(!reduceMotion);
+
+    const video = videoRef.current;
+    if (video) {
+      video.play().catch(() => {});
+      if (typeof IntersectionObserver !== "undefined") {
+        const io = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              video.play().catch(() => {});
+            } else {
+              video.pause();
+            }
+          }
+        }, { threshold: 0.05 });
+        io.observe(video);
+        return () => io.disconnect();
+      }
+    }
+  }, []);
 
   const [introFinished, setIntroFinished] = useState(() => {
     if (typeof window === "undefined") return true;
@@ -59,17 +87,31 @@ export default function Hero() {
     <section id="hero" className="hero" ref={sectionRef}>
       {/* ── 100% Crisp, Pure Video Background (Zero filters, no blur/jitter transforms) ── */}
       <div className="hero-video-wrap">
-        <video
-          ref={videoRef}
-          className="hero-video"
-          src="/bg/hero_bg.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
+        {/* The still poster is always painted first: it is the hero background
+            on phones / data-saver / reduced-motion (where the 4K loop never
+            loads), and the instant, crisp paint under the video everywhere
+            else — so the hero is never a flat empty plate. */}
+        <img
+          className="hero-video hero-poster"
+          src="/images/hero_poster.jpg"
+          alt=""
           aria-hidden="true"
+          draggable={false}
         />
+        {useVideo && (
+          <video
+            ref={videoRef}
+            className="hero-video"
+            src="/bg/hero_bg.mp4"
+            poster="/images/hero_poster.jpg"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            aria-hidden="true"
+          />
+        )}
       </div>
 
       {/* ── Main Wordmark with WebGL WarpText ── */}
@@ -82,8 +124,8 @@ export default function Hero() {
       >
         <div className="hero-warp-wrap">
           <WarpText
-            src={logoImg.src}
-            color="#111a12"
+            src={logoImg.src || "/images/logo.png"}
+            color="#000000"
             warpStrength={0.08}
             warpScale={1.7}
             speed={0.55}
@@ -147,12 +189,7 @@ export default function Hero() {
       </div>
 
       {/* ── Simple Clean Chair Annotation (No Box, No Glow) ── */}
-      <motion.div
-        className="hero-chair-annotation"
-        initial={reduced ? false : { opacity: 0, scale: 0.95 }}
-        animate={introFinished ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.75, delay: 0.35, ease: EASE_OUT }}
-      >
+      <div className="hero-chair-annotation">
         <svg
           className="chair-arrow"
           width="96"
@@ -177,13 +214,13 @@ export default function Hero() {
           />
         </svg>
 
-        <a href="#about" className="chair-note" aria-label="Scroll to learn about the chair">
-          <p className="chair-text">
+        <a href="#about" className="chair-note" aria-label="Scroll to learn about the chair" style={{ color: "#000000", textDecoration: "none" }}>
+          <p className="chair-text" style={{ color: "#000000", WebkitTextFillColor: "#000000", opacity: 1, textShadow: "none" }}>
             bro put a plastic chair on a hill<br />and called it a hackathon 
           </p>
-          <span className="chair-sub">scroll for lore ↓</span>
+          <span className="chair-sub" style={{ color: "#000000", WebkitTextFillColor: "#000000", opacity: 1, textShadow: "none" }}>scroll for lore ↓</span>
         </a>
-      </motion.div>
+      </div>
 
       <style href="hero-style" precedence="default" suppressHydrationWarning>{`
         .hero {
@@ -223,9 +260,7 @@ export default function Hero() {
         /* ── Top Center Block: Wordmark with WebGL Warp ── */
         .hero-center-content {
           position: absolute;
-          /* The floor used to be 7.5rem, which on a 375px-tall landscape phone
-             spent a third of the screen before the logo even started. */
-          top: clamp(3.25rem, 12vh, 10.5rem);
+          top: clamp(4.25rem, 14vh, 11.5rem);
           left: 0;
           right: 0;
           width: 100%;
@@ -269,7 +304,7 @@ export default function Hero() {
           left: calc(50% + 72px);
           top: 53.5%;
           transform: translateY(-50%);
-          z-index: 20;
+          z-index: 30;
           display: flex;
           align-items: center;
           gap: 0.55rem;
@@ -277,10 +312,11 @@ export default function Hero() {
         }
 
         .chair-arrow {
-          color: #1a291c;
+          color: #000000 !important;
           flex-shrink: 0;
-          opacity: 0.7;
+          opacity: 1 !important;
           margin-top: 0.2rem;
+          filter: none !important;
         }
 
         .chair-note {
@@ -289,29 +325,38 @@ export default function Hero() {
           gap: 0.2rem;
           text-decoration: none;
           cursor: pointer;
+          color: #000000 !important;
+          -webkit-text-fill-color: #000000 !important;
+          opacity: 1 !important;
         }
-        .chair-note:hover .chair-text {
-          opacity: 0.7;
+        @media (hover: hover) {
+          .chair-note:hover .chair-text {
+            opacity: 0.8;
+          }
         }
 
         .chair-text {
           font-family: var(--font-dm-sans), var(--font-display), sans-serif;
           font-size: 0.88rem;
-          font-weight: 600;
+          font-weight: 800;
           line-height: 1.32;
           letter-spacing: -0.015em;
-          color: #111a12;
+          color: #000000 !important;
+          -webkit-text-fill-color: #000000 !important;
+          opacity: 1 !important;
           margin: 0;
-          white-space: nowrap;
-          transition: opacity 150ms ease;
+          text-shadow: none !important;
         }
 
         .chair-sub {
           font-family: var(--font-geist-mono), monospace;
           font-size: 0.68rem;
-          font-weight: 500;
-          color: #566a55;
-          letter-spacing: -0.01em;
+          font-weight: 700;
+          color: #000000 !important;
+          -webkit-text-fill-color: #000000 !important;
+          opacity: 1 !important;
+          letter-spacing: 0.02em;
+          text-shadow: none !important;
         }
 
         /* ── Mossy Log Natural Divider Over Seam ── */
@@ -417,60 +462,67 @@ export default function Hero() {
 
         @media (max-width: 1024px) {
           .hero-center-content {
-            top: clamp(4.5rem, 10.5vh, 7.2rem);
+            top: clamp(5.6rem, 12.5vh, 8.5rem);
           }
           .hero-warp-wrap {
-            height: min(clamp(150px, 28vw, 300px), 32vh);
+            height: min(clamp(160px, 30vw, 320px), 34vh);
           }
         }
 
         @media (max-width: 860px) {
           .hero-center-content {
-            top: clamp(4.2rem, 9.5vh, 6.4rem);
+            top: clamp(6.8rem, 14.5vh, 9.5rem);
           }
           .hero-warp-wrap {
-            height: clamp(125px, 26vw, 220px);
+            height: clamp(150px, 32vw, 240px);
+            max-width: 98vw;
           }
           .hero-chair-annotation {
-            left: 50%;
-            top: clamp(42%, 46vh, 50%);
-            bottom: auto;
-            transform: translateX(-50%);
-            gap: 0.25rem;
-            max-width: calc(100vw - 2rem);
+            left: calc(50% + 24px);
+            top: 53.5%;
+            transform: translateY(-50%);
+            gap: 0.4rem;
             display: flex;
-            flex-direction: column-reverse;
+            flex-direction: row;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
           }
           .chair-note {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            text-align: center;
+            align-items: flex-start;
+            text-align: left;
           }
           .chair-arrow {
-            width: 44px;
-            height: 52px;
-            margin-top: 0.1rem;
-            transform: rotate(-90deg);
-            opacity: 0.88;
+            width: 54px;
+            height: 42px;
+            margin-top: 0;
+            transform: none;
+            opacity: 1 !important;
+            color: #000000 !important;
+            filter: none !important;
             flex-shrink: 0;
           }
           .chair-arrow path {
-            stroke-width: 6;
+            stroke-width: 5.5;
           }
           .chair-text {
-            font-size: 0.78rem;
-            line-height: 1.25;
-            text-align: center;
-            text-shadow: 0 1px 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.5);
+            font-size: 0.78rem !important;
+            font-weight: 800 !important;
+            line-height: 1.25 !important;
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-align: left !important;
+            text-shadow: none !important;
+            white-space: nowrap;
           }
           .chair-sub {
-            font-size: 0.62rem;
-            color: #3b5a32;
-            text-align: center;
-            text-shadow: 0 1px 6px rgba(255, 255, 255, 0.6);
+            font-size: 0.62rem !important;
+            font-weight: 700 !important;
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-align: left !important;
+            text-shadow: none !important;
           }
           .hero-log-img {
             width: clamp(950px, 130vw, 1500px);
@@ -482,27 +534,62 @@ export default function Hero() {
 
         @media (max-width: 600px) {
           .hero-center-content {
-            top: clamp(3.8rem, 8vh, 5.4rem);
+            top: clamp(7.8rem, 16.5vh, 10.5rem);
+            padding-inline: 0;
           }
           .hero-warp-wrap {
-            height: clamp(105px, 24vw, 160px);
+            height: clamp(160px, 42vw, 240px);
+            max-width: 100vw;
+            width: 100vw;
           }
           .hero-chair-annotation {
-            top: clamp(38%, 41vh, 45%);
-            gap: 0.2rem;
+            left: calc(50% + 36px);
+            top: 51.5%;
+            transform: translateY(-50%);
+            gap: 0.35rem;
+            max-width: 44vw;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            z-index: 30;
           }
           .chair-arrow {
-            width: 36px;
-            height: 44px;
-            margin-top: 0.05rem;
-            transform: rotate(-90deg);
+            width: 34px;
+            height: 26px;
+            margin-top: 0;
+            transform: none;
+            opacity: 1 !important;
+            color: #000000 !important;
+            filter: none !important;
+            flex-shrink: 0;
+          }
+          .chair-arrow path {
+            stroke-width: 6;
+          }
+          .chair-note {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
           }
           .chair-text {
-            font-size: 0.72rem;
-            line-height: 1.22;
+            font-size: clamp(0.58rem, 2vw, 0.68rem) !important;
+            font-weight: 800 !important;
+            line-height: 1.22 !important;
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-align: left !important;
+            text-shadow: none !important;
+            white-space: normal;
           }
           .chair-sub {
-            font-size: 0.6rem;
+            font-size: clamp(0.48rem, 1.5vw, 0.56rem) !important;
+            font-weight: 700 !important;
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-align: left !important;
+            text-shadow: none !important;
           }
           .hero-action-dock-split {
             flex-direction: column;
@@ -524,19 +611,34 @@ export default function Hero() {
             transform: translate(-50%, 50%);
           }
           .hero-bottom-area {
-            bottom: clamp(3.6rem, 7vh, 5.2rem);
+            bottom: clamp(3.2rem, 6.5vh, 4.8rem);
           }
         }
 
         @media (max-width: 480px) {
           .hero-center-content {
-            top: clamp(3.4rem, 7vh, 4.8rem);
+            top: clamp(8rem, 17.5vh, 11rem);
+            padding-inline: 0;
           }
           .hero-warp-wrap {
-            height: clamp(90px, 22vw, 135px);
+            height: clamp(165px, 44vw, 235px);
+            max-width: 100vw;
+            width: 100vw;
           }
           .hero-chair-annotation {
-            top: clamp(37%, 40vh, 44%);
+            left: calc(50% + 32px);
+            top: 51.5%;
+          }
+          .chair-arrow {
+            width: 30px;
+            height: 24px;
+          }
+          .chair-text {
+            font-size: 0.58rem !important;
+            line-height: 1.18 !important;
+          }
+          .chair-sub {
+            font-size: 0.48rem !important;
           }
         }
       `}</style>
