@@ -14,6 +14,8 @@ import { buildTrackTextures } from "@/lib/track-textures";
 
 /** Autoplay dwell, shared by the slider and the rail's progress bar. */
 const DWELL = 6;
+const HEADING_LINES = ["Four directions", "to build in."];
+
 /** Word-by-word reveal helper matching the RevealWords animation in Story of the Chair */
 function SplitWords({ text, className = "" }: { text: string; className?: string }) {
   const words = text.split(/\s+/).filter(Boolean);
