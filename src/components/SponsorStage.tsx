@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import sponsorHandImg from "../../public/images/sponsor.png";
 import { SPONSOR_SLOTS, EVENT } from "@/data/hackathon";
 import MediaSlot from "@/components/ui/MediaSlot";
 import Ornament from "@/components/ui/Ornament";
@@ -232,7 +233,7 @@ export default function SponsorStage() {
                   than peeking through the closed window. */}
               <div className="sxp-hands" aria-hidden="true">
                 <Image
-                  src="/images/sponsor.png"
+                  src={sponsorHandImg}
                   alt="Sponsor Handshake"
                   fill
                   sizes="100vw"
@@ -359,9 +360,9 @@ export default function SponsorStage() {
           --sxp-iy: calc((100% - var(--sxp-win-h)) / 2 * (1 - var(--sxp-p)));
           --sxp-ix: calc((100% - var(--sxp-win-w)) / 2 * (1 - var(--sxp-p)));
           --sxp-r: calc(28px * (1 - var(--sxp-p)));
-          /* One source of truth: natural 2.75:1 aspect ratio scaling (756 / 2079 = 36.4%) */
-          --sxp-hands-h: min(clamp(280px, 33.33vw, 1400px), 50vh);
-          --sxp-hands-lift: clamp(0rem, 0.8vh, 1.2rem);
+          /* One source of truth: natural 3:1 aspect ratio scaling (724 / 2172 = 33.33vw) */
+          --sxp-hands-h: clamp(280px, 33.33vw, 1400px);
+          --sxp-hands-lift: 0;
 
           position: sticky;
           top: 0;
@@ -537,8 +538,8 @@ export default function SponsorStage() {
           align-items: center;
           justify-content: flex-start;
           padding-inline: var(--padding-x);
-          /* Desktop: position naturally in the open sky */
-          padding-top: clamp(2.5rem, 7vh, 5.5rem);
+          /* Position lower in the open sky, resting naturally above the handshake */
+          padding-top: clamp(5.5rem, 13vh, 10.5rem);
           /* Keep the panel out of the arms: the flow box stops short of the
              handshake instead of being free to run into it. */
           padding-bottom: calc(var(--sxp-hands-h) * 0.45);
@@ -562,12 +563,9 @@ export default function SponsorStage() {
         .sxp-hands img {
           width: 100% !important;
           height: 100% !important;
-          /* The artwork is 2079x756 (2.75:1). Once the vh cap makes this box
-             wider than that ratio, contain fits by height and leaves sky at
-             both ends -- the arms stop reaching the edges. cover fills both
-             axes and crops the top instead, so the handshake spans edge to
-             edge at every aspect ratio. */
-          object-fit: cover;
+          /* 3:1 natural aspect ratio artwork (2172x724). contain renders the
+             full arms and clasped hands without any top or horizontal cropping. */
+          object-fit: contain;
           object-position: center bottom;
         }
 
@@ -723,12 +721,12 @@ export default function SponsorStage() {
           .sxp { --sxp-track: 280vh; }
           .sxp-stage {
             --sxp-win-w: min(88vw, 34rem);
-            --sxp-hands-h: min(clamp(200px, 44vw, 380px), 46vh);
-            --sxp-hands-lift: clamp(2.5rem, 6vh, 4.5rem);
+            --sxp-hands-h: clamp(220px, 33.33vw, 420px);
+            --sxp-hands-lift: 0;
           }
           .sxp-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); }
           .sxp-body {
-            padding-top: clamp(3.2rem, 7vh, 4.5rem);
+            padding-top: clamp(6.5rem, 14vh, 9.5rem);
             padding-bottom: clamp(9rem, 24vh, 15rem);
           }
         }
@@ -737,9 +735,9 @@ export default function SponsorStage() {
           .sxp { --sxp-track: 260vh; }
           .sxp-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .sxp-stage {
-            /* Hands carry the bottom edge on a narrow frame, lifted higher */
-            --sxp-hands-h: min(clamp(260px, 68vw, 420px), 46vh);
-            --sxp-hands-lift: clamp(7rem, 16vh, 11rem);
+            /* Hands carry the bottom edge on a narrow frame */
+            --sxp-hands-h: clamp(200px, 45vw, 340px);
+            --sxp-hands-lift: 0;
           }
           .sxp-hands img {
             object-fit: cover;
@@ -748,7 +746,7 @@ export default function SponsorStage() {
           .sxp-body {
             /* Position the content so it meets the handshake naturally with minimal gap */
             justify-content: flex-start;
-            padding-top: clamp(8.5rem, 19vh, 12.5rem);
+            padding-top: clamp(9.5rem, 21vh, 14rem);
             padding-bottom: 0;
           }
           .sxp-inner {
