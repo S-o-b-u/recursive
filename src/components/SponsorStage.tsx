@@ -53,7 +53,7 @@ export default function SponsorStage() {
   const outroRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
-  const scrollUpRef = useRef<HTMLDivElement>(null);
+  const scrollUpRef = useRef<HTMLButtonElement>(null);
 
   const sealed = SPONSOR_SLOTS.every((slot) => !slot.src);
 
@@ -151,12 +151,12 @@ export default function SponsorStage() {
           pointerEvents: b > 0.05 ? "auto" : "none",
         });
 
-        // The up arrow button only appears once the stage has fully opened
+        // The frameless up arrow only appears once the stage has fully opened
         if (scrollUpBtn) {
           const s = easePanel(clamp01((t - WINDOW_END) / 0.12));
           gsap.set(scrollUpBtn, {
             opacity: s,
-            y: (1 - s) * -14,
+            y: (1 - s) * -12,
             pointerEvents: s > 0.15 ? "auto" : "none",
           });
         }
@@ -305,31 +305,30 @@ export default function SponsorStage() {
               because both read it off the stage. */}
           <span className="sxp-keyline" aria-hidden="true" />
 
-          {/* ── Scroll Navigation to Exit Frame (Beside Nav Bar) ── */}
-          <div ref={scrollUpRef} className="sxp-scrollup-wrap">
-            <button
-              type="button"
-              onClick={scrollUp}
-              aria-label="Scroll up to previous section"
-              className="sxp-scrollup-btn"
-              title="Scroll up"
+          {/* ── Frameless Up Arrow (Appears when fully opened) ── */}
+          <button
+            ref={scrollUpRef}
+            type="button"
+            onClick={scrollUp}
+            aria-label="Scroll up to previous section"
+            className="sxp-scrollup-arrow"
+            title="Scroll up"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="22"
+              height="22"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="sxp-arrow-svg"
+              aria-hidden="true"
             >
-              <svg
-                viewBox="0 0 24 24"
-                width="16"
-                height="16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="sxp-arrow-icon"
-                aria-hidden="true"
-              >
-                <path d="M12 19V5M5 12l7-7 7 7" />
-              </svg>
-            </button>
-          </div>
+              <path d="M12 19V5M5 12l7-7 7 7" />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -671,59 +670,42 @@ export default function SponsorStage() {
           z-index: 10;
         }
 
-        /* ── Scroll Navigation to Exit Frame (Beside Nav Bar) ── */
-        .sxp-scrollup-wrap {
+        /* ── Clean Frameless Up Arrow (No Frame / Circle) ── */
+        .sxp-scrollup-arrow {
           position: absolute;
           top: clamp(1.25rem, 3.2vh, 2.25rem);
-          right: clamp(1rem, 3.5vw, 2.2rem);
+          right: clamp(1.2rem, 3.5vw, 2.5rem);
           z-index: 105;
-          display: flex;
-          align-items: center;
-          gap: 0.45rem;
+          background: transparent;
+          border: none;
+          padding: 8px;
+          margin: 0;
+          color: #142617;
+          cursor: pointer;
           opacity: 0;
           pointer-events: none;
-          will-change: transform, opacity;
-        }
-
-        .sxp-scrollup-btn {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          width: 36px;
-          height: 36px;
-          padding: 0;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.65);
-          backdrop-filter: blur(20px) saturate(180%);
-          -webkit-backdrop-filter: blur(20px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.85);
-          color: #142617;
-          cursor: pointer;
-          box-shadow:
-            0 2px 10px rgba(0, 0, 0, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.95);
-          transition: all 220ms cubic-bezier(0.23, 1, 0.32, 1);
+          transition: color 200ms ease, transform 200ms ease;
+          will-change: transform, opacity;
         }
 
-        .sxp-scrollup-btn:hover {
-          background: rgba(255, 255, 255, 0.95);
-          border-color: rgba(92, 140, 58, 0.5);
+        .sxp-scrollup-arrow:hover {
           color: #2b541d;
-          box-shadow:
-            0 4px 16px rgba(0, 0, 0, 0.12),
-            inset 0 1px 0 #ffffff;
         }
 
-        .sxp-scrollup-btn:hover .sxp-arrow-icon {
-          transform: translateY(-2px);
+        .sxp-scrollup-arrow:hover .sxp-arrow-svg {
+          transform: translateY(-3px);
         }
 
-        .sxp-arrow-icon {
-          transition: transform 200ms ease;
+        .sxp-arrow-svg {
+          transition: transform 220ms cubic-bezier(0.23, 1, 0.32, 1);
+          filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
         }
 
-        .sxp-scrollup-btn:active {
-          transform: scale(0.92);
+        .sxp-scrollup-arrow:active {
+          transform: scale(0.9);
         }
 
         /* ── Narrower viewports ── */
@@ -742,15 +724,6 @@ export default function SponsorStage() {
         }
 
         @media (max-width: 620px) {
-          .sxp-scrollup-wrap {
-            top: clamp(1.2rem, 3vh, 1.85rem);
-            right: clamp(0.6rem, 2.5vw, 1rem);
-          }
-          .sxp-scrollup-btn {
-            width: 32px;
-            height: 32px;
-            padding: 0;
-          }
           .sxp { --sxp-track: 260vh; }
           .sxp-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .sxp-stage {
