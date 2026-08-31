@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import sponsorHandImg from "../../public/images/sponsor.png";
 import { SPONSOR_SLOTS, EVENT } from "@/data/hackathon";
 import MediaSlot from "@/components/ui/MediaSlot";
 import Ornament from "@/components/ui/Ornament";
@@ -228,19 +227,6 @@ export default function SponsorStage() {
             </div>
 
             <div ref={bodyRef} className="sxp-body">
-              {/* The handshake grows out of the bottom of the sky. It lives
-                  inside the fading body so it arrives with the panel rather
-                  than peeking through the closed window. */}
-              <div className="sxp-hands" aria-hidden="true">
-                <Image
-                  src={sponsorHandImg}
-                  alt="Sponsor Handshake"
-                  fill
-                  sizes="100vw"
-                  priority={true}
-                />
-              </div>
-
               <div className="sxp-inner">
                 <Ornament className="sxp-motif" />
                 <span className="sxp-eyebrow">Supporters &amp; partners</span>
@@ -360,9 +346,6 @@ export default function SponsorStage() {
           --sxp-iy: calc((100% - var(--sxp-win-h)) / 2 * (1 - var(--sxp-p)));
           --sxp-ix: calc((100% - var(--sxp-win-w)) / 2 * (1 - var(--sxp-p)));
           --sxp-r: calc(28px * (1 - var(--sxp-p)));
-          /* One source of truth: natural 3:1 aspect ratio scaling (724 / 2172 = 33.33vw) */
-          --sxp-hands-h: clamp(280px, 33.33vw, 1400px);
-          --sxp-hands-lift: 0;
 
           position: sticky;
           top: 0;
@@ -536,37 +519,12 @@ export default function SponsorStage() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: flex-start;
+          justify-content: center;
           padding-inline: var(--padding-x);
-          /* Position lower in the open sky, resting naturally above the handshake */
-          padding-top: clamp(5.5rem, 13vh, 10.5rem);
-          /* Keep the panel out of the arms: the flow box stops short of the
-             handshake instead of being free to run into it. */
-          padding-bottom: calc(var(--sxp-hands-h) * 0.45);
+          padding-top: clamp(3rem, 7vh, 5.5rem);
+          padding-bottom: clamp(3rem, 7vh, 5.5rem);
           opacity: 0;
           pointer-events: none;
-        }
-
-        /* ── The mossy handshake ──
-           Fully flexible artwork that stretches and resizes dynamically across
-           all screen sizes (ultrawide, desktop, laptop, tablet, mobile). */
-        .sxp-hands {
-          position: absolute;
-          left: 0;
-          right: 0;
-          bottom: var(--sxp-hands-lift);
-          width: 100%;
-          height: var(--sxp-hands-h);
-          z-index: 0;
-          pointer-events: none;
-        }
-        .sxp-hands img {
-          width: 100% !important;
-          height: 100% !important;
-          /* 3:1 natural aspect ratio artwork (2172x724). contain renders the
-             full arms and clasped hands without any top or horizontal cropping. */
-          object-fit: contain;
-          object-position: center bottom;
         }
 
         .sxp-inner {
@@ -721,33 +679,21 @@ export default function SponsorStage() {
           .sxp { --sxp-track: 280vh; }
           .sxp-stage {
             --sxp-win-w: min(88vw, 34rem);
-            --sxp-hands-h: clamp(220px, 33.33vw, 420px);
-            --sxp-hands-lift: 0;
           }
           .sxp-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); }
           .sxp-body {
-            padding-top: clamp(6.5rem, 14vh, 9.5rem);
-            padding-bottom: clamp(9rem, 24vh, 15rem);
+            padding-top: clamp(4rem, 8vh, 6rem);
+            padding-bottom: clamp(4rem, 8vh, 6rem);
           }
         }
 
         @media (max-width: 620px) {
           .sxp { --sxp-track: 260vh; }
           .sxp-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-          .sxp-stage {
-            /* Hands carry the bottom edge on a narrow frame */
-            --sxp-hands-h: clamp(200px, 45vw, 340px);
-            --sxp-hands-lift: 0;
-          }
-          .sxp-hands img {
-            object-fit: cover;
-            object-position: center bottom;
-          }
           .sxp-body {
-            /* Position the content so it meets the handshake naturally with minimal gap */
-            justify-content: flex-start;
-            padding-top: clamp(9.5rem, 21vh, 14rem);
-            padding-bottom: 0;
+            justify-content: center;
+            padding-top: clamp(2rem, 5vh, 3.5rem);
+            padding-bottom: clamp(2rem, 5vh, 3.5rem);
           }
           .sxp-inner {
             gap: clamp(0.42rem, 1.1vh, 0.75rem);
@@ -786,18 +732,11 @@ export default function SponsorStage() {
           .sxp-wall { gap: 0.6rem; }
         }
 
-        /* Landscape phones. 375px of height has to hold the whole panel and a
-           handshake; at the normal sizes the panel alone wants ~330px and the
-           CTA ends up sitting on the clasp. Everything tightens and the hands
-           become a band along the bottom rather than half the screen. */
+        /* Landscape phones */
         @media (max-height: 520px) {
-          .sxp-stage {
-            --sxp-hands-h: min(clamp(120px, 30vw, 260px), 34vh);
-            --sxp-hands-lift: 0rem;
-          }
           .sxp-body {
             padding-top: clamp(1.5rem, 4vh, 2.5rem);
-            padding-bottom: calc(var(--sxp-hands-h) * 0.35);
+            padding-bottom: clamp(1.5rem, 4vh, 2.5rem);
           }
           .sxp-eyebrow { font-size: 0.62rem; letter-spacing: 0.18em; }
           .sxp-heading { font-size: clamp(1.3rem, 3.4vw, 2rem); }
