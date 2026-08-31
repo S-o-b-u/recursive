@@ -503,23 +503,35 @@ export default function Footer() {
           margin-top: clamp(3rem, 8vh, 6.5rem);
         }
 
-        /* Subtle dark blur and shadow right under the feet at the very bottom edge */
+        /* Dark blur and grounded gradient along the lower baseline across all screen sizes */
         .footer-ground-gradient {
           position: absolute;
           inset: auto 0 0 0;
-          height: clamp(34px, 16%, 64px);
+          height: clamp(48px, 22%, 140px);
           z-index: 25;
           pointer-events: none;
-          backdrop-filter: blur(6px);
-          -webkit-backdrop-filter: blur(6px);
-          mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 1) 100%);
-          -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 1) 100%);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          mask-image: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.3) 30%,
+            rgba(0, 0, 0, 0.75) 65%,
+            rgba(0, 0, 0, 1) 100%
+          );
+          -webkit-mask-image: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.3) 30%,
+            rgba(0, 0, 0, 0.75) 65%,
+            rgba(0, 0, 0, 1) 100%
+          );
           background: linear-gradient(
             180deg,
             transparent 0%,
-            rgba(6, 16, 8, 0.25) 35%,
-            rgba(4, 12, 6, 0.55) 70%,
-            rgba(2, 6, 3, 0.85) 100%
+            rgba(6, 16, 8, 0.2) 25%,
+            rgba(4, 12, 6, 0.55) 60%,
+            rgba(2, 6, 3, 0.88) 100%
           );
         }
       `}</style>
