@@ -38,23 +38,34 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       removeFromArray(array, randomIndex(array));
     const getRandomFromArray = (array: any[]) => array[randomIndex(array) | 0];
 
+    // What should stay constant is how much of the wordmark the crowd covers,
+    // not the crowd's share of the footer. On a phone the letters are width-
+    // limited and sit higher in the footer, so the band has to be deeper there
+    // to lap them the way it does on desktop.
+    const crowdBand = () => (stage.width < 620 ? 0.48 : 0.42);
+    const fitFor = (peepH: number) =>
+      Math.min(1, Math.max(0.18, (stage.height * crowdBand()) / peepH));
+
     // TWEEN FACTORIES
     const resetPeep = ({ stage, peep }: { stage: any; peep: any }) => {
       const direction = Math.random() > 0.5 ? 1 : -1;
-      const offsetY = 100 - 250 * gsap.parseEase("power2.in")(Math.random());
-      const startY = stage.height - peep.height + offsetY;
+      const fit = fitFor(peep.height);
+
+      const offsetY = (100 - 250 * gsap.parseEase("power2.in")(Math.random())) * fit;
+      const startY = stage.height - peep.height * fit + offsetY;
       let startX: number;
       let endX: number;
 
       if (direction === 1) {
-        startX = -peep.width;
+        startX = -peep.width * fit;
         endX = stage.width;
-        peep.scaleX = 1;
+        peep.scaleX = fit;
       } else {
-        startX = stage.width + peep.width;
+        startX = stage.width + peep.width * fit;
         endX = 0;
-        peep.scaleX = -1;
+        peep.scaleX = -fit;
       }
+      peep.scaleY = fit;
 
       peep.x = startX;
       peep.y = startY;
@@ -196,8 +207,19 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       }
     };
 
+    // Peeps shrink with the footer, so a head-count based on width alone
+    // leaves gaps on short screens. Base it on how wide each peep actually
+    // draws, and the wall stays equally packed at every size.
+    const CROWD_DENSITY = 9.2;
+
     const initCrowd = () => {
-      while (availablePeeps.length) {
+      const sample = allPeeps[0];
+      const drawnWidth = sample ? sample.width * fitFor(sample.height) : 120;
+      const target = Math.min(
+        allPeeps.length,
+        Math.max(26, Math.round((CROWD_DENSITY * stage.width) / drawnWidth)),
+      );
+      while (availablePeeps.length && crowd.length < target) {
         addPeepToCrowd().walk.progress(Math.random());
       }
     };
@@ -228,11 +250,17 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       availablePeeps.push(peep);
     };
 
+    // Cap the raster density. Phones report dpr 3, which costs 9x the fill of a
+    // 1x canvas every frame for a crowd of line-art figures that gains nothing
+    // from it. Small screens go lower still.
+    const dprOf = () =>
+      Math.min(window.devicePixelRatio || 1, window.innerWidth < 700 ? 1.5 : 2);
+
     const render = () => {
       if (!canvas) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = dprOf();
       ctx.scale(dpr, dpr);
 
       crowd.forEach((peep) => {
@@ -244,7 +272,7 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
 
     const resize = () => {
       if (!canvas) return;
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = dprOf();
       stage.width = canvas.clientWidth;
       stage.height = canvas.clientHeight;
       canvas.width = stage.width * dpr;
@@ -261,10 +289,22 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       initCrowd();
     };
 
+    let running = false;
+    const startRender = () => {
+      if (running) return;
+      running = true;
+      gsap.ticker.add(render);
+    };
+    const stopRender = () => {
+      if (!running) return;
+      running = false;
+      gsap.ticker.remove(render);
+    };
+
     const init = () => {
       createPeeps();
       resize();
-      gsap.ticker.add(render);
+      startRender();
     };
 
     img.onload = init;
@@ -272,6 +312,23 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
 
     const handleResize = () => resize();
     window.addEventListener("resize", handleResize);
+
+    // Only animate while the footer is actually on screen. This is the single
+    // biggest win on a phone: the page is ~12000px tall and the crowd was
+    // painting every frame of that scroll for a footer nobody had reached.
+    let io: IntersectionObserver | undefined;
+    if (typeof IntersectionObserver !== "undefined") {
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) startRender();
+            else stopRender();
+          }
+        },
+        { rootMargin: "200px" },
+      );
+      io.observe(canvas);
+    }
 
     let ro: ResizeObserver | undefined;
     if (typeof ResizeObserver !== "undefined") {
@@ -292,6 +349,8 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     return () => {
       window.removeEventListener("resize", handleResize);
       ro?.disconnect();
+      io?.disconnect();
+      stopRender();
       gsap.ticker.remove(render);
       crowd.forEach((peep) => {
         if (peep.walk) peep.walk.kill();
@@ -315,7 +374,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="footer-shell relative min-h-[clamp(320px,58vh,660px)] h-[clamp(320px,58vh,660px)] w-full bg-transparent text-[#142617] overflow-hidden select-none flex flex-col justify-end">
+    <footer className="footer-shell relative min-h-[clamp(240px,58vh,660px)] h-[clamp(240px,58vh,660px)] w-full bg-transparent text-[#142617] overflow-hidden select-none flex flex-col justify-end">
       {/* ── Soft luminous atmospheric aura & gradient lighting behind the wordmark ── */}
       <div className="footer-aurora" aria-hidden="true" />
 
@@ -331,7 +390,7 @@ export default function Footer() {
           pointerStrength={0.4}
           refraction={0.016}
           ripple
-          fontSize="clamp(5.5rem, 25.5vw, 36rem)"
+          fontSize="min(clamp(5.5rem, 29vw, 36rem), 40vh)"
           fontWeight={900}
           fontFamily="var(--font-heading), var(--font-dm-sans), sans-serif"
           letterSpacing="0.02em"
@@ -381,13 +440,15 @@ export default function Footer() {
         </button>
       </div>
 
-      <style>{`
+      <style href="footer-style" precedence="default" suppressHydrationWarning>{`
         /* ── Giant Wordmark behind the walking people ── */
         .footer-wordmark-wrap {
           position: absolute;
           inset-inline: 0;
           bottom: clamp(0.5rem, 4vh, 2.75rem);
-          height: clamp(260px, 50vh, 580px);
+          /* Capped against the footer itself: the vh term alone lets the px
+             floor push the letters out of the top of a short footer. */
+          height: min(clamp(260px, 50vh, 580px), 86%);
           z-index: 10;
           display: flex;
           justify-content: center;
@@ -395,6 +456,16 @@ export default function Footer() {
           pointer-events: auto;
           user-select: none;
           padding-inline: clamp(0.2rem, 1.2vw, 1rem);
+        }
+
+        @media (max-width: 620px) {
+          .footer-wordmark-wrap {
+            bottom: 42%;
+            height: 40%;
+          }
+          .footer-shell {
+            margin-top: clamp(1.5rem, 4.5vh, 3rem);
+          }
         }
 
         /* Luminous radial glow and aura behind the letters */
@@ -414,7 +485,7 @@ export default function Footer() {
         .footer-logo-gradient {
           position: absolute;
           inset: auto 0 0 0;
-          height: clamp(120px, 20vh, 240px);
+          height: min(clamp(120px, 20vh, 240px), 34%);
           z-index: 12;
           pointer-events: none;
           background: linear-gradient(

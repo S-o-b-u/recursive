@@ -320,7 +320,7 @@ export default function Judges() {
         </RevealBlock>
       </div>
 
-      <style>{`
+      <style href="judges-style" precedence="default" suppressHydrationWarning>{`
         .jd {
           position: relative;
           width: 100%;

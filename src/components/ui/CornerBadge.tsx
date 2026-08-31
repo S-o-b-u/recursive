@@ -5,7 +5,6 @@ import Link from "next/link";
 
 export default function CornerBadge({ className = "" }: { className?: string }) {
   const [revealed, setRevealed] = useState(false);
-  const [animKey, setAnimKey] = useState(0);
 
   // Completion is signalled three ways (the dataset flip, the custom event,
   // and again from finish()), and on the skip path finish() lands ~1.5s after
@@ -14,50 +13,65 @@ export default function CornerBadge({ className = "" }: { className?: string }) 
   const fired = useRef(false);
 
   useEffect(() => {
+    let mounted = true;
+    let timer1: ReturnType<typeof setTimeout> | undefined;
+    let timer2: ReturnType<typeof setTimeout> | undefined;
+
     const triggerEmergence = () => {
-      if (fired.current) return;
+      if (!mounted || fired.current) return;
       fired.current = true;
       setRevealed(true);
-      setAnimKey((k) => k + 1);
     };
 
     // Check if intro is actively playing right now in the DOM
     const isPlaying =
-      document.documentElement.dataset.intro === "playing" ||
-      !!document.querySelector(".intro-scene");
+      typeof document !== "undefined" &&
+      (document.documentElement.dataset.intro === "playing" ||
+        !!document.querySelector(".intro-scene"));
 
     if (!isPlaying) {
-      const timer = setTimeout(triggerEmergence, 250);
-      return () => clearTimeout(timer);
+      timer1 = setTimeout(triggerEmergence, 250);
     }
 
     // Intro is playing: listen for completion / skip signal
     const onIntroDone = () => {
-      setTimeout(triggerEmergence, 100);
+      timer2 = setTimeout(triggerEmergence, 100);
     };
 
-    window.addEventListener("recursive-intro-done", onIntroDone);
+    if (typeof window !== "undefined") {
+      window.addEventListener("recursive-intro-done", onIntroDone);
+    }
 
-    const observer = new MutationObserver(() => {
-      if (document.documentElement.dataset.intro === "done" || !document.querySelector(".intro-scene")) {
-        setTimeout(triggerEmergence, 100);
-      }
-    });
+    let observer: MutationObserver | undefined;
+    if (typeof MutationObserver !== "undefined" && typeof document !== "undefined") {
+      observer = new MutationObserver(() => {
+        if (
+          document.documentElement.dataset.intro === "done" ||
+          !document.querySelector(".intro-scene")
+        ) {
+          timer2 = setTimeout(triggerEmergence, 100);
+        }
+      });
 
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-intro"],
-    });
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-intro"],
+      });
+    }
 
     return () => {
-      window.removeEventListener("recursive-intro-done", onIntroDone);
-      observer.disconnect();
+      mounted = false;
+      if (timer1) clearTimeout(timer1);
+      if (timer2) clearTimeout(timer2);
+      if (typeof window !== "undefined") {
+        window.removeEventListener("recursive-intro-done", onIntroDone);
+      }
+      observer?.disconnect();
     };
   }, []);
 
   return (
     <div
-      key={animKey}
       className={`corner-badge-wrap ${revealed ? "corner-badge-revealed" : "corner-badge-pending"} ${className}`}
     >
       <Link href="/#about" className="corner-badge" aria-label="Shift to the power 8 The ACM Hackathon">
@@ -73,7 +87,7 @@ export default function CornerBadge({ className = "" }: { className?: string }) 
         </span>
       </Link>
 
-      <style>{`
+      <style href="corner-badge" precedence="default" suppressHydrationWarning>{`
         /* ── Top-Left Corner Badge (Emerging from |) ── */
         .corner-badge-wrap {
           position: absolute;

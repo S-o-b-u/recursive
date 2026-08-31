@@ -151,13 +151,13 @@ export default function SponsorStage() {
           pointerEvents: b > 0.05 ? "auto" : "none",
         });
 
-        // The frameless up arrow only appears once the stage has fully opened
+        // The frameless up arrow fades in as the stage opens and reaches full visibility
         if (scrollUpBtn) {
-          const s = easePanel(clamp01((t - WINDOW_END) / 0.12));
+          const s = easePanel(clamp01((t - 0.28) / 0.18));
           gsap.set(scrollUpBtn, {
             opacity: s,
-            y: (1 - s) * -12,
-            pointerEvents: s > 0.15 ? "auto" : "none",
+            y: (1 - s) * -10,
+            pointerEvents: s > 0.1 ? "auto" : "none",
           });
         }
       };
@@ -305,7 +305,7 @@ export default function SponsorStage() {
               because both read it off the stage. */}
           <span className="sxp-keyline" aria-hidden="true" />
 
-          {/* ── Frameless Up Arrow (Appears when fully opened) ── */}
+          {/* ── Frameless Up Arrow in Top Right Corner (Appears when opened) ── */}
           <button
             ref={scrollUpRef}
             type="button"
@@ -316,11 +316,11 @@ export default function SponsorStage() {
           >
             <svg
               viewBox="0 0 24 24"
-              width="22"
-              height="22"
+              width="28"
+              height="28"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2.4"
+              strokeWidth="2.8"
               strokeLinecap="round"
               strokeLinejoin="round"
               className="sxp-arrow-svg"
@@ -332,7 +332,7 @@ export default function SponsorStage() {
         </div>
       </div>
 
-      <style>{`
+      <style href="sponsor-stage" precedence="default" suppressHydrationWarning>{`
         .sxp {
           position: relative;
           width: 100%;
@@ -360,7 +360,7 @@ export default function SponsorStage() {
           --sxp-ix: calc((100% - var(--sxp-win-w)) / 2 * (1 - var(--sxp-p)));
           --sxp-r: calc(28px * (1 - var(--sxp-p)));
           /* One source of truth: natural 2.75:1 aspect ratio scaling (756 / 2079 = 36.4%) */
-          --sxp-hands-h: min(clamp(280px, 36.4vw, 1400px), 66vh);
+          --sxp-hands-h: min(clamp(280px, 33.33vw, 1400px), 50vh);
           --sxp-hands-lift: clamp(0rem, 0.8vh, 1.2rem);
 
           position: sticky;
@@ -538,8 +538,10 @@ export default function SponsorStage() {
           justify-content: flex-start;
           padding-inline: var(--padding-x);
           /* Desktop: position naturally in the open sky */
-          padding-top: clamp(3.2rem, 9.5vh, 6.5rem);
-          padding-bottom: clamp(1rem, 2vh, 2.5rem);
+          padding-top: clamp(2.5rem, 7vh, 5.5rem);
+          /* Keep the panel out of the arms: the flow box stops short of the
+             handshake instead of being free to run into it. */
+          padding-bottom: calc(var(--sxp-hands-h) * 0.45);
           opacity: 0;
           pointer-events: none;
         }
@@ -560,7 +562,12 @@ export default function SponsorStage() {
         .sxp-hands img {
           width: 100% !important;
           height: 100% !important;
-          object-fit: contain;
+          /* The artwork is 2079x756 (2.75:1). Once the vh cap makes this box
+             wider than that ratio, contain fits by height and leaves sky at
+             both ends -- the arms stop reaching the edges. cover fills both
+             axes and crops the top instead, so the handshake spans edge to
+             edge at every aspect ratio. */
+          object-fit: cover;
           object-position: center bottom;
         }
 
@@ -670,15 +677,18 @@ export default function SponsorStage() {
           z-index: 10;
         }
 
-        /* ── Clean Frameless Up Arrow (No Frame / Circle) ── */
+        /* ── Clean Frameless Up Arrow in Top Right Corner ── */
         .sxp-scrollup-arrow {
           position: absolute;
-          top: clamp(1.25rem, 3.2vh, 2.25rem);
+          top: clamp(1.2rem, 3vh, 2.2rem);
           right: clamp(1.2rem, 3.5vw, 2.5rem);
-          z-index: 105;
+          z-index: 120;
           background: transparent;
           border: none;
-          padding: 8px;
+          outline: none;
+          width: 48px;
+          height: 48px;
+          padding: 0;
           margin: 0;
           color: #142617;
           cursor: pointer;
@@ -687,7 +697,7 @@ export default function SponsorStage() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          transition: color 200ms ease, transform 200ms ease;
+          transition: color 220ms ease, transform 220ms ease;
           will-change: transform, opacity;
         }
 
@@ -696,16 +706,16 @@ export default function SponsorStage() {
         }
 
         .sxp-scrollup-arrow:hover .sxp-arrow-svg {
-          transform: translateY(-3px);
+          transform: translateY(-4px);
         }
 
         .sxp-arrow-svg {
-          transition: transform 220ms cubic-bezier(0.23, 1, 0.32, 1);
-          filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
+          transition: transform 240ms cubic-bezier(0.23, 1, 0.32, 1);
+          filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.16)) drop-shadow(0 1px 2px rgba(255, 255, 255, 0.9));
         }
 
         .sxp-scrollup-arrow:active {
-          transform: scale(0.9);
+          transform: scale(0.92);
         }
 
         /* ── Narrower viewports ── */
@@ -713,7 +723,7 @@ export default function SponsorStage() {
           .sxp { --sxp-track: 280vh; }
           .sxp-stage {
             --sxp-win-w: min(88vw, 34rem);
-            --sxp-hands-h: clamp(200px, 44vw, 380px);
+            --sxp-hands-h: min(clamp(200px, 44vw, 380px), 46vh);
             --sxp-hands-lift: clamp(2.5rem, 6vh, 4.5rem);
           }
           .sxp-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -728,7 +738,7 @@ export default function SponsorStage() {
           .sxp-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .sxp-stage {
             /* Hands carry the bottom edge on a narrow frame, lifted higher */
-            --sxp-hands-h: clamp(260px, 68vw, 420px);
+            --sxp-hands-h: min(clamp(260px, 68vw, 420px), 46vh);
             --sxp-hands-lift: clamp(7rem, 16vh, 11rem);
           }
           .sxp-hands img {
@@ -776,6 +786,32 @@ export default function SponsorStage() {
         @media (max-height: 720px) {
           .sxp-motif { display: none; }
           .sxp-wall { gap: 0.6rem; }
+        }
+
+        /* Landscape phones. 375px of height has to hold the whole panel and a
+           handshake; at the normal sizes the panel alone wants ~330px and the
+           CTA ends up sitting on the clasp. Everything tightens and the hands
+           become a band along the bottom rather than half the screen. */
+        @media (max-height: 520px) {
+          .sxp-stage {
+            --sxp-hands-h: min(clamp(120px, 30vw, 260px), 34vh);
+            --sxp-hands-lift: 0rem;
+          }
+          .sxp-body {
+            padding-top: clamp(1.5rem, 4vh, 2.5rem);
+            padding-bottom: calc(var(--sxp-hands-h) * 0.35);
+          }
+          .sxp-eyebrow { font-size: 0.62rem; letter-spacing: 0.18em; }
+          .sxp-heading { font-size: clamp(1.3rem, 3.4vw, 2rem); }
+          .sxp-lede {
+            font-size: 0.82rem;
+            line-height: 1.35;
+            max-width: 34rem;
+          }
+          .sxp-seal { margin-top: 0.1rem; }
+          .sxp-seal-word { font-size: clamp(1rem, 2.6vw, 1.5rem); }
+          .sxp-seal-q { font-size: clamp(2.2rem, 6vw, 3.4rem); }
+          .sxp-cta-wrap { margin-top: 0.35rem; transform: scale(0.9); }
         }
       `}</style>
     </section>

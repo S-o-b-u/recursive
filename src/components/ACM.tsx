@@ -136,7 +136,7 @@ export default function ACM() {
         </RevealBlock>
       </div>
 
-      <style>{`
+      <style href="acm-style" precedence="default" suppressHydrationWarning>{`
         /* ─────────────────────────────────────────
            Section base. No panel, no card - the whole
            block sits directly on the page's sky.
