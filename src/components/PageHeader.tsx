@@ -34,8 +34,8 @@ export default function PageHeader({
               align="left"
               color="#EFF3EB"
               fontSize="clamp(2.5rem, 6.5vw, 4.8rem)"
-              fontWeight={300}
-              fontFamily="var(--font-display), Georgia, serif"
+              fontWeight={500}
+              fontFamily="var(--font-heading), var(--font-dm-sans), sans-serif"
               letterSpacing="-0.035em"
               style={{
                 width: "100%",

@@ -39,8 +39,11 @@ export const dmSans = DM_Sans({
   variable: "--font-dm-sans",
 });
 
-export const hiruko = Syne({
-  subsets: ["latin"],
-  weight: ["700", "800"],
+/** Hiruko Black Alternate face for the RECURSIVE wordmark and display branding. */
+export const hiruko = localFont({
+  src: "../../public/fonts/HirukoBlackAlternate.ttf",
+  weight: "900",
+  style: "normal",
+  display: "swap",
   variable: "--font-hiruko",
 });

@@ -173,9 +173,9 @@ export default function Themes() {
                 "One seat at the table for each. Pick the one you cannot stop thinking about — every track is judged on the same four criteria.",
               ]}
               className="th-lede-words"
-              start="top 88%"
-              end="bottom 50%"
-              dim={0.16}
+              start="top 84%"
+              end="bottom 38%"
+              dim={0.18}
             />
           </div>
         </div>
@@ -360,7 +360,8 @@ export default function Themes() {
           font-weight: 500;
           font-size: clamp(2.2rem, 5vw, 3.6rem);
           line-height: 1.12;
-          letter-spacing: -0.028em;
+          letter-spacing: -0.035em;
+          word-spacing: -0.01em;
           color: #F1F7E9;
         }
         .th-heading .rh-line { display: flex; justify-content: center; }

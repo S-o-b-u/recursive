@@ -93,7 +93,8 @@ export default function About() {
           font-weight: 500;
           font-size: clamp(2.6rem, 5.8vw, 4.6rem);
           line-height: 1.1;
-          letter-spacing: -0.03em;
+          letter-spacing: -0.035em;
+          word-spacing: -0.01em;
           color: #111a12;
           text-align: center;
         }

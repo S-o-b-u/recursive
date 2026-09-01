@@ -80,10 +80,10 @@ export default function RegisterCTA() {
         }
         .cta-eyebrow {
           margin: 0;
-          font-family: var(--font-dm-sans), sans-serif;
+          font-family: var(--font-label), var(--font-geist-mono), monospace;
           font-size: 0.8rem;
           font-weight: 500;
-          letter-spacing: 0.06em;
+          letter-spacing: 0.18em;
           text-transform: uppercase;
           color: var(--color-accent);
         }
@@ -93,7 +93,8 @@ export default function RegisterCTA() {
           font-size: clamp(1.5rem, 3.5vw, 2.25rem);
           font-weight: 500;
           line-height: 1.2;
-          letter-spacing: -0.025em;
+          letter-spacing: -0.035em;
+          word-spacing: -0.01em;
           color: var(--color-text);
         }
         .cta-body {
@@ -102,6 +103,7 @@ export default function RegisterCTA() {
           font-size: clamp(0.9rem, 1.3vw, 1.05rem);
           font-weight: 400;
           line-height: 1.6;
+          letter-spacing: -0.01em;
           color: var(--color-text-secondary);
           max-width: 32rem;
           margin-inline: auto;

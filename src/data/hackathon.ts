@@ -169,38 +169,17 @@ export type ScheduleDay = {
 
 export const SCHEDULE: ScheduleDay[] = [
   {
-    day: "Day 01",
-    date: "Thursday, October 8",
+    day: "Hackathon Day",
+    date: "Thursday, October 8, 2026",
     items: [
-      { time: "09:00", title: "Check-in & breakfast", note: "Badges, swag, and the first coffee." },
-      { time: "10:30", title: "Opening ceremony", note: "Tracks, rules, and judging criteria." },
-      { time: "12:00", title: "Hacking begins", note: "The clock starts. 36 hours." },
-      { time: "15:00", title: "Workshop — Generative systems", note: "Hands-on, beginner friendly." },
-      { time: "20:00", title: "Dinner & team mixer", note: "Still looking for a team? Come here." },
-      { time: "23:30", title: "Midnight snacks" },
-    ],
-  },
-  {
-    day: "Day 02",
-    date: "Friday, October 9",
-    items: [
-      { time: "08:00", title: "Breakfast" },
-      { time: "11:00", title: "Mentor rounds", note: "Every team gets a 20-minute slot." },
-      { time: "14:00", title: "Workshop — Shipping fast", note: "Deploys, demos, and dead ends." },
-      { time: "18:00", title: "Checkpoint demos", note: "Two minutes, no slides." },
-      { time: "21:00", title: "Dinner & lightning talks" },
-      { time: "02:00", title: "Late-night quiet hours", note: "Rest area opens." },
-    ],
-  },
-  {
-    day: "Day 03",
-    date: "Saturday, October 10",
-    items: [
-      { time: "08:00", title: "Breakfast" },
-      { time: "12:00", title: "Submissions close", note: "Hard deadline on Devfolio." },
-      { time: "13:00", title: "Expo & judging", note: "Judges walk the floor." },
-      { time: "16:00", title: "Finalist presentations", note: "Top six on the main stage." },
-      { time: "17:30", title: "Closing & prizes" },
+      { time: "09:00", title: "Check-in & Registration", note: "Collect your badges, swag kits, and morning refreshments." },
+      { time: "09:45", title: "Opening Ceremony & Track Briefing", note: "Welcome by GNIT ACM Chapter, track deep dive, and rules breakdown." },
+      { time: "10:30", title: "Hacking Begins (8-Hour Sprint)", note: "The clock starts. Brainstorm, design, and code." },
+      { time: "13:00", title: "Lunch & Mentor Walkthrough", note: "Fuel up and receive 1-on-1 technical feedback from mentors." },
+      { time: "16:00", title: "Mid-Sprint Checkpoint & Snacks", note: "Progress sync, coffee break, and debugging assistance." },
+      { time: "18:30", title: "Submissions Close & Hacking Ends", note: "Final commit, push repositories, and submit project demos on Devfolio." },
+      { time: "18:45", title: "Live Demos & Expo Judging", note: "Teams present their working prototypes to the panel of judges." },
+      { time: "20:00", title: "Award Ceremony & Closing", note: "Winner announcements, prize distribution, and closing remarks." },
     ],
   },
 ];
@@ -283,36 +262,36 @@ export type Faq = { q: string; a: string };
 
 export const FAQS: Faq[] = [
   {
-    q: "Who can participate?",
-    a: "Any student or early-career builder, anywhere. Bring a college ID or a short note about what you're working on. Absolute beginners are genuinely welcome — roughly a third of our seats are held for first-timers.",
+    q: "What is Recursive and who is organizing it?",
+    a: "Recursive is the inaugural flagship 8-hour in-person hackathon hosted by the GNIT ACM Student Chapter in collaboration with the Department of Information Technology at Guru Nanak Institute of Technology (GNIT), Kolkata. It brings together developers, designers, and builders for eight hours of rapid prototyping, honest software craft, and collaborative problem-solving.",
   },
   {
-    q: "What does it cost?",
-    a: "Nothing. Entry, food, and workspace are free for everyone accepted. Travel reimbursement is available for a limited number of teams travelling more than 300km — apply during registration.",
+    q: "Who is eligible to participate?",
+    a: "Any undergraduate, postgraduate, or diploma student with a valid college ID card is eligible to participate. Whether you are an experienced builder or attending your very first hackathon, beginners are warmly welcome—mentors will be on the floor throughout the event to help you.",
   },
   {
-    q: "Do I need a team?",
-    a: "No. Come alone and find one at the Friday mixer, or register with up to three friends. Teams are capped at four people — one per chair.",
+    q: "Is there any registration fee?",
+    a: "No. Recursive is 100% free of cost. Admission, high-speed Wi-Fi access, meals, snacks, beverages, exclusive swag kits, and mentorship are provided completely free to all shortlisted participants.",
   },
   {
-    q: "Can I start building before the event?",
-    a: "No. Everything you submit must be written during the 36 hours. You can arrive with an idea, sketches, research, and a plan — that's encouraged. Boilerplate and open-source libraries are fine; a half-finished project is not.",
+    q: "What is the team size and can I apply solo?",
+    a: "Teams can consist of 1 to 4 members. You can register with a pre-formed team or apply solo. If you join alone, you can connect with other builders during the morning team-matching mixer before hacking kicks off.",
   },
   {
-    q: "What should I bring?",
-    a: "Laptop, charger, ID, a change of clothes, and anything unusual your project needs. We provide power, wifi, food, water, and a quiet place to sleep.",
+    q: "Where is the venue and what is the schedule?",
+    a: "The hackathon takes place in person at Guru Nanak Institute of Technology (GNIT), Sodepur, Kolkata. Check-in starts at 9:00 AM, the official 8-hour hacking sprint runs from 10:30 AM to 6:30 PM, followed immediately by project demos, judging, and the award ceremony.",
   },
   {
-    q: "How is judging done?",
-    a: "Four criteria, weighted equally: originality, technical depth, craft, and how well you tell the story. Judges walk the expo floor, then the top six present on the main stage.",
+    q: "Can I work on a pre-existing project or start early?",
+    a: "No. All code and designs must be created during the official 8-hour hacking window. You are encouraged to come with ideas, sketches, and plans, and you may use open-source libraries, public APIs, and frameworks, but writing core application code beforehand is strictly prohibited.",
   },
   {
-    q: "Do I keep my IP?",
-    a: "Yes. Your project is yours. We only ask permission to show it in the recap and on this site.",
+    q: "What should I bring on the day of the event?",
+    a: "Please bring your laptop, charger, power strip/extension cord, valid college ID card, and any specific hardware components your project might require. High-speed campus Wi-Fi, dedicated power stations, meals, and snacks will be provided throughout the day.",
   },
   {
-    q: "Is there a code of conduct?",
-    a: "Yes, and we enforce it. Read it before you register — it's short and it matters.",
+    q: "How will projects be evaluated and what are the prizes?",
+    a: "Projects will be evaluated by industry judges and academic mentors based on four core criteria: technical depth, problem innovation, design/UX craft, and the quality of your live demo. Cash prizes, track awards, certificates, and sponsor perks will be awarded to top teams.",
   },
 ];
 

@@ -397,8 +397,8 @@ export default function Footer() {
           ripple
           fontSize="min(clamp(7.5rem, 34vw, 42rem), 60vh)"
           fontWeight={900}
-          fontFamily="var(--font-bebas), var(--font-heading), sans-serif"
-          letterSpacing="0.01em"
+          fontFamily="var(--font-hiruko), var(--font-display), sans-serif"
+          letterSpacing="-0.035em"
           lineHeight={0.82}
           style={{
             width: "100%",
@@ -447,8 +447,8 @@ export default function Footer() {
         .footer-wordmark-wrap {
           position: absolute;
           inset-inline: 0;
-          bottom: clamp(0.5rem, 4vh, 2.75rem);
-          height: min(clamp(280px, 56vh, 640px), 90%);
+          bottom: clamp(-0.25rem, 0vh, 0.5rem);
+          height: min(clamp(280px, 56vh, 640px), 92%);
           z-index: 10;
           display: flex;
           justify-content: center;
@@ -462,11 +462,11 @@ export default function Footer() {
           footer.footer-shell {
             min-height: clamp(240px, 44vw, 440px);
             height: clamp(240px, 44vw, 440px);
-            margin-top: clamp(1rem, 3vh, 2.5rem);
+            margin-top: clamp(2rem, 4vh, 3.5rem);
           }
           .footer-wordmark-wrap {
-            bottom: clamp(0.5rem, 2vw, 1.5rem);
-            height: 92%;
+            bottom: 0;
+            height: 94%;
             padding-inline: 1vw;
           }
         }
@@ -475,11 +475,11 @@ export default function Footer() {
           footer.footer-shell {
             min-height: clamp(200px, 54vw, 290px);
             height: clamp(200px, 54vw, 290px);
-            margin-top: clamp(0.5rem, 1.5vh, 1.5rem);
+            margin-top: clamp(1rem, 2vh, 2rem);
           }
           .footer-wordmark-wrap {
-            bottom: clamp(0.2rem, 1.5vw, 0.8rem);
-            height: 94%;
+            bottom: 0;
+            height: 96%;
             padding-inline: 0;
           }
         }
@@ -500,7 +500,7 @@ export default function Footer() {
         /* Open sky between the panel above and the crowd, so the footer
            arrives as its own beat rather than butting straight onto ACM. */
         .footer-shell {
-          margin-top: clamp(3rem, 8vh, 6.5rem);
+          margin-top: clamp(4rem, 9vh, 7.5rem);
         }
 
         /* Pure rich dark gradient concealing the bottom cut edge of people */

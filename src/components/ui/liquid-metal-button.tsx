@@ -333,7 +333,10 @@ export function LiquidMetalButton({
                 style={{
                   fontSize: "14px",
                   color: "#f3f8ee",
-                  fontWeight: 600,
+                  fontFamily: "var(--font-display), var(--font-dm-sans), sans-serif",
+                  fontWeight: 700,
+                  letterSpacing: "-0.012em",
+                  wordSpacing: "0.02em",
                   textShadow: "0px 1px 2px rgba(0, 0, 0, 0.7)",
                   transform: "scale(1)",
                   whiteSpace: "nowrap",

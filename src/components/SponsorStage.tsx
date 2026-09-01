@@ -568,7 +568,8 @@ export default function SponsorStage() {
           font-weight: 500;
           font-size: clamp(1.6rem, 9.53px + 4.38vw, 4.2rem);
           line-height: 1.05;
-          letter-spacing: -0.028em;
+          letter-spacing: -0.035em;
+          word-spacing: -0.01em;
           color: #111a12;
         }
 

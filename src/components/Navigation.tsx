@@ -312,10 +312,10 @@ export default function Navigation() {
           padding: 0.35rem 0.65rem 0.35rem 0.55rem;
         }
         .nav-wordmark {
-          font-family: var(--font-display), var(--font-dm-sans), sans-serif;
-          font-weight: 700;
+          font-family: var(--font-hiruko), var(--font-display), sans-serif;
+          font-weight: 900;
           font-size: 0.98rem;
-          letter-spacing: -0.01em;
+          letter-spacing: -0.025em;
           text-transform: uppercase;
           color: var(--color-accent-deep);
           white-space: nowrap;

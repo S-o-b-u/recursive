@@ -1,335 +1,356 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { RevealBlock, RevealHeading } from "@/components/ui/reveal";
+import Ornament from "@/components/ui/Ornament";
 import { FAQS } from "@/data/hackathon";
 
-export default function HomeFAQ() {
-  return (
-    <section id="faq" className="faq" aria-labelledby="faq-title">
-      <div className="faq-sheet">
-        <span className="faq-sheet-sheen" aria-hidden="true" />
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-        {/* ── Header: Centered "FAQ" title ── */}
-        <div className="faq-head">
-          <h2 id="faq-title" className="faq-title">
-            FAQ
-          </h2>
+export default function HomeFAQ() {
+  const [openIndex, setOpenIndex] = useState<number | null>(1); // Item [02] open by default matching reference image
+
+  return (
+    <section id="faq" className="faq-section" aria-labelledby="faq-title">
+      <div className="faq-container">
+        {/* ── Header: Centered "FAQ" with Artifact (Matching Other Sections) ── */}
+        <div className="faq-header">
+          <RevealBlock y={14}>
+            <div className="faq-ornament-wrap">
+              <Ornament className="faq-crown" />
+            </div>
+          </RevealBlock>
+
+          <RevealHeading
+            className="faq-title"
+            lines={["FAQ"]}
+          />
         </div>
 
-        {/* ── The stack. Each card is a dark glass slab carrying a light
-               capsule for the question and the answer beneath it. ── */}
-        <ul className="faq-list">
-          {FAQS.map((faq, i) => (
-            <li key={i} className="faq-card">
-              <span className="faq-card-sheen" aria-hidden="true" />
-              <div className="faq-q">
-                <span className="faq-q-sheen" aria-hidden="true" />
-                <span className="faq-q-text">{faq.q}</span>
+        {/* ── Accordion List (Matching WhatsApp Reference Image) ── */}
+        <div className="faq-accordion" role="region" aria-label="Frequently Asked Questions">
+          {FAQS.map((faq, index) => {
+            const isOpen = openIndex === index;
+            const indexStr = `${index + 1}`;
+
+            return (
+              <div
+                key={index}
+                className={`faq-item ${isOpen ? "is-open" : "is-closed"}`}
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenIndex(isOpen ? null : index)}
+                  className="faq-trigger"
+                  aria-expanded={isOpen}
+                  aria-controls={`faq-answer-${index}`}
+                  id={`faq-question-${index}`}
+                >
+                  <div className="faq-row-main">
+                    <span className="faq-row-num">{indexStr}</span>
+                    <span className="faq-row-title">{faq.q}</span>
+                  </div>
+
+                  <div className="faq-arrow-box" aria-hidden="true">
+                    {isOpen ? (
+                      /* Up-Right Diagonal Arrow ↗ */
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="faq-arrow"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="7" y1="17" x2="17" y2="7" />
+                        <polyline points="7 7 17 7 17 17" />
+                      </svg>
+                    ) : (
+                      /* Down-Right Diagonal Arrow ↘ */
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="faq-arrow"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="7" y1="7" x2="17" y2="17" />
+                        <polyline points="7 17 17 17 17 7" />
+                      </svg>
+                    )}
+                  </div>
+                </button>
+
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      id={`faq-answer-${index}`}
+                      role="region"
+                      aria-labelledby={`faq-question-${index}`}
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.32, ease: EASE_OUT }}
+                      className="faq-answer-collapse"
+                    >
+                      <div className="faq-answer-inner">
+                        <p className="faq-answer-text">{faq.a}</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-              <p className="faq-a">{faq.a}</p>
-            </li>
-          ))}
-        </ul>
+            );
+          })}
+        </div>
       </div>
 
-      <style href="home-faq" precedence="default" suppressHydrationWarning>{`
+      <style href="home-faq-cloud" precedence="default" suppressHydrationWarning>{`
         /* ─────────────────────────────────────────
-           FAQ. Sits on the page sky, so every surface
-           here is glass rather than paint: the sheet
-           and the capsules let the cloud through and
-           bend it, the slabs sit dark against it.
+           Modern High-Contrast FAQ Section
+           On Global Cloud Background
         ───────────────────────────────────────── */
-        .faq {
+        .faq-section {
           position: relative;
           z-index: 10;
           width: 100%;
           display: flex;
           justify-content: center;
-          padding-block: clamp(3.5rem, 22.61px + 6.52vw, 9rem);
-          padding-inline: clamp(1rem, 3.5vw, 2rem);
+          background: transparent;
+          color: #111c14;
+          padding-block: clamp(4.5rem, 8vw, 8.5rem);
+          padding-inline: clamp(1.2rem, 4vw, 3.5rem);
           scroll-margin-top: 7rem;
         }
 
-        /* ── The sheet (Liquid Glass Frame) ── */
-        .faq-sheet {
+        .faq-container {
           position: relative;
           width: 100%;
-          max-width: 34rem;
+          max-width: 72rem;
+          margin-inline: auto;
           display: flex;
           flex-direction: column;
-          padding: clamp(1.5rem, 3.13px + 3.7vw, 3.5rem);
-          border-radius: clamp(28px, 15.57px + 2.9vw, 48px);
-          overflow: hidden;
-          isolation: isolate;
-
-          background:
-            radial-gradient(130% 90% at 15% 8%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.35) 32%, transparent 65%),
-            radial-gradient(100% 80% at 88% 92%, rgba(210, 245, 200, 0.42) 0%, transparent 60%),
-            linear-gradient(
-              152deg,
-              rgba(255, 255, 255, 0.88) 0%,
-              rgba(246, 251, 244, 0.72) 46%,
-              rgba(235, 246, 232, 0.65) 100%
-            );
-          backdrop-filter: blur(36px) saturate(185%) contrast(104%);
-          -webkit-backdrop-filter: blur(36px) saturate(185%) contrast(104%);
-          border: 1.5px solid rgba(255, 255, 255, 0.85);
-          box-shadow:
-            inset 0 2px 6px rgba(255, 255, 255, 0.98),
-            inset 0 -2px 8px rgba(22, 36, 26, 0.08),
-            inset 0 0 40px rgba(255, 255, 255, 0.5),
-            0 35px 85px -25px rgba(18, 38, 22, 0.32),
-            0 12px 28px -8px rgba(18, 38, 22, 0.16);
-          transition: box-shadow 400ms ease, border-color 400ms ease;
-        }
-
-        /* Fluid liquid specular caustics overlay */
-        .faq-sheet-sheen {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-          pointer-events: none;
-          background: linear-gradient(
-            115deg,
-            rgba(255, 255, 255, 0) 22%,
-            rgba(255, 255, 255, 0.75) 44%,
-            rgba(220, 248, 215, 0.35) 52%,
-            rgba(255, 255, 255, 0.7) 58%,
-            rgba(255, 255, 255, 0) 78%
-          );
-          opacity: 0.75;
-          animation: faq-liquid-glow 10s ease-in-out infinite alternate;
-        }
-
-        @keyframes faq-liquid-glow {
-          0% {
-            opacity: 0.55;
-            transform: scale(1) translate3d(0, 0, 0);
-          }
-          50% {
-            opacity: 0.85;
-            transform: scale(1.03) translate3d(1%, -1%, 0);
-          }
-          100% {
-            opacity: 0.6;
-            transform: scale(1) translate3d(-1%, 1%, 0);
-          }
-        }
-
-        .faq-sheet > *:not(.faq-sheet-sheen) {
-          position: relative;
-          z-index: 1;
         }
 
         /* ── Header ── */
-        .faq-head {
+        .faq-header {
+          width: 100%;
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
           text-align: center;
-          width: 100%;
-          margin-bottom: clamp(1.5rem, 2.61px + 3.26vw, 3rem);
+          margin-bottom: clamp(2.5rem, 4.5vw, 4rem);
+        }
+
+        .faq-ornament-wrap {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: clamp(1rem, 2vh, 1.6rem);
+        }
+
+        .faq-crown {
+          width: clamp(114px, 56.87px + 15.87vw, 260px);
+          height: auto;
+          opacity: 0.88;
         }
 
         .faq-title {
           margin: 0;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-size: clamp(2.5rem, 30.61px + 2.609vw, 4.2rem);
-          font-weight: 700;
-          line-height: 1;
+          font-size: clamp(2.6rem, 5.8vw, 4.6rem);
+          font-weight: 500;
+          line-height: 1.1;
           letter-spacing: -0.035em;
-          color: #16241A;
+          word-spacing: -0.01em;
+          color: #111a12;
+          text-transform: uppercase;
           text-align: center;
         }
 
-        /* ── The stack ── */
-        .faq-list {
-          margin: 0;
-          padding: 0;
-          list-style: none;
+        .faq-title .rh-line {
+          display: flex;
+          justify-content: center;
+        }
+
+        /* ── Accordion List ── */
+        .faq-accordion {
+          width: 100%;
           display: flex;
           flex-direction: column;
-          gap: clamp(0.7rem, 4.87px + 1.09vw, 1.25rem);
+          border-top: 1px solid rgba(22, 36, 26, 0.18);
         }
 
-        .faq-card {
+        /* ── Row Item ── */
+        .faq-item {
           position: relative;
-          overflow: hidden;
-          isolation: isolate;
-          padding: clamp(0.5rem, 1.87px + 0.54vw, 0.85rem);
-          border-radius: clamp(20px, 11.3px + 2.17vw, 32px);
-
-          background: linear-gradient(
-            160deg,
-            rgba(23, 39, 26, 0.9) 0%,
-            rgba(11, 22, 13, 0.94) 100%
-          );
-          backdrop-filter: blur(18px) saturate(140%);
-          -webkit-backdrop-filter: blur(18px) saturate(140%);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.14),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-            0 16px 34px -20px rgba(8, 18, 10, 0.7);
-          transition:
-            transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
-            box-shadow 420ms ease;
+          width: 100%;
+          border-bottom: 1px solid rgba(22, 36, 26, 0.18);
+          transition: background 250ms cubic-bezier(0.22, 1, 0.36, 1),
+                      color 250ms cubic-bezier(0.22, 1, 0.36, 1),
+                      border-color 250ms ease,
+                      box-shadow 250ms ease;
         }
 
-        .faq-card-sheen {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-          pointer-events: none;
-          background: linear-gradient(
-            122deg,
-            rgba(255, 255, 255, 0) 34%,
-            rgba(190, 224, 168, 0.14) 50%,
-            rgba(255, 255, 255, 0) 66%
-          );
+        /* Closed State */
+        .faq-item.is-closed {
+          background: transparent;
+          color: #16241A;
         }
 
-        .faq-card > *:not(.faq-card-sheen) {
-          position: relative;
-          z-index: 1;
+        .faq-item.is-closed:hover {
+          border-bottom-color: rgba(22, 36, 26, 0.42);
         }
 
-        .faq-card:hover {
-          transform: translateY(-2px);
-          box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.2),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-            0 22px 44px -20px rgba(8, 18, 10, 0.8);
+        .faq-item.is-closed:hover .faq-row-title {
+          color: #0b1710;
         }
 
-        /* ── Question capsule ── */
-        .faq-q {
-          position: relative;
-          overflow: hidden;
+        .faq-item.is-closed:hover .faq-arrow {
+          transform: translate(2px, 2px);
+        }
+
+        /* Open Active State (Transparent on Cloud Background) */
+        .faq-item.is-open {
+          background: transparent;
+          color: #111c14;
+        }
+
+        /* ── Trigger Button ── */
+        .faq-trigger {
+          width: 100%;
           display: flex;
           align-items: center;
-          width: 100%;
-          padding: clamp(0.62rem, 2.87px + 0.65vw, 0.9rem)
-            clamp(1rem, 4.7px + 1.3vw, 1.6rem);
-          border-radius: 999px;
-
-          background: linear-gradient(
-            150deg,
-            rgba(255, 255, 255, 0.96) 0%,
-            rgba(240, 246, 236, 0.9) 100%
-          );
-          backdrop-filter: blur(10px) saturate(150%);
-          -webkit-backdrop-filter: blur(10px) saturate(150%);
-          box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 1),
-            inset 0 -1px 0 rgba(22, 36, 26, 0.1),
-            0 4px 12px -6px rgba(0, 0, 0, 0.35);
+          justify-content: space-between;
+          gap: 1.5rem;
+          padding: clamp(1.35rem, 2.5vh, 2rem) clamp(0.75rem, 1.5vw, 1.75rem);
+          text-align: left;
+          background: transparent;
+          border: none;
+          color: inherit;
+          cursor: pointer;
+          font: inherit;
         }
 
-        .faq-q-sheen {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-          background: linear-gradient(
-            120deg,
-            rgba(255, 255, 255, 0) 32%,
-            rgba(255, 255, 255, 0.75) 48%,
-            rgba(255, 255, 255, 0) 62%
-          );
+        .faq-row-main {
+          display: flex;
+          align-items: baseline;
+          gap: clamp(1.2rem, 2.5vw, 2.75rem);
+          flex: 1;
+          min-width: 0;
         }
 
-        .faq-q-text {
-          position: relative;
-          z-index: 1;
+        .faq-row-num {
+          font-family: var(--font-bebas), var(--font-heading), sans-serif;
+          font-size: clamp(1.4rem, 15px + 1.2vw, 2.1rem);
+          font-weight: 700;
+          letter-spacing: 0.02em;
+          flex-shrink: 0;
+          color: #1b4324;
+          line-height: 1;
+          opacity: 1;
+        }
+
+        .faq-item.is-open .faq-row-num {
+          color: #111c14;
+          opacity: 1;
+        }
+
+        .faq-row-title {
+          font-family: var(--font-display), var(--font-heading), sans-serif;
+          font-size: clamp(1.05rem, 12px + 0.85vw, 1.4rem);
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.015em;
+          word-spacing: 0.04em;
+          line-height: 1.3;
+          color: inherit;
+        }
+
+        /* ── Arrow Box ── */
+        .faq-arrow-box {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          width: 32px;
+          height: 32px;
+        }
+
+        .faq-arrow {
+          width: clamp(22px, 1.8vw, 28px);
+          height: clamp(22px, 1.8vw, 28px);
+          color: #16241A;
+          transition: transform 220ms ease;
+        }
+
+        .faq-item.is-open .faq-arrow {
+          color: #111c14;
+        }
+
+        .faq-item.is-open:hover .faq-arrow {
+          transform: translate(2px, -2px);
+        }
+
+        /* ── Answer Collapse ── */
+        .faq-answer-collapse {
+          overflow: hidden;
+        }
+
+        .faq-answer-inner {
+          padding: 0 clamp(0.75rem, 1.5vw, 1.75rem) clamp(1.5rem, 2.8vh, 2.25rem);
+          margin-left: clamp(2.6rem, 4.5vw, 4.75rem);
+          max-width: 74ch;
+        }
+
+        .faq-answer-text {
+          margin: 0;
           font-family: var(--font-dm-sans), system-ui, sans-serif;
-          font-size: clamp(0.9375rem, 14.22px + 0.217vw, 1.0625rem);
-          font-weight: 600;
-          line-height: 1.32;
-          letter-spacing: -0.014em;
-          color: #14231A;
-          text-wrap: pretty;
-        }
-
-        /* ── Answer ── */
-        .faq-a {
-          margin: clamp(0.6rem, 3.13px + 0.54vw, 0.95rem) 0
-            clamp(0.35rem, 1.39px + 0.33vw, 0.6rem);
-          padding-inline: clamp(1rem, 4.7px + 1.3vw, 1.6rem);
-          font-family: var(--font-dm-sans), system-ui, sans-serif;
-          font-size: clamp(0.84375rem, 12.91px + 0.163vw, 0.9375rem);
+          font-size: clamp(0.95rem, 11.5px + 0.5vw, 1.15rem);
+          line-height: 1.7;
+          color: #334438;
           font-weight: 400;
-          line-height: 1.62;
-          letter-spacing: -0.006em;
-          color: rgba(228, 240, 223, 0.9);
-          text-wrap: pretty;
         }
 
-        /* ─────────────────────────────────────────
-           Ratios per class of device. The sheet is a
-           reading column, so it widens with the screen
-           but never past a comfortable measure.
-        ───────────────────────────────────────── */
+        /* ── Mobile Tweaks ── */
+        @media (max-width: 640px) {
+          .faq-trigger {
+            padding: 1.15rem 0.5rem;
+            gap: 0.75rem;
+          }
 
-        /* Tablet */
-        @media (min-width: 641px) {
-          .faq-sheet {
-            max-width: 48rem;
+          .faq-row-main {
+            gap: 0.75rem;
           }
-        }
 
-        /* Desktop */
-        @media (min-width: 1025px) {
-          .faq-sheet {
-            max-width: 70rem;
+          .faq-row-num {
+            font-size: 1.15rem;
+            font-weight: 800;
           }
-        }
 
-        /* Wide Desktop */
-        @media (min-width: 1280px) {
-          .faq-sheet {
-            max-width: 78rem;
+          .faq-row-title {
+            font-size: 0.95rem;
+            letter-spacing: 0.01em;
           }
-        }
 
-        /* Ultra-wide Screens */
-        @media (min-width: 1536px) {
-          .faq-sheet {
-            max-width: 84rem;
+          .faq-answer-inner {
+            margin-left: 0;
+            padding: 0 0.5rem 1.25rem;
           }
-        }
 
-        /* Phone: the capsule is the tight axis here, so the question loses its
-           pill rounding rather than its words when it has to wrap. */
-        @media (max-width: 480px) {
-          .faq-q {
-            border-radius: 22px;
+          .faq-answer-text {
+            font-size: 0.9rem;
+            line-height: 1.55;
           }
-        }
 
-        /* backdrop-filter is the expensive one on a phone GPU. Four stacked
-           glass layers per card is fine on desktop and not on a handset, so the
-           capsules and slabs keep their tint but drop the live blur. */
-        @media (max-width: 700px) {
-          .faq-card,
-          .faq-q {
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-          }
-          .faq-sheet {
-            backdrop-filter: blur(16px) saturate(150%);
-            -webkit-backdrop-filter: blur(16px) saturate(150%);
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .faq-card,
-          .faq-jump,
-          .faq-jump svg {
-            transition: none;
-          }
-          .faq-card:hover,
-          .faq-jump:hover {
-            transform: none;
+          .faq-arrow {
+            width: 20px;
+            height: 20px;
           }
         }
       `}</style>

@@ -309,7 +309,8 @@ export default function Countdown() {
           font-weight: 500;
           font-size: clamp(2.8rem, 6.2vw, 4.8rem);
           line-height: 1.12;
-          letter-spacing: -0.028em;
+          letter-spacing: -0.035em;
+          word-spacing: -0.01em;
           color: #111a12;
           text-align: center;
         }

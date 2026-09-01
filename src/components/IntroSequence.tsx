@@ -151,13 +151,35 @@ export default function IntroSequence() {
       window.dispatchEvent(new CustomEvent("recursive-intro-done"));
     }
 
-    setPhase("done");
-    requestAnimationFrame(() => {
+    const ric = (window as unknown as {
+      requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
+    }).requestIdleCallback;
+
+    // Two separate costs, so they get two separate idle slots. Unmounting the
+    // intro subtree (a video plus WebGL canvases) and refreshing every
+    // ScrollTrigger on a 12,000px page each take most of a frame; run together
+    // they drop two in a row exactly where the user takes over scrolling.
+    const scrollHome = () => {
       const l = getLenis();
       if (l) l.scrollTo(0, { immediate: true, force: true });
       else window.scrollTo(0, 0);
+    };
+
+    const refreshTriggers = () => {
+      scrollHome();
       ScrollTrigger.refresh();
-    });
+    };
+
+    const unmount = () => {
+      setPhase("done");
+      // Give the compositor a frame to settle after the subtree goes before
+      // asking every trigger to re-measure.
+      if (typeof ric === "function") ric(refreshTriggers, { timeout: 1200 });
+      else window.setTimeout(refreshTriggers, 260);
+    };
+
+    if (typeof ric === "function") ric(unmount, { timeout: 900 });
+    else window.setTimeout(unmount, 60);
   }, []);
 
   const skip = useCallback(() => {
@@ -441,7 +463,7 @@ export default function IntroSequence() {
       tl.call(() => {
         if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
         if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("recursive-intro-done"));
-      }, undefined, 7.5);
+      }, undefined, 7.25);
       tl.to(scene, { autoAlpha: 0, duration: 0.9, ease: "sine.inOut" }, 7.55);
       tl.call(resumeHeroPlate, undefined, 8.05);
       tl.set(root, { pointerEvents: "none" }, 7.9);
@@ -531,6 +553,15 @@ export default function IntroSequence() {
         0.3,
       );
       q.call(freezePlates, undefined, 0.62);
+      q.call(
+        () => {
+          if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
+          if (typeof window !== "undefined")
+            window.dispatchEvent(new CustomEvent("recursive-intro-done"));
+        },
+        undefined,
+        0.4,
+      );
       q.to(scene, { autoAlpha: 0, duration: 0.6, ease: "sine.inOut" }, 0.66);
       q.call(resumeHeroPlate, undefined, 1.02);
       q.set(root, { pointerEvents: "none" }, 1.0);

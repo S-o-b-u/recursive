@@ -54,6 +54,22 @@ export default function Hero() {
     );
   });
 
+  // The initializer above runs during render -- before IntroSequence has
+  // committed its DOM or set data-intro -- so "no intro elements on the page"
+  // is indistinguishable from "the intro has not mounted yet". Left alone, the
+  // hero concludes the intro is already over, plays its entrance behind the
+  // curtain, and is sitting perfectly still by the time the curtain lifts.
+  // That is what made the hand-off read flat. Re-check once after mount, when
+  // the sibling's DOM definitely exists.
+  useEffect(() => {
+    // data-intro is the dependable signal: IntroSequence is rendered before
+    // this component, so its effect (which sets "playing", or "done" when the
+    // intro is skipped) has already run by the time this one does. Querying for
+    // .intro-root instead is not reliable -- the pending phase renders
+    // different markup.
+    if (document.documentElement.dataset.intro !== "done") setIntroFinished(false);
+  }, []);
+
   useEffect(() => {
     if (introFinished) return;
     const onIntroDone = () => setIntroFinished(true);
@@ -119,14 +135,18 @@ export default function Hero() {
       <motion.div
         className="hero-center-content"
         ref={centerRef}
-        initial={reduced ? false : { opacity: 0, y: 22 }}
-        animate={introFinished ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 }}
-        transition={{ duration: 0.85, ease: EASE_OUT, delay: 0.08 }}
+        initial={reduced ? false : { opacity: 0, y: 14, scale: 1.02 }}
+        animate={
+          introFinished
+            ? { opacity: 1, y: 0, scale: 1 }
+            : { opacity: 0, y: 14, scale: 1.02 }
+        }
+        transition={{ duration: 0.7, ease: EASE_OUT, delay: 0.02 }}
       >
         <div className="hero-warp-wrap">
           <WarpText
             src={logoImg.src || "/images/logo.png"}
-            color="#000000"
+            color="linear-gradient(180deg, #070e08 0%, #111c14 55%, #1d3320 100%)"
             warpStrength={0.035}
             warpScale={1.5}
             speed={0.35}
@@ -147,9 +167,13 @@ export default function Hero() {
       <motion.div
         className="hero-bottom-area"
         ref={dockRef}
-        initial={reduced ? false : { opacity: 0, y: 20 }}
-        animate={introFinished ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-        transition={{ duration: 0.85, delay: 0.22, ease: EASE_OUT }}
+        initial={reduced ? false : { opacity: 0, y: 14, scale: 1.02 }}
+        animate={
+          introFinished
+            ? { opacity: 1, y: 0, scale: 1 }
+            : { opacity: 0, y: 14, scale: 1.02 }
+        }
+        transition={{ duration: 0.7, delay: 0.1, ease: EASE_OUT }}
       >
         <div className="hero-action-dock-split">
           <div className="hero-locked-wrap" title="Registration currently locked · Revealing soon">
@@ -275,7 +299,7 @@ export default function Hero() {
         /* ── Top Center Block: Wordmark with WebGL Warp ── */
         .hero-center-content {
           position: absolute;
-          top: clamp(1.8rem, 5.5vh, 4.8rem);
+          top: clamp(5.6rem, 12vh, 8.2rem);
           left: 0;
           right: 0;
           width: 100%;
@@ -294,8 +318,8 @@ export default function Hero() {
         .hero-warp-wrap {
           position: relative;
           width: 100%;
-          max-width: min(98vw, 1800px);
-          height: min(clamp(240px, 38vw, 540px), 48vh);
+          max-width: min(92vw, 1120px);
+          height: clamp(165px, 24vw, 280px);
           display: flex;
           justify-content: center;
           align-items: center;
@@ -303,11 +327,11 @@ export default function Hero() {
 
         .hero-wordmark {
           margin: 0;
-          font-family: var(--font-display), var(--font-dm-sans), sans-serif;
-          font-weight: 800;
+          font-family: var(--font-hiruko), var(--font-display), sans-serif;
+          font-weight: 900;
           font-size: clamp(3.8rem, 11.5vw, 7.8rem);
           line-height: 0.9;
-          letter-spacing: -0.035em;
+          letter-spacing: -0.04em;
           text-transform: uppercase;
           color: #111a12;
           text-shadow: 0 1px 18px rgba(255, 255, 255, 0.4);
@@ -477,21 +501,21 @@ export default function Hero() {
 
         @media (max-width: 1024px) {
           .hero-center-content {
-            top: clamp(3.2rem, 7.5vh, 5.2rem);
+            top: clamp(5.0rem, 11vh, 7.0rem);
           }
           .hero-warp-wrap {
-            max-width: 98vw;
-            height: min(clamp(200px, 36vw, 400px), 42vh);
+            max-width: min(94vw, 940px);
+            height: clamp(140px, 25vw, 230px);
           }
         }
 
         @media (max-width: 860px) {
           .hero-center-content {
-            top: clamp(4rem, 9vh, 6.2rem);
+            top: clamp(4.6rem, 10vh, 6.0rem);
           }
           .hero-warp-wrap {
-            height: clamp(180px, 38vw, 300px);
-            max-width: 98vw;
+            height: clamp(120px, 26vw, 185px);
+            max-width: 96vw;
           }
           .hero-chair-annotation {
             left: calc(50% + 24px);
@@ -566,13 +590,13 @@ export default function Hero() {
 
         @media (max-width: 600px) {
           .hero-center-content {
-            top: clamp(7.8rem, 16.5vh, 10.5rem);
+            top: clamp(4.4rem, 9.5vh, 5.4rem);
             padding-inline: 0;
           }
           .hero-warp-wrap {
-            height: clamp(160px, 42vw, 240px);
-            max-width: 100vw;
-            width: 100vw;
+            height: clamp(105px, 25vw, 155px);
+            max-width: 98vw;
+            width: 98vw;
           }
           .hero-chair-annotation {
             left: calc(50% + 36px);

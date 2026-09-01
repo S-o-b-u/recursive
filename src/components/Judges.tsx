@@ -438,7 +438,8 @@ export default function Judges() {
           font-weight: 500;
           font-size: clamp(2.2rem, 5vw, 3.6rem);
           line-height: 1.15;
-          letter-spacing: -0.028em;
+          letter-spacing: -0.035em;
+          word-spacing: -0.01em;
           color: #F1F7E9;
         }
         .jd-heading .rh-line { display: flex; justify-content: center; }

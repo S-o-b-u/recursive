@@ -46,9 +46,9 @@ function refreshOnFonts() {
 export function RevealWords({
   paragraphs,
   className = "",
-  start = "top 86%",
-  end = "bottom 52%",
-  dim = 0.15,
+  start = "top 84%",
+  end = "bottom 38%",
+  dim = 0.18,
 }: {
   paragraphs: string[];
   className?: string;
@@ -71,34 +71,55 @@ export function RevealWords({
     }
 
     const ctx = gsap.context(() => {
-      gsap.fromTo(
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: root,
+          start,
+          end,
+          scrub: 0.7,
+          invalidateOnRefresh: true,
+        },
+      });
+
+      tl.fromTo(
         words,
-        { opacity: dim, y: 6 },
+        {
+          opacity: dim,
+          y: 4,
+        },
         {
           opacity: 1,
           y: 0,
-          ease: "none",
-          duration: 1.2,
-          stagger: 0.25,
-          scrollTrigger: {
-            trigger: root,
-            start,
-            end,
-            scrub: 0.5,
-            invalidateOnRefresh: true,
+          ease: "power1.out",
+          stagger: {
+            each: 0.04,
+            ease: "none",
           },
         }
       );
     }, root);
 
-    const raf = requestAnimationFrame(() => {
+    const handleRefresh = () => {
       ScrollTrigger.refresh();
-    });
+    };
 
-    const cancel = refreshOnFonts();
+    if (typeof window !== "undefined") {
+      window.addEventListener("recursive-intro-done", handleRefresh);
+      window.addEventListener("resize", handleRefresh);
+    }
+
+    const timer1 = setTimeout(handleRefresh, 150);
+    const timer2 = setTimeout(handleRefresh, 600);
+    const cancelFonts = refreshOnFonts();
+
     return () => {
-      cancel();
-      cancelAnimationFrame(raf);
+      cancelFonts();
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      if (typeof window !== "undefined") {
+        window.removeEventListener("recursive-intro-done", handleRefresh);
+        window.removeEventListener("resize", handleRefresh);
+      }
       ctx.revert();
     };
   }, [paragraphs, start, end, dim]);
@@ -111,7 +132,9 @@ export function RevealWords({
             // Real text node between spans, so wrapping and word spacing
             // stay native — no fake margin-right hacks.
             <span key={wIdx}>
-              <span className="rw-word">{word}</span>{" "}
+              <span className="rw-word" style={{ opacity: dim }}>
+                {word}
+              </span>{" "}
             </span>
           ))}
         </p>
