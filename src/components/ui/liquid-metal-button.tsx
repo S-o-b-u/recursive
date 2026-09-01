@@ -4,6 +4,7 @@ import { liquidMetalFragmentShader, ShaderMount } from "@paper-design/shaders";
 import { Sparkles } from "lucide-react";
 import type React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { prefersLiteMedia } from "@/lib/device";
 
 /**
  * Two curves, named once.
@@ -32,10 +33,13 @@ const EASE_SIZE = `${EASE}, width 0.4s ease, height 0.4s ease`;
  * zero GPU contexts.
  */
 function preferLiteButton(): boolean {
-  if (typeof window === "undefined") {
-    return false;
-  }
-  return false;
+  // This used to unconditionally return false, so every button on every
+  // device attempted its own WebGL2 context regardless of what the comment
+  // above says -- the exact failure mode it describes. prefersLiteMedia()
+  // already encodes "fine pointer, roomy viewport, motion allowed, no
+  // Save-Data" (it backs LiquidGlassCard's own WebGL/SVG-filter gate), so
+  // delegate rather than re-derive the same checks.
+  return prefersLiteMedia();
 }
 
 export interface LiquidMetalButtonProps {
