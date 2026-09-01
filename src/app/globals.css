@@ -120,9 +120,14 @@
 
 :root {
   --font-wordmark: var(--font-hiruko);
+  --font-hiruko: var(--font-hiruko);
+  --font-heading: var(--font-heading);
+  --font-display: var(--font-display);
+  --font-okine: var(--font-display);
+  --font-bebas: var(--font-bebas);
+  --font-numeral: var(--font-bebas);
   --font-body: var(--font-dm-sans);
   --font-label: var(--font-geist-mono);
-  --font-numeral: var(--font-bebas);
 }
 
 /* ─── Register tokens with Tailwind v4 ─── */
@@ -156,6 +161,11 @@
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
   --font-sans: var(--font-dm-sans);
+  --font-heading: var(--font-heading);
+  --font-display: var(--font-display);
+  --font-bebas: var(--font-bebas);
+  --font-hiruko: var(--font-hiruko);
+  --font-mono: var(--font-geist-mono);
   --radius: var(--radius-md);
 }
 
@@ -567,8 +577,10 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 700px) {
   .gradual-blur,
   .gradual-blur * {
+    /* Unprefixed only: emitting both lets the minifier collapse the pair to
+       the -webkit- alias alone, which then loses to the component's own
+       unprefixed rule and the guard silently does nothing. */
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
 }
 
@@ -577,8 +589,10 @@ a { color: inherit; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   .gradual-blur,
   .gradual-blur * {
+    /* Unprefixed only: emitting both lets the minifier collapse the pair to
+       the -webkit- alias alone, which then loses to the component's own
+       unprefixed rule and the guard silently does nothing. */
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
 }
 
@@ -668,3 +682,41 @@ a { color: inherit; text-decoration: none; }
   animation-play-state: paused;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   Mobile compositing budget, part 2 — measured, not guessed.
+
+   At 390px wide the page carried 51 live backdrop-filters and 67 blur
+   filters. Both force the GPU to re-read and re-blur a region every frame
+   the layer moves, which is exactly what a 60Hz phone cannot afford.
+
+   Two offenders dominated, both in Judges: 31 .jd-stamp badges (a blur
+   behind a 50px "Sealed" chip that nobody can perceive) and 22
+   .jd-marquee-card blurs riding a marquee that animates the whole time the
+   section is on screen.
+
+   The large feature surfaces keep their glass — that is deliberate design.
+   What goes is the repeated small chrome, where the effect costs a full
+   compositing pass and reads as nothing.
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .jd-stamp,
+  .jd-explore-btn,
+  .transit-icon-box,
+  .venue-address-icon-box,
+  .btn-copy-address,
+  .map-control-btn,
+  .map-float-pill,
+  .map-pin-callout {
+    /* Unprefixed only: emitting both lets the minifier collapse the pair to
+       the -webkit- alias alone, which then loses to the component's own
+       unprefixed rule and the guard silently does nothing. */
+    backdrop-filter: none !important;
+  }
+
+  /* The sealed look without the per-frame blur: 22 animating blurred layers
+     become 22 plain ones that are still unreadable. */
+  .jd-grid-wrap[data-sealed="true"] .jd-marquee-card {
+    filter: saturate(0.85) brightness(0.66) !important;
+    opacity: 0.72;
+  }
+}

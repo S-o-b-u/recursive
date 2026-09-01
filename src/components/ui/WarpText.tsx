@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Renderer, Program, Mesh, Triangle, Texture } from "ogl";
 import "./WarpText.css";
 
@@ -208,8 +208,8 @@ const buildTextCanvas = ({
   if (props.src || props.imageSrc) {
     if (loadedImage && loadedImage.complete && loadedImage.naturalWidth > 0) {
       const imgRatio = loadedImage.naturalWidth / loadedImage.naturalHeight;
-      const maxWidth = width;
-      const maxHeight = height;
+      const maxWidth = width * 0.96;
+      const maxHeight = height * 0.94;
       let drawW = maxWidth;
       let drawH = maxWidth / imgRatio;
 
@@ -225,9 +225,50 @@ const buildTextCanvas = ({
       ctx.imageSmoothingQuality = "high";
       ctx.drawImage(loadedImage, drawX, drawY, drawW, drawH);
 
+      // Check if image has solid black background that needs luminance-as-alpha conversion
+      try {
+        const imgData = ctx.getImageData(0, 0, width, height);
+        const data = imgData.data;
+        // Check corners to see if black background is present
+        const cornerAlpha = data[3];
+        const cornerBrightness = data[0] + data[1] + data[2];
+        if (cornerAlpha > 200 && cornerBrightness < 20) {
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const lum = Math.max(r, g, b);
+            data[i] = 255;
+            data[i + 1] = 255;
+            data[i + 2] = 255;
+            data[i + 3] = lum;
+          }
+          ctx.putImageData(imgData, 0, 0);
+        }
+      } catch {
+        // Ignore CORS errors on canvas inspection
+      }
+
       if (props.color && props.color !== "original") {
         ctx.globalCompositeOperation = "source-in";
-        ctx.fillStyle = props.color;
+        if (props.color.includes("gradient")) {
+          const grad = ctx.createLinearGradient(0, drawY, 0, drawY + drawH);
+          const matches = Array.from(
+            props.color.matchAll(/(#[a-fA-F0-9]+|rgba?\([^)]+\)|hsla?\([^)]+\))\s*(\d+%)?/g)
+          );
+          if (matches.length > 0) {
+            matches.forEach((m, idx) => {
+              const col = m[1];
+              const stop = m[2] ? parseFloat(m[2]) / 100 : idx / Math.max(1, matches.length - 1);
+              grad.addColorStop(Math.min(1, Math.max(0, stop)), col);
+            });
+            ctx.fillStyle = grad;
+          } else {
+            ctx.fillStyle = props.color;
+          }
+        } else {
+          ctx.fillStyle = props.color;
+        }
         ctx.fillRect(0, 0, width, height);
         ctx.globalCompositeOperation = "source-over";
       }
@@ -354,6 +395,18 @@ const syncUniforms = (program: any, props: WarpTextProps) => {
   uniforms.uRipple.value = props.ripple ? 1 : 0;
 };
 
+const imageCache = new Map<string, HTMLImageElement>();
+function getPreloadedImage(src: string): HTMLImageElement | null {
+  if (typeof window === "undefined" || !src) return null;
+  let img = imageCache.get(src);
+  if (!img) {
+    img = new window.Image();
+    img.src = src;
+    imageCache.set(src, img);
+  }
+  return img;
+}
+
 export const WarpText: React.FC<WarpTextProps> = ({
   text = "Bend the moment",
   src,
@@ -376,12 +429,17 @@ export const WarpText: React.FC<WarpTextProps> = ({
   style,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const loadedImageRef = useRef<HTMLImageElement | null>(null);
+  const effectiveSrc = src || imageSrc;
+  const preloaded = effectiveSrc ? getPreloadedImage(effectiveSrc) : null;
+  const loadedImageRef = useRef<HTMLImageElement | null>(
+    preloaded && preloaded.complete && preloaded.naturalWidth > 0 ? preloaded : null
+  );
+  const [webglFailed, setWebglFailed] = useState(false);
 
   const propsRef = useRef<WarpTextProps>({
     text,
-    src: src || imageSrc,
-    imageSrc: src || imageSrc,
+    src: effectiveSrc,
+    imageSrc: effectiveSrc,
     color,
     align,
     fontSize,
@@ -399,8 +457,6 @@ export const WarpText: React.FC<WarpTextProps> = ({
   });
   // biome-ignore lint/suspicious/noExplicitAny: Internal WebGL context cache
   const contextRef = useRef<any>(null);
-
-  const effectiveSrc = src || imageSrc;
 
   useEffect(() => {
     propsRef.current = {
@@ -424,20 +480,20 @@ export const WarpText: React.FC<WarpTextProps> = ({
     };
 
     if (effectiveSrc) {
-      const img = new window.Image();
+      const img = getPreloadedImage(effectiveSrc)!;
       const onLoaded = () => {
         loadedImageRef.current = img;
         if (contextRef.current) {
           contextRef.current.rasterize();
         }
       };
-      img.onload = onLoaded;
-      img.onerror = (e) => {
-        console.warn("WarpText: Image load error:", effectiveSrc, e);
-      };
-      img.src = effectiveSrc;
       if (img.complete && img.naturalWidth > 0) {
-        onLoaded();
+        loadedImageRef.current = img;
+        if (contextRef.current) {
+          contextRef.current.rasterize();
+        }
+      } else {
+        img.addEventListener("load", onLoaded, { once: true });
       }
     } else {
       loadedImageRef.current = null;
@@ -509,22 +565,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
       if (!gl) throw new Error("WebGL context creation failed");
     } catch (error) {
       console.warn("WarpText: WebGL could not be initialized.", error);
-      if (propsRef.current.src || propsRef.current.imageSrc) {
-        const img = document.createElement("img");
-        img.src = (propsRef.current.src || propsRef.current.imageSrc)!;
-        img.alt = propsRef.current.text || "Logo";
-        img.style.width = "100%";
-        img.style.height = "100%";
-        img.style.objectFit = "contain";
-        img.style.objectPosition = "center bottom";
-        
-        // If we are colorizing to dark, invert the white logo in fallback
-        if (propsRef.current.color !== "original" && propsRef.current.color !== "#ffffff") {
-          img.style.filter = "invert(1) brightness(0)";
-        }
-        
-        container.appendChild(img);
-      }
+      setWebglFailed(true);
       return undefined;
     }
 
@@ -790,7 +831,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
       aria-level={2}
       aria-label={typeof text === "string" ? text : "heading"}
     >
-      {effectiveSrc && (
+      {webglFailed && effectiveSrc && (
         <img
           src={effectiveSrc}
           alt={typeof text === "string" ? text : "Recursive Logo"}
@@ -803,11 +844,10 @@ export const WarpText: React.FC<WarpTextProps> = ({
             objectFit: "contain",
             objectPosition: "center center",
             pointerEvents: "none",
-            filter: color !== "original" && color !== "#ffffff" ? "invert(1) brightness(0)" : undefined,
             userSelect: "none",
+            filter: color !== "original" && color !== "#ffffff" ? "invert(1) brightness(0)" : undefined,
           }}
           loading="eager"
-          decoding="async"
         />
       )}
     </div>

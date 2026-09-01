@@ -76,13 +76,12 @@ export default function VenueLocation() {
           </div>
         </div>
 
-        {/* ── 2-Column Grid Layout with Liquid Glass ── */}
+        {/* ── 2-Column Grid Layout ── */}
         <div className="venue-grid-layout">
           {/* Left Column: Campus Address & Transit Cards */}
           <div className="venue-left-col">
-            {/* 1. Campus Address Liquid Glass Card */}
-            <div className="venue-glass-card">
-              <span className="card-liquid-sheen" aria-hidden="true" />
+            {/* 1. Campus Address Transparent Card */}
+            <div className="venue-card">
               <div className="venue-address-header">
                 <div className="venue-address-icon-box">
                   <MapPin className="w-5 h-5 text-[#1b4324]" />
@@ -97,7 +96,7 @@ export default function VenueLocation() {
                 </div>
               </div>
 
-              {/* Action Buttons in Liquid Glass */}
+              {/* Action Buttons */}
               <div className="venue-btn-row">
                 <a
                   href={googleMapsUrl}
@@ -130,9 +129,8 @@ export default function VenueLocation() {
               </div>
             </div>
 
-            {/* 2. Transit & Getting Here Liquid Glass Card */}
-            <div className="venue-glass-card">
-              <span className="card-liquid-sheen" aria-hidden="true" />
+            {/* 2. Transit & Getting Here Transparent Card */}
+            <div className="venue-card">
               <h3 className="venue-card-title transit-title">Transit &amp; Getting Here</h3>
               <div className="transit-items-stack">
                 {/* By Train */}
@@ -177,11 +175,9 @@ export default function VenueLocation() {
             </div>
           </div>
 
-          {/* Right Column: Google Maps Interactive Map in Liquid Glass */}
+          {/* Right Column: Google Maps Interactive Map */}
           <div className="venue-right-col">
             <div className="venue-map-card">
-              <span className="card-liquid-sheen" aria-hidden="true" />
-
               <div className="map-view-frame">
                 {/* Floating Top Header Badges */}
                 <div className="map-floating-top">
@@ -255,11 +251,11 @@ export default function VenueLocation() {
                   </button>
                 </div>
 
-                {/* Floating Bottom Info Bar in Liquid Glass */}
+                {/* Floating Bottom Info Bar */}
                 <div className="map-floating-bottom">
                   <div className="map-bottom-left">
                     <div className="map-coords-info">
-                      <div className="coords-line font-mono">22.6907° N, 88.3792° E</div>
+                      <div className="coords-line">22.6907° N, 88.3792° E</div>
                       <div className="city-line">Sodepur, Kolkata</div>
                     </div>
                   </div>
@@ -294,13 +290,14 @@ export default function VenueLocation() {
         </div>
       </div>
 
-      <style href="venue-transparent-liquid-styles" precedence="default">{`
+      <style href="venue-transparent-styles" precedence="default">{`
         .venue-sec {
           position: relative;
           z-index: 10;
           width: 100%;
           display: flex;
           justify-content: center;
+          background: transparent;
           padding-block: clamp(3.5rem, 20px + 4.5vw, 6rem);
           padding-inline: clamp(1rem, 3.5vw, 2.5rem);
           scroll-margin-top: 7rem;
@@ -338,10 +335,10 @@ export default function VenueLocation() {
 
         .venue-eyebrow {
           display: inline-block;
-          font-family: var(--font-label), var(--font-geist-mono), monospace;
+          font-family: var(--font-geist-mono), monospace;
           font-size: 0.775rem;
           font-weight: 600;
-          letter-spacing: 0.18em;
+          letter-spacing: 0.2em;
           text-transform: uppercase;
           color: #3b6b3e;
           margin-bottom: 0.85rem;
@@ -349,27 +346,35 @@ export default function VenueLocation() {
 
         .venue-title-wrap {
           text-align: center;
-          max-width: 48rem;
+          max-width: 58rem;
           margin-inline: auto;
         }
 
         .venue-main-title {
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-size: clamp(2.1rem, 16px + 2.8vw, 3.4rem);
-          font-weight: 700;
-          line-height: 1.15;
-          letter-spacing: -0.03em;
+          font-size: clamp(2.4rem, 5.2vw, 4.2rem);
+          font-weight: 500;
+          line-height: 1.1;
+          letter-spacing: -0.035em;
+          word-spacing: -0.01em;
           color: #111c14;
+          text-align: center;
           margin: 0;
+        }
+
+        .venue-main-title .rh-line {
+          display: flex;
+          justify-content: center;
         }
 
         .venue-subtitle {
           margin-top: 1rem;
-          font-family: var(--font-body), var(--font-dm-sans), sans-serif;
-          font-size: clamp(0.925rem, 13px + 0.25vw, 1.05rem);
+          font-family: var(--font-dm-sans), sans-serif;
+          font-size: clamp(0.95rem, 13px + 0.3vw, 1.12rem);
           color: #55655a;
           line-height: 1.55;
-          max-width: 42rem;
+          letter-spacing: -0.01em;
+          max-width: 44rem;
           margin-inline: auto;
         }
 
@@ -395,75 +400,55 @@ export default function VenueLocation() {
           gap: 1.5rem;
         }
 
-        /* ── Transparent Liquid Glass Card ── */
-        .venue-glass-card {
+        /* ── iOS Liquid Frosted Glass Cards (Visible Hazy Background) ── */
+        .venue-card {
           position: relative;
-          overflow: hidden;
-          isolation: isolate;
-
-          background:
-            radial-gradient(130% 90% at 12% 10%, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.45) 36%, transparent 68%),
-            radial-gradient(100% 80% at 88% 90%, rgba(215, 245, 210, 0.35) 0%, transparent 60%),
-            linear-gradient(152deg, rgba(255, 255, 255, 0.85) 0%, rgba(246, 252, 246, 0.68) 48%, rgba(235, 248, 238, 0.58) 100%);
-          backdrop-filter: blur(28px) saturate(180%) contrast(104%);
-          -webkit-backdrop-filter: blur(28px) saturate(180%) contrast(104%);
-          border: 1.5px solid rgba(255, 255, 255, 0.88);
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.06) 48%, rgba(220, 245, 215, 0.12) 100%);
+          backdrop-filter: blur(24px) saturate(190%) contrast(104%) brightness(102%);
+          -webkit-backdrop-filter: blur(24px) saturate(190%) contrast(104%) brightness(102%);
+          border: 1px solid rgba(255, 255, 255, 0.45);
+          border-bottom: 1px solid rgba(22, 45, 26, 0.08);
           box-shadow:
-            inset 0 1.5px 3px rgba(255, 255, 255, 1),
-            inset 0 -1.5px 3px rgba(22, 36, 26, 0.05),
-            inset 0 0 28px rgba(255, 255, 255, 0.4),
-            0 20px 48px -15px rgba(18, 38, 22, 0.14),
-            0 6px 16px -4px rgba(18, 38, 22, 0.06);
-          border-radius: 1.6rem;
-          padding: 1.65rem;
+            inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.75),
+            inset 0 -1px 2px 0 rgba(22, 45, 26, 0.04),
+            inset 0 0 20px 0 rgba(255, 255, 255, 0.15),
+            0 12px 36px -10px rgba(18, 38, 22, 0.07);
+          border-radius: 1.35rem;
+          padding: 1.5rem;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms ease;
+          transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, border-color 260ms ease, background 260ms ease;
         }
 
-        .venue-glass-card:hover {
+        .venue-card:hover {
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.10) 48%, rgba(220, 245, 215, 0.18) 100%);
           transform: translateY(-2px);
+          border-color: rgba(255, 255, 255, 0.65);
           box-shadow:
-            inset 0 1.5px 3px rgba(255, 255, 255, 1),
-            0 24px 56px -16px rgba(18, 38, 22, 0.2);
-        }
-
-        .card-liquid-sheen {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-          pointer-events: none;
-          background: linear-gradient(
-            115deg,
-            rgba(255, 255, 255, 0) 24%,
-            rgba(255, 255, 255, 0.7) 46%,
-            rgba(220, 248, 215, 0.28) 52%,
-            rgba(255, 255, 255, 0.65) 58%,
-            rgba(255, 255, 255, 0) 78%
-          );
-          opacity: 0.65;
+            inset 0 1.5px 3px 0 rgba(255, 255, 255, 0.9),
+            inset 0 -1px 2px 0 rgba(22, 45, 26, 0.05),
+            inset 0 0 24px 0 rgba(255, 255, 255, 0.25),
+            0 18px 44px -10px rgba(18, 38, 22, 0.11);
         }
 
         .venue-address-header {
-          position: relative;
-          z-index: 1;
           display: flex;
           gap: 1.15rem;
           align-items: flex-start;
         }
 
         .venue-address-icon-box {
-          width: 48px;
-          height: 48px;
-          border-radius: 1.1rem;
-          background: rgba(238, 248, 238, 0.85);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1.5px solid rgba(255, 255, 255, 0.95);
+          width: 46px;
+          height: 46px;
+          border-radius: 0.95rem;
+          background: rgba(255, 255, 255, 0.22);
+          backdrop-filter: blur(16px) saturate(180%);
+          -webkit-backdrop-filter: blur(16px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.55);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 1),
-            0 2px 8px rgba(0, 0, 0, 0.04);
+            inset 0 1px 2px rgba(255, 255, 255, 0.8),
+            0 2px 8px rgba(0, 0, 0, 0.03);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -472,14 +457,12 @@ export default function VenueLocation() {
         }
 
         .venue-address-content {
-          position: relative;
-          z-index: 1;
           display: flex;
           flex-direction: column;
         }
 
         .venue-card-title {
-          font-family: var(--font-body), var(--font-dm-sans), sans-serif;
+          font-family: var(--font-display), var(--font-heading), sans-serif;
           font-size: 1.15rem;
           font-weight: 700;
           color: #111c14;
@@ -488,16 +471,15 @@ export default function VenueLocation() {
         }
 
         .venue-address-lines {
-          font-family: var(--font-body), var(--font-dm-sans), sans-serif;
+          font-family: var(--font-dm-sans), sans-serif;
           font-size: 0.92rem;
           line-height: 1.5;
-          color: #55655a;
+          letter-spacing: -0.008em;
+          color: #3b4d3f;
           margin: 0;
         }
 
         .venue-btn-row {
-          position: relative;
-          z-index: 1;
           display: flex;
           gap: 0.75rem;
           margin-top: 1.5rem;
@@ -510,21 +492,22 @@ export default function VenueLocation() {
           gap: 0.5rem;
           background: #142e1c;
           color: #ffffff;
-          font-family: var(--font-body), var(--font-dm-sans), sans-serif;
+          font-family: var(--font-display), var(--font-dm-sans), sans-serif;
           font-size: 0.875rem;
           font-weight: 600;
-          padding: 0.72rem 1.15rem;
+          letter-spacing: -0.01em;
+          padding: 0.7rem 1.15rem;
           border-radius: 0.85rem;
           text-decoration: none;
           flex: 1;
           transition: background 180ms ease, transform 150ms ease, box-shadow 180ms ease;
-          box-shadow: 0 4px 14px rgba(20, 46, 28, 0.26);
+          box-shadow: 0 4px 14px rgba(20, 46, 28, 0.24);
         }
 
         .btn-get-directions:hover {
           background: #1f4229;
           transform: translateY(-1px);
-          box-shadow: 0 6px 18px rgba(20, 46, 28, 0.32);
+          box-shadow: 0 6px 20px rgba(20, 46, 28, 0.3);
         }
 
         .btn-copy-address {
@@ -532,38 +515,37 @@ export default function VenueLocation() {
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
+          background: rgba(255, 255, 255, 0.25);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
           color: #111c14;
-          font-family: var(--font-body), var(--font-dm-sans), sans-serif;
+          font-family: var(--font-display), var(--font-dm-sans), sans-serif;
           font-size: 0.875rem;
           font-weight: 600;
-          padding: 0.72rem 1.15rem;
+          letter-spacing: -0.01em;
+          padding: 0.7rem 1.15rem;
           border-radius: 0.85rem;
-          border: 1.5px solid rgba(255, 255, 255, 0.95);
+          border: 1px solid rgba(255, 255, 255, 0.55);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 1),
-            0 2px 6px rgba(0, 0, 0, 0.04);
+            inset 0 1px 2px rgba(255, 255, 255, 0.8),
+            0 2px 6px rgba(0, 0, 0, 0.02);
           cursor: pointer;
           flex: 1;
-          transition: background 180ms ease, border-color 180ms ease;
+          transition: background 180ms ease, border-color 180ms ease, transform 150ms ease;
         }
 
         .btn-copy-address:hover {
-          background: #ffffff;
+          background: rgba(255, 255, 255, 0.5);
+          border-color: rgba(255, 255, 255, 0.8);
+          transform: translateY(-1px);
         }
 
         /* ── Transit Card ── */
         .transit-title {
-          position: relative;
-          z-index: 1;
           margin-bottom: 1.15rem;
         }
 
         .transit-items-stack {
-          position: relative;
-          z-index: 1;
           display: flex;
           flex-direction: column;
           gap: 1.15rem;
@@ -579,13 +561,13 @@ export default function VenueLocation() {
           width: 42px;
           height: 42px;
           border-radius: 0.85rem;
-          background: rgba(238, 248, 238, 0.85);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1.5px solid rgba(255, 255, 255, 0.95);
+          background: rgba(255, 255, 255, 0.22);
+          backdrop-filter: blur(16px) saturate(180%);
+          -webkit-backdrop-filter: blur(16px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.55);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 1),
-            0 2px 6px rgba(0, 0, 0, 0.03);
+            inset 0 1px 2px rgba(255, 255, 255, 0.8),
+            0 2px 8px rgba(0, 0, 0, 0.02);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -599,22 +581,24 @@ export default function VenueLocation() {
         }
 
         .transit-label {
-          font-family: var(--font-body), var(--font-dm-sans), sans-serif;
+          font-family: var(--font-display), var(--font-dm-sans), sans-serif;
           font-size: 0.925rem;
           font-weight: 700;
           color: #111c14;
+          letter-spacing: -0.01em;
           margin-bottom: 0.15rem;
         }
 
         .transit-desc {
-          font-family: var(--font-body), var(--font-dm-sans), sans-serif;
+          font-family: var(--font-dm-sans), sans-serif;
           font-size: 0.85rem;
           line-height: 1.45;
-          color: #55655a;
+          letter-spacing: -0.008em;
+          color: #3b4d3f;
           margin: 0;
         }
 
-        /* ── Right Column: Google Maps Liquid Glass Card ── */
+        /* ── Right Column: Google Maps Card ── */
         .venue-right-col {
           display: flex;
           flex-direction: column;
@@ -624,36 +608,34 @@ export default function VenueLocation() {
 
         .venue-map-card {
           position: relative;
-          overflow: hidden;
-          isolation: isolate;
-
-          background:
-            radial-gradient(130% 90% at 15% 8%, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.5) 34%, transparent 68%),
-            radial-gradient(100% 80% at 88% 92%, rgba(215, 245, 210, 0.38) 0%, transparent 60%),
-            linear-gradient(155deg, rgba(255, 255, 255, 0.88) 0%, rgba(246, 252, 246, 0.72) 48%, rgba(235, 248, 238, 0.62) 100%);
-          backdrop-filter: blur(32px) saturate(185%) contrast(104%);
-          -webkit-backdrop-filter: blur(32px) saturate(185%) contrast(104%);
-          border: 1.5px solid rgba(255, 255, 255, 0.88);
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.06) 48%, rgba(220, 245, 215, 0.12) 100%);
+          backdrop-filter: blur(24px) saturate(190%) contrast(104%) brightness(102%);
+          -webkit-backdrop-filter: blur(24px) saturate(190%) contrast(104%) brightness(102%);
+          border: 1px solid rgba(255, 255, 255, 0.45);
+          border-bottom: 1px solid rgba(22, 45, 26, 0.08);
           box-shadow:
-            inset 0 1.5px 3px rgba(255, 255, 255, 1),
-            inset 0 -1.5px 3px rgba(22, 36, 26, 0.05),
-            inset 0 0 30px rgba(255, 255, 255, 0.4),
-            0 20px 48px -15px rgba(18, 38, 22, 0.16),
-            0 6px 16px -4px rgba(18, 38, 22, 0.06);
-          border-radius: 1.6rem;
-          padding: 0.85rem;
+            inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.75),
+            inset 0 -1px 2px 0 rgba(22, 45, 26, 0.04),
+            inset 0 0 20px 0 rgba(255, 255, 255, 0.15),
+            0 12px 36px -10px rgba(18, 38, 22, 0.07);
+          border-radius: 1.35rem;
+          padding: 0.65rem;
           width: 100%;
           height: 100%;
           display: flex;
           flex-direction: column;
-          transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms ease;
+          transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, border-color 260ms ease, background 260ms ease;
         }
 
         .venue-map-card:hover {
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.10) 48%, rgba(220, 245, 215, 0.18) 100%);
           transform: translateY(-2px);
+          border-color: rgba(255, 255, 255, 0.65);
           box-shadow:
-            inset 0 1.5px 3px rgba(255, 255, 255, 1),
-            0 26px 60px -16px rgba(18, 38, 22, 0.22);
+            inset 0 1.5px 3px 0 rgba(255, 255, 255, 0.9),
+            inset 0 -1px 2px 0 rgba(22, 45, 26, 0.05),
+            inset 0 0 24px 0 rgba(255, 255, 255, 0.25),
+            0 18px 44px -10px rgba(18, 38, 22, 0.11);
         }
 
         .map-view-frame {
@@ -662,7 +644,7 @@ export default function VenueLocation() {
           width: 100%;
           height: 100%;
           min-height: 480px;
-          border-radius: 1.25rem;
+          border-radius: 0.95rem;
           overflow: hidden;
           background: #eaf1e9;
         }
@@ -677,12 +659,12 @@ export default function VenueLocation() {
           display: block;
         }
 
-        /* Floating Top Bar with Liquid Glass */
+        /* Floating Top Badges */
         .map-floating-top {
           position: absolute;
-          top: 1rem;
-          left: 1rem;
-          right: 1rem;
+          top: 0.85rem;
+          left: 0.85rem;
+          right: 0.85rem;
           z-index: 10;
           display: flex;
           align-items: center;
@@ -695,18 +677,19 @@ export default function VenueLocation() {
           display: inline-flex;
           align-items: center;
           gap: 0.45rem;
-          background: rgba(255, 255, 255, 0.88);
-          backdrop-filter: blur(16px) saturate(160%);
-          -webkit-backdrop-filter: blur(16px) saturate(160%);
-          border: 1.5px solid rgba(255, 255, 255, 0.95);
+          background: rgba(255, 255, 255, 0.32);
+          backdrop-filter: blur(20px) saturate(180%);
+          -webkit-backdrop-filter: blur(20px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.65);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 1),
-            0 4px 14px rgba(0, 0, 0, 0.06);
+            inset 0 1px 2px rgba(255, 255, 255, 0.8),
+            0 4px 14px rgba(0, 0, 0, 0.04);
           border-radius: 0.75rem;
           padding: 0.42rem 0.95rem;
-          font-family: var(--font-body), var(--font-dm-sans), sans-serif;
-          font-size: 0.85rem;
+          font-family: var(--font-display), var(--font-dm-sans), sans-serif;
+          font-size: 0.825rem;
           font-weight: 600;
+          letter-spacing: -0.01em;
           color: #111c14;
         }
 
@@ -720,15 +703,15 @@ export default function VenueLocation() {
           display: flex;
           align-items: center;
           gap: 0.6rem;
-          background: rgba(255, 255, 255, 0.92);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1.5px solid rgba(255, 255, 255, 0.95);
+          background: rgba(255, 255, 255, 0.52);
+          backdrop-filter: blur(20px) saturate(180%);
+          -webkit-backdrop-filter: blur(20px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.75);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 1),
-            0 6px 20px rgba(0, 0, 0, 0.1);
+            inset 0 1px 2px rgba(255, 255, 255, 0.85),
+            0 6px 18px rgba(0, 0, 0, 0.06);
           border-radius: 0.85rem;
-          padding: 0.5rem 0.85rem;
+          padding: 0.48rem 0.9rem;
           pointer-events: none;
         }
 
@@ -744,25 +727,26 @@ export default function VenueLocation() {
         }
 
         .pin-name {
-          font-family: var(--font-body), var(--font-dm-sans), sans-serif;
+          font-family: var(--font-display), var(--font-dm-sans), sans-serif;
           font-size: 0.825rem;
           font-weight: 700;
+          letter-spacing: -0.01em;
           color: #111c14;
           line-height: 1.25;
         }
 
         .pin-sub {
-          font-family: var(--font-body), var(--font-dm-sans), sans-serif;
+          font-family: var(--font-dm-sans), sans-serif;
           font-size: 0.72rem;
-          color: #64748b;
+          color: #526356;
           margin-top: 1px;
         }
 
-        /* Floating Zoom & Controls with Liquid Glass */
+        /* Floating Controls */
         .map-floating-controls {
           position: absolute;
-          right: 1rem;
-          bottom: 5.5rem;
+          right: 0.85rem;
+          bottom: 5.25rem;
           z-index: 10;
           display: flex;
           flex-direction: column;
@@ -773,13 +757,13 @@ export default function VenueLocation() {
           width: 34px;
           height: 34px;
           border-radius: 0.65rem;
-          background: rgba(255, 255, 255, 0.88);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
-          border: 1.5px solid rgba(255, 255, 255, 0.95);
+          background: rgba(255, 255, 255, 0.32);
+          backdrop-filter: blur(18px) saturate(180%);
+          -webkit-backdrop-filter: blur(18px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.65);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 1),
-            0 4px 12px rgba(0, 0, 0, 0.08);
+            inset 0 1px 2px rgba(255, 255, 255, 0.8),
+            0 4px 12px rgba(0, 0, 0, 0.04);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -788,36 +772,36 @@ export default function VenueLocation() {
         }
 
         .map-control-btn:hover {
-          background: #ffffff;
-          border-color: #cbd5e1;
+          background: rgba(255, 255, 255, 0.65);
+          border-color: rgba(255, 255, 255, 0.9);
           transform: translateY(-1px);
         }
 
         .map-control-btn.locating {
-          background: rgba(238, 248, 238, 0.95);
-          border-color: #a7d3a7;
+          background: rgba(234, 243, 230, 0.65);
+          border-color: #5c8c3a;
         }
 
-        /* Floating Bottom Bar with Liquid Glass */
+        /* Floating Bottom Bar */
         .map-floating-bottom {
           position: absolute;
-          bottom: 1rem;
-          left: 1rem;
-          right: 1rem;
+          bottom: 0.85rem;
+          left: 0.85rem;
+          right: 0.85rem;
           z-index: 10;
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 0.75rem;
-          background: rgba(255, 255, 255, 0.88);
-          backdrop-filter: blur(20px) saturate(170%);
-          -webkit-backdrop-filter: blur(20px) saturate(170%);
-          border: 1.5px solid rgba(255, 255, 255, 0.95);
+          background: rgba(255, 255, 255, 0.34);
+          backdrop-filter: blur(22px) saturate(180%);
+          -webkit-backdrop-filter: blur(22px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.65);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 1),
-            0 6px 20px rgba(0, 0, 0, 0.08);
-          border-radius: 1rem;
-          padding: 0.65rem 0.95rem;
+            inset 0 1px 2px rgba(255, 255, 255, 0.8),
+            0 8px 24px rgba(0, 0, 0, 0.05);
+          border-radius: 0.95rem;
+          padding: 0.55rem 0.85rem;
           flex-wrap: wrap;
         }
 
@@ -834,17 +818,18 @@ export default function VenueLocation() {
         }
 
         .coords-line {
-          font-size: 0.825rem;
-          font-weight: 700;
+          font-family: var(--font-geist-mono), monospace;
+          font-size: 0.8rem;
+          font-weight: 600;
           color: #111c14;
-          letter-spacing: -0.01em;
+          letter-spacing: 0.04em;
           white-space: nowrap;
         }
 
         .city-line {
-          font-family: var(--font-body), var(--font-dm-sans), sans-serif;
-          font-size: 0.75rem;
-          color: #64748b;
+          font-family: var(--font-dm-sans), sans-serif;
+          font-size: 0.74rem;
+          color: #526356;
           margin-top: 1px;
           white-space: nowrap;
         }
@@ -861,17 +846,17 @@ export default function VenueLocation() {
           display: inline-flex;
           align-items: center;
           gap: 0.45rem;
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1.5px solid rgba(255, 255, 255, 0.95);
+          background: rgba(255, 255, 255, 0.38);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 255, 255, 0.65);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 1),
-            0 1px 3px rgba(0, 0, 0, 0.04);
+            inset 0 1px 2px rgba(255, 255, 255, 0.8),
+            0 2px 6px rgba(0, 0, 0, 0.02);
           border-radius: 0.75rem;
-          padding: 0.45rem 0.85rem;
-          font-family: var(--font-body), var(--font-dm-sans), sans-serif;
-          font-size: 0.825rem;
+          padding: 0.42rem 0.8rem;
+          font-family: var(--font-display), var(--font-dm-sans), sans-serif;
+          font-size: 0.8rem;
           font-weight: 600;
           color: #111c14;
           cursor: pointer;
@@ -881,7 +866,8 @@ export default function VenueLocation() {
         }
 
         .btn-satellite-toggle:hover {
-          background: #ffffff;
+          background: rgba(255, 255, 255, 0.65);
+          border-color: rgba(255, 255, 255, 0.9);
         }
 
         .btn-satellite-toggle.active {
@@ -894,17 +880,17 @@ export default function VenueLocation() {
           display: inline-flex;
           align-items: center;
           gap: 0.45rem;
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1.5px solid rgba(255, 255, 255, 0.95);
+          background: rgba(255, 255, 255, 0.38);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 255, 255, 0.65);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 1),
-            0 1px 3px rgba(0, 0, 0, 0.04);
+            inset 0 1px 2px rgba(255, 255, 255, 0.8),
+            0 2px 6px rgba(0, 0, 0, 0.02);
           border-radius: 0.75rem;
-          padding: 0.45rem 0.95rem;
-          font-family: var(--font-body), var(--font-dm-sans), sans-serif;
-          font-size: 0.825rem;
+          padding: 0.42rem 0.85rem;
+          font-family: var(--font-display), var(--font-dm-sans), sans-serif;
+          font-size: 0.8rem;
           font-weight: 600;
           color: #111c14;
           text-decoration: none;
@@ -922,21 +908,22 @@ export default function VenueLocation() {
         }
 
         .btn-open-gmaps:hover {
-          background: #ffffff;
+          background: rgba(255, 255, 255, 0.65);
+          border-color: rgba(255, 255, 255, 0.9);
         }
 
         @media (max-width: 640px) {
           .map-floating-top {
-            top: 0.65rem;
-            left: 0.65rem;
-            right: 0.65rem;
+            top: 0.55rem;
+            left: 0.55rem;
+            right: 0.55rem;
           }
 
           .map-float-pill {
             padding: 0.3rem 0.55rem;
             font-size: 0.72rem;
             gap: 0.35rem;
-            border-radius: 0.6rem;
+            border-radius: 0.55rem;
           }
 
           .map-float-pill svg {
@@ -948,7 +935,7 @@ export default function VenueLocation() {
             padding: 0.35rem 0.6rem;
             top: 38%;
             left: 50%;
-            border-radius: 0.7rem;
+            border-radius: 0.65rem;
           }
 
           .pin-name {
@@ -960,15 +947,15 @@ export default function VenueLocation() {
           }
 
           .map-floating-controls {
-            right: 0.65rem;
-            bottom: 4.35rem;
+            right: 0.55rem;
+            bottom: 4.25rem;
             gap: 0.35rem;
           }
 
           .map-control-btn {
             width: 28px;
             height: 28px;
-            border-radius: 0.55rem;
+            border-radius: 0.5rem;
           }
 
           .map-control-btn svg {
@@ -977,13 +964,13 @@ export default function VenueLocation() {
           }
 
           .map-floating-bottom {
-            bottom: 0.65rem;
-            left: 0.65rem;
-            right: 0.65rem;
+            bottom: 0.55rem;
+            left: 0.55rem;
+            right: 0.55rem;
             padding: 0.38rem 0.55rem;
             gap: 0.4rem;
             flex-wrap: nowrap;
-            border-radius: 0.85rem;
+            border-radius: 0.75rem;
           }
 
           .coords-line {

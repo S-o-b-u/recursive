@@ -101,9 +101,9 @@ export default function ACM() {
           <RevealWords
             paragraphs={STORY_PARAGRAPHS}
             className="acm-story-words"
-            start="top 88%"
-            end="bottom 50%"
-            dim={0.16}
+            start="top 84%"
+            end="bottom 38%"
+            dim={0.18}
           />
         </div>
 
@@ -199,11 +199,12 @@ export default function ACM() {
         }
 
         .acm-title {
-          font-family: var(--font-heading), var(--font-display), Georgia, serif;
+          font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
           font-size: clamp(1.75rem, 12.35px + 3.87vw, 4rem);
-          font-weight: 400;
+          font-weight: 500;
           line-height: 1.06;
-          letter-spacing: -0.02em;
+          letter-spacing: -0.035em;
+          word-spacing: -0.01em;
           color: #16241A;
           text-wrap: balance;
         }
@@ -278,26 +279,31 @@ export default function ACM() {
 
         /* ── Narrative (RevealWords with Scroll Scrub) ── */
         .acm-story-wrap {
-          margin-top: clamp(2rem, 4.8vh, 3.5rem);
-          max-width: 58ch;
+          margin-top: clamp(2.2rem, 5vh, 3.8rem);
+          width: 100%;
+          max-width: clamp(46rem, 78vw, 64rem);
           margin-inline: auto;
         }
 
         .acm-story-words .rw-para {
           font-family: var(--font-dm-sans), system-ui, sans-serif;
-          font-size: clamp(1.05rem, 13.07px + 0.815vw, 1.3rem);
+          font-size: clamp(1.12rem, 11px + 1.12vw, 1.62rem);
           font-weight: 400;
-          line-height: 1.68;
-          letter-spacing: -0.01em;
-          color: #1B2C1E;
+          line-height: 1.72;
+          letter-spacing: -0.012em;
+          color: #18261A;
           text-align: center;
-          text-wrap: pretty;
+          text-wrap: balance;
+          max-width: 60rem;
+          margin-inline: auto;
         }
 
         .acm-story-words .rw-para:first-child {
           font-weight: 600;
-          color: #2F5527;
-          font-size: clamp(1.12rem, 14px + 0.9vw, 1.4rem);
+          color: #244626;
+          font-size: clamp(1.22rem, 12px + 1.32vw, 1.8rem);
+          line-height: 1.55;
+          letter-spacing: -0.015em;
         }
 
         /* ── Accreditation marks, below the story ── */
