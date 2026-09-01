@@ -583,7 +583,16 @@ export default function Navigation() {
           position: fixed;
           inset: 0;
           z-index: 999;
-          background: #eae5dc;
+          /* Frosted rather than a flat opaque fill, matching the glass
+             language used everywhere else in the nav (and the rest of the
+             site). Scroll is locked on body/html for as long as this is open
+             (see the menuOpen effect above), so the layer behind it is static
+             while the menu is up -- the blur is a one-time paint on open/close,
+             not a per-scroll-frame cost the way a persistent fixed element's
+             would be. */
+          background: rgba(234, 229, 220, 0.74);
+          backdrop-filter: blur(30px) saturate(160%);
+          -webkit-backdrop-filter: blur(30px) saturate(160%);
           color: #121A12;
           display: flex;
           flex-direction: column;
@@ -592,7 +601,7 @@ export default function Navigation() {
           overflow-y: auto;
           overscroll-behavior: contain;
           -webkit-overflow-scrolling: touch;
-          will-change: transform, opacity;
+          will-change: transform, opacity, backdrop-filter;
         }
 
         .limelq-head {
