@@ -771,6 +771,17 @@ export default function Navigation() {
         @media (max-width: 860px) {
           .nav-desktop-links, .nav-cta { display: none; }
           .nav-toggle { display: grid; }
+
+          /* On mobile the pill only holds the brand mark, Register, and the
+             toggle. The brand mark (logo + its own padding) is a few px wider
+             than the round toggle button, so Register — sandwiched between
+             them with an equal gap on both sides — reads as sitting slightly
+             right of the pill's true centre. A relative nudge corrects that
+             without disturbing the flex flow or the toggle's position. */
+          .nav-cta-liquid-metal {
+            position: relative;
+            left: -0.35rem;
+          }
         }
       `}</style>
     </>

@@ -267,7 +267,7 @@ export const FAQS: Faq[] = [
   },
   {
     q: "Who is eligible to participate?",
-    a: "Any undergraduate, postgraduate, or diploma student with a valid college ID card is eligible to participate. Whether you are an experienced builder or attending your very first hackathon, beginners are warmly welcome—mentors will be on the floor throughout the event to help you.",
+    a: "Any undergraduate, postgraduate, or diploma student is eligible to participate. You will need to carry a valid college ID card, or a government ID proof (Aadhaar, PAN, voter ID, passport, or driving licence) if you cannot present one. Whether you are an experienced builder or attending your very first hackathon, beginners are warmly welcome—mentors will be on the floor throughout the event to help you.",
   },
   {
     q: "Is there any registration fee?",
@@ -287,7 +287,7 @@ export const FAQS: Faq[] = [
   },
   {
     q: "What should I bring on the day of the event?",
-    a: "Please bring your laptop, charger, power strip/extension cord, valid college ID card, and any specific hardware components your project might require. High-speed campus Wi-Fi, dedicated power stations, meals, and snacks will be provided throughout the day.",
+    a: "Please bring your laptop, charger, power strip/extension cord, a valid college ID card (or government ID proof if you don't have one), and any specific hardware components your project might require. High-speed campus Wi-Fi, dedicated power stations, meals, and snacks will be provided throughout the day.",
   },
   {
     q: "How will projects be evaluated and what are the prizes?",
