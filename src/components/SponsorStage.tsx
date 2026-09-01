@@ -81,6 +81,8 @@ export default function SponsorStage() {
     const scrollUpBtn = scrollUpRef.current;
     if (!track || !stage || !intro || !outro || !body) return;
 
+    const plate = stage.querySelector<HTMLElement>(".sxp-plate");
+    const night = stage.querySelector<HTMLElement>(".sxp-night");
     const setP = (v: number) => stage.style.setProperty("--sxp-p", v.toFixed(4));
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -114,59 +116,98 @@ export default function SponsorStage() {
       const state = { prog: 0 };
 
       const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
-      const easeWindow = gsap.parseEase("power2.inOut");
-      const easeLabel = gsap.parseEase("power2.in");
-      const easePanel = gsap.parseEase("power2.out");
+      const easeWindow = gsap.parseEase("power1.inOut");
+      const easeLabel = gsap.parseEase("power1.inOut");
+      const easePanel = gsap.parseEase("sine.inOut");
+      const easePreview = gsap.parseEase("sine.inOut");
+
+      // Precomputed once, called every frame: this is what actually removes
+      // the per-frame cost, not the easing curves (those are cheap Math.pow
+      // calls either way).
+      const setIntro = gsap.quickSetter(intro, "css") as (
+        v: Record<string, number>,
+      ) => void;
+      const setOutro = gsap.quickSetter(outro, "css") as (
+        v: Record<string, number>,
+      ) => void;
+      const setPreview = preview
+        ? (gsap.quickSetter(preview, "css") as (v: Record<string, number>) => void)
+        : null;
+      const setBody = gsap.quickSetter(body, "css") as (
+        v: Record<string, number>,
+      ) => void;
+      const setScrollUp = scrollUpBtn
+        ? (gsap.quickSetter(scrollUpBtn, "css") as (v: Record<string, number>) => void)
+        : null;
+
+      // pointerEvents is a plain DOM write, not a GSAP tween target -- skip it
+      // when it has not actually flipped, instead of writing it every frame.
+      let bodyInteractive: boolean | null = null;
+      let scrollUpInteractive: boolean | null = null;
 
       /** Sub-ranges of the pass, in progress units. */
-      const WINDOW_END = 0.46;
-      const LABEL_END = 0.16;
-      const PREVIEW_END = 0.20;
+      const WINDOW_END = 0.55;
+      const LABEL_END = 0.20;
+      const PREVIEW_END = 0.24;
       const PANEL_IN = 0.20;
-      const PANEL_LEN = 0.26;
+      const PANEL_LEN = 0.32;
 
       const apply = () => {
         const t = state.prog;
 
-        // The window opens.
-        setP(easeWindow(clamp01(t / WINDOW_END)));
+        // The window opens and closes with symmetric quadratic curve.
+        const p = easeWindow(clamp01(t / WINDOW_END));
+        setP(p);
 
-        // The night-side labels step aside early.
-        const l = easeLabel(clamp01(t / LABEL_END));
-        gsap.set(intro, { opacity: 1 - l, y: -30 * l });
-        gsap.set(outro, { opacity: 1 - l, y: 30 * l });
-
-        // The preview title inside the closed window fades out as the window opens.
-        if (preview) {
-          const pr = clamp01(t / PREVIEW_END);
-          gsap.set(preview, { opacity: 1 - pr, scale: 1 + 0.08 * pr });
+        // Smooth bidirectional crossfade for the night field and local plate.
+        // When opening, it gently reveals the sky. When closing (scrolling up),
+        // it gracefully glides back into the dark night field without slamming to black.
+        const op = Math.max(0, Math.min(1, (1 - p) * 2.8));
+        const hide = t >= 0.75;
+        if (plate) {
+          plate.style.opacity = op.toFixed(4);
+          plate.style.visibility = hide ? "hidden" : "visible";
+        }
+        if (night) {
+          night.style.opacity = op.toFixed(4);
+          night.style.visibility = hide ? "hidden" : "visible";
         }
 
-        // The panel arrives once there is room for it.
+        // The night-side labels step aside smoothly and return gracefully on close.
+        const l = easeLabel(clamp01(t / LABEL_END));
+        setIntro({ opacity: 1 - l, y: -24 * l });
+        setOutro({ opacity: 1 - l, y: 24 * l });
+
+        // The preview title inside the closed window fades in/out symmetrically.
+        if (setPreview) {
+          const pr = easePreview(clamp01(t / PREVIEW_END));
+          setPreview({ opacity: 1 - pr, scale: 1 + 0.06 * pr });
+        }
+
+        // The panel arrives softly as the window expands and dissolves smoothly as it closes.
         const b = easePanel(clamp01((t - PANEL_IN) / PANEL_LEN));
-        gsap.set(body, {
-          opacity: b,
-          y: 36 * (1 - b),
-          pointerEvents: b > 0.05 ? "auto" : "none",
-        });
+        setBody({ opacity: b, y: 28 * (1 - b) });
+        const bodyOn = b > 0.08;
+        if (bodyOn !== bodyInteractive) {
+          bodyInteractive = bodyOn;
+          body.style.pointerEvents = bodyOn ? "auto" : "none";
+        }
 
         // The up arrow button only appears once the stage has fully opened
-        if (scrollUpBtn) {
-          const s = easePanel(clamp01((t - WINDOW_END) / 0.12));
-          gsap.set(scrollUpBtn, {
-            opacity: s,
-            y: (1 - s) * -14,
-            pointerEvents: s > 0.15 ? "auto" : "none",
-          });
+        if (setScrollUp && scrollUpBtn) {
+          const s = easePanel(clamp01((t - WINDOW_END) / 0.14));
+          setScrollUp({ opacity: s, y: (1 - s) * -14 });
+          const scrollUpOn = s > 0.15;
+          if (scrollUpOn !== scrollUpInteractive) {
+            scrollUpInteractive = scrollUpOn;
+            scrollUpBtn.style.pointerEvents = scrollUpOn ? "auto" : "none";
+          }
         }
       };
 
       // Paint the closed state before the first scroll event arrives.
       apply();
 
-      // fromTo, not to: `invalidateOnRefresh` re-reads a to() tween's start on
-      // every refresh, and a resize is a refresh — it would re-capture the
-      // start from this proxy mid-flight and collapse the range.
       gsap.fromTo(
         state,
         { prog: 0 },
@@ -179,7 +220,9 @@ export default function SponsorStage() {
             // Exactly the span the sticky child is stuck for.
             start: "top top",
             end: "bottom bottom",
-            scrub: 0.7,
+            scrub: 0.55,
+            fastScrollEnd: true,
+            preventOverlaps: true,
             invalidateOnRefresh: true,
             onRefresh: apply,
           },
@@ -364,7 +407,7 @@ export default function SponsorStage() {
            open — see the note on .sxp-plate for why. */
         .sxp-night,
         .sxp-plate {
-          opacity: clamp(0, calc((1 - var(--sxp-p)) * 6.7), 1);
+          opacity: clamp(0, calc((1 - var(--sxp-p)) * 2.8), 1);
         }
 
         .sxp-night {
@@ -442,6 +485,11 @@ export default function SponsorStage() {
           position: absolute;
           inset: 0;
           z-index: 2;
+          will-change: clip-path;
+          transform: translate3d(0, 0, 0);
+          -webkit-transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
           clip-path: inset(
             var(--sxp-iy) var(--sxp-ix) var(--sxp-iy) var(--sxp-ix)
             round var(--sxp-r)
@@ -707,12 +755,24 @@ export default function SponsorStage() {
           }
         }
 
+        @media (max-width: 860px) {
+          .sxp {
+            --sxp-track: 260vh;
+          }
+          .sxp-preview-title {
+            text-shadow: none;
+          }
+          .sxp-keyline {
+            box-shadow: 0 0 0 1px rgba(238, 248, 228, 0.22);
+          }
+        }
+
         @media (max-width: 620px) {
           .sxp-scrollup-wrap {
             top: clamp(1.2rem, 3vh, 1.85rem);
             right: clamp(0.6rem, 2.5vw, 1rem);
           }
-          .sxp { --sxp-track: 260vh; }
+          .sxp { --sxp-track: 250vh; }
           .sxp-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .sxp-body {
             justify-content: center;
@@ -735,6 +795,9 @@ export default function SponsorStage() {
           }
           .sxp-seal-q {
             font-size: clamp(6rem, 15vh, 9rem);
+            filter: none !important;
+            animation: none !important;
+            color: rgba(38, 70, 32, 0.18) !important;
           }
           .sxp-cta-wrap {
             margin-top: clamp(0.45rem, 1.2vh, 0.85rem);

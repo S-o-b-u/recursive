@@ -397,6 +397,18 @@ class MorphEngine {
     this.program.uniforms.uOverlay.value = hexToRgb(opts.overlayColor);
   }
 
+  startLoop() {
+    if (!this.raf && this.visible) {
+      this.raf = requestAnimationFrame(this.boundLoop);
+    }
+  }
+
+  renderFrame() {
+    if (this.gl && !this.gl.isContextLost?.()) {
+      this.renderer.render({ scene: this.mesh });
+    }
+  }
+
   loop(t: number) {
     if (!this.visible) {
       this.raf = 0;
@@ -404,7 +416,18 @@ class MorphEngine {
     }
     this.program.uniforms.uTime.value = t * 0.001;
     if (!this.dragging && !this.animating) this.syncOptions();
-    this.renderer.render({ scene: this.mesh });
+    this.renderFrame();
+
+    const isTouch =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(pointer: coarse), (max-width: 860px)").matches;
+
+    // Sleep when idle on mobile / touch / reduced-motion to save GPU and maintain 120fps scrolling
+    if ((isTouch || this.reducedMotion) && !this.animating && !this.dragging) {
+      this.raf = 0;
+      return;
+    }
+
     this.raf = requestAnimationFrame(this.boundLoop);
   }
 
@@ -433,6 +456,7 @@ class MorphEngine {
     this.syncOptions();
     this.prepareTarget(target, dir);
     this.animating = true;
+    this.startLoop();
     this.announce(target);
     const duration = this.reducedMotion ? Math.min(opts.duration, 0.4) : opts.duration;
     this.tween = gsap.fromTo(
@@ -490,6 +514,7 @@ class MorphEngine {
     this.animating = false;
     this.tween = null;
     this.announce(target);
+    this.renderFrame();
 
     const queued = this.pending;
     this.pending = null;
@@ -513,11 +538,13 @@ class MorphEngine {
     this.dragging = true;
     this.dragDir = 0;
     this.syncOptions();
+    this.startLoop();
     return true;
   }
 
   drag(ndx: number) {
     if (!this.dragging) return;
+    this.startLoop();
     const opts = this.getOptions();
     const dir = ndx < 0 ? 1 : -1;
     if (!opts.loop) {
@@ -540,10 +567,14 @@ class MorphEngine {
     if (!this.dragging) return;
     this.dragging = false;
     const p = this.program.uniforms.uProgress.value;
-    if (this.dragDir === 0) return;
+    if (this.dragDir === 0) {
+      this.renderFrame();
+      return;
+    }
     const target = this.wrap(this.current + this.dragDir);
     const duration = this.reducedMotion ? 0.3 : 0.5;
     this.animating = true;
+    this.startLoop();
     if (p > 0.4) {
       this.announce(target);
       this.tween = gsap.to(this.program.uniforms.uProgress, {
@@ -561,6 +592,7 @@ class MorphEngine {
         onComplete: () => {
           this.animating = false;
           this.tween = null;
+          this.renderFrame();
         }
       });
     }
@@ -627,12 +659,13 @@ export default function MorphSlider({
   useEffect(() => {
     if (!containerRef.current) return undefined;
     const reducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isTouch = typeof window !== "undefined" && window.matchMedia("(pointer: coarse), (max-width: 860px)").matches;
 
     const engine = new MorphEngine(containerRef.current, {
       items,
       startIndex,
       reducedMotion,
-      dprCap: 2,
+      dprCap: isTouch ? 1.25 : 2,
       getOptions: () => optsRef.current,
       onIndexChange: handleIndexChange
     });
@@ -659,7 +692,11 @@ export default function MorphSlider({
 
   useEffect(() => {
     if (!autoplay || hovering) return undefined;
-    const id = setTimeout(() => engineRef.current?.next(), Math.max(autoplayDelay, 1) * 1000);
+    const id = setTimeout(() => {
+      if (engineRef.current?.visible) {
+        engineRef.current?.next();
+      }
+    }, Math.max(autoplayDelay, 1) * 1000);
     return () => clearTimeout(id);
   }, [autoplay, autoplayDelay, hovering, index]);
 

@@ -57,26 +57,31 @@ export default function Themes() {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
 
+    // Do not run brief animations if the Themes section is off-screen
+    const rect = root.getBoundingClientRect();
+    const isVisible = rect.top < window.innerHeight + 100 && rect.bottom > -100;
+    if (!isVisible) return;
+
     const ctx = gsap.context(() => {
       // 1. Seat badge lift
       gsap.fromTo(
         ".th-brief-seat",
         { opacity: 0, y: 14 },
-        { opacity: 1, y: 0, ease: "expo.out", duration: 1.1 }
+        { opacity: 1, y: 0, force3D: true, ease: "expo.out", duration: 0.9 }
       );
 
       // 2. Title mask reveal
       gsap.fromTo(
         ".th-brief-title .th-mask-inner",
         { yPercent: 112 },
-        { yPercent: 0, ease: "expo.out", duration: 1.35, delay: 0.05 }
+        { yPercent: 0, force3D: true, ease: "expo.out", duration: 1.1, delay: 0.04 }
       );
 
       // 3. Hairline divider rule draw
       gsap.fromTo(
         ".th-brief-rule i",
         { scaleX: 0 },
-        { scaleX: 1, ease: "expo.out", duration: 1.45, delay: 0.1 }
+        { scaleX: 1, force3D: true, ease: "expo.out", duration: 1.2, delay: 0.08 }
       );
 
       // 4. Punchline words reveal
@@ -86,10 +91,11 @@ export default function Themes() {
         {
           opacity: 1,
           y: 0,
+          force3D: true,
           ease: "power2.out",
-          duration: 0.75,
-          stagger: 0.038,
-          delay: 0.12,
+          duration: 0.65,
+          stagger: 0.03,
+          delay: 0.1,
         }
       );
 
@@ -100,10 +106,11 @@ export default function Themes() {
         {
           opacity: 1,
           y: 0,
+          force3D: true,
           ease: "power2.out",
-          duration: 0.75,
-          stagger: 0.018,
-          delay: 0.22,
+          duration: 0.65,
+          stagger: 0.015,
+          delay: 0.18,
         }
       );
 
@@ -114,10 +121,11 @@ export default function Themes() {
         {
           opacity: 1,
           x: 0,
+          force3D: true,
           ease: "expo.out",
-          duration: 1.0,
-          stagger: 0.1,
-          delay: 0.32,
+          duration: 0.85,
+          stagger: 0.08,
+          delay: 0.26,
         }
       );
 
@@ -127,10 +135,11 @@ export default function Themes() {
         {
           opacity: 1,
           y: 0,
+          force3D: true,
           ease: "power2.out",
-          duration: 0.65,
-          stagger: 0.024,
-          delay: 0.36,
+          duration: 0.55,
+          stagger: 0.02,
+          delay: 0.3,
         }
       );
 
@@ -138,7 +147,7 @@ export default function Themes() {
       gsap.fromTo(
         ".th-brief-link",
         { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, ease: "expo.out", duration: 1.1, delay: 0.48 }
+        { opacity: 1, y: 0, force3D: true, ease: "expo.out", duration: 0.9, delay: 0.38 }
       );
     }, root);
 

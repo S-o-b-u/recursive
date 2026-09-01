@@ -554,6 +554,16 @@ export default function Sponsors({ detailed = true }: { detailed?: boolean }) {
           line-height: 1.58;
           color: #3b5038;
         }
+
+        @media (max-width: 768px) {
+          .sp-tier-card,
+          .sp-alloc-card,
+          .sp-custom-card {
+            background: rgba(255, 255, 255, 0.88) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+          }
+        }
       `}</style>
     </section>
   );

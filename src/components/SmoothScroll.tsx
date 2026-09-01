@@ -25,17 +25,70 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     }
 
     // On mobile and touch screens, native momentum scrolling is handled by GPU compositor at 120Hz.
-    // We should NOT hijack touch scrolling with Lenis JS lerp on mobile.
     const isTouch =
       typeof window !== 'undefined' &&
       ('ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth < 860);
 
+    if (isTouch) {
+      ScrollTrigger.config({ ignoreMobileResize: true });
+
+      const triggerScrollExpand = (target: HTMLElement) => {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        const isSponsors = target.id === "sponsors" || target.classList.contains("sxp");
+        if (!isSponsors) {
+          target.classList.add("is-scroll-expanded");
+          window.setTimeout(() => target.classList.remove("is-scroll-expanded"), 1200);
+        }
+      };
+
+      const onClick = (event: MouseEvent) => {
+        if (event.defaultPrevented || event.button !== 0) return;
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+        const anchor = (event.target as Element | null)?.closest?.("a");
+        if (!anchor) return;
+
+        const href = anchor.getAttribute("href");
+        if (!href) return;
+
+        const hash = href.startsWith("#")
+          ? href
+          : href.startsWith("/#") && window.location.pathname === "/"
+            ? href.slice(1)
+            : null;
+        if (!hash || hash === "#") return;
+
+        const target = document.querySelector<HTMLElement>(hash);
+        if (!target) return;
+
+        event.preventDefault();
+        triggerScrollExpand(target);
+        window.history.pushState(null, "", hash);
+      };
+
+      const onCustomExpand = (event: Event) => {
+        const customEvent = event as CustomEvent<{ target: HTMLElement | string }>;
+        const target = typeof customEvent.detail?.target === "string"
+          ? document.querySelector<HTMLElement>(customEvent.detail.target)
+          : customEvent.detail?.target;
+        if (target) triggerScrollExpand(target);
+      };
+
+      document.addEventListener("click", onClick);
+      window.addEventListener("recursive-scroll-expand", onCustomExpand);
+
+      return () => {
+        document.removeEventListener("click", onClick);
+        window.removeEventListener("recursive-scroll-expand", onCustomExpand);
+      };
+    }
+
     ScrollTrigger.config({ ignoreMobileResize: true });
 
     const lenis = new Lenis({
-      duration: isTouch ? 0 : 1.15,
+      duration: 1.15,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: !isTouch,
+      smoothWheel: true,
       syncTouch: false,
       touchMultiplier: 1.0,
     });
@@ -67,25 +120,40 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       });
 
       gsap.killTweensOf(content);
-      gsap.fromTo(
-        content,
-        {
-          scale: 0.955,
-          y: 24,
-          opacity: 0.72,
-          filter: "blur(5px)",
-        },
-        {
-          scale: 1,
-          y: 0,
-          opacity: 1,
-          filter: "blur(0px)",
-          duration: 0.95,
-          ease: "expo.out",
-          delay: 0.18,
-          clearProps: "scale,y,opacity,filter",
-        }
-      );
+      if (isTouch) {
+        gsap.fromTo(
+          content,
+          {
+            y: 16,
+            opacity: 0.82,
+          },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.55,
+            ease: "power2.out",
+            clearProps: "y,opacity",
+          }
+        );
+      } else {
+        gsap.fromTo(
+          content,
+          {
+            scale: 0.97,
+            y: 18,
+            opacity: 0.85,
+          },
+          {
+            scale: 1,
+            y: 0,
+            opacity: 1,
+            duration: 1.1,
+            ease: "power2.out",
+            delay: 0.12,
+            clearProps: "scale,y,opacity",
+          }
+        );
+      }
 
       target.classList.add("is-scroll-expanded");
       window.setTimeout(() => target.classList.remove("is-scroll-expanded"), 1400);

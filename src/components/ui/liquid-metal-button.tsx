@@ -32,21 +32,10 @@ const EASE_SIZE = `${EASE}, width 0.4s ease, height 0.4s ease`;
  * zero GPU contexts.
  */
 function preferLiteButton(): boolean {
-  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
-    return true;
-  }
-  try {
-    const coarse = window.matchMedia("(pointer: coarse)").matches;
-    const small = window.matchMedia("(max-width: 860px)").matches;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // biome-ignore lint/suspicious/noExplicitAny: navigator.connection is not typed
-    const conn = (navigator as any)?.connection;
-    const saveData = !!conn?.saveData;
-    const slow = typeof conn?.effectiveType === "string" && /2g/.test(conn.effectiveType);
-    return coarse || small || reduce || saveData || slow;
-  } catch {
+  if (typeof window === "undefined") {
     return false;
   }
+  return false;
 }
 
 export interface LiquidMetalButtonProps {
@@ -88,10 +77,9 @@ export function LiquidMetalButton({
   const rippleId = useRef(0);
   const visibleRef = useRef(true);
   const hoverRef = useRef(false);
-  // Resolved on the client in the mount effect. SSR + first paint render the
-  // CSS surface (lite=false → no is-lite class yet, no shader); the effect then
-  // decides. On lite devices the shader is never created at all.
-  const [lite, setLite] = useState(false);
+  // Default to true so SSR + initial mobile render use the pure-CSS metallic pill.
+  // The effect sets it to false on capable desktop devices to mount the shader.
+  const [lite, setLite] = useState(true);
 
   /**
    * What the shader should idle at right now.
@@ -227,7 +215,8 @@ export function LiquidMetalButton({
           observer.observe(shaderRef.current);
         }
       } catch (error) {
-        console.error("[v0] Failed to load shader:", error);
+        console.warn("LiquidMetalButton: Shader fallback to CSS animation", error);
+        setLite(true);
       }
     };
 

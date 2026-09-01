@@ -4,7 +4,6 @@ import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
-import GradualBlur from "@/components/ui/GradualBlur";
 import { getLenis } from "@/lib/lenis";
 import { prefersLiteMedia } from "@/lib/device";
 
@@ -97,9 +96,7 @@ export default function IntroSequence() {
   // Shader-backed skip button + the backdrop-filter ramp are mounted a beat
   // late so their compositing cost never lands on the opening frames.
   const [showChrome, setShowChrome] = useState(false);
-  // On phones / data-saver the cold-open plays over the still poster instead of
-  // the 4K plate — same climb, focus-rack and grade, none of the 56 MB. The
-  // frame-synced hand-off simply no-ops (there is no hero <video> to sync to).
+  // Video plate enabled on all devices so grass animates during intro
   const [liteMedia, setLiteMedia] = useState(false);
 
   const rootRef = useRef<HTMLDivElement>(null);
@@ -194,7 +191,7 @@ export default function IntroSequence() {
   // Runs before paint. Until it resolves, the component renders a bare dark
   // plate (see the "pending" branch below), so the hero never flashes.
   useLayoutEffect(() => {
-    setLiteMedia(prefersLiteMedia());
+    setLiteMedia(false);
     const params = new URLSearchParams(window.location.search);
     const force = params.get("intro");
 
@@ -250,6 +247,17 @@ export default function IntroSequence() {
       document.body.style.overflow = "hidden";
     }
     window.scrollTo(0, 0);
+
+    const introVid = videoRef.current;
+    if (introVid) {
+      introVid.muted = true;
+      introVid.defaultMuted = true;
+      introVid.playsInline = true;
+      introVid.setAttribute("playsinline", "");
+      introVid.setAttribute("webkit-playsinline", "");
+      introVid.setAttribute("muted", "");
+      introVid.play().catch(() => {});
+    }
 
     // Hold the scroll through Lenis. <SmoothScroll> mounts after this layout
     // effect, so the instance can be a frame or two late — retry briefly.
@@ -363,37 +371,44 @@ export default function IntroSequence() {
       });
       tlRef.current = tl;
 
+      const isLite = liteMedia || prefersLiteMedia();
+
       tl.set(root, { autoAlpha: 1 });
 
-      // The climb: dark, low → the hero's natural grade + framing. Transform +
-      // cheap colour filter only, so it composites clean for the full 7.4s.
-      // Ends at identity — pixel-identical to the hero's untransformed <video>.
-      // The "from" here matches the CSS initial state on .intro-media exactly,
-      // so JS taking over from first paint produces no jump.
-      tl.fromTo(
-        media,
-        {
-          scale: 1.13,
-          yPercent: -6,
-          filter: "brightness(0.46) saturate(0.74) contrast(1.04)",
-        },
-        {
-          scale: 1,
-          yPercent: 0,
-          filter: "brightness(1) saturate(1) contrast(1)",
-          duration: 7.4,
-          ease: "sine.inOut",
-        },
-        0,
-      );
-      // Focus rack on its own layer, resolved early so the costly full-frame
-      // blur is never live for long. "from" matches .intro-focus CSS.
-      tl.fromTo(
-        focus,
-        { filter: "blur(9px)" },
-        { filter: "blur(0px)", duration: 4.4, ease: "sine.out" },
-        0,
-      );
+      if (isLite) {
+        // GPU compositor only on mobile: scale & yPercent without heavy filter re-rasterization
+        tl.fromTo(
+          media,
+          { scale: 1.12, yPercent: -5 },
+          { scale: 1, yPercent: 0, duration: 7.4, ease: "sine.inOut" },
+          0,
+        );
+      } else {
+        tl.fromTo(
+          media,
+          {
+            scale: 1.13,
+            yPercent: -6,
+            filter: "brightness(0.46) saturate(0.74) contrast(1.04)",
+          },
+          {
+            scale: 1,
+            yPercent: 0,
+            filter: "brightness(1) saturate(1) contrast(1)",
+            duration: 7.4,
+            ease: "sine.inOut",
+          },
+          0,
+        );
+        // Focus rack on capable desktop only
+        tl.fromTo(
+          focus,
+          { filter: "blur(9px)" },
+          { filter: "blur(0px)", duration: 4.4, ease: "sine.out" },
+          0,
+        );
+      }
+
       tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 6.9, ease: "sine.inOut" }, 0.3);
       tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 7.0, ease: "none" }, 0);
 
@@ -401,46 +416,84 @@ export default function IntroSequence() {
         const [tin, tout] = CUES[i];
         const words = el.querySelectorAll<HTMLElement>(".intro-word");
 
-        tl.fromTo(
-          words,
-          { opacity: 0, yPercent: 26, filter: "blur(5px)" },
-          {
-            opacity: 1,
-            yPercent: 0,
-            filter: "blur(0px)",
-            duration: 0.62,
-            ease: "power2.out",
-            stagger: 0.05,
-          },
-          tin,
-        );
-        if (i < lines.length - 1) {
-          tl.to(
+        if (isLite) {
+          tl.fromTo(
             words,
+            { opacity: 0, yPercent: 22 },
             {
-              opacity: 0,
-              yPercent: -16,
-              filter: "blur(4px)",
-              duration: 0.36,
-              ease: "power1.in",
-              stagger: 0.022,
+              opacity: 1,
+              yPercent: 0,
+              duration: 0.62,
+              ease: "power2.out",
+              stagger: 0.045,
             },
-            tout,
+            tin,
           );
+          if (i < lines.length - 1) {
+            tl.to(
+              words,
+              {
+                opacity: 0,
+                yPercent: -14,
+                duration: 0.36,
+                ease: "power1.in",
+                stagger: 0.02,
+              },
+              tout,
+            );
+          }
+        } else {
+          tl.fromTo(
+            words,
+            { opacity: 0, yPercent: 26, filter: "blur(5px)" },
+            {
+              opacity: 1,
+              yPercent: 0,
+              filter: "blur(0px)",
+              duration: 0.62,
+              ease: "power2.out",
+              stagger: 0.05,
+            },
+            tin,
+          );
+          if (i < lines.length - 1) {
+            tl.to(
+              words,
+              {
+                opacity: 0,
+                yPercent: -16,
+                filter: "blur(4px)",
+                duration: 0.36,
+                ease: "power1.in",
+                stagger: 0.022,
+              },
+              tout,
+            );
+          }
         }
       });
 
       // ── Hand-off ──────────────────────────────────────────────────────────
       // 1. Warm the hero's plate ~1s ahead (playing, roughly aligned, buffered).
-      tl.call(warmHeroPlate, undefined, 6.6);
+      if (!isLite) {
+        tl.call(warmHeroPlate, undefined, 6.6);
+      }
 
       // 2. Last line eases out on its own (not yanked by the scene fade).
       const lastWords = lines[lines.length - 1].querySelectorAll<HTMLElement>(".intro-word");
-      tl.to(
-        lastWords,
-        { opacity: 0, yPercent: -14, filter: "blur(6px)", duration: 0.8, ease: "sine.inOut", stagger: 0.04 },
-        7.15,
-      );
+      if (isLite) {
+        tl.to(
+          lastWords,
+          { opacity: 0, yPercent: -14, duration: 0.8, ease: "sine.inOut", stagger: 0.035 },
+          7.15,
+        );
+      } else {
+        tl.to(
+          lastWords,
+          { opacity: 0, yPercent: -14, filter: "blur(6px)", duration: 0.8, ease: "sine.inOut", stagger: 0.04 },
+          7.15,
+        );
+      }
 
       // 3. A soft dawn glow rises from the hill line — masks the seam, then recedes.
       tl.fromTo(
@@ -485,6 +538,9 @@ export default function IntroSequence() {
       if (started || doneRef.current) return;
       started = true;
       window.clearTimeout(warmTimer);
+      if (videoRef.current) {
+        videoRef.current.play().catch(() => {});
+      }
       tl.play(0);
     };
     const warmWaits: Promise<unknown>[] = [];
@@ -520,6 +576,7 @@ export default function IntroSequence() {
       window.clearTimeout(warmTimer);
       tl.pause();
 
+      const isLite = liteMedia || prefersLiteMedia();
       const words = root.querySelectorAll<HTMLElement>(".intro-word");
       const wordInners = root.querySelectorAll<HTMLElement>(".intro-word-i");
       gsap.killTweensOf([scene, bloom, media, focus, grade, bar]);
@@ -527,24 +584,35 @@ export default function IntroSequence() {
       gsap.killTweensOf(wordInners);
       gsap.set(wordInners, { clearProps: "transform,textShadow" });
 
-      warmHeroPlate();
+      if (!isLite) {
+        warmHeroPlate();
+      }
 
       // A compressed version of the real wind-down, not a hard cut: the text
       // drops away, the plate *eases* to its final framing + grade on sine
       // (never a lurch), the dawn glow rises over the tail of that settle, and
-      // the scene dissolves between two frozen frames into the hero. ~1.7s.
+      // the scene dissolves into the hero.
       const q = gsap.timeline({ onComplete: finish });
-      q.to(words, { autoAlpha: 0, yPercent: -16, filter: "blur(6px)", duration: 0.28, ease: "power2.in" }, 0);
-      q.to(
-        media,
-        {
-          xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0,
-          filter: "brightness(1) saturate(1) contrast(1)",
-          duration: 0.6, ease: "sine.inOut",
-        },
-        0,
-      );
-      q.to(focus, { filter: "blur(0px)", duration: 0.5, ease: "sine.inOut" }, 0);
+      if (isLite) {
+        q.to(words, { autoAlpha: 0, yPercent: -14, duration: 0.28, ease: "power2.in" }, 0);
+        q.to(
+          media,
+          { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0, duration: 0.6, ease: "sine.inOut" },
+          0,
+        );
+      } else {
+        q.to(words, { autoAlpha: 0, yPercent: -16, filter: "blur(6px)", duration: 0.28, ease: "power2.in" }, 0);
+        q.to(
+          media,
+          {
+            xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0,
+            filter: "brightness(1) saturate(1) contrast(1)",
+            duration: 0.6, ease: "sine.inOut",
+          },
+          0,
+        );
+        q.to(focus, { filter: "blur(0px)", duration: 0.5, ease: "sine.inOut" }, 0);
+      }
       q.to(grade, { opacity: 0, duration: 0.6, ease: "sine.inOut" }, 0.04);
       q.fromTo(
         bloom,
@@ -552,7 +620,9 @@ export default function IntroSequence() {
         { opacity: 0.9, scale: 1, duration: 0.5, ease: "sine.out" },
         0.3,
       );
-      q.call(freezePlates, undefined, 0.62);
+      if (!isLite) {
+        q.call(freezePlates, undefined, 0.62);
+      }
       q.call(
         () => {
           if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
@@ -563,7 +633,9 @@ export default function IntroSequence() {
         0.4,
       );
       q.to(scene, { autoAlpha: 0, duration: 0.6, ease: "sine.inOut" }, 0.66);
-      q.call(resumeHeroPlate, undefined, 1.02);
+      if (!isLite) {
+        q.call(resumeHeroPlate, undefined, 1.02);
+      }
       q.set(root, { pointerEvents: "none" }, 1.0);
       q.call(releaseScroll, undefined, 1.26);
       q.to(bloom, { opacity: 0, scale: 1.04, duration: 0.65, ease: "power1.inOut" }, 1.05);
@@ -610,26 +682,17 @@ export default function IntroSequence() {
         <div className="intro-media-clip">
           <div ref={mediaRef} className="intro-media">
             <div ref={focusRef} className="intro-focus">
-              {liteMedia ? (
-                <img
-                  src="/images/hero_poster.jpg"
-                  alt=""
-                  aria-hidden="true"
-                  draggable={false}
-                />
-              ) : (
-                <video
-                  ref={videoRef}
-                  src="/bg/hero_bg.mp4"
-                  poster="/images/hero_poster.jpg"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  preload="auto"
-                  aria-hidden="true"
-                />
-              )}
+              <video
+                ref={videoRef}
+                src="/bg/hero_bg.mp4"
+                poster="/images/hero_poster.jpg"
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+                aria-hidden="true"
+              />
             </div>
           </div>
         </div>
@@ -666,22 +729,9 @@ export default function IntroSequence() {
         </div>
 
         {showChrome && (
-          <>
-            <div className="intro-skip-wrap">
-              <LiquidMetalButton label="Skip intro" onClick={skip} width={128} height={40} />
-            </div>
-
-            <GradualBlur
-              target="parent"
-              position="bottom"
-              height="6.5rem"
-              strength={2.2}
-              divCount={4}
-              curve="bezier"
-              exponential
-              opacity={1}
-            />
-          </>
+          <div className="intro-skip-wrap">
+            <LiquidMetalButton label="Skip intro" onClick={skip} width={128} height={40} />
+          </div>
         )}
       </div>
 
@@ -792,22 +842,29 @@ export default function IntroSequence() {
           line-height: 1.12;
           letter-spacing: -0.03em;
           color: #eef3e8;
-          text-shadow: 0 2px 30px rgba(0, 0, 0, 0.5);
+          text-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
         }
 
         .intro-word {
           display: inline-block;
           margin: 0 0.24em 0.12em 0;
           opacity: 0;
-          will-change: transform, opacity, filter;
         }
         .intro-word-i {
           display: inline-block;
-          will-change: transform;
         }
         .intro-word.is-accent .intro-word-i {
           color: #a6e06a;
-          text-shadow: 0 0 26px rgba(143, 196, 90, 0.45);
+          text-shadow: 0 0 16px rgba(143, 196, 90, 0.45);
+        }
+
+        @media (max-width: 768px) {
+          .intro-line-text {
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
+          }
+          .intro-word.is-accent .intro-word-i {
+            text-shadow: none !important;
+          }
         }
 
         .intro-progress {

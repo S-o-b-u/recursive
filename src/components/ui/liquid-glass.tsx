@@ -1,8 +1,9 @@
 "use client";
 
-import { ReactNode, useId, useState, useRef, useCallback } from "react";
+import { ReactNode, useId, useState, useRef, useCallback, useEffect } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import { cn } from "@/lib/utils";
+import { prefersLiteMedia } from "@/lib/device";
 
 type Intensity = "none" | "sm" | "md" | "lg";
 
@@ -54,8 +55,12 @@ export function LiquidGlassCard({
 }: LiquidGlassCardProps) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   const filterId = `lg-displace-${uid}`;
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [lite, setLite] = useState(true);
+  useEffect(() => {
+    setLite(prefersLiteMedia());
+  }, []);
 
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
   // Fluid spring mouse physics (viscous elastic liquid lag)
@@ -158,8 +163,8 @@ export function LiquidGlassCard({
         backfaceVisibility: "hidden",
       }}
     >
-      {/* ── 1. Refraction: warps whatever sits behind the pane ── */}
-      {refraction && (
+      {/* ── 1. Refraction: warps whatever sits behind the pane (desktop only) ── */}
+      {!lite && refraction && (
         <>
           <svg aria-hidden className="absolute h-0 w-0">
             <filter id={filterId} x="-20%" y="-20%" width="140%" height="140%">
@@ -192,8 +197,8 @@ export function LiquidGlassCard({
         </>
       )}
 
-      {/* ── 2. Pure Living Liquid Currents (Continuous Organic Morphing & Drifting) ── */}
-      {fluidAnimation && (
+      {/* ── 2. Pure Living Liquid Currents (Continuous Organic Morphing & Drifting - desktop only) ── */}
+      {!lite && fluidAnimation && (
         <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden" style={{ borderRadius: "inherit" }}>
           {/* Ambient Liquid Current Blob 1 */}
           <div

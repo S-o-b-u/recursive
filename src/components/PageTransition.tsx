@@ -100,28 +100,20 @@ export default function PageTransition() {
 
     settleNewPage();
 
-    // ── IN: Automatic Scroll Expand on the incoming page ────────────────────
+    // ── IN: Lightweight, smooth fade on the incoming page ────────────────────
     const mainEl = document.querySelector<HTMLElement>("main") || document.querySelector<HTMLElement>(".page-wrap");
     if (mainEl && !reduced()) {
       gsap.killTweensOf(mainEl);
       gsap.fromTo(
         mainEl,
         {
-          scale: 0.972,
-          y: 20,
-          opacity: 0.82,
-          filter: "blur(4px)",
-          transformOrigin: "50% 8vh",
+          opacity: 0.88,
         },
         {
-          scale: 1,
-          y: 0,
           opacity: 1,
-          filter: "blur(0px)",
-          duration: 1.1,
-          ease: "power3.out",
-          delay: 0.08,
-          clearProps: "scale,y,opacity,filter,transformOrigin",
+          duration: 0.45,
+          ease: "power2.out",
+          clearProps: "opacity",
         }
       );
     }

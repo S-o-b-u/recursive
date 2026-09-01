@@ -300,6 +300,9 @@ export default function HomeFAQ() {
         /* ── Answer Collapse ── */
         .faq-answer-collapse {
           overflow: hidden;
+          transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
         }
 
         .faq-answer-inner {
