@@ -190,10 +190,9 @@ export default function Sponsors({ detailed = true }: { detailed?: boolean }) {
         }
 
         .sp-motif {
-          width: clamp(96px, 47.48px + 13.478vw, 220px);
+          width: clamp(114px, 56.87px + 15.87vw, 260px);
           height: auto;
-          color: #2F5527;
-          opacity: 0.85;
+          opacity: 0.88;
         }
 
         .sp-header {

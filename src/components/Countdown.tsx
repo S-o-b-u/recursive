@@ -294,10 +294,9 @@ export default function Countdown() {
         }
 
         .cd-motif {
-          width: clamp(132px, 62.35px + 19.348vw, 310px);
+          width: clamp(114px, 56.87px + 15.87vw, 260px);
           height: auto;
-          color: #2F5527;
-          opacity: 0.8;
+          opacity: 0.88;
         }
 
         .cd-head-wrap {

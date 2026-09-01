@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { NAV_LINKS, EVENT } from "@/data/hackathon";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
@@ -32,15 +33,18 @@ export default function Navigation() {
             className="pointer-events-auto"
           >
             <div className="nav-glass-pill-layout">
-              {/* Brand mark — recursive asterisk */}
+              {/* Brand mark — stylized R logo */}
               <NavLink href="/" className="nav-brand" ariaLabel={`${EVENT.name} — home`}>
                 <span className="nav-logo-btn">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="nav-asterisk">
-                    <line x1="12" y1="4" x2="12" y2="20" />
-                    <line x1="4" y1="12" x2="20" y2="12" />
-                    <line x1="6.34" y1="6.34" x2="17.66" y2="17.66" />
-                    <line x1="6.34" y1="17.66" x2="17.66" y2="6.34" />
-                  </svg>
+                  <Image
+                    src="/images/R.png"
+                    alt={`${EVENT.name} logo`}
+                    width={24}
+                    height={24}
+                    className="nav-r-logo"
+                    style={{ width: "auto", height: "auto" }}
+                    priority
+                  />
                 </span>
                 <span className="nav-wordmark">{EVENT.name}</span>
               </NavLink>
@@ -53,7 +57,7 @@ export default function Navigation() {
 
               <LiquidMetalButton
                 label="Register"
-                href={EVENT.devfolioUrl}
+                href="https://docs.google.com/forms/d/e/1FAIpQLSdDTkIxyYih8bbSP0Ns1I_QMIyDjGpvUhcIXrlXjor9c7fE9w/viewform"
                 target="_blank"
                 rel="noopener noreferrer"
                 width={104}
@@ -258,8 +262,8 @@ export default function Navigation() {
 
               <div onClick={() => setMenuOpen(false)}>
                 <LiquidMetalButton
-                  label="Register on Devfolio"
-                  href={EVENT.devfolioUrl}
+                  label="Register"
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSdDTkIxyYih8bbSP0Ns1I_QMIyDjGpvUhcIXrlXjor9c7fE9w/viewform"
                   target="_blank"
                   rel="noopener noreferrer"
                   width={185}
@@ -303,9 +307,9 @@ export default function Navigation() {
           border-radius: var(--radius-pill);
           display: flex;
           align-items: center;
-          gap: 0.55rem;
+          gap: 0.5rem;
           flex-shrink: 0;
-          padding: 3px 0.55rem 3px 3px;
+          padding: 0.35rem 0.65rem 0.35rem 0.55rem;
         }
         .nav-wordmark {
           font-family: var(--font-display), var(--font-dm-sans), sans-serif;
@@ -317,22 +321,24 @@ export default function Navigation() {
           white-space: nowrap;
         }
         .nav-logo-btn {
-          display: grid;
-          place-items: center;
-          width: 2.3rem;
-          height: 2.3rem;
-          border-radius: 50%;
-          color: var(--color-accent-deep);
-          background: rgba(255, 255, 255, 0.6);
-          box-shadow:
-            0 2px 8px rgba(22, 45, 26, 0.08),
-            inset 0 1px 3px rgba(255, 255, 255, 0.95);
-          transition: transform 200ms var(--ease-out), color 200ms ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: auto;
+          height: auto;
+          background: transparent;
+          box-shadow: none;
+          transition: transform 200ms var(--ease-out);
           flex-shrink: 0;
         }
-        .nav-asterisk { width: 1.1rem; height: 1.1rem; }
-        .nav-brand:hover .nav-logo-btn { transform: rotate(45deg); color: var(--color-accent); }
-        .nav-brand:active .nav-logo-btn { transform: scale(0.92); }
+        .nav-r-logo {
+          width: 1.45rem;
+          height: 1.45rem;
+          object-fit: contain;
+          display: block;
+        }
+        .nav-brand:hover .nav-logo-btn { transform: scale(1.08); }
+        .nav-brand:active .nav-logo-btn { transform: scale(0.94); }
 
         @media (max-width: 520px) {
           .nav-wordmark { display: none; }

@@ -33,6 +33,7 @@ export default function SponsorWall() {
 
   return (
     <section id="sponsors" className="sp" aria-label="Sponsors">
+      <div className="sp-inner">
         {/* ── Centered Header ── */}
         <div className="sp-head-wrap">
           <RevealBlock y={10}>
@@ -59,15 +60,16 @@ export default function SponsorWall() {
           </RevealBlock>
           <RevealBlock y={14} delay={0.1}>
             <div className="sp-cta-wrap">
-              <button
-                type="button"
+              <a
+                href={EVENT.sponsorUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="sp-link"
-                aria-label="Partner with this edition - Currently Locked"
-                disabled
+                aria-label="Partner with this edition"
               >
                 <span className="sp-link-text-slot">
                   <span className="sp-link-text-default">Partner with this edition</span>
-                  <span className="sp-link-text-hover">Locked · Revealing Soon</span>
+                  <span className="sp-link-text-hover">Partner with this edition</span>
                 </span>
                 <span className="sp-link-icon-slot" aria-hidden="true">
                   <svg viewBox="0 0 24 24" className="sp-arrow">
@@ -80,12 +82,8 @@ export default function SponsorWall() {
                       strokeLinejoin="round"
                     />
                   </svg>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sp-lock-icon">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                  </svg>
                 </span>
-              </button>
+              </a>
             </div>
           </RevealBlock>
         </div>
@@ -157,8 +155,7 @@ export default function SponsorWall() {
         .sp-motif {
           width: clamp(114px, 56.87px + 15.87vw, 260px);
           height: auto;
-          color: #7FB84E;
-          opacity: 0.62;
+          opacity: 0.88;
         }
 
         .sp-head-wrap {

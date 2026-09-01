@@ -7,6 +7,7 @@ import { prefersLiteMedia } from "@/lib/device";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import WarpText from "@/components/ui/WarpText";
+import { Lock } from "lucide-react";
 import logoImg from "../../public/images/logo.png";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
@@ -151,14 +152,28 @@ export default function Hero() {
         transition={{ duration: 0.85, delay: 0.22, ease: EASE_OUT }}
       >
         <div className="hero-action-dock-split">
-          <LiquidMetalButton
-            label="Register on Devfolio"
-            href={EVENT.devfolioUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            width={190}
-            height={46}
-          />
+          <div className="hero-locked-wrap" title="Registration currently locked · Revealing soon">
+            <LiquidMetalButton
+              label="Register on Devfolio"
+              width={190}
+              height={46}
+              iconPosition="right"
+              icon={
+                <Lock
+                  size={15}
+                  style={{
+                    color: "#ffffff",
+                    stroke: "#ffffff",
+                    marginLeft: "2px",
+                    display: "inline-block",
+                    verticalAlign: "middle",
+                    filter: "drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.4))",
+                  }}
+                  aria-hidden="true"
+                />
+              }
+            />
+          </div>
 
           <LiquidMetalButton
             label="Join Discord"
@@ -531,6 +546,22 @@ export default function Hero() {
           .hero-log-divider {
             transform: translate(-50%, 50%);
           }
+        }
+
+        .hero-locked-wrap {
+          display: inline-flex;
+          position: relative;
+          cursor: not-allowed;
+          opacity: 0.9;
+          transition: opacity 180ms ease;
+        }
+
+        .hero-locked-wrap:hover {
+          opacity: 1;
+        }
+
+        .hero-locked-wrap * {
+          pointer-events: none;
         }
 
         @media (max-width: 600px) {

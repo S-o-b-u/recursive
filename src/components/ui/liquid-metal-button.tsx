@@ -54,6 +54,7 @@ export interface LiquidMetalButtonProps {
   onClick?: () => void;
   viewMode?: "text" | "icon";
   icon?: React.ReactNode;
+  iconPosition?: "left" | "right";
   className?: string;
   width?: number;
   height?: number;
@@ -67,6 +68,7 @@ export function LiquidMetalButton({
   onClick,
   viewMode = "text",
   icon,
+  iconPosition = "left",
   className = "",
   width: customWidth,
   height: customHeight,
@@ -337,11 +339,13 @@ export function LiquidMetalButton({
                   whiteSpace: "nowrap",
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "6px",
+                  justifyContent: "center",
+                  gap: "7px",
                 }}
               >
-                {icon}
-                {label}
+                {iconPosition === "left" && icon}
+                <span>{label}</span>
+                {iconPosition === "right" && icon}
               </span>
             )}
           </div>
