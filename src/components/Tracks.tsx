@@ -149,7 +149,7 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
                   </div>
 
                   <a
-                    href={EVENT.devfolioUrl}
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSdDTkIxyYih8bbSP0Ns1I_QMIyDjGpvUhcIXrlXjor9c7fE9w/viewform"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="tr-cta-btn"
@@ -186,10 +186,9 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
         }
 
         .tr-motif {
-          width: clamp(96px, 47.48px + 13.478vw, 220px);
+          width: clamp(114px, 56.87px + 15.87vw, 260px);
           height: auto;
-          color: #2F5527;
-          opacity: 0.85;
+          opacity: 0.88;
         }
 
         .tr-header {

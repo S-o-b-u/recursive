@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SPONSOR_SLOTS, EVENT } from "@/data/hackathon";
@@ -53,7 +52,7 @@ export default function SponsorStage() {
   const outroRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
-  const scrollUpRef = useRef<HTMLButtonElement>(null);
+  const scrollUpRef = useRef<HTMLDivElement>(null);
 
   const sealed = SPONSOR_SLOTS.every((slot) => !slot.src);
 
@@ -151,13 +150,13 @@ export default function SponsorStage() {
           pointerEvents: b > 0.05 ? "auto" : "none",
         });
 
-        // The frameless up arrow fades in as the stage opens and reaches full visibility
+        // The up arrow button only appears once the stage has fully opened
         if (scrollUpBtn) {
-          const s = easePanel(clamp01((t - 0.28) / 0.18));
+          const s = easePanel(clamp01((t - WINDOW_END) / 0.12));
           gsap.set(scrollUpBtn, {
             opacity: s,
-            y: (1 - s) * -10,
-            pointerEvents: s > 0.1 ? "auto" : "none",
+            y: (1 - s) * -14,
+            pointerEvents: s > 0.15 ? "auto" : "none",
           });
         }
       };
@@ -228,8 +227,8 @@ export default function SponsorStage() {
 
             <div ref={bodyRef} className="sxp-body">
               <div className="sxp-inner">
-                <span className="sxp-eyebrow">Supporters &amp; partners</span>
                 <Ornament className="sxp-motif" />
+                <span className="sxp-eyebrow">Supporters &amp; partners</span>
                 <h2 className="sxp-heading">Our Sponsors</h2>
                 <p className="sxp-lede">
                   {sealed
@@ -263,7 +262,10 @@ export default function SponsorStage() {
                 <div className="sxp-cta-wrap">
                   <LiquidMetalButton
                     label="Partner with this edition"
-                    href={`mailto:${EVENT.email}`}
+                    href={EVENT.sponsorUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    iconPosition="right"
                     icon={
                       <svg
                         viewBox="0 0 24 24"
@@ -292,34 +294,35 @@ export default function SponsorStage() {
               because both read it off the stage. */}
           <span className="sxp-keyline" aria-hidden="true" />
 
-          {/* ── Frameless Up Arrow in Top Right Corner (Appears when opened) ── */}
-          <button
-            ref={scrollUpRef}
-            type="button"
-            onClick={scrollUp}
-            aria-label="Scroll up to previous section"
-            className="sxp-scrollup-arrow"
-            title="Scroll up"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              width="28"
-              height="28"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="sxp-arrow-svg"
-              aria-hidden="true"
+          {/* ── Scroll Navigation to Exit Frame (Beside Nav Bar) ── */}
+          <div ref={scrollUpRef} className="sxp-scrollup-wrap">
+            <button
+              type="button"
+              onClick={scrollUp}
+              aria-label="Scroll up to previous section"
+              className="sxp-scrollup-btn"
+              title="Scroll up"
             >
-              <path d="M12 19V5M5 12l7-7 7 7" />
-            </svg>
-          </button>
+              <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="sxp-arrow-icon"
+                aria-hidden="true"
+              >
+                <path d="M12 19V5M5 12l7-7 7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
-      <style href="sponsor-stage" precedence="default" suppressHydrationWarning>{`
+      <style>{`
         .sxp {
           position: relative;
           width: 100%;
@@ -346,6 +349,9 @@ export default function SponsorStage() {
           --sxp-iy: calc((100% - var(--sxp-win-h)) / 2 * (1 - var(--sxp-p)));
           --sxp-ix: calc((100% - var(--sxp-win-w)) / 2 * (1 - var(--sxp-p)));
           --sxp-r: calc(28px * (1 - var(--sxp-p)));
+          /* One source of truth: natural 2.75:1 aspect ratio scaling (756 / 2079 = 36.4%) */
+          --sxp-hands-h: min(clamp(280px, 36.4vw, 1400px), 66vh);
+          --sxp-hands-lift: clamp(0rem, 0.8vh, 1.2rem);
 
           position: sticky;
           top: 0;
@@ -521,8 +527,8 @@ export default function SponsorStage() {
           align-items: center;
           justify-content: center;
           padding-inline: var(--padding-x);
-          padding-top: clamp(3rem, 7vh, 5.5rem);
-          padding-bottom: clamp(3rem, 7vh, 5.5rem);
+          padding-top: clamp(2.5rem, 5vh, 4.5rem);
+          padding-bottom: clamp(2.5rem, 5vh, 4.5rem);
           opacity: 0;
           pointer-events: none;
         }
@@ -531,28 +537,27 @@ export default function SponsorStage() {
           position: relative;
           z-index: 1;
           width: 100%;
-          max-width: 68rem;
+          max-width: min(90vw, 68rem);
+          margin-inline: auto;
           display: flex;
           flex-direction: column;
           align-items: center;
           text-align: center;
-          gap: clamp(0.6rem, 1.4vh, 1.1rem);
+          gap: clamp(0.45rem, 1.2vh, 0.85rem);
         }
 
         .sxp-motif {
-          width: clamp(96px, 46px + 13.5vw, 215px);
+          width: clamp(114px, 56.87px + 15.87vw, 260px);
           height: auto;
-          color: #2F5527;
-          opacity: 0.92;
-          margin-top: 0.15rem;
+          opacity: 0.88;
           margin-bottom: 0.25rem;
         }
 
         .sxp-eyebrow {
           font-family: var(--font-geist-mono), monospace;
-          font-size: clamp(0.78rem, 1.05vw, 0.92rem);
+          font-size: clamp(0.72rem, 0.95vw, 0.85rem);
           font-weight: 600;
-          letter-spacing: 0.24em;
+          letter-spacing: 0.22em;
           text-transform: uppercase;
           color: #3D6B22;
         }
@@ -561,7 +566,7 @@ export default function SponsorStage() {
           margin: 0.15rem 0 0;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
           font-weight: 500;
-          font-size: clamp(1.8rem, 12px + 4.8vw, 4.4rem);
+          font-size: clamp(1.6rem, 9.53px + 4.38vw, 4.2rem);
           line-height: 1.05;
           letter-spacing: -0.028em;
           color: #111a12;
@@ -571,8 +576,8 @@ export default function SponsorStage() {
           margin: 0;
           max-width: 48rem;
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: clamp(1rem, 1.45vw, 1.25rem);
-          line-height: 1.6;
+          font-size: clamp(0.95rem, 1.35vw, 1.15rem);
+          line-height: 1.55;
           color: #2A3B28;
           text-wrap: pretty;
         }
@@ -583,14 +588,15 @@ export default function SponsorStage() {
           display: grid;
           place-items: center;
           width: 100%;
-          margin-top: clamp(0.8rem, 2.2vh, 1.8rem);
+          margin-top: clamp(0.8rem, 2vh, 1.8rem);
+          margin-bottom: clamp(0.4rem, 1.2vh, 1rem);
         }
 
         .sxp-seal-q {
           grid-area: 1 / 1;
           font-family: var(--font-hiruko), var(--font-display), Georgia, serif;
           font-weight: 700;
-          font-size: clamp(10rem, 28vh, 17rem);
+          font-size: clamp(8.5rem, 24vh, 15rem);
           line-height: 0.75;
           color: rgba(38, 70, 32, 0.32);
           filter: blur(7px);
@@ -602,9 +608,9 @@ export default function SponsorStage() {
           grid-area: 1 / 1;
           font-family: var(--font-hiruko), var(--font-display), sans-serif;
           font-weight: 900;
-          font-size: clamp(1.85rem, 5vw, 3.5rem);
+          font-size: clamp(1.6rem, 4.4vw, 3.1rem);
           line-height: 1;
-          letter-spacing: 0.22em;
+          letter-spacing: 0.19em;
           text-transform: uppercase;
           color: #16300F;
           text-shadow:
@@ -620,58 +626,70 @@ export default function SponsorStage() {
         .sxp-wall {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: clamp(1.1rem, 2.4vw, 2rem);
+          gap: clamp(0.75rem, 1.8vw, 1.5rem);
           width: 100%;
           max-width: 68rem;
-          margin-top: clamp(1.2rem, 2.8vh, 2.2rem);
+          margin-top: clamp(0.8rem, 2vh, 1.8rem);
         }
 
         .sxp-cta-wrap {
-          margin-top: clamp(1.2rem, 2.6vh, 2rem);
+          margin-top: clamp(1rem, 2.4vh, 2rem);
           display: flex;
           justify-content: center;
           align-items: center;
           z-index: 10;
         }
 
-        /* ── Clean Frameless Up Arrow in Top Right Corner ── */
-        .sxp-scrollup-arrow {
+        /* ── Scroll Navigation to Exit Frame (Beside Nav Bar) ── */
+        .sxp-scrollup-wrap {
           position: absolute;
-          top: clamp(1.2rem, 3vh, 2.2rem);
-          right: clamp(1.2rem, 3.5vw, 2.5rem);
-          z-index: 120;
-          background: transparent;
-          border: none;
-          outline: none;
-          width: 48px;
-          height: 48px;
-          padding: 0;
-          margin: 0;
-          color: #142617;
-          cursor: pointer;
+          top: clamp(1.25rem, 3.2vh, 2.25rem);
+          right: clamp(1rem, 3.5vw, 2.2rem);
+          z-index: 105;
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
           opacity: 0;
           pointer-events: none;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          transition: color 220ms ease, transform 220ms ease;
           will-change: transform, opacity;
         }
 
-        .sxp-scrollup-arrow:hover {
-          color: #2b541d;
+        .sxp-scrollup-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: auto;
+          height: auto;
+          padding: 0.35rem;
+          background: transparent;
+          backdrop-filter: none;
+          -webkit-backdrop-filter: none;
+          border: none;
+          color: #1b3519;
+          cursor: pointer;
+          box-shadow: none;
+          transition: all 220ms cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        .sxp-scrollup-arrow:hover .sxp-arrow-svg {
-          transform: translateY(-4px);
+        .sxp-scrollup-btn:hover {
+          background: transparent;
+          border: none;
+          color: #2F5527;
+          box-shadow: none;
         }
 
-        .sxp-arrow-svg {
-          transition: transform 240ms cubic-bezier(0.23, 1, 0.32, 1);
-          filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.16)) drop-shadow(0 1px 2px rgba(255, 255, 255, 0.9));
+        .sxp-scrollup-btn:hover .sxp-arrow-icon {
+          transform: translateY(-3px);
         }
 
-        .sxp-scrollup-arrow:active {
+        .sxp-arrow-icon {
+          width: 22px;
+          height: 22px;
+          transition: transform 200ms ease, color 200ms ease;
+          filter: drop-shadow(0 1px 3px rgba(255, 255, 255, 0.9));
+        }
+
+        .sxp-scrollup-btn:active {
           transform: scale(0.92);
         }
 
@@ -683,47 +701,55 @@ export default function SponsorStage() {
           }
           .sxp-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); }
           .sxp-body {
-            padding-top: clamp(4rem, 8vh, 6rem);
-            padding-bottom: clamp(4rem, 8vh, 6rem);
+            padding-top: clamp(3rem, 6vh, 4.5rem);
+            padding-bottom: clamp(2rem, 5vh, 4rem);
           }
         }
 
         @media (max-width: 620px) {
+          .sxp-scrollup-wrap {
+            top: clamp(1.2rem, 3vh, 1.85rem);
+            right: clamp(0.6rem, 2.5vw, 1rem);
+          }
           .sxp { --sxp-track: 260vh; }
           .sxp-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .sxp-body {
             justify-content: center;
-            padding-top: clamp(2rem, 5vh, 3.5rem);
-            padding-bottom: clamp(2rem, 5vh, 3.5rem);
+            padding-top: clamp(3.5rem, 8vh, 5rem);
+            padding-bottom: clamp(2rem, 4vh, 3.5rem);
           }
           .sxp-inner {
             gap: clamp(0.42rem, 1.1vh, 0.75rem);
           }
           .sxp-motif {
-            width: 100px;
-            margin-bottom: 0.1rem;
-          }
-          .sxp-heading {
-            font-size: 1.95rem;
-          }
-          .sxp-lede {
-            font-size: 0.86rem;
-            line-height: 1.4;
-            max-width: 22rem;
+            width: clamp(114px, 30vw, 160px);
+            margin-bottom: 0.15rem;
           }
           .sxp-seal {
             margin-top: clamp(0.35rem, 1.1vh, 0.65rem);
           }
           .sxp-seal-word {
             font-size: 1.28rem;
+            letter-spacing: 0.15em;
           }
           .sxp-seal-q {
-            font-size: clamp(6rem, 24vw, 8.5rem);
-            filter: blur(6px);
+            font-size: clamp(6rem, 15vh, 9rem);
           }
           .sxp-cta-wrap {
-            margin-top: clamp(0.45rem, 1.2vh, 0.8rem);
+            margin-top: clamp(0.45rem, 1.2vh, 0.85rem);
             transform: scale(0.96);
+          }
+        }
+
+        /* ── Larger Viewports (1440p / Ultrawide) ── */
+        @media (min-width: 1440px) {
+          .sxp-inner {
+            max-width: 74rem;
+            gap: clamp(0.6rem, 1.4vh, 1rem);
+          }
+          .sxp-wall {
+            max-width: 74rem;
+            gap: 1.75rem;
           }
         }
 
@@ -731,25 +757,6 @@ export default function SponsorStage() {
         @media (max-height: 720px) {
           .sxp-motif { display: none; }
           .sxp-wall { gap: 0.6rem; }
-        }
-
-        /* Landscape phones */
-        @media (max-height: 520px) {
-          .sxp-body {
-            padding-top: clamp(1.5rem, 4vh, 2.5rem);
-            padding-bottom: clamp(1.5rem, 4vh, 2.5rem);
-          }
-          .sxp-eyebrow { font-size: 0.62rem; letter-spacing: 0.18em; }
-          .sxp-heading { font-size: clamp(1.3rem, 3.4vw, 2rem); }
-          .sxp-lede {
-            font-size: 0.82rem;
-            line-height: 1.35;
-            max-width: 34rem;
-          }
-          .sxp-seal { margin-top: 0.1rem; }
-          .sxp-seal-word { font-size: clamp(1rem, 2.6vw, 1.5rem); }
-          .sxp-seal-q { font-size: clamp(2.2rem, 6vw, 3.4rem); }
-          .sxp-cta-wrap { margin-top: 0.35rem; transform: scale(0.9); }
         }
       `}</style>
     </section>

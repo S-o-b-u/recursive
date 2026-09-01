@@ -27,6 +27,24 @@
   --color-accent-soft: #E5EFD9;
   --color-bark: #6B5541;
 
+  /* shadcn / UI color tokens (in HSL for opacity support) */
+  --background: 100 20% 93%;
+  --foreground: 137 25% 11%;
+  --muted: 100 20% 89%;
+  --muted-foreground: 120 11% 37%;
+  --card: 0 0% 100%;
+  --card-foreground: 137 25% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 137 25% 11%;
+  --primary: 137 25% 11%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 100 20% 89%;
+  --secondary-foreground: 137 25% 11%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --input: 105 20% 86%;
+  --ring: 137 25% 11%;
+
   /* Liquid glass material */
   --glass-bg: rgba(255, 255, 255, 0.42);
   --glass-bg-strong: rgba(255, 255, 255, 0.62);
@@ -121,6 +139,22 @@
   --color-accent: var(--color-accent);
   --color-accent-bright: var(--color-accent-bright);
   --color-accent-soft: var(--color-accent-soft);
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
   --font-sans: var(--font-dm-sans);
   --radius: var(--radius-md);
 }
@@ -283,6 +317,15 @@ a { color: inherit; text-decoration: none; }
 */
 
 .night {
+  --background: 120 100% 1%;
+  --foreground: 92 45% 93%;
+  --muted: 128 30% 10%;
+  --muted-foreground: 105 25% 65%;
+  --border: 130 20% 20%;
+  --card: 120 100% 2%;
+  --card-foreground: 92 45% 93%;
+  --popover: 120 100% 2%;
+  --popover-foreground: 92 45% 93%;
   position: relative;
   isolation: isolate;
   background: var(--color-night);

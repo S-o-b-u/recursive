@@ -7,6 +7,7 @@ import Themes from "@/components/Themes";
 import Judges from "@/components/Judges";
 import SponsorStage from "@/components/SponsorStage";
 import HomeFAQ from "@/components/HomeFAQ";
+import VenueLocation from "@/components/VenueLocation";
 
 export default function Home() {
   return (
@@ -30,6 +31,7 @@ export default function Home() {
           backdrop, so FAQ and ACM below simply continue on that background. */}
       <SponsorStage />
       <HomeFAQ />
+      <VenueLocation />
       <ACM />
     </main>
   );

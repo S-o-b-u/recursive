@@ -418,8 +418,7 @@ export default function Judges() {
         .jd-motif {
           width: clamp(114px, 56.87px + 15.87vw, 260px);
           height: auto;
-          color: #7FB84E;
-          opacity: 0.62;
+          opacity: 0.88;
         }
 
         .jd-head-wrap { width: 100%; }

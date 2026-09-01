@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // @ts-ignore
+  agentRules: false,
   allowedDevOrigins: [
     "192.168.29.237",
     "192.168.29.237:3000",

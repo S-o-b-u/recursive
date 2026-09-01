@@ -14,32 +14,32 @@ const SUBLOGOS = [
     alt: "JIS Group",
     name: "JIS Group",
     tier: "Educational Partner",
-    width: 115,
-    height: 38,
+    width: 65,
+    height: 52,
   },
   {
     src: "/college_logo/aicte.png",
     alt: "AICTE Approved",
     name: "AICTE Approved",
     tier: "Statutory Body",
-    width: 50,
-    height: 38,
+    width: 70,
+    height: 52,
   },
   {
     src: "/college_logo/naac.png",
     alt: "NAAC Accredited",
     name: "NAAC Accredited",
     tier: "Institutional Quality",
-    width: 50,
-    height: 38,
+    width: 70,
+    height: 52,
   },
   {
-    src: "/college_logo/nba.png",
-    alt: "NBA Accredited",
-    name: "NBA Accredited",
-    tier: "Technical Tier-1",
-    width: 50,
-    height: 38,
+    src: "/college_logo/IIC.png",
+    alt: "Institution's Innovation Council",
+    name: "Institution's Innovation Council",
+    tier: "Ministry of Education Initiative",
+    width: 130,
+    height: 52,
   },
 ];
 
@@ -71,6 +71,7 @@ export default function ACM() {
 
         <RevealBlock y={16} delay={0.1}>
           <div className="acm-host">
+            <span className="acm-host-name">GNIT ACM Student Chapter</span>
             <Image
               src="/college_logo/gnitacm.png"
               alt="GNIT ACM Student Chapter"
@@ -80,7 +81,18 @@ export default function ACM() {
               style={{ width: "auto", height: "auto" }}
               priority
             />
-            <span className="acm-host-name">GNIT ACM Student Chapter</span>
+            <a
+              href="https://gnitkolkata.acm.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="acm-chapter-link"
+              aria-label="Visit GNIT ACM Student Chapter"
+            >
+              <span className="acm-link-text">Visit Chapter Website</span>
+              <svg viewBox="0 0 24 24" className="acm-link-arrow" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </a>
           </div>
         </RevealBlock>
 
@@ -108,7 +120,7 @@ export default function ACM() {
                       alt={sub.alt}
                       width={sub.width}
                       height={sub.height}
-                      className="acm-mark-logo"
+                      className={`acm-mark-logo ${sub.src.includes("IIC") ? "acm-mark-iic" : ""}`}
                       style={{ width: "auto", height: "auto" }}
                     />
                   </span>
@@ -200,10 +212,9 @@ export default function ACM() {
         .acm-flourish {
           display: block;
           margin-top: clamp(1.6rem, 4vh, 3rem);
-          width: clamp(112px, 55.65px + 15.652vw, 256px);
+          width: clamp(114px, 56.87px + 15.87vw, 260px);
           height: auto;
-          color: #2F5527;
-          opacity: 0.72;
+          opacity: 0.88;
         }
 
         /* ── The host chapter, standing alone ── */
@@ -216,18 +227,53 @@ export default function ACM() {
         }
 
         .acm-host-logo {
-          width: clamp(168px, 87.65px + 22.32vw, 374px) !important;
+          width: clamp(210px, 110px + 25vw, 420px) !important;
           height: auto !important;
           object-fit: contain;
         }
 
         .acm-host-name {
           font-family: var(--font-geist-mono), monospace;
-          font-size: clamp(0.66rem, 0.6px + 0.196vw, 0.78rem);
-          font-weight: 500;
-          letter-spacing: 0.2em;
+          font-size: clamp(0.82rem, 0.7rem + 0.32vw, 1.02rem);
+          font-weight: 700;
+          letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: #4A6146;
+          color: #244626;
+        }
+
+        .acm-chapter-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          margin-top: 0.25rem;
+          padding: 0.35rem 0.15rem 3px;
+          min-height: 36px;
+          background: transparent;
+          border: none;
+          border-bottom: 1.5px solid rgba(47, 85, 39, 0.38);
+          font-family: var(--font-dm-sans), sans-serif;
+          font-size: clamp(0.85rem, 1.1vw, 0.94rem);
+          font-weight: 600;
+          color: #2F5527;
+          text-decoration: none;
+          cursor: pointer;
+          transition: border-color 180ms ease, color 180ms ease, transform 180ms ease;
+        }
+
+        .acm-chapter-link:hover {
+          color: #142e1c;
+          border-bottom-color: #142e1c;
+          transform: translateX(2px);
+        }
+
+        .acm-link-arrow {
+          width: 15px;
+          height: 15px;
+          transition: transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .acm-chapter-link:hover .acm-link-arrow {
+          transform: translateX(3px);
         }
 
         /* ── Narrative (RevealWords with Scroll Scrub) ── */
@@ -297,7 +343,7 @@ export default function ACM() {
         }
 
         .acm-mark-plate {
-          height: clamp(38px, 26.26px + 3.26vw, 68px);
+          height: clamp(52px, 34px + 4.2vw, 84px);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -307,8 +353,14 @@ export default function ACM() {
           max-height: 100%;
           width: auto !important;
           height: auto !important;
-          max-width: clamp(84px, 45.13px + 10.8vw, 184px);
+          max-width: clamp(105px, 58px + 12vw, 220px);
           object-fit: contain;
+        }
+
+        .acm-mark-iic {
+          max-width: clamp(120px, 75px + 12vw, 230px) !important;
+          transform: scale(1.12);
+          transform-origin: center center;
         }
 
         .acm-mark-name {

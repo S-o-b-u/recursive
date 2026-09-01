@@ -37,7 +37,7 @@ export default function About() {
         <RevealBlock className="ab-action-wrap" y={16} delay={0.12}>
           <LiquidMetalButton
             label="Claim Your Seat"
-            href={EVENT.devfolioUrl}
+            href="https://docs.google.com/forms/d/e/1FAIpQLSdDTkIxyYih8bbSP0Ns1I_QMIyDjGpvUhcIXrlXjor9c7fE9w/viewform"
             target="_blank"
             rel="noopener noreferrer"
             width={210}
@@ -80,8 +80,7 @@ export default function About() {
         .ab-crown {
           width: clamp(114px, 56.87px + 15.87vw, 260px);
           height: auto;
-          color: #2F5527;
-          opacity: 0.85;
+          opacity: 0.88;
         }
 
         .ab-head-wrap {
@@ -131,11 +130,27 @@ export default function About() {
           text-wrap: balance;
         }
 
-        /* ── Action Wrap ── */
+        /* ── Action Wrap & Locked Button ── */
         .ab-action-wrap {
           margin-top: clamp(2.75rem, 5.5vh, 4.5rem);
           display: flex;
           justify-content: center;
+        }
+
+        .ab-locked-wrap {
+          display: inline-flex;
+          position: relative;
+          cursor: not-allowed;
+          opacity: 0.88;
+          transition: opacity 180ms ease, transform 180ms ease;
+        }
+
+        .ab-locked-wrap:hover {
+          opacity: 1;
+        }
+
+        .ab-locked-wrap * {
+          pointer-events: none;
         }
       `}</style>
     </section>

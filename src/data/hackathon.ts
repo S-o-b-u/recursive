@@ -16,7 +16,8 @@ export const EVENT = {
   teamSize: "1 – 4 builders",
   seats: 4, // the four chairs on the hill
   devfolioUrl: "#",
-  discordUrl: "#",
+  sponsorUrl: "https://forms.gle/6WMzt855AmDqDUac8",
+  discordUrl: "https://discord.gg/SMYB7tJQf",
   email: "team@recursive.dev",
   socials: {
     x: "#",
