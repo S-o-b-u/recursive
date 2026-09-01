@@ -261,6 +261,17 @@ export default function IntroSequence() {
 
     // Hold the scroll through Lenis. <SmoothScroll> mounts after this layout
     // effect, so the instance can be a frame or two late — retry briefly.
+    //
+    // <SmoothScroll> never constructs a Lenis instance on touch/mobile at all
+    // (native momentum scroll instead) — same isTouch check as there. Without
+    // this guard, grabLenis() polled every animation frame for the intro's
+    // entire ~9s runtime on every phone, never finding one, purely because
+    // there was nothing to give up on: one more source of needless per-frame
+    // work stacked on the busiest, least-headroom window of the whole page.
+    const isTouch =
+      typeof window !== "undefined" &&
+      ("ontouchstart" in window || navigator.maxTouchPoints > 0 || window.innerWidth < 860);
+
     let lenisHooked = false;
     let lenisRaf = 0;
     const grabLenis = () => {
@@ -273,8 +284,10 @@ export default function IntroSequence() {
       }
       lenisRaf = requestAnimationFrame(grabLenis);
     };
-    grabLenis();
-    const onLenisReady = () => grabLenis();
+    if (!isTouch) grabLenis();
+    const onLenisReady = () => {
+      if (!isTouch) grabLenis();
+    };
     window.addEventListener("lenis:ready", onLenisReady);
 
     const block = (e: Event) => e.preventDefault();

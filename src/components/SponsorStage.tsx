@@ -765,6 +765,19 @@ export default function SponsorStage() {
           .sxp-keyline {
             box-shadow: 0 0 0 1px rgba(238, 248, 228, 0.22);
           }
+
+          /* The big blurred "?" behind YET TO REVEAL breathes (opacity + scale)
+             on an 8s loop for as long as this section is mounted -- not just
+             during the scroll-expand motion, but the whole time the user is
+             anywhere near it, including while scrubbing through the section.
+             filter: blur() on a large, continuously-transforming element is a
+             real per-frame rasterisation cost, stacked on top of the clip-path
+             recalculation the window itself already does every scrubbed frame.
+             Freezing it keeps the soft blurred mark in place without repainting
+             it every frame; the blur itself is untouched. */
+          .sxp-seal-q {
+            animation: none;
+          }
         }
 
         @media (max-width: 620px) {

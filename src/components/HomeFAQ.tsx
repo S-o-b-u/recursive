@@ -9,7 +9,10 @@ import { FAQS } from "@/data/hackathon";
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export default function HomeFAQ() {
-  const [openIndex, setOpenIndex] = useState<number | null>(1); // Item [02] open by default matching reference image
+  // Starts fully closed. It previously forced item 2 open on load to match a
+  // reference screenshot, which read as the accordion "opening itself" rather
+  // than as a deliberate default.
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
     <section id="faq" className="faq-section" aria-labelledby="faq-title">
