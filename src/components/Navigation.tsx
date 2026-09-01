@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
@@ -9,12 +9,31 @@ import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import NavLink from "@/components/ui/NavLink";
 import { triggerScrollExpand } from "@/lib/scroll-expand";
+import { getLenis } from "@/lib/lenis";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export default function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
   const reduced = useReducedMotion();
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+      getLenis()?.stop();
+    } else {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+      getLenis()?.start();
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+      getLenis()?.start();
+    };
+  }, [menuOpen]);
 
   return (
     <>
@@ -72,19 +91,10 @@ export default function Navigation() {
                 aria-label="Toggle menu"
                 aria-expanded={menuOpen}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  {menuOpen ? (
-                    <>
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </>
-                  ) : (
-                    <>
-                      <line x1="4" y1="9" x2="20" y2="9" />
-                      <line x1="4" y1="15" x2="20" y2="15" />
-                    </>
-                  )}
-                </svg>
+                <span className={`nav-toggle-icon ${menuOpen ? "is-open" : ""}`} aria-hidden="true">
+                  <span className="nav-toggle-bar nav-toggle-bar-1" />
+                  <span className="nav-toggle-bar nav-toggle-bar-2" />
+                </span>
               </button>
             </div>
           </LiquidGlassCard>
@@ -154,13 +164,18 @@ export default function Navigation() {
         {menuOpen && (
           <motion.div
             className="limelq-nav-screen"
-            initial={{ opacity: 0, y: -12 }}
+            initial={{ opacity: 0, y: -24 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
           >
             {/* Top Bar */}
-            <div className="limelq-head">
+            <motion.div
+              className="limelq-head"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.28, delay: 0.04, ease: [0.22, 1, 0.36, 1] }}
+            >
               <Link href="/" onClick={() => setMenuOpen(false)} className="limelq-brand">
                 {EVENT.name}
               </Link>
@@ -171,12 +186,12 @@ export default function Navigation() {
                 onClick={() => setMenuOpen(false)}
                 aria-label="Close menu"
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                  <line x1="19" y1="5" x2="5" y2="19" />
-                  <line x1="5" y1="5" x2="19" y2="19" />
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
               </button>
-            </div>
+            </motion.div>
 
             {/* Menu List with Black Square Prefix & Hairline Dividers */}
             <div className="limelq-list">
@@ -190,12 +205,19 @@ export default function Navigation() {
                 { label: "Schedule", href: "/schedule", locked: true },
                 { label: "Prizes", href: "/prizes", locked: true },
                 { label: "FAQ", href: "/faq", locked: true },
-              ].map((item) =>
+              ].map((item, idx) =>
                 item.locked ? (
-                  <div
+                  <motion.div
                     key={item.label}
                     className="limelq-item limelq-item--locked"
                     aria-disabled="true"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{
+                      duration: 0.24,
+                      delay: 0.06 + idx * 0.022,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
                   >
                     <span className="limelq-bullet" aria-hidden="true" />
                     <span className="limelq-text">{item.label}</span>
@@ -216,41 +238,56 @@ export default function Navigation() {
                       </svg>
                       LOCKED
                     </span>
-                  </div>
+                  </motion.div>
                 ) : (
-                  <Link
+                  <motion.div
                     key={item.label}
-                    href={item.href}
-                    onClick={(e) => {
-                      setMenuOpen(false);
-                      const isSamePage =
-                        typeof window !== "undefined" &&
-                        (item.href.startsWith("#") ||
-                          (item.href.startsWith("/#") &&
-                            window.location.pathname === "/"));
-                      if (isSamePage) {
-                        const hash = item.href.startsWith("/#")
-                          ? item.href.slice(1)
-                          : item.href;
-                        const target = document.querySelector<HTMLElement>(hash);
-                        if (target) {
-                          e.preventDefault();
-                          window.setTimeout(() => triggerScrollExpand(target), 120);
-                          window.history.pushState(null, "", hash);
-                        }
-                      }
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{
+                      duration: 0.24,
+                      delay: 0.06 + idx * 0.022,
+                      ease: [0.22, 1, 0.36, 1],
                     }}
-                    className="limelq-item"
                   >
-                    <span className="limelq-bullet" aria-hidden="true" />
-                    <span className="limelq-text">{item.label}</span>
-                  </Link>
+                    <Link
+                      href={item.href}
+                      onClick={(e) => {
+                        setMenuOpen(false);
+                        const isSamePage =
+                          typeof window !== "undefined" &&
+                          (item.href.startsWith("#") ||
+                            (item.href.startsWith("/#") &&
+                              window.location.pathname === "/"));
+                        if (isSamePage) {
+                          const hash = item.href.startsWith("/#")
+                            ? item.href.slice(1)
+                            : item.href;
+                          const target = document.querySelector<HTMLElement>(hash);
+                          if (target) {
+                            e.preventDefault();
+                            window.setTimeout(() => triggerScrollExpand(target), 120);
+                            window.history.pushState(null, "", hash);
+                          }
+                        }
+                      }}
+                      className="limelq-item"
+                    >
+                      <span className="limelq-bullet" aria-hidden="true" />
+                      <span className="limelq-text">{item.label}</span>
+                    </Link>
+                  </motion.div>
                 )
               )}
             </div>
 
             {/* Bottom Row */}
-            <div className="limelq-foot">
+            <motion.div
+              className="limelq-foot"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.28, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
+            >
               <a
                 href={EVENT.discordUrl}
                 target="_blank"
@@ -270,7 +307,7 @@ export default function Navigation() {
                   height={44}
                 />
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -516,14 +553,37 @@ export default function Navigation() {
         }
         .nav-toggle:active { transform: scale(0.92); }
 
+        .nav-toggle-icon {
+          position: relative;
+          width: 17px;
+          height: 11px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .nav-toggle-bar {
+          display: block;
+          width: 17px;
+          height: 1.75px;
+          background: currentColor;
+          border-radius: 2px;
+          transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), opacity 180ms ease;
+          transform-origin: center;
+        }
+        .nav-toggle-icon.is-open .nav-toggle-bar-1 {
+          transform: translateY(4.6px) rotate(45deg);
+        }
+        .nav-toggle-icon.is-open .nav-toggle-bar-2 {
+          transform: translateY(-4.6px) rotate(-45deg);
+        }
+
         /* ── Editorial Linen Canvas Mobile Navigation (matching LimeIQ reference) ── */
         .limelq-nav-screen {
           position: fixed;
           inset: 0;
           z-index: 999;
-          background: rgba(234, 229, 220, 0.82);
-          backdrop-filter: blur(28px) saturate(180%);
-          -webkit-backdrop-filter: blur(28px) saturate(180%);
+          background: #eae5dc;
           color: #121A12;
           display: flex;
           flex-direction: column;
@@ -532,6 +592,7 @@ export default function Navigation() {
           overflow-y: auto;
           overscroll-behavior: contain;
           -webkit-overflow-scrolling: touch;
+          will-change: transform, opacity;
         }
 
         .limelq-head {

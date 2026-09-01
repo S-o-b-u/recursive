@@ -71,8 +71,10 @@ export default function FlipCard({
           cursor: pointer;
           border-radius: var(--radius-lg);
           transform-style: preserve-3d;
-          transition: transform 760ms cubic-bezier(0.22, 0.9, 0.24, 1);
+          transition: transform 620ms cubic-bezier(0.22, 0.9, 0.24, 1);
           -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+          will-change: transform;
         }
 
         .fcd.is-disabled .fcd-shell {
@@ -101,10 +103,17 @@ export default function FlipCard({
           border-radius: var(--radius-lg);
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
+          transform: translate3d(0, 0, 0);
           text-align: left;
         }
 
-        .fcd-back { transform: rotateY(180deg); }
+        .fcd-back { transform: rotateY(180deg) translate3d(0, 0, 0); }
+
+        @media (max-width: 768px) {
+          .fcd-shell {
+            transition: transform 440ms cubic-bezier(0.22, 0.9, 0.24, 1);
+          }
+        }
 
         @media (prefers-reduced-motion: reduce) {
           .fcd-shell { transition-duration: 1ms; }

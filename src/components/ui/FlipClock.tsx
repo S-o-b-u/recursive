@@ -444,6 +444,8 @@ export default function FlipClock({
         @media (max-width: 680px) {
           .fkc { --fkc-w: clamp(3.0rem, 19.5vw, 5.6rem); }
 
+          .fkc-smoke { display: none !important; }
+
           .fkc-board {
             display: grid;
             grid-template-columns: repeat(2, max-content);

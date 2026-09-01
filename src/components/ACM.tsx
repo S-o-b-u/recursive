@@ -78,7 +78,6 @@ export default function ACM() {
               width={360}
               height={110}
               className="acm-host-logo"
-              style={{ width: "auto", height: "auto" }}
               priority
             />
             <a
@@ -121,7 +120,6 @@ export default function ACM() {
                       width={sub.width}
                       height={sub.height}
                       className={`acm-mark-logo ${sub.src.includes("IIC") ? "acm-mark-iic" : ""}`}
-                      style={{ width: "auto", height: "auto" }}
                     />
                   </span>
                   <span className="acm-mark-name">{sub.name}</span>
@@ -409,7 +407,7 @@ export default function ACM() {
            two-up grid so the logos keep their size
            instead of shrinking into stamps.
         ───────────────────────────────────────── */
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
           .acm-title-wrap {
             max-width: 18ch;
           }
@@ -419,18 +417,54 @@ export default function ACM() {
           }
 
           .acm-marks-row {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: clamp(1.5rem, 5vw, 2.2rem);
-            max-width: 26rem;
-            margin-inline: auto;
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: clamp(1.2rem, 3.5vw, 1.8rem) clamp(0.75rem, 2.5vw, 1.25rem) !important;
+            max-width: min(92vw, 24rem) !important;
+            margin-inline: auto !important;
+            width: 100% !important;
+            align-items: start !important;
           }
-        }
 
-        @media (max-width: 360px) {
-          .acm-marks-row {
-            grid-template-columns: minmax(0, 1fr);
-            max-width: 15rem;
+          .acm-mark {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+          }
+
+          .acm-mark-plate {
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.25rem;
+          }
+
+          .acm-mark-logo {
+            max-height: 46px;
+            max-width: 105px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+          }
+
+          .acm-mark-iic {
+            max-width: 115px !important;
+            max-height: 44px !important;
+            transform: scale(1.05);
+          }
+
+          .acm-mark-name {
+            font-size: 0.8rem;
+            line-height: 1.25;
+          }
+
+          .acm-mark-tier {
+            font-size: 0.62rem;
+            line-height: 1.2;
+            margin-top: 2px;
           }
         }
 

@@ -460,6 +460,14 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
         .tr-cta-btn:hover .tr-cta-arrow {
           transform: translateX(3px);
         }
+
+        @media (max-width: 768px) {
+          .tr-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+          }
+        }
       `}</style>
     </section>
   );

@@ -269,6 +269,7 @@ export default function VenueLocation() {
                     >
                       <Globe className="w-3.5 h-3.5 shrink-0" />
                       <span className="btn-label-desktop">{isSatellite ? "Roadmap" : "Satellite Imagery"}</span>
+                      <span className="btn-label-tablet">{isSatellite ? "Roadmap" : "Satellite"}</span>
                       <span className="btn-label-mobile">{isSatellite ? "Roadmap" : "Satellite"}</span>
                     </button>
 
@@ -279,7 +280,8 @@ export default function VenueLocation() {
                       className="btn-open-gmaps"
                     >
                       <span className="btn-label-desktop">Open in Google Maps</span>
-                      <span className="btn-label-mobile">Google Maps</span>
+                      <span className="btn-label-tablet">Google Maps</span>
+                      <span className="btn-label-mobile">Maps</span>
                       <ExternalLink className="w-3.5 h-3.5 shrink-0 text-[#55655a]" />
                     </a>
                   </div>
@@ -903,6 +905,10 @@ export default function VenueLocation() {
           display: inline;
         }
 
+        .btn-label-tablet {
+          display: none;
+        }
+
         .btn-label-mobile {
           display: none;
         }
@@ -990,8 +996,12 @@ export default function VenueLocation() {
             display: none;
           }
 
-          .btn-label-mobile {
+          .btn-label-tablet {
             display: inline;
+          }
+
+          .btn-label-mobile {
+            display: none;
           }
 
           .btn-satellite-toggle,
@@ -1007,6 +1017,51 @@ export default function VenueLocation() {
           .btn-open-gmaps svg {
             width: 12px;
             height: 12px;
+          }
+        }
+
+        @media (max-width: 440px) {
+          .map-floating-bottom {
+            bottom: 0.45rem;
+            left: 0.45rem;
+            right: 0.45rem;
+            padding: 0.32rem 0.45rem;
+            gap: 0.25rem;
+          }
+
+          .coords-line {
+            font-size: 0.63rem;
+            letter-spacing: 0.01em;
+          }
+
+          .city-line {
+            font-size: 0.58rem;
+          }
+
+          .btn-label-desktop {
+            display: none;
+          }
+
+          .btn-label-tablet {
+            display: none;
+          }
+
+          .btn-label-mobile {
+            display: inline;
+          }
+
+          .btn-satellite-toggle,
+          .btn-open-gmaps {
+            padding: 0.24rem 0.42rem;
+            font-size: 0.68rem;
+            gap: 0.2rem;
+            border-radius: 0.5rem;
+          }
+
+          .btn-satellite-toggle svg,
+          .btn-open-gmaps svg {
+            width: 11px;
+            height: 11px;
           }
         }
       `}</style>

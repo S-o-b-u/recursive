@@ -70,13 +70,17 @@ export function RevealWords({
       return;
     }
 
+    const isMobile =
+      typeof window !== "undefined" &&
+      window.matchMedia("(pointer: coarse), (max-width: 768px)").matches;
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: root,
           start,
           end,
-          scrub: 0.7,
+          scrub: isMobile ? 0.35 : 0.7,
           invalidateOnRefresh: true,
         },
       });
@@ -85,14 +89,15 @@ export function RevealWords({
         words,
         {
           opacity: dim,
-          y: 4,
+          y: isMobile ? 2 : 4,
         },
         {
           opacity: 1,
           y: 0,
+          force3D: true,
           ease: "power1.out",
           stagger: {
-            each: 0.04,
+            each: isMobile ? 0.018 : 0.035,
             ease: "none",
           },
         }
@@ -157,7 +162,9 @@ export function RevealWords({
         }
         .rw-word {
           display: inline-block;
-          will-change: opacity, transform;
+          transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
         }
       `}</style>
     </div>
@@ -197,10 +204,11 @@ export function RevealHeading({
         { yPercent: 112 },
         {
           yPercent: 0,
+          force3D: true,
           ease: "expo.out",
-          duration: 1.75,
+          duration: 1.5,
           delay,
-          stagger: 0.13,
+          stagger: 0.1,
           scrollTrigger: {
             trigger: root,
             start: "top 88%",
@@ -230,7 +238,12 @@ export function RevealHeading({
           padding-bottom: 0.09em;
           margin-bottom: -0.09em;
         }
-        .rh-inner { display: block; }
+        .rh-inner {
+          display: block;
+          transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+        }
       `}</style>
     </h2>
   );
@@ -279,8 +292,9 @@ export function RevealBlock({
         {
           opacity: 1,
           y: 0,
+          force3D: true,
           ease: "expo.out",
-          duration: 1.45,
+          duration: 1.25,
           delay,
           stagger,
           scrollTrigger: {
@@ -340,7 +354,11 @@ export function ParallaxY({
     const inner = root.firstElementChild as HTMLElement | null;
     if (!inner) return;
 
-    if (reduced()) {
+    const isMobile =
+      typeof window !== "undefined" &&
+      (window.matchMedia("(pointer: coarse), (max-width: 860px)").matches || reduced());
+
+    if (isMobile) {
       gsap.set(inner, { y: 0 });
       return;
     }
@@ -356,7 +374,9 @@ export function ParallaxY({
             trigger: root,
             start,
             end,
-            scrub: 0.5,
+            scrub: 1.2,
+            fastScrollEnd: true,
+            preventOverlaps: true,
             invalidateOnRefresh: true,
           },
         }
@@ -407,6 +427,7 @@ export function RuleDraw({
         { scaleX: 0 },
         {
           scaleX: 1,
+          force3D: true,
           ease: "expo.out",
           duration,
           delay,
@@ -428,8 +449,10 @@ export function RuleDraw({
           width: 100%;
           height: 1px;
           background: var(--color-border);
-          transform: scaleX(0);
+          transform: translate3d(0, 0, 0) scaleX(0);
           transform-origin: left center;
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
         }
       `}</style>
     </>

@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
+import { gsap } from "gsap";
 import { JUDGES, EVENT } from "@/data/hackathon";
 import { RevealHeading, RevealBlock, ParallaxY } from "@/components/ui/reveal";
 import Ornament from "@/components/ui/Ornament";
@@ -131,29 +133,22 @@ function SealedFront({ index, seat }: { index: number; seat: (typeof SEATS)[numb
       <svg className="jd-front-figure" viewBox="0 0 240 262" aria-hidden="true">
         <defs>
           <linearGradient id={`${gid}m`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="rgba(143,196,90,0.34)" />
+            <stop offset="0" stopColor="rgba(143,196,90,0.30)" />
             <stop offset="1" stopColor="rgba(143,196,90,0.06)" />
           </linearGradient>
-          <filter id={`${gid}s`} x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="2.8" />
-          </filter>
         </defs>
-        <path d={BUST} fill={`url(#${gid}m)`} filter={`url(#${gid}s)`} />
+        <path d={BUST} fill={`url(#${gid}m)`} />
       </svg>
 
       <span className="jd-front-q" aria-hidden="true">
         <svg viewBox="0 0 100 100">
-          <text x={50 + qShift} y="74" textAnchor="middle">
+          <text x={50 + qShift} y={74} textAnchor="middle">
             ?
           </text>
         </svg>
       </span>
 
-      <span
-        className="jd-grain"
-        aria-hidden="true"
-        style={{ backgroundImage: `url("${GRAIN}")` }}
-      />
+      <span className="jd-grain" aria-hidden="true" />
 
       <span className="jd-front-meta">
         <span className="jd-front-seat">
@@ -219,9 +214,57 @@ function SeatBack({ seat }: { seat: (typeof SEATS)[number] }) {
 export default function Judges() {
   // Every name still blank means the whole panel is under wraps.
   const sealed = JUDGES.every((j) => j.name.trim().length === 0 && !j.photo.src);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || typeof window === "undefined") return;
+
+    const drift1 = section.querySelector<HTMLElement>(".jd-drift-1");
+    const drift2 = section.querySelector<HTMLElement>(".jd-drift-2");
+    if (!drift1 || !drift2) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        drift1,
+        { x: 35 },
+        {
+          x: -110,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1.2,
+            fastScrollEnd: true,
+            preventOverlaps: true,
+          },
+        }
+      );
+
+      gsap.fromTo(
+        drift2,
+        { x: -110 },
+        {
+          x: 35,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1.2,
+            fastScrollEnd: true,
+            preventOverlaps: true,
+          },
+        }
+      );
+    }, section);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <section id="judges" className="jd" aria-label="Mentors and Judges">
+    <section id="judges" ref={sectionRef} className="jd" aria-label="Mentors and Judges">
       <div className="jd-inner">
         <RevealBlock y={14}>
           <div className="jd-ornament-wrap">
@@ -255,7 +298,7 @@ export default function Judges() {
         >
           <div className="jd-grid-wrap" data-sealed={sealed ? "true" : "false"}>
             <div className="jd-grid">
-                {JUDGES.map((judge, i) => {
+              {JUDGES.map((judge, i) => {
                 const seat = SEATS[i % SEATS.length];
                 const filled = judge.name.trim().length > 0 && !!judge.photo.src;
 
@@ -287,68 +330,72 @@ export default function Judges() {
               })}
             </div>
 
-            {/* ── Mobile: Smooth Infinite Marquee Tracks with Hover/Touch Pause (< 680px) ── */}
+            {/* ── Mobile: Smooth Infinite Marquee Tracks (< 680px) ── */}
             <div className="jd-marquee-wrap" aria-label="Mentors and judges scrolling carousel">
               {/* Row 1 — Seats 1 to 5 scrolling left */}
-              <div className="jd-marquee-track jd-marquee-track-1">
-                {[...JUDGES.slice(0, 5), ...JUDGES.slice(0, 5)].map((judge, idx) => {
-                  const originalIdx = idx % 5;
-                  const seat = SEATS[originalIdx];
-                  const filled = judge.name.trim().length > 0 && !!judge.photo.src;
+              <div className="jd-drift jd-drift-1">
+                <div className="jd-marquee-track jd-marquee-track-1">
+                  {[...JUDGES.slice(0, 5), ...JUDGES.slice(0, 5)].map((judge, idx) => {
+                    const originalIdx = idx % 5;
+                    const seat = SEATS[originalIdx];
+                    const filled = judge.name.trim().length > 0 && !!judge.photo.src;
 
-                  return (
-                    <div className="jd-marquee-card" key={`m1-${idx}-${judge.photo.expect}`}>
-                      <FlipCard
-                        ratio="3 / 4.4"
-                        disabled={!filled}
-                        label={
-                          filled
-                            ? `${judge.name} — ${judge.role}.`
-                            : `${seat.domain} — seat ${originalIdx + 1}.`
-                        }
-                        front={
-                          filled ? (
-                            <PhotoFront index={originalIdx} judge={judge} />
-                          ) : (
-                            <SealedFront index={originalIdx} seat={seat} />
-                          )
-                        }
-                        back={<SeatBack seat={seat} />}
-                      />
-                    </div>
-                  );
-                })}
+                    return (
+                      <div className="jd-marquee-card" key={`m1-${idx}-${judge.photo.expect}`}>
+                        <FlipCard
+                          ratio="3 / 4.4"
+                          disabled={!filled}
+                          label={
+                            filled
+                              ? `${judge.name} — ${judge.role}.`
+                              : `${seat.domain} — seat ${originalIdx + 1}.`
+                          }
+                          front={
+                            filled ? (
+                              <PhotoFront index={originalIdx} judge={judge} />
+                            ) : (
+                              <SealedFront index={originalIdx} seat={seat} />
+                            )
+                          }
+                          back={<SeatBack seat={seat} />}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Row 2 — Seats 6 to 9 scrolling right */}
-              <div className="jd-marquee-track jd-marquee-track-2">
-                {[...JUDGES.slice(5, 9), ...JUDGES.slice(5, 9), ...JUDGES.slice(5, 9)].map((judge, idx) => {
-                  const originalIdx = 5 + (idx % 4);
-                  const seat = SEATS[originalIdx];
-                  const filled = judge.name.trim().length > 0 && !!judge.photo.src;
+              <div className="jd-drift jd-drift-2">
+                <div className="jd-marquee-track jd-marquee-track-2">
+                  {[...JUDGES.slice(5, 9), ...JUDGES.slice(5, 9), ...JUDGES.slice(5, 9)].map((judge, idx) => {
+                    const originalIdx = 5 + (idx % 4);
+                    const seat = SEATS[originalIdx];
+                    const filled = judge.name.trim().length > 0 && !!judge.photo.src;
 
-                  return (
-                    <div className="jd-marquee-card" key={`m2-${idx}-${judge.photo.expect}`}>
-                      <FlipCard
-                        ratio="3 / 4.4"
-                        disabled={!filled}
-                        label={
-                          filled
-                            ? `${judge.name} — ${judge.role}.`
-                            : `${seat.domain} — seat ${originalIdx + 1}.`
-                        }
-                        front={
-                          filled ? (
-                            <PhotoFront index={originalIdx} judge={judge} />
-                          ) : (
-                            <SealedFront index={originalIdx} seat={seat} />
-                          )
-                        }
-                        back={<SeatBack seat={seat} />}
-                      />
-                    </div>
-                  );
-                })}
+                    return (
+                      <div className="jd-marquee-card" key={`m2-${idx}-${judge.photo.expect}`}>
+                        <FlipCard
+                          ratio="3 / 4.4"
+                          disabled={!filled}
+                          label={
+                            filled
+                              ? `${judge.name} — ${judge.role}.`
+                              : `${seat.domain} — seat ${originalIdx + 1}.`
+                          }
+                          front={
+                            filled ? (
+                              <PhotoFront index={originalIdx} judge={judge} />
+                            ) : (
+                              <SealedFront index={originalIdx} seat={seat} />
+                            )
+                          }
+                          back={<SeatBack seat={seat} />}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
@@ -486,11 +533,12 @@ export default function Judges() {
         .jd .jseal-tape-a { transform: translateY(-50%) rotate(-42deg); }
         .jd .jseal-tape-b { transform: translateY(-50%) rotate(40deg); }
 
-        /* When sealed, the cards stay locked and permanently blurred behind the wax seal,
-           even when hovered or focused. */
-        .jd-grid-wrap[data-sealed="true"] .jd-cell .px-in,
+        /* When sealed, the cards stay locked behind the wax seal */
+        .jd-grid-wrap[data-sealed="true"] .jd-cell .px-in {
+          opacity: 0.82;
+        }
         .jd-grid-wrap[data-sealed="true"] .jd-marquee-card {
-          filter: blur(3.4px) saturate(0.9) brightness(0.78);
+          opacity: 0.88;
         }
 
         /* Seal was drawn for the sage sections: its vignette is a pale wash
@@ -611,9 +659,7 @@ export default function Judges() {
           text-transform: uppercase;
           color: rgba(214, 240, 190, 0.72);
           border: 1px solid rgba(190, 224, 168, 0.24);
-          background: rgba(8, 18, 6, 0.55);
-          backdrop-filter: blur(6px);
-          -webkit-backdrop-filter: blur(6px);
+          background: rgba(8, 18, 6, 0.88);
         }
 
         /* ── Back face: the seat brief ── */
@@ -731,9 +777,7 @@ export default function Judges() {
           gap: 0.65rem;
           padding: 0.72rem clamp(1.25rem, 16.87px + 0.87vw, 1.75rem);
           border-radius: var(--radius-pill);
-          background: rgba(226, 244, 208, 0.07);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
+          background: rgba(18, 38, 16, 0.85);
           border: 1px solid rgba(190, 224, 168, 0.22);
           font-family: var(--font-dm-sans), sans-serif;
           font-size: 0.88rem;
@@ -805,7 +849,7 @@ export default function Judges() {
           }
           .jd-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: clamp(1rem, 2.4vw, 1.8rem);
+            gap: clamp(0.75rem, 2vw, 1.25rem);
           }
           .jd-front-domain {
             font-size: clamp(0.85rem, 1.8vw, 1.05rem);
@@ -817,16 +861,6 @@ export default function Judges() {
           .jd .jseal-tape-b { transform: translateY(-50%) rotate(43deg); }
         }
 
-        @media (max-width: 960px) {
-          .jd-grid-wrap {
-            max-width: 56rem;
-          }
-          .jd-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: clamp(0.9rem, 2.5vw, 1.6rem);
-          }
-        }
-
         /* ── Mobile Marquee Cards (< 680px) ── */
         .jd-marquee-wrap {
           display: none;
@@ -836,8 +870,33 @@ export default function Judges() {
           margin-right: calc(50% - 50vw);
           overflow: hidden;
           padding-block: 0.25rem;
-          mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+        }
+
+        .jd-marquee-wrap::before,
+        .jd-marquee-wrap::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 10vw;
+          z-index: 5;
+          pointer-events: none;
+        }
+        .jd-marquee-wrap::before {
+          left: 0;
+          background: linear-gradient(to right, rgba(14, 26, 16, 0.95) 0%, transparent 100%);
+        }
+        .jd-marquee-wrap::after {
+          right: 0;
+          background: linear-gradient(to left, rgba(14, 26, 16, 0.95) 0%, transparent 100%);
+        }
+
+        .jd-drift {
+          width: 100%;
+          will-change: transform;
+          transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
         }
 
         .jd-marquee-track {
@@ -847,6 +906,24 @@ export default function Judges() {
           padding-block: 0.35rem;
           will-change: transform;
           touch-action: pan-y;
+          transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+        }
+
+        .jd-marquee-card {
+          width: clamp(140px, 42vw, 185px);
+          flex-shrink: 0;
+          transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+          transition: transform 260ms cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .jd-marquee-card:hover,
+        .jd-marquee-card:active {
+          transform: scale(1.04);
+          z-index: 10;
         }
 
         .jd-marquee-track-1 {
@@ -865,36 +942,35 @@ export default function Judges() {
           animation-play-state: paused !important;
         }
 
-        .jd-marquee-card {
-          width: clamp(140px, 42vw, 185px);
-          flex-shrink: 0;
-          transition: transform 260ms cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        .jd-marquee-card:hover,
-        .jd-marquee-card:active {
-          transform: scale(1.04);
-          z-index: 10;
-        }
-
         @keyframes jd-marquee-scroll-left {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(-50%, 0, 0); }
         }
 
         @keyframes jd-marquee-scroll-right {
-          0% { transform: translateX(-50%); }
-          100% { transform: translateX(0); }
+          0% { transform: translate3d(-50%, 0, 0); }
+          100% { transform: translate3d(0, 0, 0); }
         }
 
         @media (max-width: 680px) {
+          .jd-front-figure {
+            animation: none !important;
+          }
+          .jd-front-q svg {
+            filter: none !important;
+          }
           .jd-grid {
             display: none !important;
           }
           .jd-marquee-wrap {
-            display: flex;
+            display: flex !important;
             flex-direction: column;
             gap: 0.75rem;
+          }
+          .jd-marquee-track {
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
           }
           .jd-grid-reveal {
             margin-top: clamp(1.75rem, 4.5vh, 2.75rem);

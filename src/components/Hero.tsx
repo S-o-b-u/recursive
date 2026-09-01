@@ -19,16 +19,17 @@ export default function Hero() {
   const centerRef = useRef<HTMLDivElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
 
-  // Enable video playback across devices unless reduced-motion is requested
+  // Background video plate showing the hill and moving grass on all devices
   const [useVideo, setUseVideo] = useState(true);
   useEffect(() => {
-    const reduceMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    setUseVideo(!reduceMotion);
-
     const video = videoRef.current;
     if (video) {
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+      video.setAttribute("playsinline", "");
+      video.setAttribute("webkit-playsinline", "");
+      video.setAttribute("muted", "");
       video.play().catch(() => {});
       if (typeof IntersectionObserver !== "undefined") {
         const io = new IntersectionObserver((entries) => {
@@ -100,6 +101,14 @@ export default function Hero() {
     };
   }, [introFinished]);
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   return (
     <section id="hero" className="hero" ref={sectionRef}>
       {/* ── 100% Crisp, Pure Video Background (Zero filters, no blur/jitter transforms) ── */}
@@ -135,13 +144,16 @@ export default function Hero() {
       <motion.div
         className="hero-center-content"
         ref={centerRef}
-        initial={reduced ? false : { opacity: 0, y: 14, scale: 1.02 }}
+        initial={reduced ? false : { opacity: 0, y: 14 }}
         animate={
           introFinished
-            ? { opacity: 1, y: 0, scale: 1 }
-            : { opacity: 0, y: 14, scale: 1.02 }
+            ? { opacity: 1, y: 0 }
+            : { opacity: 0, y: 14 }
         }
         transition={{ duration: 0.7, ease: EASE_OUT, delay: 0.02 }}
+        style={{
+          top: isMobile ? "clamp(7.8rem, 18.5vh, 10.5rem)" : undefined,
+        }}
       >
         <div className="hero-warp-wrap">
           <WarpText
@@ -167,11 +179,11 @@ export default function Hero() {
       <motion.div
         className="hero-bottom-area"
         ref={dockRef}
-        initial={reduced ? false : { opacity: 0, y: 14, scale: 1.02 }}
+        initial={reduced ? false : { opacity: 0, y: 14 }}
         animate={
           introFinished
-            ? { opacity: 1, y: 0, scale: 1 }
-            : { opacity: 0, y: 14, scale: 1.02 }
+            ? { opacity: 1, y: 0 }
+            : { opacity: 0, y: 14 }
         }
         transition={{ duration: 0.7, delay: 0.1, ease: EASE_OUT }}
       >
@@ -511,11 +523,22 @@ export default function Hero() {
 
         @media (max-width: 860px) {
           .hero-center-content {
-            top: clamp(4.6rem, 10vh, 6.0rem);
+            top: clamp(7.5rem, 18vh, 10.5rem);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
           }
           .hero-warp-wrap {
-            height: clamp(120px, 26vw, 185px);
-            max-width: 96vw;
+            width: min(76vw, calc(22vh * 2.22)) !important;
+            max-width: min(76vw, 540px) !important;
+            aspect-ratio: 1559 / 702 !important;
+            height: auto !important;
+            max-height: 22vh !important;
+            margin-inline: auto !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
           .hero-chair-annotation {
             left: calc(50% + 24px);
@@ -590,13 +613,33 @@ export default function Hero() {
 
         @media (max-width: 600px) {
           .hero-center-content {
-            top: clamp(4.4rem, 9.5vh, 5.4rem);
-            padding-inline: 0;
+            top: clamp(7.8rem, 18.5vh, 10.5rem) !important;
+            padding-inline: clamp(0.5rem, 2vw, 1rem);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
           }
           .hero-warp-wrap {
-            height: clamp(105px, 25vw, 155px);
-            max-width: 98vw;
-            width: 98vw;
+            width: min(72vw, calc(19vh * 2.22)) !important;
+            max-width: min(72vw, 360px) !important;
+            aspect-ratio: 1559 / 702 !important;
+            height: auto !important;
+            max-height: 19vh !important;
+            margin-inline: auto !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .hero-warp-wrap canvas,
+          .hero-warp-wrap img,
+          .hero-warp-wrap .warp-text {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            object-fit: contain !important;
           }
           .hero-chair-annotation {
             left: calc(50% + 36px);
@@ -651,6 +694,12 @@ export default function Hero() {
             flex-direction: column;
             width: calc(100vw - 2.5rem);
             max-width: 20rem;
+            align-items: center;
+          }
+          .hero-locked-wrap {
+            display: flex;
+            justify-content: center;
+            width: 100%;
           }
           .hero-action-dock-split .block {
             width: 100%;
@@ -662,12 +711,14 @@ export default function Hero() {
           }
           .hero-log-img {
             width: clamp(720px, 160vw, 1000px);
+            transform: translate3d(0, 0, 0);
           }
           .hero-log-divider {
             transform: translate(-50%, 50%);
           }
           .hero-bottom-area {
             bottom: clamp(3.2rem, 6.5vh, 4.8rem);
+            transform: translate3d(0, 0, 0);
           }
         }
 

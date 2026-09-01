@@ -35,7 +35,12 @@ export default function Seal({ word = "SEALED" }: { word?: string }) {
 
   useEffect(() => {
     const el = shaderHost.current;
-    if (!el) return;
+    if (!el || typeof window === "undefined") return;
+    const isMobile =
+      window.matchMedia("(pointer: coarse), (max-width: 860px)").matches ||
+      "ontouchstart" in window;
+    if (isMobile) return;
+
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     try {
       mount.current = new ShaderMount(
@@ -199,9 +204,7 @@ export default function Seal({ word = "SEALED" }: { word?: string }) {
           background:
             linear-gradient(180deg, rgba(178, 158, 118, 0.22) 0%, rgba(178, 158, 118, 0) 14%),
             linear-gradient(180deg, rgba(30, 60, 28, 0.97) 0%, rgba(13, 31, 11, 0.98) 100%);
-          -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 15%, #000 85%, transparent 100%);
-          mask-image: linear-gradient(180deg, transparent 0%, #000 15%, #000 85%, transparent 100%);
-          filter: drop-shadow(0 14px 26px rgba(12, 26, 12, 0.5));
+          box-shadow: 0 10px 24px rgba(6, 16, 6, 0.6);
         }
         .jseal-tape-a { transform: translateY(-50%) rotate(-35deg); }
         .jseal-tape-b { transform: translateY(-50%) rotate(33deg); }
@@ -288,10 +291,23 @@ export default function Seal({ word = "SEALED" }: { word?: string }) {
         }
 
         @media (max-width: 768px) {
+          .jseal {
+            transform: translate3d(0, 0, 0);
+          }
           .jseal-tape {
             width: 360%;
             margin-left: -180%;
             height: clamp(38px, 6.2vw, 48px);
+            -webkit-mask-image: none;
+            mask-image: none;
+            filter: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+          }
+          .jseal-track {
+            animation: none;
+          }
+          .jseal-gloss {
+            animation: none;
           }
           .jseal-tape-a { transform: translateY(-50%) rotate(-54deg); }
           .jseal-tape-b { transform: translateY(-50%) rotate(52deg); }

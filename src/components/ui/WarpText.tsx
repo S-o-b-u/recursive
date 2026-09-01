@@ -831,25 +831,55 @@ export const WarpText: React.FC<WarpTextProps> = ({
       aria-level={2}
       aria-label={typeof text === "string" ? text : "heading"}
     >
-      {webglFailed && effectiveSrc && (
-        <img
-          src={effectiveSrc}
-          alt={typeof text === "string" ? text : "Recursive Logo"}
-          className="warp-text-fallback-img"
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            objectPosition: "center center",
-            pointerEvents: "none",
-            userSelect: "none",
-            filter: color !== "original" && color !== "#ffffff" ? "invert(1) brightness(0)" : undefined,
-          }}
-          loading="eager"
-        />
-      )}
+      {webglFailed &&
+        (effectiveSrc ? (
+          <img
+            src={effectiveSrc}
+            alt={typeof text === "string" ? text : "Recursive Logo"}
+            className="warp-text-fallback-img"
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              objectPosition: "center center",
+              pointerEvents: "none",
+              userSelect: "none",
+              filter: color !== "original" && color !== "#ffffff" ? "invert(1) brightness(0)" : undefined,
+            }}
+            loading="eager"
+          />
+        ) : (
+          <div
+            className="warp-text-fallback-txt"
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "center",
+              fontFamily: fontFamily || "var(--font-hiruko), var(--font-display), sans-serif",
+              fontWeight: fontWeight || 900,
+              fontSize: fontSize || "clamp(3.5rem, 18vw, 12rem)",
+              letterSpacing: letterSpacing || "-0.035em",
+              lineHeight: lineHeight || 0.82,
+              background: color?.startsWith("linear-gradient")
+                ? color
+                : "linear-gradient(180deg, #070e08 0%, #0f1c12 36%, #1a301e 72%, #2c4e30 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              color: "transparent",
+              textAlign: "center",
+              userSelect: "none",
+              pointerEvents: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {text}
+          </div>
+        ))}
     </div>
   );
 };
