@@ -83,6 +83,8 @@ export default function SponsorStage() {
 
     const plate = stage.querySelector<HTMLElement>(".sxp-plate");
     const night = stage.querySelector<HTMLElement>(".sxp-night");
+    const frameEl = stage.querySelector<HTMLElement>(".sxp-frame");
+    const keyline = stage.querySelector<HTMLElement>(".sxp-keyline");
     const setP = (v: number) => stage.style.setProperty("--sxp-p", v.toFixed(4));
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -144,6 +146,51 @@ export default function SponsorStage() {
       // when it has not actually flipped, instead of writing it every frame.
       let bodyInteractive: boolean | null = null;
       let scrollUpInteractive: boolean | null = null;
+      // Same idea for the two backdrops: opacity changes every frame, but
+      // `visibility` flips twice in the whole pass.
+      let backdropHidden: boolean | null = null;
+      // The window geometry settles before the scrub does. Once the insets stop
+      // moving there is nothing to repaint, and re-writing clip-path anyway
+      // costs a raster of the whole stage.
+      let lastInv = -1;
+
+      /**
+       * The window geometry, resolved to pixels once per refresh.
+       *
+       * --sxp-p used to be written every frame and several descendants derived
+       * their insets, radius and opacity from it through calc(). That is a
+       * lovely single-source-of-truth on paper, and it measured 4.25ms per
+       * frame against a 0.02ms budget for writing the same values directly:
+       * a custom property read by descendant rules invalidates all of them,
+       * and style recalculation is exactly what a phone is slowest at.
+       *
+       * The clamp()/min() stay in the stylesheet (still one source of truth,
+       * and still what paints the closed state before this effect runs); a
+       * hidden probe asks the browser to resolve them to pixels, once, on
+       * refresh. Per frame this is now arithmetic plus two element writes.
+       */
+      let winW = 0;
+      let winH = 0;
+      let stageW = 0;
+      let stageH = 0;
+
+      const measure = () => {
+        const probe = document.createElement("div");
+        probe.style.cssText =
+          "position:absolute;left:0;top:0;visibility:hidden;pointer-events:none;" +
+          "width:var(--sxp-win-w);height:var(--sxp-win-h);";
+        stage.appendChild(probe);
+        const pr = probe.getBoundingClientRect();
+        winW = pr.width;
+        winH = pr.height;
+        probe.remove();
+        const sr = stage.getBoundingClientRect();
+        stageW = sr.width;
+        stageH = sr.height;
+        // New box, so the insets must be rewritten even at unchanged progress.
+        lastInv = -1;
+      };
+      measure();
 
       /** Sub-ranges of the pass, in progress units. */
       const WINDOW_END = 0.55;
@@ -157,20 +204,45 @@ export default function SponsorStage() {
 
         // The window opens and closes with symmetric quadratic curve.
         const p = easeWindow(clamp01(t / WINDOW_END));
-        setP(p);
+        const inv = 1 - p;
+        if (inv !== lastInv) {
+          lastInv = inv;
+          const iy = Math.max(0, (stageH - winH) / 2) * inv;
+          const ix = Math.max(0, (stageW - winW) / 2) * inv;
+          const r = 28 * inv;
+          const iyPx = iy + "px";
+          const ixPx = ix + "px";
+
+          if (frameEl) {
+            frameEl.style.clipPath =
+              "inset(" + iyPx + " " + ixPx + " " + iyPx + " " + ixPx + " round " + r + "px)";
+          }
+          if (keyline) {
+            const ks = keyline.style;
+            // One shorthand rather than four longhands: same box, a quarter of
+            // the style writes.
+            ks.inset = iyPx + " " + ixPx;
+            ks.borderRadius = r + "px";
+            ks.opacity = inv.toFixed(4);
+          }
+        }
 
         // Smooth bidirectional crossfade for the night field and local plate.
         // When opening, it gently reveals the sky. When closing (scrolling up),
         // it gracefully glides back into the dark night field without slamming to black.
         const op = Math.max(0, Math.min(1, (1 - p) * 2.8));
         const hide = t >= 0.75;
+        const flip = hide !== backdropHidden;
+        if (flip) backdropHidden = hide;
+        const vis = hide ? "hidden" : "visible";
+        const opStr = op.toFixed(4);
         if (plate) {
-          plate.style.opacity = op.toFixed(4);
-          plate.style.visibility = hide ? "hidden" : "visible";
+          plate.style.opacity = opStr;
+          if (flip) plate.style.visibility = vis;
         }
         if (night) {
-          night.style.opacity = op.toFixed(4);
-          night.style.visibility = hide ? "hidden" : "visible";
+          night.style.opacity = opStr;
+          if (flip) night.style.visibility = vis;
         }
 
         // The night-side labels step aside smoothly and return gracefully on close.
@@ -224,7 +296,10 @@ export default function SponsorStage() {
             fastScrollEnd: true,
             preventOverlaps: true,
             invalidateOnRefresh: true,
-            onRefresh: apply,
+            onRefresh: () => {
+              measure();
+              apply();
+            },
           },
         },
       );

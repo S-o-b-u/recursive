@@ -13,6 +13,11 @@ export const metadata: Metadata = {
     template: `%s | ${EVENT.name}`,
   },
   description: `${EVENT.name} is a ${EVENT.duration} hackathon inspired by the relationship between recursion and organic growth. ${EVENT.dates}. ${EVENT.format}.`,
+  icons: {
+    icon: "/images/R.png",
+    shortcut: "/images/R.png",
+    apple: "/images/R.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
