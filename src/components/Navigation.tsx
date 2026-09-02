@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { NAV_LINKS, EVENT } from "@/data/hackathon";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
@@ -52,19 +51,8 @@ export default function Navigation() {
             className="pointer-events-auto"
           >
             <div className="nav-glass-pill-layout">
-              {/* Brand mark — stylized R logo */}
+              {/* Brand mark */}
               <NavLink href="/" className="nav-brand" ariaLabel={`${EVENT.name} — home`}>
-                <span className="nav-logo-btn">
-                  <Image
-                    src="/images/R.png"
-                    alt={`${EVENT.name} logo`}
-                    width={24}
-                    height={24}
-                    className="nav-r-logo"
-                    style={{ width: "auto", height: "auto" }}
-                    priority
-                  />
-                </span>
                 <span className="nav-wordmark">{EVENT.name}</span>
               </NavLink>
 
@@ -346,7 +334,7 @@ export default function Navigation() {
           align-items: center;
           gap: 0.5rem;
           flex-shrink: 0;
-          padding: 0.35rem 0.65rem 0.35rem 0.55rem;
+          padding: 0.5rem 0.85rem;
         }
         .nav-wordmark {
           font-family: var(--font-hiruko), var(--font-display), sans-serif;
@@ -357,28 +345,10 @@ export default function Navigation() {
           color: var(--color-accent-deep);
           white-space: nowrap;
         }
-        .nav-logo-btn {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: auto;
-          height: auto;
-          background: transparent;
-          box-shadow: none;
-          transition: transform 200ms var(--ease-out);
-          flex-shrink: 0;
-        }
-        .nav-r-logo {
-          width: 1.45rem;
-          height: 1.45rem;
-          object-fit: contain;
-          display: block;
-        }
-        .nav-brand:hover .nav-logo-btn { transform: scale(1.08); }
-        .nav-brand:active .nav-logo-btn { transform: scale(0.94); }
 
         @media (max-width: 520px) {
-          .nav-wordmark { display: none; }
+          .nav-wordmark { font-size: 0.88rem; }
+          .nav-brand { padding: 0.45rem 0.65rem; }
         }
 
         .nav-desktop-links {

@@ -103,6 +103,7 @@ export default function IntroSequence() {
   const sceneRef = useRef<HTMLDivElement>(null);
   const mediaRef = useRef<HTMLDivElement>(null);
   const focusRef = useRef<HTMLDivElement>(null);
+  const rackRef = useRef<HTMLImageElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const gradeRef = useRef<HTMLDivElement>(null);
   const bloomRef = useRef<HTMLDivElement>(null);
@@ -230,6 +231,7 @@ export default function IntroSequence() {
     const scene = sceneRef.current;
     const media = mediaRef.current;
     const focus = focusRef.current;
+    const rack = rackRef.current;
     const grade = gradeRef.current;
     const bloom = bloomRef.current;
     const bar = barRef.current;
@@ -302,6 +304,21 @@ export default function IntroSequence() {
 
     const heroVideo = () =>
       document.querySelector<HTMLVideoElement>("video.hero-video");
+
+    // The hero mounts under the curtain and starts its own plate immediately,
+    // so for the whole cold-open the device is decoding two copies of the same
+    // 4K file -- and exactly one of them is on screen. The hidden one is pure
+    // contention for the frames the intro is trying to hit, and it is worst on
+    // the phones that can least afford it. Park it until warmHeroPlate wants it
+    // back; finish() and the skip path both restart it, so it cannot be
+    // stranded paused.
+    const suspendHeroPlate = () => {
+      const heroVid = heroVideo();
+      if (!heroVid) return;
+      try {
+        heroVid.pause();
+      } catch {}
+    };
 
     // Coarse warm-up: start the hero's plate playing and roughly aligned, a
     // second before the cut, so it is decoding and buffered by hand-off time.
@@ -387,6 +404,11 @@ export default function IntroSequence() {
       const isLite = liteMedia || prefersLiteMedia();
 
       tl.set(root, { autoAlpha: 1 });
+      // Not at effect time: <Hero> is a sibling whose mount effect calls play()
+      // on its own plate, and passive effects run after this layout effect, so
+      // a pause taken now is undone a tick later. The timeline does not start
+      // until the warm gate opens, which is comfortably after that.
+      tl.call(suspendHeroPlate, undefined, 0);
 
       if (isLite) {
         // GPU compositor only on mobile: scale & yPercent without heavy filter re-rasterization
@@ -413,13 +435,16 @@ export default function IntroSequence() {
           },
           0,
         );
-        // Focus rack on capable desktop only
-        tl.fromTo(
-          focus,
-          { filter: "blur(9px)" },
-          { filter: "blur(0px)", duration: 4.4, ease: "sine.out" },
-          0,
-        );
+        // Focus rack: cross-fade the pre-blurred still away rather than
+        // animating a blur radius. Compositor-only.
+        if (rack) {
+          tl.fromTo(
+            rack,
+            { opacity: 1 },
+            { opacity: 0, duration: 4.4, ease: "sine.out" },
+            0,
+          );
+        }
       }
 
       tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 6.9, ease: "sine.inOut" }, 0.3);
@@ -488,9 +513,15 @@ export default function IntroSequence() {
 
       // ── Hand-off ──────────────────────────────────────────────────────────
       // 1. Warm the hero's plate ~1s ahead (playing, roughly aligned, buffered).
-      if (!isLite) {
-        tl.call(warmHeroPlate, undefined, 6.6);
-      }
+      //    This used to be desktop-only, on the theory that a phone should not
+      //    run two decoders at once. But freezePlates still seeks the hero plate
+      //    at 7.4 on every device, and the dissolve starts uncovering it at
+      //    7.55: a cold seek on a phone does not land a decoded frame in 150ms,
+      //    so the crossfade revealed a stale or blank plate. The phone needs the
+      //    lead time more than the desktop does, not less -- and now that the
+      //    plate is parked for the first six seconds, this is the only stretch
+      //    where two decoders overlap at all.
+      tl.call(warmHeroPlate, undefined, 6.6);
 
       // 2. Last line eases out on its own (not yanked by the scene fade).
       const lastWords = lines[lines.length - 1].querySelectorAll<HTMLElement>(".intro-word");
@@ -524,7 +555,9 @@ export default function IntroSequence() {
       // here anyway, but this guarantees no residual transform can offset it
       // against the hero (that was the "not synced" double image).
       tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 7.4);
-      tl.set(focus, { clearProps: "filter" }, 7.4);
+      // Guarantee a perfectly sharp plate at the cut, whatever the rack tween
+      // resolved to.
+      if (rack) tl.set(rack, { opacity: 0 }, 7.4);
       tl.call(freezePlates, undefined, 7.4);
       tl.call(() => {
         if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
@@ -593,13 +626,18 @@ export default function IntroSequence() {
       const words = root.querySelectorAll<HTMLElement>(".intro-word");
       const wordInners = root.querySelectorAll<HTMLElement>(".intro-word-i");
       gsap.killTweensOf([scene, bloom, media, focus, grade, bar]);
+      if (rack) gsap.killTweensOf(rack);
       gsap.killTweensOf(words);
       gsap.killTweensOf(wordInners);
       gsap.set(wordInners, { clearProps: "transform,textShadow" });
 
-      if (!isLite) {
-        warmHeroPlate();
-      }
+      // Every device, now that the plate is parked at t=0: on lite this is what
+      // gets it moving again, and without it the skip would dissolve onto a
+      // frozen hero. (freezePlates stays desktop-only below -- the skip gives it
+      // only ~40ms before the dissolve, which is not enough for a phone to land
+      // a seek, and a slight drift between two copies of the same loop is a far
+      // smaller fault than a stalled plate.)
+      warmHeroPlate();
 
       // A compressed version of the real wind-down, not a hard cut: the text
       // drops away, the plate *eases* to its final framing + grade on sine
@@ -624,7 +662,7 @@ export default function IntroSequence() {
           },
           0,
         );
-        q.to(focus, { filter: "blur(0px)", duration: 0.5, ease: "sine.inOut" }, 0);
+        if (rack) q.to(rack, { opacity: 0, duration: 0.5, ease: "sine.inOut" }, 0);
       }
       q.to(grade, { opacity: 0, duration: 0.6, ease: "sine.inOut" }, 0.04);
       q.fromTo(
@@ -646,9 +684,9 @@ export default function IntroSequence() {
         0.4,
       );
       q.to(scene, { autoAlpha: 0, duration: 0.6, ease: "sine.inOut" }, 0.66);
-      if (!isLite) {
-        q.call(resumeHeroPlate, undefined, 1.02);
-      }
+      // No-ops when the plate is already running, so it is safe on the lite
+      // path where freezePlates never paused it.
+      q.call(resumeHeroPlate, undefined, 1.02);
       q.set(root, { pointerEvents: "none" }, 1.0);
       q.call(releaseScroll, undefined, 1.26);
       q.to(bloom, { opacity: 0, scale: 1.04, duration: 0.65, ease: "power1.inOut" }, 1.05);
@@ -665,6 +703,9 @@ export default function IntroSequence() {
       cancelAnimationFrame(lenisRaf);
       // If we unmount before the timeline releases scroll itself, undo the lock.
       if (lenisHooked && !doneRef.current) getLenis()?.start();
+      // Same reasoning for the parked hero plate: finish() restarts it on the
+      // normal routes, so this only covers an unmount that skipped them.
+      if (!doneRef.current) resumeHeroPlate();
       try {
         history.scrollRestoration = prevRestoration;
       } catch {}
@@ -705,6 +746,15 @@ export default function IntroSequence() {
                 playsInline
                 preload="auto"
                 aria-hidden="true"
+              />
+              {/* The focus rack, pre-blurred. See .intro-rack. */}
+              <img
+                ref={rackRef}
+                className="intro-rack"
+                src="/images/hero_poster.jpg"
+                alt=""
+                aria-hidden="true"
+                draggable={false}
               />
             </div>
           </div>
@@ -787,12 +837,37 @@ export default function IntroSequence() {
           will-change: transform, filter;
           backface-visibility: hidden;
         }
-        /* Separate layer so the focus-rack blur tween never fights the climb's
-           transform + colour-grade tween on .intro-media. */
+        /* Separate layer so the focus rack never fights the climb's transform +
+           colour-grade tween on .intro-media. */
         .intro-focus {
           position: absolute;
           inset: 0;
-          will-change: filter;
+        }
+
+        /* The focus rack used to be a blur radius animated from 9px to 0px
+           over 4.4s on .intro-focus. A full-viewport gaussian re-rasterises the
+           entire plate on every frame at a radius that changes on every frame,
+           which is the most expensive thing in the whole cold-open -- and it
+           overlaps the first three story lines, so it lands exactly where the
+           intro can least afford it. (The lite branch already avoided it for
+           precisely this reason; the problem is that "not lite" includes every
+           weak laptop.)
+           Same picture, none of the cost: stack a pre-blurred still on top and
+           cross-fade it out. The blur is rasterised once, and opacity is a
+           compositor property, so the rack is now free per frame.
+           It lives inside .intro-focus (so inside .intro-media) deliberately --
+           that way it inherits the identical climb transform and colour grade,
+           and cannot drift against the video underneath it. scale() hides the
+           transparent edge the blur samples in from outside the box. */
+        .intro-rack {
+          filter: blur(9px);
+          transform: scale(1.06);
+          will-change: opacity;
+          pointer-events: none;
+          /* Hidden by default: only the non-lite branch builds the rack tween,
+             and its fromTo raises this to 1 before the first paint. On lite
+             there is no rack at all, and this stays 0. */
+          opacity: 0;
         }
         .intro-media video,
         .intro-media img {
