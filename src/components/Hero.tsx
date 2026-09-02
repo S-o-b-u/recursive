@@ -23,28 +23,54 @@ export default function Hero() {
   const [useVideo, setUseVideo] = useState(true);
   useEffect(() => {
     const video = videoRef.current;
-    if (video) {
-      video.muted = true;
-      video.defaultMuted = true;
-      video.playsInline = true;
-      video.setAttribute("playsinline", "");
-      video.setAttribute("webkit-playsinline", "");
-      video.setAttribute("muted", "");
+    if (!video) return;
+
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+    video.setAttribute("muted", "");
+
+    const playHero = () => {
       video.play().catch(() => {});
-      if (typeof IntersectionObserver !== "undefined") {
-        const io = new IntersectionObserver((entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              video.play().catch(() => {});
-            } else {
-              video.pause();
-            }
-          }
-        }, { threshold: 0.05 });
-        io.observe(video);
-        return () => io.disconnect();
-      }
+    };
+
+    const isIntroPlaying =
+      typeof document !== "undefined" &&
+      document.documentElement.dataset.intro === "playing";
+
+    if (isIntroPlaying) {
+      window.addEventListener("recursive-intro-done", playHero, { once: true });
+    } else {
+      playHero();
     }
+
+    if (typeof IntersectionObserver !== "undefined") {
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            if (
+              typeof document === "undefined" ||
+              document.documentElement.dataset.intro === "done"
+            ) {
+              video.play().catch(() => {});
+            }
+          } else {
+            video.pause();
+          }
+        }
+      }, { threshold: 0.05 });
+      io.observe(video);
+      return () => {
+        window.removeEventListener("recursive-intro-done", playHero);
+        io.disconnect();
+      };
+    }
+
+    return () => {
+      window.removeEventListener("recursive-intro-done", playHero);
+    };
   }, []);
 
   const [introFinished, setIntroFinished] = useState(() => {
@@ -130,7 +156,7 @@ export default function Hero() {
             className="hero-video"
             src="/bg/hero_bg.mp4"
             poster="/images/hero_poster.jpg"
-            autoPlay
+            autoPlay={false}
             loop
             muted
             playsInline
@@ -240,7 +266,12 @@ export default function Hero() {
       </div>
 
       {/* ── Simple Clean Chair Annotation (No Box, No Glow) ── */}
-      <div className="hero-chair-annotation">
+      <motion.div
+        className="hero-chair-annotation"
+        initial={reduced ? false : { opacity: 0 }}
+        animate={introFinished ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.6, delay: 0.12, ease: EASE_OUT }}
+      >
         <svg
           className="chair-arrow"
           width="96"
@@ -271,7 +302,7 @@ export default function Hero() {
           </p>
           <span className="chair-sub" style={{ color: "#000000", WebkitTextFillColor: "#000000", opacity: 1, textShadow: "none" }}>scroll for lore ↓</span>
         </a>
-      </div>
+      </motion.div>
 
       <style href="hero-style" precedence="default" suppressHydrationWarning>{`
         .hero {
@@ -733,19 +764,48 @@ export default function Hero() {
             width: 100vw;
           }
           .hero-chair-annotation {
-            left: calc(50% + 32px);
+            left: calc(50% + 28px);
             top: 51.5%;
+            gap: 0.28rem;
+            max-width: 42vw;
           }
           .chair-arrow {
-            width: 30px;
-            height: 24px;
+            width: 26px;
+            height: 20px;
+          }
+          .chair-arrow path {
+            stroke-width: 5;
           }
           .chair-text {
-            font-size: 0.58rem !important;
-            line-height: 1.18 !important;
+            font-size: 0.52rem !important;
+            line-height: 1.15 !important;
           }
           .chair-sub {
-            font-size: 0.48rem !important;
+            font-size: 0.42rem !important;
+          }
+        }
+
+        /* Specifically tailored for 6.0" and 6.1" phones (iPhone 12/13/14/15/16 at 390px/393px, Pixel, Galaxy) */
+        @media (max-width: 420px) {
+          .hero-chair-annotation {
+            left: calc(50% + 25px);
+            top: 51.5%;
+            gap: 0.25rem;
+            max-width: 42vw;
+          }
+          .chair-arrow {
+            width: 23px;
+            height: 18px;
+          }
+          .chair-arrow path {
+            stroke-width: 4.8;
+          }
+          .chair-text {
+            font-size: 0.49rem !important;
+            line-height: 1.14 !important;
+          }
+          .chair-sub {
+            font-size: 0.39rem !important;
           }
         }
       `}</style>

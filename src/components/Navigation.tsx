@@ -192,7 +192,7 @@ export default function Navigation() {
                 { label: "Tracks", href: "/tracks", locked: true },
                 { label: "Schedule", href: "/schedule", locked: true },
                 { label: "Prizes", href: "/prizes", locked: true },
-                { label: "FAQ", href: "/faq", locked: true },
+                { label: "FAQ", href: "/#faq" },
               ].map((item, idx) =>
                 item.locked ? (
                   <motion.div
@@ -339,16 +339,16 @@ export default function Navigation() {
         .nav-wordmark {
           font-family: var(--font-hiruko), var(--font-display), sans-serif;
           font-weight: 900;
-          font-size: 0.98rem;
-          letter-spacing: -0.025em;
+          font-size: 1.18rem;
+          letter-spacing: -0.02em;
           text-transform: uppercase;
           color: var(--color-accent-deep);
           white-space: nowrap;
         }
 
         @media (max-width: 520px) {
-          .nav-wordmark { font-size: 0.88rem; }
-          .nav-brand { padding: 0.45rem 0.65rem; }
+          .nav-wordmark { font-size: 1.05rem; }
+          .nav-brand { padding: 0.45rem 0.75rem; }
         }
 
         .nav-desktop-links {

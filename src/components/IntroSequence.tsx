@@ -93,9 +93,6 @@ const SCROLL_KEYS = new Set([
 
 export default function IntroSequence() {
   const [phase, setPhase] = useState<"pending" | "playing" | "done">("pending");
-  // Shader-backed skip button + the backdrop-filter ramp are mounted a beat
-  // late so their compositing cost never lands on the opening frames.
-  const [showChrome, setShowChrome] = useState(false);
   // Video plate enabled on all devices so grass animates during intro
   const [liteMedia, setLiteMedia] = useState(false);
 
@@ -103,11 +100,11 @@ export default function IntroSequence() {
   const sceneRef = useRef<HTMLDivElement>(null);
   const mediaRef = useRef<HTMLDivElement>(null);
   const focusRef = useRef<HTMLDivElement>(null);
-  const rackRef = useRef<HTMLImageElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const gradeRef = useRef<HTMLDivElement>(null);
   const bloomRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
+  const skipRef = useRef<HTMLDivElement>(null);
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const bailRef = useRef<(() => void) | null>(null);
@@ -172,12 +169,12 @@ export default function IntroSequence() {
       setPhase("done");
       // Give the compositor a frame to settle after the subtree goes before
       // asking every trigger to re-measure.
-      if (typeof ric === "function") ric(refreshTriggers, { timeout: 1200 });
-      else window.setTimeout(refreshTriggers, 260);
+      if (typeof ric === "function") ric(refreshTriggers, { timeout: 1500 });
+      else window.setTimeout(refreshTriggers, 600);
     };
 
-    if (typeof ric === "function") ric(unmount, { timeout: 900 });
-    else window.setTimeout(unmount, 60);
+    if (typeof ric === "function") ric(unmount, { timeout: 1200 });
+    else window.setTimeout(unmount, 500);
   }, []);
 
   const skip = useCallback(() => {
@@ -231,10 +228,10 @@ export default function IntroSequence() {
     const scene = sceneRef.current;
     const media = mediaRef.current;
     const focus = focusRef.current;
-    const rack = rackRef.current;
     const grade = gradeRef.current;
     const bloom = bloomRef.current;
     const bar = barRef.current;
+    const skipWrap = skipRef.current;
     const lines = lineRefs.current.filter(Boolean) as HTMLDivElement[];
     if (!root || !scene || !media || !focus || !grade || !bloom || !bar) return;
 
@@ -251,6 +248,7 @@ export default function IntroSequence() {
     window.scrollTo(0, 0);
 
     const introVid = videoRef.current;
+    let cleanupVidListeners: (() => void) | null = null;
     if (introVid) {
       introVid.muted = true;
       introVid.defaultMuted = true;
@@ -258,8 +256,63 @@ export default function IntroSequence() {
       introVid.setAttribute("playsinline", "");
       introVid.setAttribute("webkit-playsinline", "");
       introVid.setAttribute("muted", "");
-      introVid.play().catch(() => {});
+
+      const ensurePlaying = () => {
+        if (introVid.paused && !doneRef.current) {
+          introVid.play().catch(() => {});
+        }
+      };
+
+      introVid.addEventListener("waiting", ensurePlaying);
+      introVid.addEventListener("stalled", ensurePlaying);
+      const onPause = () => {
+        if (!doneRef.current) {
+          ensurePlaying();
+        }
+      };
+      introVid.addEventListener("pause", onPause);
+
+      // Handle seamless video loop without freeze on mobile
+      let looping = false;
+      const onTimeUpdate = () => {
+        if (looping) return;
+        if (introVid.duration && Number.isFinite(introVid.duration)) {
+          if (introVid.currentTime >= introVid.duration - 0.35) {
+            looping = true;
+            introVid.currentTime = 0;
+            ensurePlaying();
+            window.setTimeout(() => {
+              looping = false;
+            }, 300);
+          }
+        }
+      };
+      introVid.addEventListener("timeupdate", onTimeUpdate);
+      introVid.addEventListener("seeked", ensurePlaying);
+      const onEnded = () => {
+        introVid.currentTime = 0;
+        ensurePlaying();
+      };
+      introVid.addEventListener("ended", onEnded);
+
+      ensurePlaying();
+
+      cleanupVidListeners = () => {
+        introVid.removeEventListener("waiting", ensurePlaying);
+        introVid.removeEventListener("stalled", ensurePlaying);
+        introVid.removeEventListener("pause", onPause);
+        introVid.removeEventListener("timeupdate", onTimeUpdate);
+        introVid.removeEventListener("seeked", ensurePlaying);
+        introVid.removeEventListener("ended", onEnded);
+      };
     }
+
+    const onTouchKick = () => {
+      if (videoRef.current && videoRef.current.paused && !doneRef.current) {
+        videoRef.current.play().catch(() => {});
+      }
+    };
+    window.addEventListener("touchstart", onTouchKick, { passive: true });
 
     // Hold the scroll through Lenis. <SmoothScroll> mounts after this layout
     // effect, so the instance can be a frame or two late — retry briefly.
@@ -320,51 +373,27 @@ export default function IntroSequence() {
       } catch {}
     };
 
-    // Coarse warm-up: start the hero's plate playing and roughly aligned, a
-    // second before the cut, so it is decoding and buffered by hand-off time.
+    const isMobileDevice = isTouch || liteMedia || prefersLiteMedia();
+
+    // Coarse warm-up: start the hero's plate playing and roughly aligned on desktop.
+    // On mobile / touch devices, do not spin up the second video early —
+    // iOS WebKit will pause the active intro video if a second video starts playing!
     const warmHeroPlate = () => {
-      const introVid = videoRef.current;
+      if (isMobileDevice) return;
       const heroVid = heroVideo();
-      if (!introVid || !heroVid) return;
+      if (!heroVid) return;
       try {
-        const dur = heroVid.duration || introVid.duration;
-        if (dur && Number.isFinite(dur) && introVid.readyState >= 2) {
-          heroVid.currentTime = introVid.currentTime % dur;
-        }
         const p = heroVid.play();
         if (p && typeof p.catch === "function") p.catch(() => {});
       } catch {}
     };
 
-    // The actual fix for the desync: two independent <video>s of the same file
-    // drift ~0.2s apart over the second between warm-up and the crossfade (and
-    // one may loop mid-dissolve). So just before the scene fades, freeze BOTH
-    // on the exact same frame — a paused pair cannot drift or shimmer. The seek
-    // is invisible because the scene is still fully opaque. finish() resumes
-    // the hero plate once the dissolve is done.
-    const freezePlates = () => {
-      const introVid = videoRef.current;
-      const heroVid = heroVideo();
-      if (!introVid || !heroVid) return;
-      try {
-        const dur = heroVid.duration || introVid.duration;
-        const t =
-          dur && Number.isFinite(dur) ? introVid.currentTime % dur : introVid.currentTime;
-        introVid.pause();
-        heroVid.pause();
-        if (heroVid.readyState >= 1) heroVid.currentTime = t;
-      } catch {}
-    };
 
-    // Both plates are paused on the same frame for the crossfade. The hero's
-    // needs to be moving again by the time it is the only one on screen --
-    // finish() used to do that, but it does not run until the bloom has fully
-    // receded, which left the grass frozen for two thirds of a second right
-    // after the reveal. Restarting the plate is separable from releasing
-    // scroll, so it happens under the tail of the dissolve instead.
+
+    // Resumes the hero's plate under the dissolve.
     const resumeHeroPlate = () => {
       const heroVid = heroVideo();
-      if (!heroVid || !heroVid.paused) return;
+      if (!heroVid) return;
       try {
         const p = heroVid.play();
         if (p && typeof p.catch === "function") p.catch(() => {});
@@ -410,42 +439,25 @@ export default function IntroSequence() {
       // until the warm gate opens, which is comfortably after that.
       tl.call(suspendHeroPlate, undefined, 0);
 
-      if (isLite) {
-        // GPU compositor only on mobile: scale & yPercent without heavy filter re-rasterization
-        tl.fromTo(
-          media,
-          { scale: 1.12, yPercent: -5 },
-          { scale: 1, yPercent: 0, duration: 7.4, ease: "sine.inOut" },
-          0,
-        );
-      } else {
-        tl.fromTo(
-          media,
-          {
-            scale: 1.13,
-            yPercent: -6,
-            filter: "brightness(0.46) saturate(0.74) contrast(1.04)",
-          },
-          {
-            scale: 1,
-            yPercent: 0,
-            filter: "brightness(1) saturate(1) contrast(1)",
-            duration: 7.4,
-            ease: "sine.inOut",
-          },
-          0,
-        );
-        // Focus rack: cross-fade the pre-blurred still away rather than
-        // animating a blur radius. Compositor-only.
-        if (rack) {
-          tl.fromTo(
-            rack,
-            { opacity: 1 },
-            { opacity: 0, duration: 4.4, ease: "sine.out" },
-            0,
-          );
-        }
-      }
+      const isWideScreen = typeof window !== "undefined" && window.innerWidth >= 768;
+      // On desktop, tablet, and widescreen devices, scale at 1.07 and yPercent at -3.2%
+      // so the hill crest and plastic chair fit naturally in frame without aggressive cropping.
+      const initialScale = isWideScreen ? 1.07 : 1.12;
+      const initialYPercent = isWideScreen ? -3.2 : -5;
+
+      // Pin media to starting transform immediately before paint — eliminates 1s jump
+      gsap.set(media, {
+        scale: initialScale,
+        yPercent: initialYPercent,
+        transformOrigin: "center center",
+        force3D: true,
+      });
+
+      tl.to(
+        media,
+        { scale: 1, yPercent: 0, duration: 7.55, ease: "power1.inOut" },
+        0,
+      );
 
       tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 6.9, ease: "sine.inOut" }, 0.3);
       tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 7.0, ease: "none" }, 0);
@@ -454,216 +466,150 @@ export default function IntroSequence() {
         const [tin, tout] = CUES[i];
         const words = el.querySelectorAll<HTMLElement>(".intro-word");
 
-        if (isLite) {
-          tl.fromTo(
+        tl.fromTo(
+          words,
+          { opacity: 0, y: 16, scale: 0.97 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.62,
+            ease: "power3.out",
+            stagger: 0.036,
+          },
+          tin,
+        );
+        if (i < lines.length - 1) {
+          tl.to(
             words,
-            { opacity: 0, yPercent: 22 },
             {
-              opacity: 1,
-              yPercent: 0,
-              duration: 0.62,
-              ease: "power2.out",
-              stagger: 0.045,
+              opacity: 0,
+              y: -12,
+              duration: 0.34,
+              ease: "power2.in",
+              stagger: 0.018,
             },
-            tin,
+            tout,
           );
-          if (i < lines.length - 1) {
-            tl.to(
-              words,
-              {
-                opacity: 0,
-                yPercent: -14,
-                duration: 0.36,
-                ease: "power1.in",
-                stagger: 0.02,
-              },
-              tout,
-            );
-          }
-        } else {
-          tl.fromTo(
-            words,
-            { opacity: 0, yPercent: 26, filter: "blur(5px)" },
-            {
-              opacity: 1,
-              yPercent: 0,
-              filter: "blur(0px)",
-              duration: 0.62,
-              ease: "power2.out",
-              stagger: 0.05,
-            },
-            tin,
-          );
-          if (i < lines.length - 1) {
-            tl.to(
-              words,
-              {
-                opacity: 0,
-                yPercent: -16,
-                filter: "blur(4px)",
-                duration: 0.36,
-                ease: "power1.in",
-                stagger: 0.022,
-              },
-              tout,
-            );
-          }
         }
       });
 
-      // ── Hand-off ──────────────────────────────────────────────────────────
-      // 1. Warm the hero's plate ~1s ahead (playing, roughly aligned, buffered).
-      //    This used to be desktop-only, on the theory that a phone should not
-      //    run two decoders at once. But freezePlates still seeks the hero plate
-      //    at 7.4 on every device, and the dissolve starts uncovering it at
-      //    7.55: a cold seek on a phone does not land a decoded frame in 150ms,
-      //    so the crossfade revealed a stale or blank plate. The phone needs the
-      //    lead time more than the desktop does, not less -- and now that the
-      //    plate is parked for the first six seconds, this is the only stretch
-      //    where two decoders overlap at all.
-      tl.call(warmHeroPlate, undefined, 6.6);
-
-      // 2. Last line eases out on its own (not yanked by the scene fade).
-      const lastWords = lines[lines.length - 1].querySelectorAll<HTMLElement>(".intro-word");
-      if (isLite) {
-        tl.to(
-          lastWords,
-          { opacity: 0, yPercent: -14, duration: 0.8, ease: "sine.inOut", stagger: 0.035 },
-          7.15,
+      if (skipWrap) {
+        // Smoothly fade in at 1.0s
+        tl.fromTo(
+          skipWrap,
+          { opacity: 0, y: 10, pointerEvents: "none" },
+          { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", pointerEvents: "auto" },
+          1.0,
         );
-      } else {
+        // Cleanly dismiss BEFORE hero page transition so it never lingers after transition
         tl.to(
-          lastWords,
-          { opacity: 0, yPercent: -14, filter: "blur(6px)", duration: 0.8, ease: "sine.inOut", stagger: 0.04 },
-          7.15,
+          skipWrap,
+          { opacity: 0, y: 8, duration: 0.35, ease: "power2.in", pointerEvents: "none" },
+          6.7,
         );
       }
+
+      // ── Hand-off ──────────────────────────────────────────────────────────
+      if (!isMobileDevice) {
+        tl.call(warmHeroPlate, undefined, 6.6);
+      }
+
+      // 2. Last line eases out on its own with soft deceleration
+      const lastWords = lines[lines.length - 1].querySelectorAll<HTMLElement>(".intro-word");
+      tl.to(
+        lastWords,
+        { opacity: 0, y: -12, scale: 0.98, duration: 0.58, ease: "power2.inOut", stagger: 0.024 },
+        7.15,
+      );
 
       // 3. A soft dawn glow rises from the hill line — masks the seam, then recedes.
       tl.fromTo(
         bloom,
-        { opacity: 0, scale: 1.12 },
-        { opacity: 1, scale: 1, duration: 1.0, ease: "sine.inOut" },
+        { opacity: 0, scale: 1.08 },
+        { opacity: isMobileDevice ? 0.7 : 1, scale: 1, duration: 0.85, ease: "power1.inOut" },
         7.25,
       );
 
-      // 4. Freeze BOTH plates on the same frame, then dissolve between them —
-      //    two paused videos cannot drift, so the grass does not shimmer. The
-      //    0.15s gap lets the hero settle on the seeked frame behind the still-
-      //    opaque scene. finish() resumes the hero plate.
-      // Pin the plate to exact identity before the crossfade — the climb ends
-      // here anyway, but this guarantees no residual transform can offset it
-      // against the hero (that was the "not synced" double image).
-      tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 7.4);
-      // Guarantee a perfectly sharp plate at the cut, whatever the rack tween
-      // resolved to.
-      if (rack) tl.set(rack, { opacity: 0 }, 7.4);
-      tl.call(freezePlates, undefined, 7.4);
+      // Pin the plate to exact identity at the dissolve start without micro-snap
+      tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 7.55);
+
+      // Hand off to Hero: signal at 7.4s so Hero starts playing smoothly right before the dissolve
+      const handoffTime = isMobileDevice ? 7.4 : 7.25;
       tl.call(() => {
         if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
         if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("recursive-intro-done"));
-      }, undefined, 7.25);
-      tl.to(scene, { autoAlpha: 0, duration: 0.9, ease: "sine.inOut" }, 7.55);
-      tl.call(resumeHeroPlate, undefined, 8.05);
-      tl.set(root, { pointerEvents: "none" }, 7.9);
-      tl.call(releaseScroll, undefined, 8.45);
+      }, undefined, handoffTime);
+
+      const dissolveDuration = isMobileDevice ? 0.65 : 0.85;
+      tl.to(scene, { autoAlpha: 0, duration: dissolveDuration, ease: "power1.inOut" }, 7.55);
+
+      // Once scene is fully transparent, ensure hero is playing and release introVid
+      tl.call(() => {
+        if (isMobileDevice && introVid) {
+          try {
+            introVid.pause();
+          } catch {}
+        }
+        resumeHeroPlate();
+      }, undefined, 7.55 + dissolveDuration + 0.1);
+
+      tl.set(root, { pointerEvents: "none" }, 7.8);
+      tl.call(releaseScroll, undefined, 8.3);
 
       // 5. Glow recedes over the settled landing page.
-      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 1.15, ease: "power1.inOut" }, 7.95);
+      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 0.9, ease: "power1.inOut" }, 7.55 + dissolveDuration);
     }, root);
 
     const tl = tlRef.current!;
 
-    // ── Warm start ─────────────────────────────────────────────────────────
-    // Hold the (paused) timeline until fonts, the first decoded video frame and
-    // a couple of composited frames have settled — otherwise the opening beat
-    // lands mid-decode / mid-font-swap and stutters on a cold reload.
+    // ── Synchronous start: video and timeline start in exact lockstep from frame 0 ──
     let started = false;
-    let warmTimer = 0;
+    const vid = videoRef.current;
     const startNow = () => {
       if (started || doneRef.current) return;
       started = true;
-      window.clearTimeout(warmTimer);
-      if (videoRef.current) {
-        videoRef.current.play().catch(() => {});
+      if (vid) {
+        try {
+          vid.currentTime = 0;
+        } catch {}
+        const p = vid.play();
+        if (p && typeof p.catch === "function") p.catch(() => {});
       }
       tl.play(0);
     };
-    const warmWaits: Promise<unknown>[] = [];
-    const vid = videoRef.current;
-    if (vid && vid.readyState < 2) {
-      warmWaits.push(
-        new Promise<void>((resolve) => {
-          const onData = () => {
-            vid.removeEventListener("loadeddata", onData);
-            resolve();
-          };
-          vid.addEventListener("loadeddata", onData);
-        }),
-      );
-    }
-    if (document.fonts?.ready) warmWaits.push(document.fonts.ready);
-    warmTimer = window.setTimeout(startNow, 340); // hard cap so it always runs
-    Promise.all(warmWaits).then(() => {
-      requestAnimationFrame(() => requestAnimationFrame(startNow));
-    });
 
-    // Chrome (shader skip button + backdrop-filter ramp) mounts a beat late.
-    const chromeTimer = window.setTimeout(() => setShowChrome(true), 700);
+    const startRaf = requestAnimationFrame(startNow);
 
     // ── Graceful skip ─────────────────────────────────────────────────────
-    // Not a whole-timeline scrub. Freeze where we are, match the hero plate,
-    // and run a short version of the real hand-off: a touch of glow, dissolve.
     let bailing = false;
     bailRef.current = () => {
       if (bailing || doneRef.current) return;
       bailing = true;
       started = true;
-      window.clearTimeout(warmTimer);
+      cancelAnimationFrame(startRaf);
       tl.pause();
 
-      const isLite = liteMedia || prefersLiteMedia();
       const words = root.querySelectorAll<HTMLElement>(".intro-word");
       const wordInners = root.querySelectorAll<HTMLElement>(".intro-word-i");
       gsap.killTweensOf([scene, bloom, media, focus, grade, bar]);
-      if (rack) gsap.killTweensOf(rack);
+      if (skipWrap) gsap.killTweensOf(skipWrap);
       gsap.killTweensOf(words);
       gsap.killTweensOf(wordInners);
       gsap.set(wordInners, { clearProps: "transform,textShadow" });
 
-      // Every device, now that the plate is parked at t=0: on lite this is what
-      // gets it moving again, and without it the skip would dissolve onto a
-      // frozen hero. (freezePlates stays desktop-only below -- the skip gives it
-      // only ~40ms before the dissolve, which is not enough for a phone to land
-      // a seek, and a slight drift between two copies of the same loop is a far
-      // smaller fault than a stalled plate.)
       warmHeroPlate();
 
-      // A compressed version of the real wind-down, not a hard cut: the text
-      // drops away, the plate *eases* to its final framing + grade on sine
-      // (never a lurch), the dawn glow rises over the tail of that settle, and
-      // the scene dissolves into the hero.
       const q = gsap.timeline({ onComplete: finish });
-      if (isLite) {
-        q.to(words, { autoAlpha: 0, yPercent: -14, duration: 0.28, ease: "power2.in" }, 0);
-        q.to(
-          media,
-          { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0, duration: 0.6, ease: "sine.inOut" },
-          0,
-        );
-      } else {
-        q.to(words, { autoAlpha: 0, yPercent: -16, filter: "blur(6px)", duration: 0.28, ease: "power2.in" }, 0);
-        q.to(
-          media,
-          {
-            xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0,
-            filter: "brightness(1) saturate(1) contrast(1)",
-            duration: 0.6, ease: "sine.inOut",
-          },
-          0,
-        );
-        if (rack) q.to(rack, { opacity: 0, duration: 0.5, ease: "sine.inOut" }, 0);
+      if (skipWrap) {
+        q.to(skipWrap, { opacity: 0, scale: 0.9, y: 6, duration: 0.22, ease: "power2.in", pointerEvents: "none" }, 0);
       }
+      q.to(words, { autoAlpha: 0, yPercent: -14, duration: 0.28, ease: "power2.in" }, 0);
+      q.to(
+        media,
+        { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0, duration: 0.6, ease: "sine.inOut" },
+        0,
+      );
       q.to(grade, { opacity: 0, duration: 0.6, ease: "sine.inOut" }, 0.04);
       q.fromTo(
         bloom,
@@ -671,9 +617,6 @@ export default function IntroSequence() {
         { opacity: 0.9, scale: 1, duration: 0.5, ease: "sine.out" },
         0.3,
       );
-      if (!isLite) {
-        q.call(freezePlates, undefined, 0.62);
-      }
       q.call(
         () => {
           if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
@@ -693,8 +636,7 @@ export default function IntroSequence() {
     };
 
     return () => {
-      window.clearTimeout(warmTimer);
-      window.clearTimeout(chromeTimer);
+      cancelAnimationFrame(startRaf);
       bailRef.current = null;
       root.removeEventListener("wheel", block);
       root.removeEventListener("touchmove", block);
@@ -716,9 +658,9 @@ export default function IntroSequence() {
 
   if (phase === "done") return null;
 
-  // "pending" (SSR + first client paint, before pass 1 decides): a bare dark
-  // plate over the whole viewport. Same colour as .intro-scene, so if the intro
-  // does play the swap is invisible; if it turns out to be skipped this is at
+  // Pass 1: decide. In this render, phase is "pending". We render an opaque
+  // dark backing plate so the document never paints a frame of the hero before
+  // Pass 1 runs. Because the intro covers the whole viewport, this renders at
   // most one dark frame before the hero — never the bright chair flash that a
   // `return null` here produced.
   if (phase === "pending") {
@@ -740,21 +682,12 @@ export default function IntroSequence() {
                 ref={videoRef}
                 src="/bg/hero_bg.mp4"
                 poster="/images/hero_poster.jpg"
-                autoPlay
+                autoPlay={false}
                 loop
                 muted
                 playsInline
                 preload="auto"
                 aria-hidden="true"
-              />
-              {/* The focus rack, pre-blurred. See .intro-rack. */}
-              <img
-                ref={rackRef}
-                className="intro-rack"
-                src="/images/hero_poster.jpg"
-                alt=""
-                aria-hidden="true"
-                draggable={false}
               />
             </div>
           </div>
@@ -791,11 +724,9 @@ export default function IntroSequence() {
           <div ref={barRef} className="intro-progress-fill" />
         </div>
 
-        {showChrome && (
-          <div className="intro-skip-wrap">
-            <LiquidMetalButton label="Skip intro" onClick={skip} width={128} height={40} />
-          </div>
-        )}
+        <div ref={skipRef} className="intro-skip-wrap">
+          <LiquidMetalButton label="Skip intro" onClick={skip} width={128} height={40} />
+        </div>
       </div>
 
       <div ref={bloomRef} className="intro-bloom" aria-hidden="true" />
@@ -834,7 +765,9 @@ export default function IntroSequence() {
         .intro-media {
           position: absolute;
           inset: 0;
-          will-change: transform, filter;
+          will-change: transform;
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
           backface-visibility: hidden;
         }
         /* Separate layer so the focus rack never fights the climb's transform +
@@ -844,31 +777,7 @@ export default function IntroSequence() {
           inset: 0;
         }
 
-        /* The focus rack used to be a blur radius animated from 9px to 0px
-           over 4.4s on .intro-focus. A full-viewport gaussian re-rasterises the
-           entire plate on every frame at a radius that changes on every frame,
-           which is the most expensive thing in the whole cold-open -- and it
-           overlaps the first three story lines, so it lands exactly where the
-           intro can least afford it. (The lite branch already avoided it for
-           precisely this reason; the problem is that "not lite" includes every
-           weak laptop.)
-           Same picture, none of the cost: stack a pre-blurred still on top and
-           cross-fade it out. The blur is rasterised once, and opacity is a
-           compositor property, so the rack is now free per frame.
-           It lives inside .intro-focus (so inside .intro-media) deliberately --
-           that way it inherits the identical climb transform and colour grade,
-           and cannot drift against the video underneath it. scale() hides the
-           transparent edge the blur samples in from outside the box. */
-        .intro-rack {
-          filter: blur(9px);
-          transform: scale(1.06);
-          will-change: opacity;
-          pointer-events: none;
-          /* Hidden by default: only the non-lite branch builds the rack tween,
-             and its fromTo raises this to 1 before the first paint. On lite
-             there is no rack at all, and this stays 0. */
-          opacity: 0;
-        }
+
         .intro-media video,
         .intro-media img {
           position: absolute;
@@ -878,6 +787,10 @@ export default function IntroSequence() {
           object-fit: cover;
           /* Must match Hero's .hero-video so the frame-synced hand-off aligns. */
           object-position: center center;
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
         }
 
         /* Dark from above — you're at the bottom, looking up the hill. */
@@ -897,6 +810,9 @@ export default function IntroSequence() {
           opacity: 0;
           pointer-events: none;
           mix-blend-mode: screen;
+          will-change: opacity, transform;
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
           background:
             radial-gradient(72% 46% at 50% 74%,
               rgba(255, 244, 214, 0.55) 0%,
@@ -904,6 +820,16 @@ export default function IntroSequence() {
               rgba(214, 230, 196, 0.08) 58%,
               rgba(214, 230, 196, 0) 78%),
             linear-gradient(0deg, rgba(255, 240, 208, 0.14) 0%, rgba(255, 240, 208, 0) 42%);
+        }
+
+        @media (max-width: 860px), (pointer: coarse) {
+          .intro-bloom {
+            mix-blend-mode: normal !important;
+            background: radial-gradient(72% 46% at 50% 74%,
+              rgba(255, 244, 214, 0.42) 0%,
+              rgba(252, 236, 198, 0.22) 30%,
+              rgba(214, 230, 196, 0) 65%) !important;
+          }
         }
 
         .intro-captions {
@@ -915,40 +841,95 @@ export default function IntroSequence() {
         .intro-line {
           position: absolute;
           inset: 0;
-          display: grid;
-          place-items: center;
-          padding: 0 7vw;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 clamp(1.5rem, 6vw, 6rem);
+          padding-bottom: clamp(1.5rem, 5vh, 4rem);
         }
 
         .intro-line-text {
           margin: 0;
-          max-width: 20ch;
+          width: 100%;
+          max-width: clamp(22ch, 75vw, 36ch);
           text-align: center;
           font-family: var(--font-display), var(--font-dm-sans), sans-serif;
           font-weight: 700;
-          font-size: clamp(1.7rem, 5.4vw, 3.4rem);
-          line-height: 1.12;
-          letter-spacing: -0.03em;
+          font-size: clamp(1.8rem, 4.2vw, 3.6rem);
+          line-height: 1.15;
+          letter-spacing: -0.025em;
           color: #eef3e8;
-          text-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
+          text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
         }
 
         .intro-word {
           display: inline-block;
           margin: 0 0.24em 0.12em 0;
           opacity: 0;
+          will-change: transform, opacity;
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
+          backface-visibility: hidden;
         }
         .intro-word-i {
           display: inline-block;
+          transform: translateZ(0);
         }
         .intro-word.is-accent .intro-word-i {
           color: #a6e06a;
           text-shadow: 0 0 16px rgba(143, 196, 90, 0.45);
         }
 
-        @media (max-width: 768px) {
+        /* Tablets & iPads (768px - 1024px) */
+        @media (min-width: 768px) and (max-width: 1024px) {
+          .intro-line {
+            padding: 0 6vw;
+            padding-bottom: 4vh;
+          }
           .intro-line-text {
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
+            max-width: 28ch;
+            font-size: clamp(2.2rem, 4.4vw, 3.2rem);
+            line-height: 1.18;
+          }
+        }
+
+        /* Desktops & Laptops (1025px - 1599px) */
+        @media (min-width: 1025px) {
+          .intro-line {
+            padding: 0 8vw;
+            padding-bottom: 5vh;
+          }
+          .intro-line-text {
+            max-width: 32ch;
+            font-size: clamp(2.8rem, 3.6vw, 3.8rem);
+            line-height: 1.16;
+          }
+        }
+
+        /* Large & Ultrawide Screens (1600px+) */
+        @media (min-width: 1600px) {
+          .intro-line {
+            padding: 0 10vw;
+            padding-bottom: 6vh;
+          }
+          .intro-line-text {
+            max-width: 36ch;
+            font-size: clamp(3.4rem, 3.2vw, 4.4rem);
+            line-height: 1.15;
+          }
+        }
+
+        /* Mobile (< 768px) */
+        @media (max-width: 767px) {
+          .intro-line {
+            padding: 0 7vw;
+            padding-bottom: 2vh;
+          }
+          .intro-line-text {
+            max-width: 20ch;
+            font-size: clamp(1.65rem, 5.8vw, 2.3rem);
+            line-height: 1.16;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
           }
           .intro-word.is-accent .intro-word-i {
             text-shadow: none !important;
@@ -974,14 +955,19 @@ export default function IntroSequence() {
 
         .intro-skip-wrap {
           position: absolute;
-          right: clamp(1rem, 3vw, 2rem);
-          bottom: clamp(1.1rem, 3.4vh, 2rem);
+          right: clamp(1.2rem, 3vw, 2.8rem);
+          bottom: clamp(1.2rem, 3.5vh, 2.8rem);
           z-index: 1002;
-          animation: intro-skip-in 420ms cubic-bezier(0.23, 1, 0.32, 1) both;
+          opacity: 0;
+          pointer-events: none;
+          will-change: opacity, transform;
         }
-        @keyframes intro-skip-in {
-          from { opacity: 0; transform: translateY(6px); }
-          to { opacity: 1; transform: translateY(0); }
+
+        @media (min-width: 1025px) {
+          .intro-skip-wrap {
+            right: clamp(2rem, 3.5vw, 3.5rem);
+            bottom: clamp(2rem, 4vh, 3.5rem);
+          }
         }
 
         @media (prefers-reduced-motion: reduce) {
