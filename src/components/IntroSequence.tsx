@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
@@ -95,6 +95,15 @@ export default function IntroSequence() {
   const [phase, setPhase] = useState<"pending" | "playing" | "done">("pending");
   // Video plate enabled on all devices so grass animates during intro
   const [liteMedia, setLiteMedia] = useState(false);
+  // The skip button is shader-backed. Its wrapper is always mounted -- the
+  // timeline tweens it, and a null ref would silently drop those tweens -- but
+  // the button itself waits. Mounted with the scene, it put a WebGL context
+  // creation and a shader compile on the intro's opening frames, alongside the
+  // first video decode and the first paint: the single worst moment to spend
+  // several hundred synchronous milliseconds, and the cost swings with whether
+  // the shader cache is warm, which is exactly the shape of an intermittent
+  // freeze. It is invisible until the 1.0s fade-in anyway.
+  const [showChrome, setShowChrome] = useState(false);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -185,6 +194,12 @@ export default function IntroSequence() {
     else finish();
   }, [finish]);
 
+  useEffect(() => {
+    if (phase !== "playing") return;
+    const t = window.setTimeout(() => setShowChrome(true), 900);
+    return () => window.clearTimeout(t);
+  }, [phase]);
+
   // ── Pass 1: decide ──────────────────────────────────────────────────────
   // Runs before paint. Until it resolves, the component renders a bare dark
   // plate (see the "pending" branch below), so the hero never flashes.
@@ -249,6 +264,8 @@ export default function IntroSequence() {
 
     const introVid = videoRef.current;
     let cleanupVidListeners: (() => void) | null = null;
+    /** Set once the hand-off intentionally stops the intro's plate. */
+    let plateReleased = false;
     if (introVid) {
       introVid.muted = true;
       introVid.defaultMuted = true;
@@ -257,8 +274,17 @@ export default function IntroSequence() {
       introVid.setAttribute("webkit-playsinline", "");
       introVid.setAttribute("muted", "");
 
+      // Every one of the listeners below exists to fight a plate that stopped
+      // on its own (a decoder stall, a backgrounded tab, a mid-loop hiccup).
+      // But the hand-off *deliberately* stops it, and these were winning that
+      // argument too: introVid.pause() at the end of the dissolve fired
+      // "pause", ensurePlaying() restarted it, and the intro's decoder kept
+      // running over the hero's for as long as the subtree stayed mounted --
+      // two 4K streams competing at precisely the moment the hero arrives.
+      // Once the plate is deliberately released, these stand down.
       const ensurePlaying = () => {
-        if (introVid.paused && !doneRef.current) {
+        if (plateReleased || doneRef.current) return;
+        if (introVid.paused) {
           introVid.play().catch(() => {});
         }
       };
@@ -308,6 +334,7 @@ export default function IntroSequence() {
     }
 
     const onTouchKick = () => {
+      if (plateReleased) return;
       if (videoRef.current && videoRef.current.paused && !doneRef.current) {
         videoRef.current.play().catch(() => {});
       }
@@ -563,6 +590,7 @@ export default function IntroSequence() {
       tl.call(() => {
         if (isMobileDevice && introVid) {
           try {
+            plateReleased = true;
             introVid.pause();
           } catch {}
         }
@@ -597,6 +625,43 @@ export default function IntroSequence() {
     };
 
     startNow();
+
+    // ── Watchdog ──────────────────────────────────────────────────────────
+    // The intro is a fixed, full-viewport overlay that holds scroll, so a stall
+    // is not a cosmetic glitch: it is a page the visitor cannot use, with no
+    // way out but a reload. The causes are all things that happen on real
+    // phones and cannot be enumerated from here -- a decoder evicted under
+    // memory pressure, a long GC, a compositor hiccup, a tab that came back
+    // from the background in a strange state.
+    //
+    // So instead of guessing at causes, watch the only symptom that matters:
+    // whether the timeline is still moving. A playing timeline advances every
+    // single frame, so any wholly motionless stretch is already abnormal --
+    // 2.5s of it is not a slow phone, it is a stuck one. Hand off when that
+    // happens. A hard cut to the hero is a poor ending, but it is an ending.
+    //
+    // Two states are legitimately motionless and must not trip it: a
+    // backgrounded tab (rAF is suspended by design) and a paused timeline
+    // (the skip path pauses it to run its own outro).
+    let lastProgress = -1;
+    let lastMoved = performance.now();
+    const watchdog = window.setInterval(() => {
+      if (doneRef.current) {
+        window.clearInterval(watchdog);
+        return;
+      }
+      const now = performance.now();
+      const progress = tl.progress();
+      if (progress !== lastProgress || document.hidden || tl.paused()) {
+        lastProgress = progress;
+        lastMoved = now;
+        return;
+      }
+      if (now - lastMoved > 2500) {
+        window.clearInterval(watchdog);
+        finish();
+      }
+    }, 500);
 
     // ── Graceful skip ─────────────────────────────────────────────────────
     let bailing = false;
@@ -655,6 +720,7 @@ export default function IntroSequence() {
       bailRef.current = null;
       root.removeEventListener("wheel", block);
       root.removeEventListener("touchmove", block);
+      window.clearInterval(watchdog);
       window.removeEventListener("keydown", blockKeys);
       window.removeEventListener("lenis:ready", onLenisReady);
       cancelAnimationFrame(lenisRaf);
@@ -808,7 +874,9 @@ export default function IntroSequence() {
         </div>
 
         <div ref={skipRef} className="intro-skip-wrap">
-          <LiquidMetalButton label="Skip intro" onClick={skip} width={128} height={40} />
+          {showChrome && (
+            <LiquidMetalButton label="Skip intro" onClick={skip} width={128} height={40} />
+          )}
         </div>
       </div>
 
