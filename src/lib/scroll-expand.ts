@@ -88,6 +88,7 @@ export function triggerScrollExpand(
       y: 14,
       opacity: 0.85,
       transformOrigin: "50% 20%",
+      force3D: true,
     },
     {
       scale: 1,
@@ -96,6 +97,7 @@ export function triggerScrollExpand(
       duration: 1.2,
       ease: "power2.out",
       delay: expandDelay,
+      force3D: true,
       clearProps: "scale,y,opacity,transformOrigin",
     }
   );
@@ -108,6 +110,7 @@ export function triggerScrollExpand(
         scale: 0.98,
         y: 12,
         opacity: 0.85,
+        force3D: true,
       },
       {
         scale: 1,
@@ -117,6 +120,7 @@ export function triggerScrollExpand(
         stagger: 0.04,
         ease: "power2.out",
         delay: expandDelay + 0.1,
+        force3D: true,
         clearProps: "scale,y,opacity",
       }
     );

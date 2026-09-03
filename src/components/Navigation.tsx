@@ -21,15 +21,18 @@ export default function Navigation() {
     if (menuOpen) {
       document.body.style.overflow = "hidden";
       document.documentElement.style.overflow = "hidden";
+      document.documentElement.setAttribute("data-menu-open", "true");
       getLenis()?.stop();
     } else {
       document.body.style.overflow = "";
       document.documentElement.style.overflow = "";
+      document.documentElement.removeAttribute("data-menu-open");
       getLenis()?.start();
     }
     return () => {
       document.body.style.overflow = "";
       document.documentElement.style.overflow = "";
+      document.documentElement.removeAttribute("data-menu-open");
       getLenis()?.start();
     };
   }, [menuOpen]);
@@ -174,7 +177,7 @@ export default function Navigation() {
                 onClick={() => setMenuOpen(false)}
                 aria-label="Close menu"
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
                   <line x1="18" y1="6" x2="6" y2="18" />
                   <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
@@ -525,8 +528,8 @@ export default function Navigation() {
 
         .nav-toggle-icon {
           position: relative;
-          width: 17px;
-          height: 11px;
+          width: 18px;
+          height: 12px;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
@@ -534,44 +537,51 @@ export default function Navigation() {
         }
         .nav-toggle-bar {
           display: block;
-          width: 17px;
-          height: 1.75px;
-          background: currentColor;
-          border-radius: 2px;
+          width: 18px;
+          height: 2.75px;
+          background: #121A12;
+          border-radius: 999px;
           transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), opacity 180ms ease;
           transform-origin: center;
         }
         .nav-toggle-icon.is-open .nav-toggle-bar-1 {
-          transform: translateY(4.6px) rotate(45deg);
+          transform: translateY(4.625px) rotate(45deg);
         }
         .nav-toggle-icon.is-open .nav-toggle-bar-2 {
-          transform: translateY(-4.6px) rotate(-45deg);
+          transform: translateY(-4.625px) rotate(-45deg);
         }
 
         /* ── Editorial Linen Canvas Mobile Navigation (matching LimeIQ reference) ── */
         .limelq-nav-screen {
           position: fixed;
-          inset: 0;
-          z-index: 999;
-          /* Frosted rather than a flat opaque fill, matching the glass
-             language used everywhere else in the nav (and the rest of the
-             site). Scroll is locked on body/html for as long as this is open
-             (see the menuOpen effect above), so the layer behind it is static
-             while the menu is up -- the blur is a one-time paint on open/close,
-             not a per-scroll-frame cost the way a persistent fixed element's
-             would be. */
-          background: rgba(234, 229, 220, 0.74);
-          backdrop-filter: blur(30px) saturate(160%);
-          -webkit-backdrop-filter: blur(30px) saturate(160%);
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          width: 100vw;
+          height: 100%;
+          min-height: 100vh;
+          min-height: 100dvh;
+          z-index: 99999;
+          /* Fully opaque linen canvas — prevents background hero elements, grass, and log divider from showing through */
+          background: #EAE5DC;
           color: #121A12;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
           padding: clamp(1.4rem, 4vh, 2.2rem) clamp(1.25rem, 5.5vw, 2.4rem);
+          padding-bottom: calc(clamp(1.4rem, 4vh, 2.2rem) + env(safe-area-inset-bottom, 0px));
           overflow-y: auto;
           overscroll-behavior: contain;
           -webkit-overflow-scrolling: touch;
-          will-change: transform, opacity, backdrop-filter;
+          will-change: transform, opacity;
+        }
+
+        /* Guarantee the hero log/branch is completely hidden when mobile menu is open */
+        html[data-menu-open="true"] .hero-log-divider {
+          opacity: 0 !important;
+          visibility: hidden !important;
+          pointer-events: none !important;
         }
 
         .limelq-head {

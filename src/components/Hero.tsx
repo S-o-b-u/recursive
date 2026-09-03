@@ -307,7 +307,10 @@ export default function Hero() {
       <style href="hero-style" precedence="default" suppressHydrationWarning>{`
         .hero {
           position: relative;
-          height: 100svh;
+          min-height: 100vh;
+          min-height: 100dvh;
+          height: 100vh;
+          height: 100dvh;
           width: 100%;
           overflow-x: clip;
           overflow-y: visible;
