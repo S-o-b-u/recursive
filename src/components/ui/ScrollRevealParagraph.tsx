@@ -184,7 +184,10 @@ export function ScrollRevealParagraph({
         }
 
         .scroll-reveal--pinned {
-          height: 100svh;
+          min-height: 100vh;
+          min-height: 100dvh;
+          height: 100vh;
+          height: 100dvh;
           padding: 0 clamp(1.5rem, 6vw, 4rem);
           overflow: hidden;
         }

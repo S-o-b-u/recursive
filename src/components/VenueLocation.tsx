@@ -402,19 +402,18 @@ export default function VenueLocation() {
           gap: 1.5rem;
         }
 
-        /* ── iOS Liquid Frosted Glass Cards (Visible Hazy Background) ── */
+        /* ── iOS Liquid Frosted Glass Cards (Transparent Cloud View) ── */
         .venue-card {
           position: relative;
-          background: linear-gradient(145deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.06) 48%, rgba(220, 245, 215, 0.12) 100%);
-          backdrop-filter: blur(24px) saturate(190%) contrast(104%) brightness(102%);
-          -webkit-backdrop-filter: blur(24px) saturate(190%) contrast(104%) brightness(102%);
-          border: 1px solid rgba(255, 255, 255, 0.45);
-          border-bottom: 1px solid rgba(22, 45, 26, 0.08);
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 48%, rgba(220, 245, 215, 0.04) 100%);
+          backdrop-filter: blur(10px) saturate(160%);
+          -webkit-backdrop-filter: blur(10px) saturate(160%);
+          border: 1px solid rgba(255, 255, 255, 0.32);
+          border-bottom: 1px solid rgba(22, 45, 26, 0.06);
           box-shadow:
-            inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.75),
-            inset 0 -1px 2px 0 rgba(22, 45, 26, 0.04),
-            inset 0 0 20px 0 rgba(255, 255, 255, 0.15),
-            0 12px 36px -10px rgba(18, 38, 22, 0.07);
+            inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.55),
+            inset 0 -1px 1.5px 0 rgba(22, 45, 26, 0.03),
+            0 8px 24px -8px rgba(18, 38, 22, 0.06);
           border-radius: 1.35rem;
           padding: 1.5rem;
           display: flex;
@@ -424,14 +423,12 @@ export default function VenueLocation() {
         }
 
         .venue-card:hover {
-          background: linear-gradient(145deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.10) 48%, rgba(220, 245, 215, 0.18) 100%);
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 48%, rgba(220, 245, 215, 0.08) 100%);
           transform: translateY(-2px);
-          border-color: rgba(255, 255, 255, 0.65);
+          border-color: rgba(255, 255, 255, 0.55);
           box-shadow:
-            inset 0 1.5px 3px 0 rgba(255, 255, 255, 0.9),
-            inset 0 -1px 2px 0 rgba(22, 45, 26, 0.05),
-            inset 0 0 24px 0 rgba(255, 255, 255, 0.25),
-            0 18px 44px -10px rgba(18, 38, 22, 0.11);
+            inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.75),
+            0 14px 36px -10px rgba(18, 38, 22, 0.09);
         }
 
         .venue-address-header {
@@ -444,13 +441,13 @@ export default function VenueLocation() {
           width: 46px;
           height: 46px;
           border-radius: 0.95rem;
-          background: rgba(255, 255, 255, 0.22);
-          backdrop-filter: blur(16px) saturate(180%);
-          -webkit-backdrop-filter: blur(16px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.55);
+          background: rgba(255, 255, 255, 0.12);
+          backdrop-filter: blur(10px) saturate(160%);
+          -webkit-backdrop-filter: blur(10px) saturate(160%);
+          border: 1px solid rgba(255, 255, 255, 0.4);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 0.8),
-            0 2px 8px rgba(0, 0, 0, 0.03);
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.65),
+            0 2px 6px rgba(0, 0, 0, 0.02);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -517,9 +514,9 @@ export default function VenueLocation() {
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
-          background: rgba(255, 255, 255, 0.25);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
+          background: rgba(255, 255, 255, 0.14);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
           color: #111c14;
           font-family: var(--font-display), var(--font-dm-sans), sans-serif;
           font-size: 0.875rem;
@@ -527,9 +524,9 @@ export default function VenueLocation() {
           letter-spacing: -0.01em;
           padding: 0.7rem 1.15rem;
           border-radius: 0.85rem;
-          border: 1px solid rgba(255, 255, 255, 0.55);
+          border: 1px solid rgba(255, 255, 255, 0.42);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 0.8),
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.65),
             0 2px 6px rgba(0, 0, 0, 0.02);
           cursor: pointer;
           flex: 1;
@@ -537,8 +534,8 @@ export default function VenueLocation() {
         }
 
         .btn-copy-address:hover {
-          background: rgba(255, 255, 255, 0.5);
-          border-color: rgba(255, 255, 255, 0.8);
+          background: rgba(255, 255, 255, 0.35);
+          border-color: rgba(255, 255, 255, 0.65);
           transform: translateY(-1px);
         }
 
@@ -563,13 +560,13 @@ export default function VenueLocation() {
           width: 42px;
           height: 42px;
           border-radius: 0.85rem;
-          background: rgba(255, 255, 255, 0.22);
-          backdrop-filter: blur(16px) saturate(180%);
-          -webkit-backdrop-filter: blur(16px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.55);
+          background: rgba(255, 255, 255, 0.12);
+          backdrop-filter: blur(10px) saturate(160%);
+          -webkit-backdrop-filter: blur(10px) saturate(160%);
+          border: 1px solid rgba(255, 255, 255, 0.4);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 0.8),
-            0 2px 8px rgba(0, 0, 0, 0.02);
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.65),
+            0 2px 6px rgba(0, 0, 0, 0.02);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -610,16 +607,15 @@ export default function VenueLocation() {
 
         .venue-map-card {
           position: relative;
-          background: linear-gradient(145deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.06) 48%, rgba(220, 245, 215, 0.12) 100%);
-          backdrop-filter: blur(24px) saturate(190%) contrast(104%) brightness(102%);
-          -webkit-backdrop-filter: blur(24px) saturate(190%) contrast(104%) brightness(102%);
-          border: 1px solid rgba(255, 255, 255, 0.45);
-          border-bottom: 1px solid rgba(22, 45, 26, 0.08);
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 48%, rgba(220, 245, 215, 0.04) 100%);
+          backdrop-filter: blur(10px) saturate(160%);
+          -webkit-backdrop-filter: blur(10px) saturate(160%);
+          border: 1px solid rgba(255, 255, 255, 0.32);
+          border-bottom: 1px solid rgba(22, 45, 26, 0.06);
           box-shadow:
-            inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.75),
-            inset 0 -1px 2px 0 rgba(22, 45, 26, 0.04),
-            inset 0 0 20px 0 rgba(255, 255, 255, 0.15),
-            0 12px 36px -10px rgba(18, 38, 22, 0.07);
+            inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.55),
+            inset 0 -1px 1.5px 0 rgba(22, 45, 26, 0.03),
+            0 8px 24px -8px rgba(18, 38, 22, 0.06);
           border-radius: 1.35rem;
           padding: 0.65rem;
           width: 100%;
@@ -630,14 +626,12 @@ export default function VenueLocation() {
         }
 
         .venue-map-card:hover {
-          background: linear-gradient(145deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.10) 48%, rgba(220, 245, 215, 0.18) 100%);
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 48%, rgba(220, 245, 215, 0.08) 100%);
           transform: translateY(-2px);
-          border-color: rgba(255, 255, 255, 0.65);
+          border-color: rgba(255, 255, 255, 0.55);
           box-shadow:
-            inset 0 1.5px 3px 0 rgba(255, 255, 255, 0.9),
-            inset 0 -1px 2px 0 rgba(22, 45, 26, 0.05),
-            inset 0 0 24px 0 rgba(255, 255, 255, 0.25),
-            0 18px 44px -10px rgba(18, 38, 22, 0.11);
+            inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.75),
+            0 14px 36px -10px rgba(18, 38, 22, 0.09);
         }
 
         .map-view-frame {
@@ -648,7 +642,7 @@ export default function VenueLocation() {
           min-height: 480px;
           border-radius: 0.95rem;
           overflow: hidden;
-          background: #eaf1e9;
+          background: transparent;
         }
 
         .google-maps-frame {
@@ -659,6 +653,12 @@ export default function VenueLocation() {
           height: calc(100% + 110px);
           border: 0;
           display: block;
+          opacity: 0.82;
+          transition: opacity 250ms ease;
+        }
+
+        .venue-map-card:hover .google-maps-frame {
+          opacity: 0.95;
         }
 
         /* Floating Top Badges */
@@ -679,13 +679,13 @@ export default function VenueLocation() {
           display: inline-flex;
           align-items: center;
           gap: 0.45rem;
-          background: rgba(255, 255, 255, 0.32);
-          backdrop-filter: blur(20px) saturate(180%);
-          -webkit-backdrop-filter: blur(20px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.65);
+          background: rgba(255, 255, 255, 0.22);
+          backdrop-filter: blur(12px) saturate(160%);
+          -webkit-backdrop-filter: blur(12px) saturate(160%);
+          border: 1px solid rgba(255, 255, 255, 0.45);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 0.8),
-            0 4px 14px rgba(0, 0, 0, 0.04);
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.65),
+            0 4px 12px rgba(0, 0, 0, 0.03);
           border-radius: 0.75rem;
           padding: 0.42rem 0.95rem;
           font-family: var(--font-display), var(--font-dm-sans), sans-serif;
@@ -705,13 +705,13 @@ export default function VenueLocation() {
           display: flex;
           align-items: center;
           gap: 0.6rem;
-          background: rgba(255, 255, 255, 0.52);
-          backdrop-filter: blur(20px) saturate(180%);
-          -webkit-backdrop-filter: blur(20px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.75);
+          background: rgba(255, 255, 255, 0.36);
+          backdrop-filter: blur(14px) saturate(160%);
+          -webkit-backdrop-filter: blur(14px) saturate(160%);
+          border: 1px solid rgba(255, 255, 255, 0.55);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 0.85),
-            0 6px 18px rgba(0, 0, 0, 0.06);
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.75),
+            0 4px 14px rgba(0, 0, 0, 0.04);
           border-radius: 0.85rem;
           padding: 0.48rem 0.9rem;
           pointer-events: none;
@@ -759,13 +759,13 @@ export default function VenueLocation() {
           width: 34px;
           height: 34px;
           border-radius: 0.65rem;
-          background: rgba(255, 255, 255, 0.32);
-          backdrop-filter: blur(18px) saturate(180%);
-          -webkit-backdrop-filter: blur(18px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.65);
+          background: rgba(255, 255, 255, 0.22);
+          backdrop-filter: blur(12px) saturate(160%);
+          -webkit-backdrop-filter: blur(12px) saturate(160%);
+          border: 1px solid rgba(255, 255, 255, 0.45);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 0.8),
-            0 4px 12px rgba(0, 0, 0, 0.04);
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.65),
+            0 4px 10px rgba(0, 0, 0, 0.03);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -774,13 +774,13 @@ export default function VenueLocation() {
         }
 
         .map-control-btn:hover {
-          background: rgba(255, 255, 255, 0.65);
-          border-color: rgba(255, 255, 255, 0.9);
+          background: rgba(255, 255, 255, 0.5);
+          border-color: rgba(255, 255, 255, 0.75);
           transform: translateY(-1px);
         }
 
         .map-control-btn.locating {
-          background: rgba(234, 243, 230, 0.65);
+          background: rgba(234, 243, 230, 0.55);
           border-color: #5c8c3a;
         }
 
@@ -795,13 +795,13 @@ export default function VenueLocation() {
           align-items: center;
           justify-content: space-between;
           gap: 0.75rem;
-          background: rgba(255, 255, 255, 0.34);
-          backdrop-filter: blur(22px) saturate(180%);
-          -webkit-backdrop-filter: blur(22px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.65);
+          background: rgba(255, 255, 255, 0.24);
+          backdrop-filter: blur(14px) saturate(160%);
+          -webkit-backdrop-filter: blur(14px) saturate(160%);
+          border: 1px solid rgba(255, 255, 255, 0.45);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 0.8),
-            0 8px 24px rgba(0, 0, 0, 0.05);
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.65),
+            0 6px 18px rgba(0, 0, 0, 0.04);
           border-radius: 0.95rem;
           padding: 0.55rem 0.85rem;
           flex-wrap: wrap;
@@ -848,13 +848,13 @@ export default function VenueLocation() {
           display: inline-flex;
           align-items: center;
           gap: 0.45rem;
-          background: rgba(255, 255, 255, 0.38);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.65);
+          background: rgba(255, 255, 255, 0.26);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.45);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 0.8),
-            0 2px 6px rgba(0, 0, 0, 0.02);
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.65),
+            0 2px 4px rgba(0, 0, 0, 0.02);
           border-radius: 0.75rem;
           padding: 0.42rem 0.8rem;
           font-family: var(--font-display), var(--font-dm-sans), sans-serif;
@@ -868,8 +868,8 @@ export default function VenueLocation() {
         }
 
         .btn-satellite-toggle:hover {
-          background: rgba(255, 255, 255, 0.65);
-          border-color: rgba(255, 255, 255, 0.9);
+          background: rgba(255, 255, 255, 0.5);
+          border-color: rgba(255, 255, 255, 0.75);
         }
 
         .btn-satellite-toggle.active {
@@ -882,13 +882,13 @@ export default function VenueLocation() {
           display: inline-flex;
           align-items: center;
           gap: 0.45rem;
-          background: rgba(255, 255, 255, 0.38);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.65);
+          background: rgba(255, 255, 255, 0.26);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.45);
           box-shadow:
-            inset 0 1px 2px rgba(255, 255, 255, 0.8),
-            0 2px 6px rgba(0, 0, 0, 0.02);
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.65),
+            0 2px 4px rgba(0, 0, 0, 0.02);
           border-radius: 0.75rem;
           padding: 0.42rem 0.85rem;
           font-family: var(--font-display), var(--font-dm-sans), sans-serif;

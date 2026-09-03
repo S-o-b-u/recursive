@@ -114,18 +114,21 @@ export default function SponsorStage() {
      * entirely: there is one number, and everything else is computed from it on
      * every update and every refresh.
      */
+    const isTouch =
+      typeof window !== "undefined" &&
+      ("ontouchstart" in window ||
+        navigator.maxTouchPoints > 0 ||
+        window.innerWidth < 860 ||
+        window.matchMedia("(pointer: coarse)").matches);
+
     const ctx = gsap.context(() => {
-      const state = { prog: 0 };
-
       const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
-      const easeWindow = gsap.parseEase("power1.inOut");
-      const easeLabel = gsap.parseEase("power1.inOut");
-      const easePanel = gsap.parseEase("sine.inOut");
-      const easePreview = gsap.parseEase("sine.inOut");
+      const easeWindow = gsap.parseEase("sine.out");
+      const easeLabel = gsap.parseEase("power1.out");
+      const easePanel = gsap.parseEase("power1.out");
+      const easePreview = gsap.parseEase("sine.out");
 
-      // Precomputed once, called every frame: this is what actually removes
-      // the per-frame cost, not the easing curves (those are cheap Math.pow
-      // calls either way).
+      // Precomputed once, called every frame
       const setIntro = gsap.quickSetter(intro, "css") as (
         v: Record<string, number>,
       ) => void;
@@ -142,33 +145,16 @@ export default function SponsorStage() {
         ? (gsap.quickSetter(scrollUpBtn, "css") as (v: Record<string, number>) => void)
         : null;
 
-      // pointerEvents is a plain DOM write, not a GSAP tween target -- skip it
-      // when it has not actually flipped, instead of writing it every frame.
       let bodyInteractive: boolean | null = null;
       let scrollUpInteractive: boolean | null = null;
-      // Same idea for the two backdrops: opacity changes every frame, but
-      // `visibility` flips twice in the whole pass.
-      let backdropHidden: boolean | null = null;
-      // The window geometry settles before the scrub does. Once the insets stop
-      // moving there is nothing to repaint, and re-writing clip-path anyway
-      // costs a raster of the whole stage.
-      let lastInv = -1;
 
-      /**
-       * The window geometry, resolved to pixels once per refresh.
-       *
-       * --sxp-p used to be written every frame and several descendants derived
-       * their insets, radius and opacity from it through calc(). That is a
-       * lovely single-source-of-truth on paper, and it measured 4.25ms per
-       * frame against a 0.02ms budget for writing the same values directly:
-       * a custom property read by descendant rules invalidates all of them,
-       * and style recalculation is exactly what a phone is slowest at.
-       *
-       * The clamp()/min() stay in the stylesheet (still one source of truth,
-       * and still what paints the closed state before this effect runs); a
-       * hidden probe asks the browser to resolve them to pixels, once, on
-       * refresh. Per frame this is now arithmetic plus two element writes.
-       */
+      let lastInv = -1;
+      let lastOp = -1;
+      let lastL = -1;
+      let lastPr = -1;
+      let lastB = -1;
+      let lastS = -1;
+
       let winW = 0;
       let winH = 0;
       let stageW = 0;
@@ -187,8 +173,12 @@ export default function SponsorStage() {
         const sr = stage.getBoundingClientRect();
         stageW = sr.width;
         stageH = sr.height;
-        // New box, so the insets must be rewritten even at unchanged progress.
         lastInv = -1;
+        lastOp = -1;
+        lastL = -1;
+        lastPr = -1;
+        lastB = -1;
+        lastS = -1;
       };
       measure();
 
@@ -199,110 +189,120 @@ export default function SponsorStage() {
       const PANEL_IN = 0.20;
       const PANEL_LEN = 0.32;
 
-      const apply = () => {
-        const t = state.prog;
-
-        // The window opens and closes with symmetric quadratic curve.
+      const apply = (t: number) => {
+        // 1. The window opens and closes with organic, gentle sine.out curve.
         const p = easeWindow(clamp01(t / WINDOW_END));
         const inv = 1 - p;
-        if (inv !== lastInv) {
+        if (Math.abs(inv - lastInv) > 0.0004 || (inv <= 0.001 && lastInv > 0.001) || (inv >= 0.999 && lastInv < 0.999)) {
           lastInv = inv;
-          const iy = Math.max(0, (stageH - winH) / 2) * inv;
-          const ix = Math.max(0, (stageW - winW) / 2) * inv;
-          const r = 28 * inv;
-          const iyPx = iy + "px";
-          const ixPx = ix + "px";
+          if (inv <= 0.001) {
+            if (frameEl) {
+              frameEl.style.clipPath = "inset(0px 0px 0px 0px round 0px)";
+            }
+            if (keyline) {
+              keyline.style.opacity = "0";
+            }
+          } else {
+            const iy = Math.max(0, (stageH - winH) / 2) * inv;
+            const ix = Math.max(0, (stageW - winW) / 2) * inv;
+            const r = 28 * inv;
+            const iyPx = iy < 0.2 ? "0px" : iy.toFixed(1) + "px";
+            const ixPx = ix < 0.2 ? "0px" : ix.toFixed(1) + "px";
+            const rPx = r < 0.2 ? "0px" : r.toFixed(1) + "px";
 
-          if (frameEl) {
-            frameEl.style.clipPath =
-              "inset(" + iyPx + " " + ixPx + " " + iyPx + " " + ixPx + " round " + r + "px)";
-          }
-          if (keyline) {
-            const ks = keyline.style;
-            // One shorthand rather than four longhands: same box, a quarter of
-            // the style writes.
-            ks.inset = iyPx + " " + ixPx;
-            ks.borderRadius = r + "px";
-            ks.opacity = inv.toFixed(4);
+            if (frameEl) {
+              frameEl.style.clipPath =
+                "inset(" + iyPx + " " + ixPx + " " + iyPx + " " + ixPx + " round " + rPx + ")";
+            }
+            if (keyline) {
+              const ks = keyline.style;
+              ks.inset = iyPx + " " + ixPx;
+              ks.borderRadius = rPx;
+              ks.opacity = Math.max(0, (inv - 0.06) / 0.94).toFixed(3);
+            }
           }
         }
 
-        // Smooth bidirectional crossfade for the night field and local plate.
-        // When opening, it gently reveals the sky. When closing (scrolling up),
-        // it gracefully glides back into the dark night field without slamming to black.
+        // 2. Smooth bidirectional crossfade for the night field and local plate.
         const op = Math.max(0, Math.min(1, (1 - p) * 2.8));
-        const hide = t >= 0.75;
-        const flip = hide !== backdropHidden;
-        if (flip) backdropHidden = hide;
-        const vis = hide ? "hidden" : "visible";
-        const opStr = op.toFixed(4);
-        if (plate) {
-          plate.style.opacity = opStr;
-          if (flip) plate.style.visibility = vis;
-        }
-        if (night) {
-          night.style.opacity = opStr;
-          if (flip) night.style.visibility = vis;
+        if (Math.abs(op - lastOp) > 0.008 || (op === 0 && lastOp !== 0) || (op === 1 && lastOp !== 1)) {
+          lastOp = op;
+          const opStr = op.toFixed(3);
+          if (plate) plate.style.opacity = opStr;
+          if (night) night.style.opacity = opStr;
         }
 
-        // The night-side labels step aside smoothly and return gracefully on close.
+        // 3. The night-side labels step aside smoothly and return gracefully on close.
         const l = easeLabel(clamp01(t / LABEL_END));
-        setIntro({ opacity: 1 - l, y: -24 * l });
-        setOutro({ opacity: 1 - l, y: 24 * l });
+        if (Math.abs(l - lastL) > 0.008 || (l === 0 && lastL !== 0) || (l === 1 && lastL !== 1)) {
+          lastL = l;
+          setIntro({ opacity: 1 - l, y: -24 * l });
+          setOutro({ opacity: 1 - l, y: 24 * l });
+        }
 
-        // The preview title inside the closed window fades in/out symmetrically.
+        // 4. The preview title inside the closed window fades in/out symmetrically.
         if (setPreview) {
           const pr = easePreview(clamp01(t / PREVIEW_END));
-          setPreview({ opacity: 1 - pr, scale: 1 + 0.06 * pr });
+          if (Math.abs(pr - lastPr) > 0.008 || (pr === 0 && lastPr !== 0) || (pr === 1 && lastPr !== 1)) {
+            lastPr = pr;
+            setPreview({ opacity: 1 - pr, scale: 1 + 0.06 * pr });
+          }
         }
 
-        // The panel arrives softly as the window expands and dissolves smoothly as it closes.
+        // 5. The panel arrives softly as the window expands and dissolves smoothly as it closes.
         const b = easePanel(clamp01((t - PANEL_IN) / PANEL_LEN));
-        setBody({ opacity: b, y: 28 * (1 - b) });
-        const bodyOn = b > 0.08;
-        if (bodyOn !== bodyInteractive) {
-          bodyInteractive = bodyOn;
-          body.style.pointerEvents = bodyOn ? "auto" : "none";
+        if (Math.abs(b - lastB) > 0.008 || (b === 0 && lastB !== 0) || (b === 1 && lastB !== 1)) {
+          lastB = b;
+          setBody({ opacity: b, y: 28 * (1 - b) });
+          const bodyOn = b > 0.08;
+          if (bodyOn !== bodyInteractive) {
+            bodyInteractive = bodyOn;
+            body.style.pointerEvents = bodyOn ? "auto" : "none";
+          }
         }
 
-        // The up arrow button only appears once the stage has fully opened
+        // 6. The up arrow button only appears once the stage has fully opened
         if (setScrollUp && scrollUpBtn) {
           const s = easePanel(clamp01((t - WINDOW_END) / 0.14));
-          setScrollUp({ opacity: s, y: (1 - s) * -14 });
-          const scrollUpOn = s > 0.15;
-          if (scrollUpOn !== scrollUpInteractive) {
-            scrollUpInteractive = scrollUpOn;
-            scrollUpBtn.style.pointerEvents = scrollUpOn ? "auto" : "none";
+          if (Math.abs(s - lastS) > 0.008 || (s === 0 && lastS !== 0) || (s === 1 && lastS !== 1)) {
+            lastS = s;
+            setScrollUp({ opacity: s, y: (1 - s) * -14 });
+            const scrollUpOn = s > 0.15;
+            if (scrollUpOn !== scrollUpInteractive) {
+              scrollUpInteractive = scrollUpOn;
+              scrollUpBtn.style.pointerEvents = scrollUpOn ? "auto" : "none";
+            }
           }
         }
       };
 
       // Paint the closed state before the first scroll event arrives.
-      apply();
+      apply(0);
 
-      gsap.fromTo(
-        state,
-        { prog: 0 },
-        {
-          prog: 1,
-          ease: "none",
-          onUpdate: apply,
-          scrollTrigger: {
-            trigger: track,
-            // Exactly the span the sticky child is stuck for.
-            start: "top top",
-            end: "bottom bottom",
-            scrub: 0.55,
-            fastScrollEnd: true,
-            preventOverlaps: true,
-            invalidateOnRefresh: true,
-            onRefresh: () => {
-              measure();
-              apply();
-            },
-          },
+      const state = { prog: 0 };
+      const tween = gsap.to(state, {
+        prog: 1,
+        ease: "none",
+        paused: true,
+        onUpdate: () => {
+          apply(state.prog);
         },
-      );
+      });
+
+      ScrollTrigger.create({
+        trigger: track,
+        start: "top top",
+        end: "bottom bottom",
+        animation: tween,
+        scrub: isTouch ? 0.14 : 0.2,
+        fastScrollEnd: false,
+        preventOverlaps: true,
+        invalidateOnRefresh: true,
+        onRefresh: () => {
+          measure();
+          apply(state.prog);
+        },
+      });
     }, track);
 
     return () => ctx.revert();
@@ -483,6 +483,10 @@ export default function SponsorStage() {
         .sxp-night,
         .sxp-plate {
           opacity: clamp(0, calc((1 - var(--sxp-p)) * 2.8), 1);
+          will-change: opacity;
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
+          backface-visibility: hidden;
         }
 
         .sxp-night {
@@ -495,7 +499,8 @@ export default function SponsorStage() {
         .sxp-label {
           position: absolute;
           left: 50%;
-          transform: translateX(-50%);
+          transform: translateX(-50%) translateZ(0);
+          -webkit-transform: translateX(-50%) translateZ(0);
           z-index: 3;
           display: flex;
           flex-direction: column;
@@ -504,6 +509,8 @@ export default function SponsorStage() {
           width: min(90vw, 44rem);
           pointer-events: none;
           text-align: center;
+          will-change: transform, opacity;
+          backface-visibility: hidden;
         }
 
         /* Both anchored off the window edge, so they keep their clearance
@@ -560,9 +567,10 @@ export default function SponsorStage() {
           position: absolute;
           inset: 0;
           z-index: 2;
+          contain: paint;
           will-change: clip-path;
-          transform: translate3d(0, 0, 0);
-          -webkit-transform: translate3d(0, 0, 0);
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
           clip-path: inset(
@@ -595,6 +603,10 @@ export default function SponsorStage() {
           background-size: cover;
           background-position: center top;
           background-repeat: no-repeat;
+          will-change: opacity;
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
+          backface-visibility: hidden;
         }
 
         .sxp-keyline {
@@ -610,8 +622,11 @@ export default function SponsorStage() {
           opacity: calc(1 - var(--sxp-p));
           box-shadow:
             0 0 0 1px rgba(238, 248, 228, 0.22),
-            0 40px 90px -34px rgba(0, 0, 0, 0.9),
+            0 24px 50px -16px rgba(0, 0, 0, 0.75),
             inset 0 1px 0 rgba(255, 255, 255, 0.5);
+          will-change: opacity;
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
         }
 
         /* ── Preview title inside the frame before it expands (matches reference) ── */
@@ -624,6 +639,8 @@ export default function SponsorStage() {
           pointer-events: none;
           user-select: none;
           padding-inline: clamp(1rem, 3vw, 2.5rem);
+          will-change: transform, opacity;
+          transform: translateZ(0);
         }
 
         .sxp-preview-title {
@@ -654,6 +671,10 @@ export default function SponsorStage() {
           padding-bottom: clamp(2.5rem, 5vh, 4.5rem);
           opacity: 0;
           pointer-events: none;
+          will-change: transform, opacity;
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
+          backface-visibility: hidden;
         }
 
         .sxp-inner {

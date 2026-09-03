@@ -439,6 +439,22 @@ export default function IntroSequence() {
       // until the warm gate opens, which is comfortably after that.
       tl.call(suspendHeroPlate, undefined, 0);
 
+      // Opaque from frame 0, not faded up.
+      //
+      // This was a 0.35s fade from opacity 0, added to cover a 1-frame position
+      // snap, and it was the entire black gap after a reload: the pending plate
+      // has already unmounted by the time it runs and .intro-root is
+      // transparent, so every frame of the fade was also a frame of dead dark
+      // (or, with a warm cache, of the finished hero bleeding through the
+      // half-opaque scene). Shortening it only shrinks the dip -- it still dips.
+      //
+      // There is nothing left to cover now: the pending plate paints this same
+      // still, at this same frame-0 transform and grade, so the swap has no
+      // visible seam. And the snap it guarded against cannot happen anyway --
+      // fromTo applies its from-state via immediateRender, synchronously, before
+      // the browser paints the frame the scene first appears on.
+      tl.set(scene, { opacity: 1 }, 0);
+
       const isWideScreen = typeof window !== "undefined" && window.innerWidth >= 768;
       // On desktop, tablet, and widescreen devices, scale at 1.07 and yPercent at -3.2%
       // so the hill crest and plastic chair fit naturally in frame without aggressive cropping.
@@ -468,11 +484,10 @@ export default function IntroSequence() {
 
         tl.fromTo(
           words,
-          { opacity: 0, y: 16, scale: 0.97 },
+          { opacity: 0, y: 16 },
           {
             opacity: 1,
             y: 0,
-            scale: 1,
             duration: 0.62,
             ease: "power3.out",
             stagger: 0.036,
@@ -570,16 +585,18 @@ export default function IntroSequence() {
       if (started || doneRef.current) return;
       started = true;
       if (vid) {
-        try {
-          vid.currentTime = 0;
-        } catch {}
+        if (vid.currentTime > 0.05) {
+          try {
+            vid.currentTime = 0;
+          } catch {}
+        }
         const p = vid.play();
         if (p && typeof p.catch === "function") p.catch(() => {});
       }
       tl.play(0);
     };
 
-    const startRaf = requestAnimationFrame(startNow);
+    startNow();
 
     // ── Graceful skip ─────────────────────────────────────────────────────
     let bailing = false;
@@ -587,7 +604,6 @@ export default function IntroSequence() {
       if (bailing || doneRef.current) return;
       bailing = true;
       started = true;
-      cancelAnimationFrame(startRaf);
       tl.pause();
 
       const words = root.querySelectorAll<HTMLElement>(".intro-word");
@@ -636,7 +652,6 @@ export default function IntroSequence() {
     };
 
     return () => {
-      cancelAnimationFrame(startRaf);
       bailRef.current = null;
       root.removeEventListener("wheel", block);
       root.removeEventListener("touchmove", block);
@@ -667,8 +682,76 @@ export default function IntroSequence() {
     return (
       <div
         aria-hidden="true"
-        style={{ position: "fixed", inset: 0, zIndex: 9998, background: "#0a140c" }}
-      />
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: "100vw",
+          height: "100%",
+          minHeight: "100dvh",
+          zIndex: 9998,
+          overflow: "hidden",
+          background: "#0a140c",
+        }}
+        className="intro-pending-plate"
+      >
+        {/* This plate is what the document paints first, before hydration has
+            even decided whether the intro runs -- so on a reload it is on
+            screen for as long as the phone needs to boot React. It used to be
+            flat #0a140c, which is why reloading read as: finished page, hard
+            cut to a slab of black, long dead pause, and only then the intro.
+            Painting the intro's own opening frame here instead means the swap
+            to the real scene has nothing to cut between -- same still, same
+            framing, same grade -- so the black gap disappears.
+            The transform mirrors the media's frame-0 state, and the gradient
+            below is a copy of .intro-grade at opacity 1. */}
+        {/* The grade differs between the two frame-0 states -- the desktop
+            branch opens on brightness(0.46), the lite branch on no filter at
+            all -- and getting it wrong trades the black gap for a brightness
+            pop. prefersLiteMedia() is just media queries underneath, so the
+            plate can mirror the same predicate in CSS and be correct before any
+            JS has run. (saveData has no CSS equivalent; that path lands on the
+            lite value, which is what it wants anyway.) */}
+        <style>{
+          ".intro-pending-plate img{filter:brightness(0.46) saturate(0.74) contrast(1.04)}" +
+          "@media (pointer: coarse),(max-width: 860px),(prefers-reduced-motion: reduce){" +
+          ".intro-pending-plate img{filter:none}}"
+        }</style>
+        <img
+          src="/images/hero_poster.jpg"
+          alt=""
+          draggable={false}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center center",
+            transform: "scale(1.12) translateY(-5%)",
+            // A 32x18 blur of the poster, inline, ~400 bytes. The preload above
+            // makes the real still fast, but "fast" is still a network round
+            // trip: on a cold cache the plate would paint flat black until it
+            // lands, which is the whole bug coming back for first-time
+            // visitors. This is in the HTML itself, so the opening frame is on
+            // screen in the first paint no matter what the network is doing,
+            // and the full-resolution still simply replaces it in place.
+            backgroundImage: `url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABMNDhEODBMRDxEVFBMXHTAfHRoaHToqLCMwRT1JR0Q9Q0FMVm1dTFFoUkFDX4JgaHF1e3x7SlyGkIV3j214e3b/2wBDARQVFR0ZHTgfHzh2T0NPdnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnb/wAARCAASACADASIAAhEBAxEB/8QAGgAAAgIDAAAAAAAAAAAAAAAAAAUDBAEGB//EACUQAAICAQIEBwAAAAAAAAAAAAECAAMRBCEFMVFhBhQiQXGBkf/EABcBAQEBAQAAAAAAAAAAAAAAAAACAQP/xAAZEQEBAAMBAAAAAAAAAAAAAAAAAQIDMUH/2gAMAwEAAhEDEQA/ANrrVWXPOShRFz8So0qZutVe3uZWbxBW21VbN3JxIucnQ6KgyKxQq9DF1fGqzs6lT8yx52q5fQ4J6TJsxvKOeXu76hyzMTnmTCpjkbn9hCR4kwrJKbkzFbsGGGI+4QnCj//Z)`,
+            backgroundSize: "cover",
+            backgroundPosition: "center center",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "radial-gradient(120% 90% at 50% 116%, rgba(6,14,9,0) 32%, rgba(6,14,9,0.8) 76%, rgba(4,10,7,0.96) 100%), linear-gradient(180deg, rgba(6,13,9,0.7) 0%, rgba(6,13,9,0.24) 46%, rgba(6,13,9,0.48) 100%)",
+          }}
+        />
+      </div>
     );
   }
 
@@ -682,7 +765,7 @@ export default function IntroSequence() {
                 ref={videoRef}
                 src="/bg/hero_bg.mp4"
                 poster="/images/hero_poster.jpg"
-                autoPlay={false}
+                autoPlay
                 loop
                 muted
                 playsInline
@@ -734,7 +817,14 @@ export default function IntroSequence() {
       <style href="intro-sequence" precedence="default" suppressHydrationWarning>{`
         .intro-root {
           position: fixed;
-          inset: 0;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          width: 100vw;
+          height: 100%;
+          min-height: 100vh;
+          min-height: 100dvh;
           z-index: 9999;
           overflow: hidden;
           background: transparent;
@@ -747,10 +837,17 @@ export default function IntroSequence() {
            the glow (a sibling, not a child) lingers over the landing page. */
         .intro-scene {
           position: absolute;
-          inset: 0;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          width: 100%;
+          height: 100%;
+          min-height: 100vh;
+          min-height: 100dvh;
           overflow: hidden;
           background: #0a140c;
-          opacity: 1;
+          opacity: 0;
           contain: layout paint style;
         }
 

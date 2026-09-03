@@ -165,7 +165,10 @@ export default function Lore() {
       <style>{`
         .lore-section {
           position: relative;
-          height: 100svh;
+          min-height: 100vh;
+          min-height: 100dvh;
+          height: 100vh;
+          height: 100dvh;
           width: 100%;
           background: 
             radial-gradient(ellipse 90% 45% at 50% 0%, rgba(92, 140, 58, 0.22) 0%, transparent 65%),
