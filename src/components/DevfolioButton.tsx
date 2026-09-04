@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { EVENT } from "@/data/hackathon";
 
 export interface DevfolioButtonProps {
@@ -64,37 +64,16 @@ export default function DevfolioButton({
   className = "",
   style,
 }: DevfolioButtonProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    // Reset container contents
-    container.innerHTML = "";
-
-    // Create the exact Devfolio apply-button element according to the official integration guide
-    const btn = document.createElement("div");
-    btn.className = "apply-button";
-    btn.setAttribute("data-hackathon-slug", slug);
-    btn.setAttribute("data-button-theme", theme);
-    btn.style.height = "44px";
-    btn.style.width = "312px";
-    container.appendChild(btn);
-
     registerAndLoadScript();
 
     return () => {
       unregisterAndCleanup();
-      if (container) {
-        container.innerHTML = "";
-      }
     };
   }, [slug, theme]);
 
   return (
     <div
-      ref={containerRef}
       className={`devfolio-button-wrapper ${className}`.trim()}
       style={{
         display: "inline-flex",
@@ -105,6 +84,13 @@ export default function DevfolioButton({
         maxWidth: "100%",
         ...style,
       }}
-    />
+    >
+      <div
+        className="apply-button"
+        data-hackathon-slug={slug}
+        data-button-theme={theme}
+        style={{ height: "44px", width: "312px" }}
+      />
+    </div>
   );
 }

@@ -15,7 +15,7 @@ export const EVENT = {
   venue: "Guru Nanak Institute of Technology",
   teamSize: "1 – 4 builders",
   seats: 4, // the four chairs on the hill
-  devfolioUrl: "#",
+  devfolioUrl: "https://devfolio.co",
   devfolioSlug: "recursive", // Replace with your verified Devfolio hackathon slug (e.g. "recursive")
   devfolioTheme: "light" as "light" | "dark" | "dark-inverted",
   sponsorUrl: "https://forms.gle/6WMzt855AmDqDUac8",
@@ -153,7 +153,7 @@ export const JUDGES: Judge[] = [
 
 /** Sponsor logo wall. Add a slot per signed sponsor, drop the logo in, set `src`. */
 export const SPONSOR_SLOTS: Slot[] = [
-  { label: "Sponsor 01", expect: "/images/sponsors/01.svg", src: "" },
+  { label: "DEVFOLIO LOGO", expect: "/images/devfolio.png", src: "/images/devfolio.png" },
   { label: "Sponsor 02", expect: "/images/sponsors/02.svg", src: "" },
   { label: "Sponsor 03", expect: "/images/sponsors/03.svg", src: "" },
   { label: "Sponsor 04", expect: "/images/sponsors/04.svg", src: "" },

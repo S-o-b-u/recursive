@@ -105,12 +105,21 @@ export default function SponsorWall() {
                   style={{ "--c": cell.c, "--r": cell.r } as CSSProperties}
                 >
                   {slot.src ? (
-                    <MediaSlot
-                      slot={slot}
-                      ratio={cell.ratio}
-                      fit="contain"
-                      sizes="(max-width: 780px) 50vw, 33vw"
-                    />
+                    <a
+                      href={slot.label.toLowerCase().includes("devfolio") ? "https://devfolio.co" : undefined}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="sp-media-link"
+                      title={slot.label}
+                      style={{ display: "block", width: "100%", height: "100%" }}
+                    >
+                      <MediaSlot
+                        slot={slot}
+                        ratio={cell.ratio}
+                        fit="contain"
+                        sizes="(max-width: 780px) 50vw, 33vw"
+                      />
+                    </a>
                   ) : (
                     <SponsorRevealCard ratio={cell.ratio} index={i} />
                   )}

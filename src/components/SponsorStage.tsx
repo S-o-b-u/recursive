@@ -354,28 +354,28 @@ export default function SponsorStage() {
                     : "Organizations and platforms empowering the builders on the hill."}
                 </p>
 
-                {sealed ? (
-                  <div className="sxp-seal">
-                    <span className="sxp-seal-q" aria-hidden="true">
-                      ?
-                    </span>
-                    <span className="sxp-seal-word">Yet to reveal</span>
-                  </div>
-                ) : (
-                  <div className="sxp-wall">
-                    {SPONSOR_SLOTS.map((slot) => (
-                      <div className="sxp-cell" key={slot.expect}>
-                        <MediaSlot
-                          slot={slot}
-                          ratio={RATIO}
-                          fit="contain"
-                          dither={false}
-                          sizes="(max-width: 700px) 44vw, 22vw"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {/* ── Devfolio Platform Partner ── */}
+                <div className="sxp-partner-tier">
+                  <span className="sxp-tier-badge">PLATFORM PARTNER</span>
+                  <a
+                    href="https://devfolio.co"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="sxp-partner-card"
+                    title="Devfolio"
+                  >
+                    <img
+                      src="/images/devfolio.png"
+                      alt="DEVFOLIO LOGO"
+                      className="sxp-partner-logo"
+                      width={220}
+                      height={44}
+                    />
+                  </a>
+                  <span className="sxp-unrevealed-note">
+                    More community partners &amp; sponsors revealing soon
+                  </span>
+                </div>
 
                 <div className="sxp-cta-wrap">
                   <LiquidMetalButton
@@ -727,54 +727,65 @@ export default function SponsorStage() {
           text-wrap: pretty;
         }
 
-        /* ── The sealed mark ── */
-        .sxp-seal {
-          position: relative;
-          display: grid;
-          place-items: center;
-          width: 100%;
-          margin-top: clamp(0.8rem, 2vh, 1.8rem);
-          margin-bottom: clamp(0.4rem, 1.2vh, 1rem);
+        .sxp-partner-tier {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.65rem;
+          margin-top: clamp(1rem, 2.2vh, 1.8rem);
+          margin-bottom: clamp(0.6rem, 1.5vh, 1.2rem);
+          z-index: 10;
         }
 
-        .sxp-seal-q {
-          grid-area: 1 / 1;
-          font-family: var(--font-hiruko), var(--font-display), Georgia, serif;
-          font-weight: 700;
-          font-size: clamp(8.5rem, 24vh, 15rem);
-          line-height: 0.75;
-          color: rgba(38, 70, 32, 0.32);
-          filter: blur(7px);
-          animation: sxp-seal-breathe 8s ease-in-out infinite;
-          user-select: none;
-        }
-
-        .sxp-seal-word {
-          grid-area: 1 / 1;
-          font-family: var(--font-hiruko), var(--font-display), sans-serif;
-          font-weight: 900;
-          font-size: clamp(1.6rem, 4.4vw, 3.1rem);
-          line-height: 1;
-          letter-spacing: 0.19em;
+        .sxp-tier-badge {
+          font-family: var(--font-label), var(--font-geist-mono), monospace;
+          font-size: 0.72rem;
+          font-weight: 600;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
-          color: #16300F;
-          text-shadow:
-            0 2px 0 rgba(255, 255, 255, 0.4),
-            0 0 28px rgba(255, 255, 255, 0.8);
+          color: #2b5420;
+          background: rgba(43, 84, 32, 0.08);
+          border: 1px solid rgba(43, 84, 32, 0.18);
+          padding: 0.25rem 0.75rem;
+          border-radius: 9999px;
         }
 
-        @keyframes sxp-seal-breathe {
-          0%, 100% { opacity: 0.85; transform: scale(1); }
-          50%      { opacity: 1;    transform: scale(1.03); }
+        .sxp-partner-card {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1.1rem 2.5rem;
+          background: rgba(255, 255, 255, 0.75);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.95);
+          border-radius: 1.25rem;
+          box-shadow:
+            0 4px 20px -4px rgba(0, 0, 0, 0.06),
+            0 1px 3px rgba(0, 0, 0, 0.04);
+          transition: transform 200ms ease, box-shadow 200ms ease;
         }
 
-        .sxp-wall {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: clamp(0.75rem, 1.8vw, 1.5rem);
-          width: 100%;
-          max-width: 68rem;
-          margin-top: clamp(0.8rem, 2vh, 1.8rem);
+        .sxp-partner-card:hover {
+          transform: translateY(-2px);
+          box-shadow:
+            0 8px 30px -4px rgba(0, 0, 0, 0.12),
+            0 2px 6px rgba(0, 0, 0, 0.06);
+        }
+
+        .sxp-partner-logo {
+          height: clamp(34px, 4.2vh, 46px);
+          width: auto;
+          object-fit: contain;
+          display: block;
+        }
+
+        .sxp-unrevealed-note {
+          font-family: var(--font-dm-sans), sans-serif;
+          font-size: 0.85rem;
+          color: rgba(30, 50, 25, 0.65);
+          letter-spacing: 0.01em;
+          margin-top: 0.25rem;
         }
 
         .sxp-cta-wrap {
