@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import "./globals.css";
 import { display, geistMono, hiruko, dmSans, headingNow, bebasNeue } from "./fonts";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -35,9 +34,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistMono.variable} ${display.variable} ${hiruko.variable} ${dmSans.variable} ${headingNow.variable} ${bebasNeue.variable}`}
     >
       <body>
-        <Script
-          src="https://apply.devfolio.co/v2/sdk.js"
-          strategy="beforeInteractive"
+        {/*
+          Devfolio SDK — injected as a literal <script> via dangerouslySetInnerHTML
+          so the tag appears in the server-rendered HTML body and is visible to
+          Devfolio's verification crawler, which fetches raw HTML without executing
+          JS. The Next.js <Script> component with strategy="beforeInteractive"
+          does NOT emit a real <script> tag in SSR HTML in the App Router; it is
+          deferred to client-side hydration and encoded in the RSC payload only.
+        */}
+        <div
+          dangerouslySetInnerHTML={{
+            __html:
+              '<script defer async src="https://apply.devfolio.co/v2/sdk.js"></script>',
+          }}
         />
         {/* The intro's opening frame is this still. It is the very first thing
             the document paints (see the pending plate in IntroSequence), so it
