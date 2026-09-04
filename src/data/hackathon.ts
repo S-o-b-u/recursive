@@ -16,7 +16,7 @@ export const EVENT = {
   teamSize: "1 – 4 builders",
   seats: 4, // the four chairs on the hill
   devfolioUrl: "https://devfolio.co",
-  devfolioSlug: "recursive", // Replace with your verified Devfolio hackathon slug (e.g. "recursive")
+  devfolioSlug: "recursiveacm", // Replace with your verified Devfolio hackathon slug (e.g. "recursive")
   devfolioTheme: "light" as "light" | "dark" | "dark-inverted",
   sponsorUrl: "https://forms.gle/6WMzt855AmDqDUac8",
   discordUrl: "https://discord.gg/SMYB7tJQf",
