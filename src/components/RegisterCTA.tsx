@@ -1,7 +1,7 @@
 import { EVENT } from "@/data/hackathon";
 import Reveal from "./Reveal";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
-import { Lock } from "lucide-react";
+import DevfolioButton from "@/components/DevfolioButton";
 
 /**
  * Registration CTA — no glass card wrapper, clean typographic layout
@@ -25,35 +25,14 @@ export default function RegisterCTA() {
             find one when you arrive.
           </p>
           <div className="cta-actions">
-            <div className="cta-locked-wrap" title="Registration currently locked · Revealing soon">
-              <LiquidMetalButton
-                label="Register on Devfolio"
-                width={190}
-                height={46}
-                iconPosition="right"
-                icon={
-                  <Lock
-                    size={15}
-                    style={{
-                      color: "#ffffff",
-                      stroke: "#ffffff",
-                      marginLeft: "2px",
-                      display: "inline-block",
-                      verticalAlign: "middle",
-                      filter: "drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.4))",
-                    }}
-                    aria-hidden="true"
-                  />
-                }
-              />
-            </div>
+            <DevfolioButton />
             <LiquidMetalButton
               label="Join Discord"
               href={EVENT.discordUrl}
               target="_blank"
               rel="noopener noreferrer"
               width={145}
-              height={46}
+              height={44}
             />
           </div>
         </Reveal>
@@ -116,19 +95,7 @@ export default function RegisterCTA() {
           align-items: center;
           margin-top: 1.5rem;
         }
-        .cta-locked-wrap {
-          display: inline-flex;
-          position: relative;
-          cursor: not-allowed;
-          opacity: 0.9;
-          transition: opacity 180ms ease;
-        }
-        .cta-locked-wrap:hover {
-          opacity: 1;
-        }
-        .cta-locked-wrap * {
-          pointer-events: none;
-        }
+
         .cta-hill {
           position: absolute;
           left: -3%;
