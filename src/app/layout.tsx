@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { display, geistMono, hiruko, dmSans, headingNow, bebasNeue } from "./fonts";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -34,6 +35,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistMono.variable} ${display.variable} ${hiruko.variable} ${dmSans.variable} ${headingNow.variable} ${bebasNeue.variable}`}
     >
       <body>
+        <Script
+          src="https://apply.devfolio.co/v2/sdk.js"
+          strategy="beforeInteractive"
+        />
         {/* The intro's opening frame is this still. It is the very first thing
             the document paints (see the pending plate in IntroSequence), so it
             has to be decodable by then -- otherwise a reload shows a slab of

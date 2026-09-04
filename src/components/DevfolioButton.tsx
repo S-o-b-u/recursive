@@ -1,6 +1,3 @@
-"use client";
-
-import Script from "next/script";
 import { EVENT } from "@/data/hackathon";
 
 export interface DevfolioButtonProps {
@@ -17,34 +14,27 @@ export default function DevfolioButton({
   style,
 }: DevfolioButtonProps) {
   return (
-    <>
+    <div
+      className={`devfolio-button-wrapper ${className}`.trim()}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "44px",
+        width: "312px",
+        maxWidth: "100%",
+        ...style,
+      }}
+    >
       <div
-        className={`devfolio-button-wrapper ${className}`.trim()}
+        className="apply-button"
+        data-hackathon-slug={slug}
+        data-button-theme={theme}
         style={{
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "44px",
+          height: "44px",
           width: "312px",
-          maxWidth: "100%",
-          ...style,
         }}
-      >
-        <div
-          className="apply-button"
-          data-hackathon-slug={slug}
-          data-button-theme={theme}
-          style={{
-            height: "44px",
-            width: "312px",
-          }}
-        />
-      </div>
-
-      <Script
-        src="https://apply.devfolio.co/v2/sdk.js"
-        strategy="afterInteractive"
       />
-    </>
+    </div>
   );
 }
