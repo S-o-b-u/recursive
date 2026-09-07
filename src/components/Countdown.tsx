@@ -250,7 +250,7 @@ export default function Countdown() {
              picks up — that is the seam. ── */}
       <div className="cd-valley" aria-hidden="true">
         <Image
-          src="/images/valley.png"
+          src="/images/valley.webp"
           alt=""
           width={2752}
           height={1536}

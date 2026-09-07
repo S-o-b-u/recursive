@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RECURSIVE
 
-## Getting Started
+Site for the RECURSIVE hackathon — GNIT ACM Student Chapter.
 
-First, run the development server:
+Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind CSS v4 ·
+GSAP + ScrollTrigger · Lenis.
+
+## Running it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev     # http://localhost:3000, bound to 0.0.0.0 for phone testing
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+npm run build && npm start
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Animation and media behaviour only really shows itself in a production build,
+so check anything performance-related against `npm run build && npm start`
+rather than the dev server.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Layout
 
-## Learn More
+```
+src/app/          routes; globals.css holds the design tokens and fluid scales
+src/components/   sections (Hero, Themes, Judges, …); ui/ holds the primitives
+src/data/         hackathon.ts is the single source for copy, tracks, FAQs
+src/lib/          Lenis singleton, device heuristics, scroll + texture helpers
+public/           media; hero_bg.mp4 is the shared hero/intro plate
+```
 
-To learn more about Next.js, take a look at the following resources:
+`src/data/hackathon.ts` drives most on-page copy — dates, tracks, prizes, FAQ
+answers, sponsor tiers. Edit content there rather than in components.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Things worth knowing before editing
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **The intro owns the first ~9s of `/`.** `IntroSequence` renders a full-screen
+  overlay, holds scroll through Lenis, and hands off to `Hero`. Force it with
+  `?intro=1`, skip it with `?intro=0`. It carries a watchdog: 2.5s of zero
+  timeline progress while visible hands off rather than leaving the page locked.
+- **`prefersLiteMedia()` (`src/lib/device.ts`) is the one capability gate.**
+  Coarse pointer, ≤860px, reduced-motion, or Save-Data takes the cheap path.
+  Several components branch on it; keep new heavy effects behind it too.
+- **WebGL contexts are scarce** (~16, fewer on phones). `RetroDither` and
+  `WarpText` each take one and both release it via `WEBGL_lose_context` on
+  unmount. Anything new that takes a context must do the same, or unrelated
+  canvases elsewhere on the page go blank.
+- **Fluid sizing** uses `clamp(<mobile>, <px> + <vw>, <desktop>)` ramping
+  360→1280. A clamp pinned to a fixed floor breaks tablets.
+- Media is cached `immutable` by `next.config.ts`, so **change the filename**
+  when replacing an image or video.
 
-## Deploy on Vercel
+## Known issues
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Font licensing.** `MADEOkineSansPERSONALUSE-Bold.otf` (`--font-display`) and
+  `HeadingNowTrial-45Medium.ttf` (`--font-heading`) are a personal-use font and a
+  trial font. Both need proper licences, or replacing, before this is treated as
+  a settled public site.
+- No Content-Security-Policy. The page mixes inline styles, a WebGL layer, the
+  Devfolio SDK and a Google Maps embed, so a policy needs to be written against
+  those flows rather than guessed at.

@@ -18,6 +18,7 @@ export const EVENT = {
   devfolioUrl: "https://devfolio.co",
   devfolioSlug: "recursiveacm", // Replace with your verified Devfolio hackathon slug (e.g. "recursive")
   devfolioTheme: "light" as "light" | "dark" | "dark-inverted",
+  proposalTemplateUrl: "https://docs.google.com/presentation/d/1hWmofLq_oe_ZI_n_gTTszlc0AqkJIQyhz1n0iyBXEO8/copy", // Official Idea Submission PPT Template
   sponsorUrl: "https://forms.gle/6WMzt855AmDqDUac8",
   discordUrl: "https://discord.gg/SMYB7tJQf",
   email: "team@recursive.dev",
@@ -70,68 +71,127 @@ export type Track = {
 };
 
 /**
- * Four themes.
- * TODO: these are placeholders — replace the titles and lines with the real
- * themes once they are locked.
+ * Six themes.
  */
 export const TRACKS: Track[] = [
   {
-    slug: "generative-nature",
-    title: "Generative Nature",
+    slug: "ai-intelligent-systems",
+    title: "AI & Intelligent Systems",
     seat: "Seat 01",
-    line: "Simple rules, repeated, until something grows.",
-    media: { label: "Generative Nature", expect: "/images/themes/generative.jpg", src: "" },
+    line: "Autonomous agents, neural frontiers, and models that reason.",
+    media: { label: "AI & Intelligent Systems", expect: "/images/themes/ai.jpg", src: "/images/themes/ai.jpg" },
     summary:
-      "Systems that grow. Recursion, L-systems, cellular automata, agents that evolve their own rules — anything where a simple instruction repeated becomes something beautiful.",
+      "Push beyond wrappers. Build autonomous agents, multimodal intelligence, specialized reasoning pipelines, and generative workflows that solve real problems with depth and precision.",
     prompts: [
-      "Procedural worlds that never repeat",
-      "Creative tools built on generative grammars",
-      "Agentic pipelines that refine their own output",
+      "Multi-agent orchestration and autonomous workflows",
+      "Edge AI, local inference, and real-time reasoning engines",
+      "Domain-specific reasoning assistants and multimodal interfaces",
     ],
   },
   {
-    slug: "climate-regeneration",
-    title: "Climate & Regeneration",
+    slug: "fintech-digital-innovation",
+    title: "FinTech & Digital Innovation",
     seat: "Seat 02",
-    line: "Software for soil, air, water and the people counting it.",
-    media: { label: "Climate & Regeneration", expect: "/images/themes/climate.jpg", src: "" },
+    line: "Code the future of capital — programmable, instant, and borderless.",
+    media: { label: "FinTech & Digital Innovation", expect: "/images/themes/finance.jpg", src: "/images/themes/finance.jpg" },
     summary:
-      "Software for the living world. Measure, restore, or protect — from soil sensors to supply-chain transparency to tools that make climate data legible.",
+      "Reinvent how value is created, protected, and exchanged. Build high-frequency automated market makers, decentralized settlement protocols, zero-knowledge fraud shields, micro-wealth tooling, or autonomous AI financial agents that make capital accessible to everyone.",
     prompts: [
-      "Making emissions data actually usable",
-      "Community tooling for restoration projects",
-      "Low-power sensing for farms and forests",
+      "Autonomous AI financial agents & algorithmic micro-investing",
+      "Zero-knowledge proof payments & real-time fraud defense",
+      "Programmable escrow rails, smart commerce & borderless settlements",
     ],
   },
   {
-    slug: "open-web",
-    title: "Open Web & Dev Tools",
+    slug: "healthtech-wellness",
+    title: "HealthTech & Wellness",
     seat: "Seat 03",
-    line: "Sharpen the tools the rest of us build with.",
-    media: { label: "Open Web & Dev Tools", expect: "/images/themes/openweb.jpg", src: "" },
+    line: "Sensory diagnostic tools, proactive care, and human vitality.",
+    media: { label: "HealthTech & Wellness", expect: "/images/themes/heart.jpg", src: "/images/themes/heart.jpg" },
     summary:
-      "Sharpen the tools everyone builds with. Compilers, debuggers, protocols, editors, local-first sync — infrastructure that other people's ideas can root into.",
+      "Software and hardware for the human body and mind. Build tools for preventative diagnostics, mental wellness telemetry, patient care coordination, and accessible assistive technology.",
     prompts: [
-      "Local-first apps that survive the network",
-      "Developer experience nobody has fixed yet",
-      "Protocols for a less centralised web",
+      "Assistive tech and accessible sensory interfaces",
+      "Predictive health telemetry and wearable sensor integration",
+      "Mental wellness tools rooted in behavioral science",
     ],
   },
   {
-    slug: "wildcard",
-    title: "Wildcard",
+    slug: "cybersecurity-digital-trust",
+    title: "Cybersecurity & Digital Trust",
     seat: "Seat 04",
-    line: "The idea that kept you up. Bring that one.",
-    media: { label: "Wildcard", expect: "/images/themes/wildcard.mp4", src: "", kind: "video" },
+    line: "Cryptographic guardrails, zero trust, and resilient systems.",
+    media: { label: "Cybersecurity & Digital Trust", expect: "/images/themes/cyber.jpg", src: "/images/themes/cyber.jpg" },
     summary:
-      "Anything that grows. If it doesn't fit a track but it made you stay up until 4am, it belongs here. Judged on originality and craft, nothing else.",
+      "Fortify the networks we rely on. Zero-knowledge authentication, threat telemetry, automated vulnerability patches, encrypted data enclaves, and cryptographic proofs of identity.",
     prompts: [
-      "The idea you couldn't stop thinking about",
-      "Hardware, games, art, weird interfaces",
-      "Something genuinely new",
+      "Zero-knowledge proofs and cryptographic identity verification",
+      "Autonomous vulnerability discovery and automated patch generation",
+      "Privacy-preserving analytics and distributed zero-trust perimeters",
+    ],
+  },
+  {
+    slug: "climatetech-sustainability",
+    title: "ClimateTech & Sustainability",
+    seat: "Seat 05",
+    line: "Software for soil, energy transitions, and ecological accountability.",
+    media: { label: "ClimateTech & Sustainability", expect: "/images/themes/earth.jpg", src: "/images/themes/earth.jpg" },
+    summary:
+      "Software for the living world. Measure, restore, or protect — from carbon accounting to renewable energy dispatch, circular economy platforms, and ecological sensor networks.",
+    prompts: [
+      "Hyper-local environmental sensing and ecological monitors",
+      "Supply chain transparency and carbon accounting ledgers",
+      "Smart grid management and renewable energy optimization",
+    ],
+  },
+  {
+    slug: "open-innovation",
+    title: "Open Innovation",
+    seat: "Seat 06",
+    line: "The wildcard idea that kept you up until 4am. Build that.",
+    media: { label: "Open Innovation", expect: "/images/themes/openinvo.jpg", src: "/images/themes/openinvo.jpg" },
+    summary:
+      "Unconstrained exploration. Cross-disciplinary hardware hacks, novel human-computer interfaces, decentralized protocols, creative dev tooling, or audacious ideas that defy standard categorization.",
+    prompts: [
+      "Radical human-computer interfaces and spatial computing",
+      "Developer tools and protocols that sharpen everyone's craft",
+      "Unclassifiable experiments, playful software, and raw ingenuity",
     ],
   },
 ];
+
+export const TRACK_CRITERIA: Record<string, string[]> = {
+  "ai-intelligent-systems": [
+    "Cognitive Depth — novel architectures, robust agent loops, or fine-tuned reasoning",
+    "Practical Utility — solves genuine complexity beyond simple prompt wrappers",
+    "Execution & Latency — fluid streaming, graceful fallback, and responsive interaction",
+  ],
+  "fintech-digital-innovation": [
+    "Security & Integrity — robust handling of transactions, edge cases, and state",
+    "Economic Utility — tangible improvement in accessibility, cost, or clarity",
+    "User Experience — simplifying complex financial flows into intuitive interfaces",
+  ],
+  "healthtech-wellness": [
+    "Clinical & Human Impact — thoughtful consideration of empathy, accessibility, and care",
+    "Data Privacy & Precision — reliable telemetry and private handling of sensitive signals",
+    "Experience Polish — clean, stress-free interaction design for critical moments",
+  ],
+  "cybersecurity-digital-trust": [
+    "Cryptographic Rigor — sound threat modeling and sound security architecture",
+    "Resilience & Hardening — defense against adversarial attacks and edge cases",
+    "Operational Ergonomics — security that empowers users without friction",
+  ],
+  "climatetech-sustainability": [
+    "Ecological Impact — practical utility for conservation, efficiency, or restoration",
+    "Data Legibility — transforming complex environmental datasets into clarity",
+    "System Feasibility — real-world viability, low-power or offline capability",
+  ],
+  "open-innovation": [
+    "Uncompromising Originality — ideas that break conventional hackathon molds",
+    "Technical Execution — turning an unconventional premise into working code",
+    "Demo Polish — immediate, captivating presentation on stage",
+  ],
+};
 
 /**
  * Judges. No names until they confirm — fill `name`/`role` and the photo `src`
@@ -219,7 +279,7 @@ export const PRIZES: Prize[] = [
 export const TRACK_PRIZE = {
   amount: "₹25,000",
   label: "Best in each track",
-  note: "One award per seat — four in total.",
+  note: "One award per track — six in total.",
 };
 
 export const SPECIAL_PRIZES = [
@@ -274,6 +334,14 @@ export const FAQS: Faq[] = [
   {
     q: "Is there any registration fee?",
     a: "No. Recursive is 100% free of cost. Admission, high-speed Wi-Fi access, meals, snacks, beverages, exclusive swag kits, and mentorship are provided completely free to all shortlisted participants.",
+  },
+  {
+    q: "How do I apply, and what is the idea submission process?",
+    a: "Applying for Recursive is done via Devfolio with an idea review round:\n\n1. Register on Devfolio: Click the 'Apply with Devfolio' button and complete your profile. You can apply solo or form a team of 1 to 4 members.\n2. Download the Idea Template: Access the official [Recursive ACM Idea Submission Template](https://docs.google.com/presentation/d/1hWmofLq_oe_ZI_n_gTTszlc0AqkJIQyhz1n0iyBXEO8/copy) on Google Slides.\n3. Prepare Your Proposal: Fill out the slides with your problem statement, target track, technical architecture, and impact.\n4. Export as PDF & Upload: Save your completed deck as a PDF (max 5–6 slides) and upload it directly in your Devfolio application form before registration closes.\n5. Review & RSVP: Applications will be reviewed by the organizing committee. Shortlisted teams will receive an acceptance invitation on Devfolio and email to confirm their attendance (RSVP) for the in-person hackathon at GNIT.",
+  },
+  {
+    q: "What should be included in our Idea Submission PPT?",
+    a: "Keep your presentation concise and impactful (5 to 6 slides). We recommend following this structure:\n\n• Slide 1 — Team & Track: Team name, members, college, contact info, and chosen track.\n• Slide 2 — Problem Statement: The real-world friction, inefficiency, or challenge you aim to solve.\n• Slide 3 — Proposed Solution: Your approach, key features, and core innovation.\n• Slide 4 — System Architecture & Stack: Software frameworks, databases, external APIs, ML models, or hardware components.\n• Slide 5 — 8-Hour Execution Plan: Minimum Viable Product (MVP) scope to be built and demonstrated live on stage.",
   },
   {
     q: "What is the team size and can I apply solo?",

@@ -1,7 +1,7 @@
 /**
  * Procedural cover art for the track slider.
  *
- * `TRACKS[].media.src` is still empty — no artwork has been shot for the four
+ * `TRACKS[].media.src` is still empty — no artwork has been shot for the six
  * tracks yet — but the morph shader needs a real texture per slide or every
  * frame falls back to flat #181818. So each track gets a painted plate instead
  * of a placeholder box: a deep base, a few soft light pools, and a set of
@@ -24,10 +24,18 @@ export type TrackPalette = {
 
 /** One palette per track, in `TRACKS` order. Wraps if tracks are added. */
 export const TRACK_PALETTES: TrackPalette[] = [
-  { base: "#0B1A0C", glow: ["#4E8F32", "#9BD35C"], line: "#C6EE93" },
-  { base: "#07161A", glow: ["#1E6E70", "#5FC8B0"], line: "#9FE7D6" },
+  // 01. AI & Intelligent Systems: Electric Indigo / Neural Blue
+  { base: "#0B0A1C", glow: ["#4338CA", "#818CF8"], line: "#C7D2FE" },
+  // 02. FinTech & Digital Innovation: Gold / Amber
   { base: "#141007", glow: ["#8A6320", "#E0AE4C"], line: "#F2D79B" },
-  { base: "#150B1B", glow: ["#5C3382", "#B072D9"], line: "#DCB8F0" },
+  // 03. HealthTech & Wellness: Rose / Ruby / Crimson
+  { base: "#18080E", glow: ["#9F1239", "#F43F5E"], line: "#FECDD3" },
+  // 04. Cybersecurity & Digital Trust: Deep Cobalt / Electric Cyan
+  { base: "#05131C", glow: ["#0284C7", "#38BDF8"], line: "#BAE6FD" },
+  // 05. ClimateTech & Sustainability: Forest Moss / Emerald
+  { base: "#0B1A0C", glow: ["#2E7D32", "#81C784"], line: "#C8E6C9" },
+  // 06. Open Innovation: Sunset Coral / Tangerine / Violet
+  { base: "#160C14", glow: ["#C026D3", "#FB923C"], line: "#FDE047" },
 ];
 
 const W = 1024;

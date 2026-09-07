@@ -204,14 +204,34 @@ export default function IntroSequence() {
   // Runs before paint. Until it resolves, the component renders a bare dark
   // plate (see the "pending" branch below), so the hero never flashes.
   useLayoutEffect(() => {
+    if (doneRef.current) return;
     setLiteMedia(false);
     const params = new URLSearchParams(window.location.search);
     const force = params.get("intro");
 
-    if (force === "0") {
+    let isInternalAnchorNav = false;
+    let hasHash = false;
+    try {
+      if (typeof window !== "undefined") {
+        isInternalAnchorNav = Boolean(sessionStorage.getItem("recursive:skip-intro-for-anchor"));
+        hasHash = Boolean(window.location.hash && window.location.hash !== "#");
+      }
+    } catch {}
+
+    // On page reload of "/" without an anchor, the intro plays.
+    // When navigating to an anchor (e.g. clicking "Back to all tracks"), skip intro immediately.
+    if (force === "0" || (force !== "1" && (isInternalAnchorNav || hasHash))) {
       doneRef.current = true;
+      if (typeof window !== "undefined") {
+        window.setTimeout(() => {
+          try { sessionStorage.removeItem("recursive:skip-intro-for-anchor"); } catch {}
+        }, 2000);
+      }
       if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
       setPhase("done");
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("recursive-intro-done"));
+      }
       return;
     }
 
@@ -227,6 +247,9 @@ export default function IntroSequence() {
       doneRef.current = true;
       if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
       setPhase("done");
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("recursive-intro-done"));
+      }
       return;
     }
 
@@ -722,6 +745,11 @@ export default function IntroSequence() {
       root.removeEventListener("touchmove", block);
       window.clearInterval(watchdog);
       window.removeEventListener("keydown", blockKeys);
+      // Was never removed: a window-level touchstart listener outliving the
+      // intro, holding its closure alive and running on every tap for the rest
+      // of the session. Harmless in effect (doneRef short-circuits it) but a
+      // leak all the same.
+      window.removeEventListener("touchstart", onTouchKick);
       window.removeEventListener("lenis:ready", onLenisReady);
       cancelAnimationFrame(lenisRaf);
       // If we unmount before the timeline releases scroll itself, undo the lock.

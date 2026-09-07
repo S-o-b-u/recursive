@@ -33,13 +33,14 @@ const EASE_SIZE = `${EASE}, width 0.4s ease, height 0.4s ease`;
  * zero GPU contexts.
  */
 function preferLiteButton(): boolean {
-  // This used to unconditionally return false, so every button on every
-  // device attempted its own WebGL2 context regardless of what the comment
-  // above says -- the exact failure mode it describes. prefersLiteMedia()
-  // already encodes "fine pointer, roomy viewport, motion allowed, no
-  // Save-Data" (it backs LiquidGlassCard's own WebGL/SVG-filter gate), so
-  // delegate rather than re-derive the same checks.
-  return prefersLiteMedia();
+  if (typeof window === "undefined") return true;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return true;
+  try {
+    const canvas = document.createElement("canvas");
+    return !Boolean(window.WebGL2RenderingContext && canvas.getContext("webgl2"));
+  } catch {
+    return true;
+  }
 }
 
 export interface LiquidMetalButtonProps {
@@ -79,22 +80,6 @@ export function LiquidMetalButton({
   const shaderMount = useRef<any>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const rippleId = useRef(0);
-  const visibleRef = useRef(true);
-  const hoverRef = useRef(false);
-  // Default to true so SSR + initial mobile render use the pure-CSS metallic pill.
-  // The effect sets it to false on capable desktop devices to mount the shader.
-  const [lite, setLite] = useState(true);
-
-  /**
-   * What the shader should idle at right now.
-   *
-   * The observer parks it at 0 off screen, but hover and click used to write
-   * 0.6 / 1 unconditionally — so leaving a button or clicking one and scrolling
-   * away within the 300ms reset restarted a shader nothing could see, and it
-   * kept running until the button happened to re-enter the viewport. Every
-   * speed change goes through here instead.
-   */
-  const restSpeed = () => (!visibleRef.current ? 0 : hoverRef.current ? 1 : 0.6);
 
   const dimensions = useMemo(() => {
     if (viewMode === "icon") {
@@ -137,27 +122,34 @@ export function LiquidMetalButton({
           top: 0 !important;
           left: 0 !important;
           border-radius: 100px !important;
+          z-index: 2 !important;
+          pointer-events: none !important;
         }
-        /* CSS liquid-metal base. On capable devices the WebGL canvas overlays
-           this; on phones/tablets (no shader) it IS the surface, so the pill
-           never renders flat. */
+        /* Dynamic liquid metal base surface. Seamlessly animated with CSS flow */
         .shader-container-exploded {
-          background:
-            linear-gradient(135deg, #e2e6e9 0%, #b0b6bb 15%, #585d62 39%, #24272b 51%, #494e53 65%, #b9bfc4 88%, #e6eaed 100%);
+          background: linear-gradient(135deg, #e2e6e9 0%, #b0b6bb 15%, #585d62 39%, #24272b 51%, #494e53 65%, #b9bfc4 88%, #e6eaed 100%);
+          background-size: 200% 200%;
+          animation: lm-fluid-flow 7s ease-in-out infinite alternate;
         }
-        .shader-container-exploded.is-lite::after {
+        .shader-container-exploded::after {
           content: "";
           position: absolute;
           inset: 0;
           border-radius: 100px;
-          background: linear-gradient(115deg, transparent 34%, rgba(255,255,255,0.55) 50%, transparent 66%);
+          background: linear-gradient(115deg, transparent 28%, rgba(255,255,255,0.65) 50%, transparent 72%);
           background-size: 260% 100%;
-          animation: lm-sheen 3.6s linear infinite;
+          animation: lm-sheen 3.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
           pointer-events: none;
+          z-index: 1;
+        }
+        @keyframes lm-fluid-flow {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
         }
         @keyframes lm-sheen {
-          from { background-position: 150% 0; }
-          to { background-position: -170% 0; }
+          from { background-position: 160% 0; }
+          to { background-position: -160% 0; }
         }
         @keyframes ripple-animation {
           0% {
@@ -173,63 +165,120 @@ export function LiquidMetalButton({
       document.head.appendChild(style);
     }
 
-    // Decide once, on the client, whether this button spends a WebGL context.
-    const useLite = preferLiteButton();
-    setLite(useLite);
-    if (useLite) {
-      // Pure-CSS pill — the injected metallic background + sheen carry it.
+    if (preferLiteButton()) {
       return;
     }
 
-    let observer: IntersectionObserver | null = null;
-    const loadShader = async () => {
+    let disposed = false;
+    const loadShader = () => {
+      if (disposed || !shaderRef.current) return;
+
       try {
-        if (shaderRef.current) {
-          if (shaderMount.current?.destroy) {
-            shaderMount.current.destroy();
+        if (shaderMount.current) {
+          if (typeof shaderMount.current.dispose === "function") {
+            shaderMount.current.dispose();
           }
+          shaderMount.current = null;
+        }
 
-          shaderMount.current = new ShaderMount(
-            shaderRef.current,
-            liquidMetalFragmentShader,
-            {
-              u_repetition: 4,
-              u_softness: 0.5,
-              u_shiftRed: 0.3,
-              u_shiftBlue: 0.3,
-              u_distortion: 0,
-              u_contour: 0,
-              u_angle: 45,
-              u_scale: 8,
-              u_shape: 0,
-              u_offsetX: 0.1,
-              u_offsetY: -0.1,
-            },
-            undefined,
-            0.6,
-          );
+        const mount: any = new ShaderMount(
+          shaderRef.current,
+          liquidMetalFragmentShader,
+          {
+            u_repetition: 4,
+            u_softness: 0.5,
+            u_shiftRed: 0.3,
+            u_shiftBlue: 0.3,
+            u_distortion: 0,
+            u_contour: 0,
+            u_angle: 45,
+            u_scale: 8,
+            u_shape: 0,
+            u_offsetX: 0.1,
+            u_offsetY: -0.1,
+          },
+          undefined,
+          0.6,
+        );
 
-          observer = new IntersectionObserver(
-            ([entry]) => {
-              visibleRef.current = entry.isIntersecting;
-              shaderMount.current?.setSpeed?.(restSpeed());
-            },
-            { rootMargin: "100px" }
-          );
-          observer.observe(shaderRef.current);
+        // Robust physical viewport visibility check:
+        // ShaderMount's internal IntersectionObserver can produce false negatives
+        // when nested inside elements with 3D perspective transforms or during page transition animations.
+        // We override updateCurrentSpeed to check physical viewport coordinates accurately.
+        mount.updateCurrentSpeed = () => {
+          if (disposed) return;
+          const isDocHidden = typeof document !== "undefined" && document.hidden;
+          if (isDocHidden) {
+            mount.setCurrentSpeed(0);
+            return;
+          }
+          const el = shaderRef.current;
+          if (!el) {
+            mount.setCurrentSpeed(0);
+            return;
+          }
+          const rect = el.getBoundingClientRect();
+          // Button is active if any part is within or near the visible screen (generous 120px boundary)
+          const inView =
+            rect.bottom > -120 &&
+            rect.top < window.innerHeight + 120 &&
+            rect.right > -120 &&
+            rect.left < window.innerWidth + 120;
+
+          mount.isInViewport = inView;
+          mount.setCurrentSpeed(inView ? mount.speed : 0);
+        };
+
+        shaderMount.current = mount;
+        mount.updateCurrentSpeed();
+
+        // Auto-recover if WebGL context is lost during tab switch / navigation
+        const canvas = shaderRef.current.querySelector("canvas");
+        if (canvas) {
+          canvas.addEventListener("webglcontextlost", (e) => {
+            e.preventDefault();
+          });
+          canvas.addEventListener("webglcontextrestored", () => {
+            if (!disposed) loadShader();
+          });
         }
       } catch (error) {
-        console.warn("LiquidMetalButton: Shader fallback to CSS animation", error);
-        setLite(true);
+        console.warn("LiquidMetalButton: WebGL Shader init contested, retrying...", error);
+        if (!disposed) {
+          setTimeout(() => {
+            if (!disposed && !shaderMount.current) {
+              loadShader();
+            }
+          }, 350);
+        }
       }
     };
 
     loadShader();
 
+    const handleSync = () => {
+      if (shaderMount.current && !disposed) {
+        shaderMount.current.updateCurrentSpeed();
+      }
+    };
+
+    window.addEventListener("scroll", handleSync, { passive: true });
+    window.addEventListener("resize", handleSync, { passive: true });
+    window.addEventListener("liquid-metal-resume", handleSync);
+    window.addEventListener("focus", handleSync);
+
     return () => {
-      observer?.disconnect();
-      if (shaderMount.current?.destroy) {
-        shaderMount.current.destroy();
+      disposed = true;
+      window.removeEventListener("scroll", handleSync);
+      window.removeEventListener("resize", handleSync);
+      window.removeEventListener("liquid-metal-resume", handleSync);
+      window.removeEventListener("focus", handleSync);
+      if (shaderMount.current) {
+        if (typeof shaderMount.current.dispose === "function") {
+          shaderMount.current.dispose();
+        } else if (typeof shaderMount.current.destroy === "function") {
+          shaderMount.current.destroy();
+        }
         shaderMount.current = null;
       }
     };
@@ -237,22 +286,28 @@ export function LiquidMetalButton({
 
   const handleMouseEnter = () => {
     setIsHovered(true);
-    hoverRef.current = true;
-    shaderMount.current?.setSpeed?.(restSpeed());
+    if (shaderMount.current) {
+      shaderMount.current.isInViewport = true;
+      shaderMount.current.setSpeed?.(1.0);
+    }
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
     setIsPressed(false);
-    hoverRef.current = false;
-    shaderMount.current?.setSpeed?.(restSpeed());
+    if (shaderMount.current) {
+      shaderMount.current.setSpeed?.(0.6);
+    }
   };
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (shaderMount.current?.setSpeed) {
-      shaderMount.current.setSpeed(2.4);
+    if (shaderMount.current) {
+      shaderMount.current.isInViewport = true;
+      shaderMount.current.setSpeed?.(2.4);
       setTimeout(() => {
-        shaderMount.current?.setSpeed?.(restSpeed());
+        if (shaderMount.current) {
+          shaderMount.current.setSpeed?.(0.6);
+        }
       }, 300);
     }
 
@@ -403,7 +458,7 @@ export function LiquidMetalButton({
             >
               <div
                 ref={shaderRef}
-                className={`shader-container-exploded${lite ? " is-lite" : ""}`}
+                className="shader-container-exploded"
                 style={{
                   borderRadius: "100px",
                   overflow: "hidden",

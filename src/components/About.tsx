@@ -2,7 +2,6 @@
 
 import { EVENT } from "@/data/hackathon";
 import { RevealWords, RevealHeading, RevealBlock } from "@/components/ui/reveal";
-import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import Ornament from "@/components/ui/Ornament";
 
 const STORY = [
@@ -32,18 +31,6 @@ export default function About() {
         <div className="ab-story-wrap">
           <RevealWords paragraphs={STORY} className="ab-story" />
         </div>
-
-        {/* ── Liquid Metal Button ── */}
-        <RevealBlock className="ab-action-wrap" y={16} delay={0.12}>
-          <LiquidMetalButton
-            label="Claim Your Seat"
-            href="https://docs.google.com/forms/d/e/1FAIpQLSdDTkIxyYih8bbSP0Ns1I_QMIyDjGpvUhcIXrlXjor9c7fE9w/viewform"
-            target="_blank"
-            rel="noopener noreferrer"
-            width={210}
-            height={48}
-          />
-        </RevealBlock>
       </div>
 
       <style>{`
@@ -131,28 +118,6 @@ export default function About() {
           text-wrap: balance;
         }
 
-        /* ── Action Wrap & Locked Button ── */
-        .ab-action-wrap {
-          margin-top: clamp(2.75rem, 5.5vh, 4.5rem);
-          display: flex;
-          justify-content: center;
-        }
-
-        .ab-locked-wrap {
-          display: inline-flex;
-          position: relative;
-          cursor: not-allowed;
-          opacity: 0.88;
-          transition: opacity 180ms ease, transform 180ms ease;
-        }
-
-        .ab-locked-wrap:hover {
-          opacity: 1;
-        }
-
-        .ab-locked-wrap * {
-          pointer-events: none;
-        }
       `}</style>
     </section>
   );

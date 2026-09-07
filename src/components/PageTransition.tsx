@@ -5,88 +5,107 @@ import { usePathname, useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getLenis } from "@/lib/lenis";
-import { triggerScrollExpand } from "@/lib/scroll-expand";
-
 /**
- * PageTransition — a curtain that sweeps through between routes.
+ * PageTransition — an Apple-grade, fluid cinematic curtain between routes.
  *
- * The App Router swaps trees instantly, which on a site this heavy reads as a
- * hard cut: the old page vanishes mid-scroll and the new one appears already
- * half-built, with every scroll-triggered reveal firing at once. This covers
- * the swap.
+ * Symmetrical paths (§7 of Apple Design Foundation):
+ *   - Forward navigation: Curtain sweeps up from bottom (100% -> 0), then clears out the top (0 -> -100%).
+ *   - Backward navigation (e.g. "← Back to all tracks"): Curtain sweeps down from top (-100% -> 0), then clears out the bottom (0 -> 100%).
  *
- * Two halves, because `usePathname()` only updates *after* navigation:
- *
- *   OUT — a document-level click listener catches internal links, holds the
- *         navigation, sweeps the curtain up over the page, then routes.
- *   IN  — the pathname change lands the new page at the top and sweeps the
- *         curtain off the top edge, so it reads as one continuous pass rather
- *         than a panel that arrives and retreats the way it came.
- *
- * Same-page hash links are deliberately ignored: SmoothScroll owns those and
- * eases them through Lenis.
+ * Latency & Polish (§1 & §3):
+ *   - Captured click listener ensures instantaneous response before router starts.
+ *   - Lenis and ScrollTrigger are measured and resized *behind the curtain*.
+ *   - Incoming page lands precisely on its anchor before the curtain lifts, completely eliminating scroll jumps.
  */
 
 /** Curtain covers the page. */
-const OUT_MS = 0.5;
-/** Curtain clears the page. Slower — the reveal is the part you watch. */
-const IN_MS = 0.78;
+const OUT_MS = 0.35;
+/** Curtain clears the page to reveal incoming content. */
+const IN_MS = 0.44;
+/** Minimum dwell time (ms) while curtain is closed so the emblem animation is clearly seen. */
+const MIN_HOLD_MS = 950;
 
 export default function PageTransition() {
   const veilRef = useRef<HTMLDivElement>(null);
-  const markRef = useRef<HTMLSpanElement>(null);
+  const markRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
 
   /** Set once a route change has actually been started from here. */
   const navigating = useRef(false);
+  const isBackRef = useRef(false);
   const lastPath = useRef(pathname);
+  const targetHashRef = useRef<string>("");
+  const curtainClosedAt = useRef<number>(0);
 
   const reduced = () =>
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /**
-   * Put the incoming page where it belongs before the curtain lifts, then
-   * re-measure every trigger on it.
-   *
-   * "Where it belongs" is the top *unless* the link carried a hash — the nav
-   * items are all `/#section`, so from a sub-page they are both a route change
-   * and an anchor, and forcing 0 would swallow the anchor.
+   * Positions the incoming page behind the curtain before it lifts.
+   * Resizes Lenis to update scroll limits, clears trigger caches,
+   * and synchronizes immediate landing without visible scroll animations.
    */
   const settleNewPage = useCallback(() => {
-    const land = () => {
-      const hash = window.location.hash;
-      const target = hash && hash.length > 1 ? document.querySelector(hash) : null;
-      const lenis = getLenis();
+    const hash = (typeof window !== "undefined" ? window.location.hash : "") || targetHashRef.current;
+    const lenis = getLenis();
 
-      if (target) {
-        if (lenis) lenis.scrollTo(target as HTMLElement, { immediate: true, force: true });
-        else (target as HTMLElement).scrollIntoView();
-        return;
-      }
-      if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
-      else window.scrollTo(0, 0);
-    };
+    if (typeof ScrollTrigger !== "undefined" && typeof ScrollTrigger.clearScrollMemory === "function") {
+      ScrollTrigger.clearScrollMemory();
+    }
 
-    land();
-    // One frame later the new tree has laid out, so anchors are honest and the
-    // section we were asked for actually exists to scroll to.
-    requestAnimationFrame(() => {
-      land();
-      ScrollTrigger.refresh();
-      const hash = window.location.hash;
-      const target = hash && hash.length > 1 ? document.querySelector<HTMLElement>(hash) : null;
+    if (lenis) {
+      lenis.resize();
+    }
+
+    if (hash && hash.length > 1) {
+      const target = document.querySelector<HTMLElement>(hash);
       if (target) {
-        window.setTimeout(() => triggerScrollExpand(target), 180);
+        const rect = target.getBoundingClientRect();
+        const absoluteTop = rect.top + window.scrollY;
+
+        window.scrollTo(0, absoluteTop);
+        if (lenis) {
+          lenis.resize();
+          lenis.scrollTo(absoluteTop, { immediate: true, force: true });
+        } else {
+          target.scrollIntoView({ block: "start" });
+        }
+
+        window.setTimeout(() => {
+          if (typeof window !== "undefined" && window.location.hash) {
+            try {
+              window.history.replaceState(null, "", window.location.pathname);
+            } catch {}
+          }
+        }, 150);
+        return true;
       }
-    });
+    }
+
+    if (!hash) {
+      window.scrollTo(0, 0);
+      if (lenis) {
+        lenis.resize();
+        lenis.scrollTo(0, { immediate: true, force: true });
+      }
+    }
+    return false;
   }, []);
 
-  // GSAP owns the transform from here on; park the curtain below the fold.
+  // GSAP owns the transform; park the curtain below the fold.
   useEffect(() => {
     const veil = veilRef.current;
     if (veil) gsap.set(veil, { yPercent: 100 });
+    if (typeof window !== "undefined" && window.location.hash) {
+      try {
+        const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+        if (nav?.type === "reload") {
+          window.history.replaceState(null, "", window.location.pathname);
+        }
+      } catch {}
+    }
   }, []);
 
   // ── IN: the new route has committed ───────────────────────────────────────
@@ -96,56 +115,91 @@ export default function PageTransition() {
 
     const veil = veilRef.current;
     const mark = markRef.current;
+    const wasNavigating = navigating.current;
     navigating.current = false;
+    const isBack = isBackRef.current;
 
     settleNewPage();
 
-    // ── IN: Lightweight, smooth fade on the incoming page ────────────────────
+    // Subtle incoming page reveal
     const mainEl = document.querySelector<HTMLElement>("main") || document.querySelector<HTMLElement>(".page-wrap");
     if (mainEl && !reduced()) {
       gsap.killTweensOf(mainEl);
       gsap.fromTo(
         mainEl,
-        {
-          opacity: 0.88,
-        },
+        { opacity: 0.92 },
         {
           opacity: 1,
-          duration: 0.45,
+          duration: 0.38,
           ease: "power2.out",
           clearProps: "opacity",
         }
       );
     }
 
-    if (!veil || !mark || reduced()) {
-      if (veil) gsap.set(veil, { yPercent: 100, visibility: "hidden" });
+    if (!veil || !mark || reduced() || !wasNavigating) {
+      if (veil) gsap.set(veil, { yPercent: 100, visibility: "hidden", pointerEvents: "none" });
+      if (mark) mark.classList.remove("is-active");
+      isBackRef.current = false;
+      targetHashRef.current = "";
+      curtainClosedAt.current = 0;
       return;
     }
 
     gsap.killTweensOf([veil, mark]);
-    gsap.set(veil, { yPercent: 0, visibility: "visible" });
+    gsap.set(veil, { yPercent: 0, visibility: "visible", pointerEvents: "auto" });
 
-    const tl = gsap.timeline();
-    tl.to(mark, { opacity: 0, scale: 0.94, duration: 0.28, ease: "power2.in" }, 0);
-    tl.to(
-      veil,
-      {
-        yPercent: -100,
-        duration: IN_MS,
-        ease: "expo.inOut",
-        // Park it back below the fold, ready for the next departure.
-        onComplete: () => gsap.set(veil, { yPercent: 100, visibility: "hidden" }),
-      },
-      0.04,
-    );
+    // Calculate remaining hold time so user clearly sees the emblem animation
+    const elapsed = curtainClosedAt.current > 0 ? Date.now() - curtainClosedAt.current : 0;
+    const remainingHold = Math.max(0, MIN_HOLD_MS - elapsed);
+    const holdDelaySec = remainingHold / 1000;
 
-    return () => {
-      tl.kill();
-    };
+    // Allow DOM to commit layout at the target position before lifting the curtain
+    requestAnimationFrame(() => {
+      if (typeof ScrollTrigger !== "undefined") {
+        ScrollTrigger.refresh();
+      }
+      settleNewPage();
+
+      const tl = gsap.timeline({
+        delay: holdDelaySec,
+        onStart: () => {
+          settleNewPage();
+        },
+        onComplete: () => {
+          gsap.set(veil, { yPercent: 100, visibility: "hidden", pointerEvents: "none" });
+          if (mark) mark.classList.remove("is-active");
+          isBackRef.current = false;
+          targetHashRef.current = "";
+          curtainClosedAt.current = 0;
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new Event("liquid-metal-resume"));
+          }
+        },
+      });
+      tl.to(
+        mark,
+        {
+          opacity: 0,
+          scale: 0.96,
+          duration: 0.22,
+          ease: "power2.inOut",
+        },
+        0,
+      );
+      tl.to(
+        veil,
+        {
+          yPercent: isBack ? 100 : -100,
+          duration: IN_MS,
+          ease: "expo.out",
+        },
+        0.03,
+      );
+    });
   }, [pathname, settleNewPage]);
 
-  // ── OUT: hold internal links and cover the page first ─────────────────────
+  // ── OUT: capture internal links and cover the page first ───────────────────
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
       if (event.defaultPrevented || event.button !== 0) return;
@@ -170,12 +224,43 @@ export default function PageTransition() {
       }
       if (url.origin !== window.location.origin) return;
 
-      // Same page, different anchor — SmoothScroll eases it. Leave it alone.
+      // Same page, different anchor — SmoothScroll eases it.
       if (url.pathname === window.location.pathname) return;
 
+      // Prevent premature route swap while curtain is animating
       event.preventDefault();
       if (navigating.current) return;
       navigating.current = true;
+
+      const isBack =
+        anchor.getAttribute("data-direction") === "back" ||
+        anchor.classList.contains("tb-back-btn") ||
+        (url.hash === "#themes" && window.location.pathname.startsWith("/tracks"));
+      isBackRef.current = isBack;
+
+      if (typeof history !== "undefined" && "scrollRestoration" in history) {
+        try {
+          history.scrollRestoration = "manual";
+        } catch {}
+      }
+      if (typeof ScrollTrigger !== "undefined" && typeof ScrollTrigger.clearScrollMemory === "function") {
+        ScrollTrigger.clearScrollMemory();
+      }
+
+      if (url.hash) {
+        targetHashRef.current = url.hash;
+        try {
+          sessionStorage.setItem("recursive:skip-intro-for-anchor", url.hash);
+        } catch {}
+      } else {
+        targetHashRef.current = "";
+        try {
+          sessionStorage.removeItem("recursive:skip-intro-for-anchor");
+        } catch {}
+        if (typeof document !== "undefined") {
+          delete document.documentElement.dataset.intro;
+        }
+      }
 
       const to = `${url.pathname}${url.search}${url.hash}`;
       const veil = veilRef.current;
@@ -187,81 +272,164 @@ export default function PageTransition() {
       }
 
       gsap.killTweensOf([veil, mark]);
-      gsap.set(veil, { yPercent: 100, visibility: "visible" });
-      gsap.set(mark, { opacity: 0, scale: 0.94 });
+      // Reset & activate animation so it starts from keyframe 0% cleanly
+      mark.classList.remove("is-active");
+      void mark.offsetWidth; // trigger reflow
+      mark.classList.add("is-active");
+
+      // Symmetrical path: Back navigations enter from top (-100%), Forward enters from bottom (100%)
+      gsap.set(veil, { yPercent: isBack ? -100 : 100, visibility: "visible", pointerEvents: "auto" });
+      gsap.set(mark, { opacity: 0, scale: 0.96 });
 
       const tl = gsap.timeline({
-        onComplete: () => router.push(to),
+        onComplete: () => {
+          curtainClosedAt.current = Date.now();
+          router.push(to);
+        },
       });
       tl.to(veil, { yPercent: 0, duration: OUT_MS, ease: "power3.inOut" }, 0);
-      tl.to(mark, { opacity: 1, scale: 1, duration: 0.34, ease: "expo.out" }, 0.16);
+      tl.to(
+        mark,
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.24,
+          ease: "power2.out",
+        },
+        0.06,
+      );
     };
 
-    document.addEventListener("click", onClick);
-    return () => document.removeEventListener("click", onClick);
+    // Use capture phase so we reliably intercept before Next.js Link initiates navigation
+    document.addEventListener("click", onClick, { capture: true });
+    return () => document.removeEventListener("click", onClick, { capture: true });
   }, [router]);
 
   return (
     <div ref={veilRef} className="pt-veil" aria-hidden="true">
-      <span ref={markRef} className="pt-mark">
-        <svg viewBox="0 0 48 48" fill="none">
-          <g
-            stroke="currentColor"
-            strokeWidth="3.2"
-            strokeLinecap="round"
-          >
-            <line x1="24" y1="7" x2="24" y2="41" />
-            <line x1="7" y1="24" x2="41" y2="24" />
-            <line x1="12" y1="12" x2="36" y2="36" />
-            <line x1="12" y1="36" x2="36" y2="12" />
-          </g>
-        </svg>
-      </span>
+      <div ref={markRef} className="pt-mark">
+        <img
+          src="/images/artifact.png"
+          alt=""
+          className="pt-artifact-base pt-artifact-center"
+          draggable={false}
+        />
+        <img
+          src="/images/artifact.png"
+          alt=""
+          className="pt-artifact-base pt-artifact-left"
+          draggable={false}
+        />
+        <img
+          src="/images/artifact.png"
+          alt=""
+          className="pt-artifact-base pt-artifact-right"
+          draggable={false}
+        />
+      </div>
 
       <style href="page-transition" precedence="default">{`
         .pt-veil {
           position: fixed;
           inset: 0;
-          z-index: 200;
+          z-index: 100000;
           display: grid;
           place-items: center;
           pointer-events: none;
-          /* No transform here on purpose. GSAP reads a CSS transform as a base
-             y in px and then stacks yPercent on top of it, which parked the
-             curtain at 200% instead of 100%. Visibility does the hiding until
-             the mount effect hands GSAP the starting position. */
           visibility: hidden;
           will-change: transform;
           background:
             radial-gradient(120% 70% at 50% 0%, rgba(52, 88, 38, 0.42) 0%, rgba(52, 88, 38, 0) 62%),
             linear-gradient(180deg, #0A160A 0%, #010301 62%);
-          /* A soft leading edge, so the curtain arrives as a wash rather than a
-             hard rectangle sliding up the screen. */
-          box-shadow: 0 -40px 80px -20px rgba(1, 3, 1, 0.9);
+          box-shadow: 0 0 100px 30px rgba(1, 3, 1, 0.95);
         }
 
         .pt-mark {
-          display: block;
-          width: clamp(34px, 5vw, 52px);
-          color: rgba(184, 222, 140, 0.9);
+          position: relative;
+          width: clamp(150px, 22vw, 240px);
+          aspect-ratio: 744 / 220;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           opacity: 0;
-          filter: drop-shadow(0 0 18px rgba(92, 140, 58, 0.45));
+          pointer-events: none;
+          user-select: none;
+          will-change: transform, opacity;
         }
 
-        .pt-mark svg {
+        .pt-artifact-base {
+          position: absolute;
+          inset: 0;
           width: 100%;
-          height: auto;
-          display: block;
-          animation: pt-spin 3.4s linear infinite;
+          height: 100%;
+          object-fit: contain;
+          /* Original botanical green — rich, natural, matches site ornament */
+          filter: brightness(1.16) saturate(1.1);
+          pointer-events: none;
+          user-select: none;
+          -webkit-user-drag: none;
         }
 
-        @keyframes pt-spin {
-          to { transform: rotate(180deg); }
+        /* Center anchor: subtle constant presence at the pivot */
+        .pt-artifact-center {
+          -webkit-mask-image: radial-gradient(ellipse 24% 65% at 50% 50%, black 30%, transparent 100%);
+          mask-image: radial-gradient(ellipse 24% 65% at 50% 50%, black 30%, transparent 100%);
+          opacity: 0.72;
+        }
+
+        /* Dramatic split fade: Left wing starts visible */
+        .pt-artifact-left {
+          -webkit-mask-image: linear-gradient(to right, black 0%, black 38%, transparent 58%);
+          mask-image: linear-gradient(to right, black 0%, black 38%, transparent 58%);
+          opacity: 1;
+        }
+
+        /* Dramatic split fade: Right wing starts hidden */
+        .pt-artifact-right {
+          -webkit-mask-image: linear-gradient(to right, transparent 42%, black 62%, black 100%);
+          mask-image: linear-gradient(to right, transparent 42%, black 62%, black 100%);
+          opacity: 0;
+        }
+
+        .pt-mark.is-active .pt-artifact-left {
+          animation: pt-split-left 1.05s ease-in-out infinite alternate;
+        }
+
+        .pt-mark.is-active .pt-artifact-right {
+          animation: pt-split-right 1.05s ease-in-out infinite alternate;
+        }
+
+        @keyframes pt-split-left {
+          0% {
+            opacity: 1;
+            transform: scale(1.02);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(0.98);
+          }
+        }
+
+        @keyframes pt-split-right {
+          0% {
+            opacity: 0;
+            transform: scale(0.98);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1.02);
+          }
         }
 
         @media (prefers-reduced-motion: reduce) {
           .pt-veil { display: none; }
-          .pt-mark svg { animation: none; }
+          .pt-artifact-left, .pt-artifact-right {
+            animation: none;
+            opacity: 0.85;
+            -webkit-mask-image: none;
+            mask-image: none;
+          }
+          .pt-artifact-center { display: none; }
         }
       `}</style>
     </div>

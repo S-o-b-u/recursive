@@ -14,7 +14,7 @@ import { buildTrackTextures } from "@/lib/track-textures";
 
 /** Autoplay dwell, shared by the slider and the rail's progress bar. */
 const DWELL = 6;
-const HEADING_LINES = ["Four directions", "to build in."];
+const HEADING_LINES = ["Six directions", "to build in."];
 
 /** Word-by-word reveal helper matching the RevealWords animation in Story of the Chair */
 function SplitWords({ text, className = "" }: { text: string; className?: string }) {
@@ -23,7 +23,8 @@ function SplitWords({ text, className = "" }: { text: string; className?: string
     <span className={`th-words ${className}`}>
       {words.map((word, i) => (
         <span key={i} className="th-word-slot">
-          <span className="th-word">{word}</span>{" "}
+          <span className="th-word">{word}</span>
+          {i < words.length - 1 ? " " : ""}
         </span>
       ))}
     </span>
@@ -158,7 +159,7 @@ export default function Themes() {
   const index = String(active + 1).padStart(2, "0");
 
   return (
-    <section id="themes" className="th" aria-label="Tracks">
+    <section className="th" aria-label="Tracks">
       <div className="th-inner">
         <RevealBlock y={14}>
           <div className="th-ornament-wrap">
@@ -166,9 +167,21 @@ export default function Themes() {
           </div>
         </RevealBlock>
 
+        {/* Precise anchor landing directly on "Six directions to build in." with navbar clearance */}
+        <div
+          id="themes"
+          style={{ position: "relative", top: "-3.5rem", height: 0, pointerEvents: "none" }}
+          aria-hidden="true"
+        />
+        <div
+          id="tracks"
+          style={{ position: "relative", top: "-3.5rem", height: 0, pointerEvents: "none" }}
+          aria-hidden="true"
+        />
+
         <div className="th-head-wrap">
           <RevealBlock y={10}>
-            <span className="th-eyebrow">The four tracks</span>
+            <span className="th-eyebrow">The six tracks</span>
           </RevealBlock>
 
           <RevealHeading
@@ -216,8 +229,6 @@ export default function Themes() {
                 />
               )}
 
-              {/* keyline + corner ticks, drawn over the canvas */}
-              <span className="th-plate-frame" aria-hidden="true" />
 
               <span className="th-plate-index" aria-hidden="true">
                 {index}
@@ -262,15 +273,14 @@ export default function Themes() {
                 ))}
               </ul>
 
-              <button
-                type="button"
+              <Link
+                href={`/tracks/${track.slug}`}
                 className="th-brief-link"
-                aria-label="Read the full brief - Currently Locked"
-                disabled
+                aria-label={`Read the full brief for ${track.title}`}
               >
                 <span className="th-link-text-slot">
                   <span className="th-link-text-default">Read the full brief</span>
-                  <span className="th-link-text-hover">Locked · Revealing Soon</span>
+                  <span className="th-link-text-hover">Explore track brief</span>
                 </span>
                 <span className="th-link-icon-slot" aria-hidden="true">
                   <svg viewBox="0 0 24 24" className="th-link-arrow">
@@ -283,17 +293,13 @@ export default function Themes() {
                       strokeLinejoin="round"
                     />
                   </svg>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="th-link-lock">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                  </svg>
                 </span>
-              </button>
+              </Link>
             </div>
           </div>
         </RevealBlock>
 
-        {/* ── Rail: four tabs, the active one carrying the dwell bar ── */}
+        {/* ── Rail: six tabs, the active one carrying the dwell bar ── */}
         <RevealBlock y={16} delay={0.14} className="th-rail-reveal">
           <div className="th-rail" role="tablist" aria-label="Tracks">
             {TRACKS.map((t, i) => (
@@ -352,7 +358,10 @@ export default function Themes() {
           opacity: 0.88;
         }
 
-        .th-head-wrap { width: 100%; }
+        .th-head-wrap {
+          width: 100%;
+          scroll-margin-top: 5.5rem;
+        }
 
         .th-eyebrow {
           font-family: var(--font-geist-mono), monospace;
@@ -419,25 +428,6 @@ export default function Themes() {
 
         .th-morph { width: 100%; height: 100%; }
 
-        .th-plate-frame {
-          position: absolute;
-          inset: 12px;
-          z-index: 3;
-          border-radius: 12px;
-          pointer-events: none;
-          box-shadow: inset 0 0 0 1px rgba(238, 248, 228, 0.16);
-          /* corner ticks: keep the keyline only at the four corners */
-          -webkit-mask:
-            linear-gradient(#000 0 0) top left / 22px 22px no-repeat,
-            linear-gradient(#000 0 0) top right / 22px 22px no-repeat,
-            linear-gradient(#000 0 0) bottom left / 22px 22px no-repeat,
-            linear-gradient(#000 0 0) bottom right / 22px 22px no-repeat;
-          mask:
-            linear-gradient(#000 0 0) top left / 22px 22px no-repeat,
-            linear-gradient(#000 0 0) top right / 22px 22px no-repeat,
-            linear-gradient(#000 0 0) bottom left / 22px 22px no-repeat,
-            linear-gradient(#000 0 0) bottom right / 22px 22px no-repeat;
-        }
 
         .th-plate-index {
           position: absolute;
@@ -521,7 +511,7 @@ export default function Themes() {
         }
 
         .th-word-slot {
-          display: inline-block;
+          display: inline;
         }
 
         .th-word {
@@ -592,7 +582,8 @@ export default function Themes() {
           font-size: 0.9rem;
           font-weight: 600;
           color: #B8DE8C;
-          cursor: not-allowed;
+          text-decoration: none;
+          cursor: pointer;
           user-select: none;
           transition: color 200ms ease, border-color 200ms ease, gap 200ms ease;
         }
@@ -633,22 +624,13 @@ export default function Themes() {
           height: 0.88rem;
           opacity: 1;
           transform: scale(1);
-          transition: opacity 200ms ease, transform 200ms ease;
-        }
-
-        .th-link-lock {
-          grid-area: 1 / 1;
-          width: 0.88rem;
-          height: 0.88rem;
-          color: #FFDE7A;
-          opacity: 0;
-          transform: scale(0.7);
-          transition: opacity 200ms ease, transform 200ms ease;
+          transition: opacity 200ms ease, transform 200ms ease, color 200ms ease;
         }
 
         .th-brief-link:hover {
           color: #FFDE7A;
           border-color: rgba(255, 222, 122, 0.6);
+          gap: 0.65rem;
         }
 
         .th-brief-link:hover .th-link-text-default {
@@ -662,13 +644,8 @@ export default function Themes() {
         }
 
         .th-brief-link:hover .th-link-arrow {
-          opacity: 0;
-          transform: scale(0.7);
-        }
-
-        .th-brief-link:hover .th-link-lock {
-          opacity: 1;
-          transform: scale(1);
+          transform: translateX(4px);
+          color: #FFDE7A;
         }
 
         /* ── Rail ── */
@@ -679,8 +656,8 @@ export default function Themes() {
 
         .th-rail {
           display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: clamp(0.6rem, 1.6vw, 1.25rem);
+          grid-template-columns: repeat(6, minmax(0, 1fr));
+          gap: clamp(0.5rem, 1.2vw, 1rem);
           width: 100%;
           border-top: 1px solid rgba(190, 224, 168, 0.13);
           padding-top: clamp(1rem, 2vw, 1.5rem);
@@ -710,7 +687,7 @@ export default function Themes() {
 
         .th-tab-name {
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: clamp(0.8rem, 1.1vw, 0.95rem);
+          font-size: clamp(0.78rem, 1.05vw, 0.92rem);
           font-weight: 500;
           letter-spacing: -0.012em;
           line-height: 1.25;
@@ -756,16 +733,26 @@ export default function Themes() {
           border-radius: 4px;
         }
 
+        @media (max-width: 1060px) {
+          .th-rail {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            row-gap: 1.1rem;
+          }
+        }
+
         @media (max-width: 900px) {
           .th-stage {
             grid-template-columns: minmax(0, 1fr);
             gap: clamp(1.5rem, 5vw, 2.25rem);
           }
           .th-plate { aspect-ratio: 4 / 3; }
-          .th-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 1rem; }
         }
 
-        @media (max-width: 460px) {
+        @media (max-width: 600px) {
+          .th-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 420px) {
           .th-rail { grid-template-columns: minmax(0, 1fr); }
         }
 
