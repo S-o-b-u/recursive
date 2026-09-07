@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { RevealBlock, RevealHeading } from "@/components/ui/reveal";
 import Ornament from "@/components/ui/Ornament";
+import { VENUE } from "@/data/hackathon";
 import {
   MapPin,
   Navigation,
@@ -27,13 +28,15 @@ export default function VenueLocation() {
   const [mapKey, setMapKey] = useState(0);
   const [isLocating, setIsLocating] = useState(false);
 
-  const addressText =
-    "157/ F, Nilgunj Road, Sahid Colony, Panihati, Sodepur, Kolkata, West Bengal 700114";
-  const googleMapsUrl =
-    "https://www.google.com/maps/search/?api=1&query=Guru+Nanak+Institute+of+Technology+Panihati+Sodepur+Kolkata";
+  const addressText = VENUE.full;
+  // Pin the exact campus coordinates rather than a name search: a text query
+  // can resolve to any of the several Guru Nanak institutes clustered on this
+  // road (the dental college and the pharmacy institute share the campus).
+  const pin = `${VENUE.lat},${VENUE.lng}`;
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${pin}`;
   const googleMapsEmbedUrl = isSatellite
-    ? `https://maps.google.com/maps?q=22.6997,88.3792&hl=en&t=k&z=${zoom}&output=embed`
-    : `https://maps.google.com/maps?q=22.6997,88.3792&hl=en&z=${zoom}&output=embed`;
+    ? `https://maps.google.com/maps?q=${pin}&hl=en&t=k&z=${zoom}&output=embed`
+    : `https://maps.google.com/maps?q=${pin}&hl=en&z=${zoom}&output=embed`;
 
   const handleCopy = () => {
     if (typeof navigator !== "undefined" && navigator.clipboard) {
@@ -255,7 +258,7 @@ export default function VenueLocation() {
                 <div className="map-floating-bottom">
                   <div className="map-bottom-left">
                     <div className="map-coords-info">
-                      <div className="coords-line">22.6907° N, 88.3792° E</div>
+                      <div className="coords-line">{VENUE.display}</div>
                       <div className="city-line">Sodepur, Kolkata</div>
                     </div>
                   </div>
@@ -642,23 +645,23 @@ export default function VenueLocation() {
           min-height: 480px;
           border-radius: 0.95rem;
           overflow: hidden;
-          background: transparent;
+          background: #e5e3df;
         }
 
         .google-maps-frame {
           position: absolute;
-          top: 0;
+          top: -72px;
           left: 0;
           width: 100%;
-          height: calc(100% + 110px);
+          height: calc(100% + 185px);
           border: 0;
           display: block;
-          opacity: 0.82;
+          opacity: 0.88;
           transition: opacity 250ms ease;
         }
 
         .venue-map-card:hover .google-maps-frame {
-          opacity: 0.95;
+          opacity: 0.96;
         }
 
         /* Floating Top Badges */
@@ -679,13 +682,13 @@ export default function VenueLocation() {
           display: inline-flex;
           align-items: center;
           gap: 0.45rem;
-          background: rgba(255, 255, 255, 0.22);
-          backdrop-filter: blur(12px) saturate(160%);
-          -webkit-backdrop-filter: blur(12px) saturate(160%);
-          border: 1px solid rgba(255, 255, 255, 0.45);
+          background: rgba(255, 255, 255, 0.45);
+          backdrop-filter: blur(14px) saturate(160%);
+          -webkit-backdrop-filter: blur(14px) saturate(160%);
+          border: 1px solid rgba(255, 255, 255, 0.6);
           box-shadow:
-            inset 0 1px 1.5px rgba(255, 255, 255, 0.65),
-            0 4px 12px rgba(0, 0, 0, 0.03);
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.75),
+            0 4px 12px rgba(0, 0, 0, 0.04);
           border-radius: 0.75rem;
           padding: 0.42rem 0.95rem;
           font-family: var(--font-display), var(--font-dm-sans), sans-serif;
@@ -919,6 +922,11 @@ export default function VenueLocation() {
         }
 
         @media (max-width: 640px) {
+          .google-maps-frame {
+            top: -68px;
+            height: calc(100% + 180px);
+          }
+
           .map-floating-top {
             top: 0.55rem;
             left: 0.55rem;

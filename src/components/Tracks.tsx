@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { TRACKS, TRACK_CRITERIA, EVENT } from "@/data/hackathon";
 import Ornament from "@/components/ui/Ornament";
 
@@ -28,7 +27,7 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
   }, []);
 
   return (
-    <section id="tracks" className="tr-section" aria-label="Detailed Track Briefs">
+    <section id="track-briefs" className="tr-section" aria-label="Detailed Track Briefs">
       <div className="tr-inner">
         {/* ── Section Header Motif ── */}
         <div className="tr-ornament-wrap">
@@ -76,7 +75,7 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
 
                 {/* ── Track Card Media ── */}
                 {track.media.src && (
-                  <Link href={`/tracks/${track.slug}`} className="tr-card-media-link" aria-label={`View full brief for ${track.title}`}>
+                  <div className="tr-card-media-link">
                     <div className="tr-card-media">
                       <img
                         src={track.media.src}
@@ -86,15 +85,11 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
                       />
                       <span className="tr-card-media-gloss" aria-hidden="true" />
                     </div>
-                  </Link>
+                  </div>
                 )}
 
                 {/* ── Title & Line ── */}
-                <h3 className="tr-card-title">
-                  <Link href={`/tracks/${track.slug}`} className="tr-title-link">
-                    {track.title}
-                  </Link>
-                </h3>
+                <h3 className="tr-card-title">{track.title}</h3>
                 <p className="tr-card-line">&ldquo;{track.line}&rdquo;</p>
 
                 <div className="tr-card-divider" />
@@ -144,18 +139,6 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
                     <span>Track Prize Eligible</span>
                   </div>
 
-                  <div className="tr-card-actions">
-                    <Link
-                      href={`/tracks/${track.slug}`}
-                      className="tr-brief-btn"
-                      aria-label={`Read full brief for ${track.title}`}
-                    >
-                      <span>Read Brief</span>
-                      <svg viewBox="0 0 24 24" className="tr-cta-arrow" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M5 12h14M13 6l6 6-6 6" />
-                      </svg>
-                    </Link>
-                  </div>
                 </div>
               </article>
             );

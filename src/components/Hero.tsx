@@ -168,6 +168,12 @@ export default function Hero() {
         }
         transition={{ duration: 0.7, ease: EASE_OUT, delay: 0.02 }}
       >
+        <h1 className="sr-only">
+          RECURSIVE 2026 — ACM Hackathon by GNIT ACM Student Chapter
+        </h1>
+        <p className="sr-only">
+          Official website for RECURSIVE Hackathon 2026 at Guru Nanak Institute of Technology (GNIT), Kolkata. An 8-hour sprint in AI, Web3, FinTech, HealthTech, CyberSecurity, and Open Innovation. Register on Devfolio.
+        </p>
         <div className="hero-warp-wrap">
           <WarpText
             src={logoImg.src || "/images/logo.png"}

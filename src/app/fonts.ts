@@ -10,13 +10,21 @@ export const bebasNeue = localFont({
   variable: "--font-bebas",
 });
 
-/** HeadingNow face for all headings across every page. */
+/** HeadingNow face for all headings across every page. Excludes watermarked digits 0-9 so they cleanly fall back to DM Sans. */
 export const headingNow = localFont({
   src: "../../public/fonts/HeadingNowTrial-45Medium.ttf",
   weight: "500",
   style: "normal",
   display: "swap",
   variable: "--font-heading",
+  adjustFontFallback: false,
+  fallback: ["var(--font-dm-sans)", "sans-serif"],
+  declarations: [
+    {
+      prop: "unicode-range",
+      value: "U+0000-002F, U+003A-10FFFF",
+    },
+  ],
 });
 
 /** Display face for the wordmark and big display. */

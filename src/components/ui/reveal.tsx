@@ -148,7 +148,7 @@ export function RevealWords({
         </p>
       ))}
 
-      <style>{`
+      <style href="reveal-words" precedence="default">{`
         .rw {
           display: flex;
           flex-direction: column;
@@ -232,7 +232,13 @@ export function RevealHeading({
         </span>
       ))}
 
-      <style>{`
+      {/* href + precedence so React hoists this to <head> and emits it once.
+          Without them it rendered a <style> element *inside* every <h2> --
+          invalid markup (a heading takes phrasing content, and this is not),
+          repeated seven times on the homepage, and sitting in the middle of the
+          text a crawler reads out of the heading. Sibling components in this
+          file already do it this way. */}
+      <style href="reveal-heading" precedence="default">{`
         .rh { margin: 0; }
         .rh-line {
           display: block;

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { RevealBlock, RevealHeading } from "@/components/ui/reveal";
 import Ornament from "@/components/ui/Ornament";
 import { FAQS } from "@/data/hackathon";
+import { FaqJsonLd } from "@/components/JsonLd";
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -34,6 +35,7 @@ export default function HomeFAQ() {
 
   return (
     <section id="faq" className="faq-section" aria-labelledby="faq-title">
+      <FaqJsonLd />
       <div className="faq-container">
         {/* ── Header: Centered "FAQ" with Artifact (Matching Other Sections) ── */}
         <div className="faq-header">

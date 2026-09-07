@@ -302,8 +302,8 @@ export default function Navigation() {
         }
 
         @media (max-width: 520px) {
-          .nav-wordmark { font-size: 1.05rem; }
-          .nav-brand { padding: 0.45rem 0.75rem; }
+          .nav-wordmark { font-size: 0.95rem; line-height: 1; }
+          .nav-brand { padding: 0.22rem 0.55rem; }
         }
 
         .nav-desktop-links {
@@ -735,8 +735,47 @@ export default function Navigation() {
         }
 
         @media (max-width: 860px) {
+          .nav-root {
+            top: clamp(0.4rem, 1.2vh, 0.65rem);
+          }
+
+          .nav-glass-pill-layout {
+            padding: 0.18rem 0.25rem 0.18rem 0.35rem;
+            gap: 0.15rem;
+          }
+
+          .nav-brand {
+            padding: 0.22rem 0.55rem;
+          }
+
+          .nav-wordmark {
+            font-size: 0.95rem;
+            line-height: 1;
+          }
+
           .nav-desktop-links, .nav-cta { display: none; }
-          .nav-toggle { display: grid; }
+          .nav-toggle {
+            display: grid;
+            width: 1.85rem;
+            height: 1.85rem;
+          }
+
+          .nav-toggle-icon {
+            width: 14px;
+            height: 10px;
+          }
+
+          .nav-toggle-bar {
+            width: 14px;
+            height: 2px;
+          }
+
+          .nav-toggle-icon.is-open .nav-toggle-bar-1 {
+            transform: translateY(4px) rotate(45deg);
+          }
+          .nav-toggle-icon.is-open .nav-toggle-bar-2 {
+            transform: translateY(-4px) rotate(-45deg);
+          }
 
           /* Ultra-translucent crystal frosted glass on mobile phone navbar pill */
           .nav-glass-container > div,

@@ -32,8 +32,8 @@ export const TRACK_PALETTES: TrackPalette[] = [
   { base: "#18080E", glow: ["#9F1239", "#F43F5E"], line: "#FECDD3" },
   // 04. Cybersecurity & Digital Trust: Deep Cobalt / Electric Cyan
   { base: "#05131C", glow: ["#0284C7", "#38BDF8"], line: "#BAE6FD" },
-  // 05. ClimateTech & Sustainability: Forest Moss / Emerald
-  { base: "#0B1A0C", glow: ["#2E7D32", "#81C784"], line: "#C8E6C9" },
+  // 05. Web3 & Blockchain: Neon Cyan / Electric Violet / Deep Indigo
+  { base: "#0B071A", glow: ["#6366F1", "#06B6D4"], line: "#A5B4FC" },
   // 06. Open Innovation: Sunset Coral / Tangerine / Violet
   { base: "#160C14", glow: ["#C026D3", "#FB923C"], line: "#FDE047" },
 ];

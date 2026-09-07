@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { gsap } from "gsap";
 import { TRACKS } from "@/data/hackathon";
 import { RevealHeading, RevealBlock, RevealWords } from "@/components/ui/reveal";
@@ -28,6 +27,21 @@ function SplitWords({ text, className = "" }: { text: string; className?: string
         </span>
       ))}
     </span>
+  );
+}
+
+/** Render title with any numbers styled in clean numeral/DM Sans to avoid font trial glyphs */
+function formatTrackTitle(title: string) {
+  const parts = title.split(/(\d+)/);
+  if (parts.length === 1) return title;
+  return parts.map((part, i) =>
+    /^\d+$/.test(part) ? (
+      <span key={i} className="th-title-num">
+        {part}
+      </span>
+    ) : (
+      part
+    )
   );
 }
 
@@ -143,13 +157,6 @@ export default function Themes() {
           delay: 0.3,
         }
       );
-
-      // 7. Brief action button
-      gsap.fromTo(
-        ".th-brief-link",
-        { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, force3D: true, ease: "expo.out", duration: 0.9, delay: 0.38 }
-      );
     }, root);
 
     return () => ctx.revert();
@@ -244,7 +251,7 @@ export default function Themes() {
                   of a clipped line instead of just fading in. */}
               <h3 className="th-brief-title">
                 <span className="th-mask-line">
-                  <span className="th-mask-inner">{track.title}</span>
+                  <span className="th-mask-inner">{formatTrackTitle(track.title)}</span>
                 </span>
               </h3>
 
@@ -272,29 +279,6 @@ export default function Themes() {
                   </li>
                 ))}
               </ul>
-
-              <Link
-                href={`/tracks/${track.slug}`}
-                className="th-brief-link"
-                aria-label={`Read the full brief for ${track.title}`}
-              >
-                <span className="th-link-text-slot">
-                  <span className="th-link-text-default">Read the full brief</span>
-                  <span className="th-link-text-hover">Explore track brief</span>
-                </span>
-                <span className="th-link-icon-slot" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" className="th-link-arrow">
-                    <path
-                      d="M5 12h14M13 6l6 6-6 6"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-              </Link>
             </div>
           </div>
         </RevealBlock>
@@ -492,6 +476,13 @@ export default function Themes() {
           text-wrap: balance;
         }
 
+        .th-title-num {
+          font-family: var(--font-dm-sans), system-ui, sans-serif;
+          font-weight: 600;
+          letter-spacing: -0.015em;
+          display: inline-block;
+        }
+
         .th-brief-rule {
           display: block;
           width: 100%;
@@ -563,89 +554,6 @@ export default function Themes() {
           height: auto;
           margin-top: 0.24em;
           color: rgba(143, 196, 90, 0.72);
-        }
-
-        .th-brief-link {
-          align-self: flex-start;
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          margin-top: clamp(1.3rem, 2.6vw, 1.9rem);
-          /* The underline is the visual, but the hit area has to be bigger than
-             the text — this was a 26px-tall target on a touch screen. */
-          padding: 0.5rem 0 3px;
-          min-height: 40px;
-          background: transparent;
-          border: none;
-          border-bottom: 1.5px solid rgba(143, 196, 90, 0.34);
-          font-family: var(--font-dm-sans), sans-serif;
-          font-size: 0.9rem;
-          font-weight: 600;
-          color: #B8DE8C;
-          text-decoration: none;
-          cursor: pointer;
-          user-select: none;
-          transition: color 200ms ease, border-color 200ms ease, gap 200ms ease;
-        }
-
-        .th-link-text-slot {
-          display: inline-grid;
-          grid-template-areas: "text";
-          align-items: center;
-        }
-
-        .th-link-text-default {
-          grid-area: text;
-          display: inline-block;
-          transition: opacity 200ms ease, transform 200ms ease;
-        }
-
-        .th-link-text-hover {
-          grid-area: text;
-          display: inline-block;
-          opacity: 0;
-          transform: translateY(4px);
-          color: #FFDE7A;
-          white-space: nowrap;
-          transition: opacity 200ms ease, transform 200ms ease;
-        }
-
-        .th-link-icon-slot {
-          display: inline-grid;
-          place-items: center;
-          width: 0.95rem;
-          height: 0.95rem;
-          flex-shrink: 0;
-        }
-
-        .th-link-arrow {
-          grid-area: 1 / 1;
-          width: 0.88rem;
-          height: 0.88rem;
-          opacity: 1;
-          transform: scale(1);
-          transition: opacity 200ms ease, transform 200ms ease, color 200ms ease;
-        }
-
-        .th-brief-link:hover {
-          color: #FFDE7A;
-          border-color: rgba(255, 222, 122, 0.6);
-          gap: 0.65rem;
-        }
-
-        .th-brief-link:hover .th-link-text-default {
-          opacity: 0;
-          transform: translateY(-4px);
-        }
-
-        .th-brief-link:hover .th-link-text-hover {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        .th-brief-link:hover .th-link-arrow {
-          transform: translateX(4px);
-          color: #FFDE7A;
         }
 
         /* ── Rail ── */

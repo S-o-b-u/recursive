@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import SectionWrapper from "./SectionWrapper";
 import Reveal from "./Reveal";
 import { FAQS, EVENT } from "@/data/hackathon";
+import { FaqJsonLd } from "@/components/JsonLd";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
@@ -100,6 +101,7 @@ export default function FAQ() {
           );
         })}
       </div>
+      <FaqJsonLd />
     </SectionWrapper>
   );
 }
