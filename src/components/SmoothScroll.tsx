@@ -108,10 +108,15 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     gsap.ticker.lagSmoothing(500, 33);
 
     const triggerScrollExpand = (target: HTMLElement) => {
+      const sectionRoot = target.closest<HTMLElement>("section, .night, main") || target;
       const content =
         target.querySelector<HTMLElement>(
           ".section-inner, .acm-inner, .th-inner, .sp-inner, .cd-inner, .about-inner, .tracks-grid, .prize-pool-inner, .faq-inner"
-        ) || target;
+        ) ||
+        sectionRoot.querySelector<HTMLElement>(
+          ".section-inner, .acm-inner, .th-inner, .sp-inner, .cd-inner, .about-inner, .tracks-grid, .prize-pool-inner, .faq-inner"
+        ) ||
+        target;
 
       lenis.scrollTo(target, {
         offset: 0,
@@ -155,8 +160,8 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
         );
       }
 
-      target.classList.add("is-scroll-expanded");
-      window.setTimeout(() => target.classList.remove("is-scroll-expanded"), 1400);
+      sectionRoot.classList.add("is-scroll-expanded");
+      window.setTimeout(() => sectionRoot.classList.remove("is-scroll-expanded"), 1400);
     };
 
     // Hash links (the hero's "scroll for lore", the nav anchors) execute

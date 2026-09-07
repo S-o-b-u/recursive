@@ -6,7 +6,7 @@ import { EVENT } from "@/data/hackathon";
 
 export const metadata: Metadata = {
   title: "Tracks",
-  description: `The four tracks at ${EVENT.name} — one for each chair on the hill.`,
+  description: `The six tracks at ${EVENT.name} — six directions to build in.`,
 };
 
 export default function TracksPage() {
@@ -14,7 +14,7 @@ export default function TracksPage() {
     <main>
       <PageHeader
         label="Tracks"
-        title="Four seats, four directions."
+        title="Six tracks, six directions."
         lede={
           <p>
             A track is a lean, not a leash. Submit under the one your project is closest

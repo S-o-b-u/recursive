@@ -105,6 +105,9 @@ export function RevealWords({
     }, root);
 
     const handleRefresh = () => {
+      if (typeof window !== "undefined" && window.location.hash && typeof ScrollTrigger.clearScrollMemory === "function") {
+        ScrollTrigger.clearScrollMemory();
+      }
       ScrollTrigger.refresh();
     };
 

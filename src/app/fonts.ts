@@ -1,5 +1,5 @@
 import localFont from "next/font/local";
-import { Geist, Geist_Mono, DM_Sans, Syne } from "next/font/google";
+import { Geist_Mono, DM_Sans } from "next/font/google";
 
 /** Bebas Neue face for numbers across the website. */
 export const bebasNeue = localFont({

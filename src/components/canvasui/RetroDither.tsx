@@ -755,6 +755,14 @@ export function createRetroDither(
       gl!.deleteShader(vertexShader);
       gl!.deleteShader(fragmentShader);
       gl!.deleteBuffer(quad);
+      // Deleting the objects does not free the *context*, and the context is
+      // the scarce thing: this component's own note says a page carries
+      // twenty-plus slots against a browser cap of roughly sixteen. Without
+      // this, every mount/unmount cycle strands one, and once the cap is hit
+      // the browser evicts the oldest live context -- which is how an unrelated
+      // WebGL element elsewhere on the page goes blank for no local reason.
+      // <WarpText> already releases its context this way; this did not.
+      gl!.getExtension("WEBGL_lose_context")?.loseContext();
       if (htmlInCanvas) paintable.onpaint = null;
     },
   };

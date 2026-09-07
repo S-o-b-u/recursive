@@ -37,18 +37,24 @@ export function triggerScrollExpand(
   const targetY = targetRect.top + currentY;
   const distance = Math.abs(targetY - currentY);
 
+  const sectionRoot = target.closest<HTMLElement>("section, .night, main") || target;
+
   // Primary content container within the section
   const content =
     target.querySelector<HTMLElement>(
       ".section-inner, .acm-inner, .th-inner, .sp-inner, .cd-inner, .about-inner, .tracks-grid, .prize-pool-inner, .faq-inner"
-    ) || target;
+    ) ||
+    sectionRoot.querySelector<HTMLElement>(
+      ".section-inner, .acm-inner, .th-inner, .sp-inner, .cd-inner, .about-inner, .tracks-grid, .prize-pool-inner, .faq-inner"
+    ) ||
+    target;
 
   const isSponsors = target.id === "sponsors" || target.classList.contains("sxp");
   if (isTouch) {
     target.scrollIntoView({ behavior: "smooth", block: "start" });
     if (!isSponsors) {
-      target.classList.add("is-scroll-expanded");
-      window.setTimeout(() => target.classList.remove("is-scroll-expanded"), 1200);
+      sectionRoot.classList.add("is-scroll-expanded");
+      window.setTimeout(() => sectionRoot.classList.remove("is-scroll-expanded"), 1200);
     }
     return;
   }
@@ -62,9 +68,16 @@ export function triggerScrollExpand(
   const expandDelay = distance > 800 ? Math.min(scrollDuration * 0.32, 0.44) : 0.06;
 
   // Staggered interactive child cards/plates
-  const childCards = target.querySelectorAll<HTMLElement>(
-    ".th-stage, .th-brief, .judge-card-wrapper, .sp-row, .acm-logo-plate, .cd-clock-wrapper, .about-core"
-  );
+  const childCards =
+    target.querySelectorAll<HTMLElement>(
+      ".th-stage, .th-brief, .judge-card-wrapper, .sp-row, .acm-logo-plate, .cd-clock-wrapper, .about-core"
+    ).length > 0
+      ? target.querySelectorAll<HTMLElement>(
+          ".th-stage, .th-brief, .judge-card-wrapper, .sp-row, .acm-logo-plate, .cd-clock-wrapper, .about-core"
+        )
+      : sectionRoot.querySelectorAll<HTMLElement>(
+          ".th-stage, .th-brief, .judge-card-wrapper, .sp-row, .acm-logo-plate, .cd-clock-wrapper, .about-core"
+        );
 
   // 1. Smooth scroll to target with fluid Apple curve
   if (lenis) {
@@ -127,6 +140,6 @@ export function triggerScrollExpand(
   }
 
   // 4. Soft expansion ambient glow
-  target.classList.add("is-scroll-expanded");
-  window.setTimeout(() => target.classList.remove("is-scroll-expanded"), 1600);
+  sectionRoot.classList.add("is-scroll-expanded");
+  window.setTimeout(() => sectionRoot.classList.remove("is-scroll-expanded"), 1600);
 }

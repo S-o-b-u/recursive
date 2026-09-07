@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
 import React, { useEffect, useRef } from "react";
 import { EVENT } from "@/data/hackathon";
@@ -372,6 +373,13 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
 };
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  // Hide footer on individual track detail brief pages (/tracks/[slug])
+  if (pathname && /^\/tracks\/.+/.test(pathname)) {
+    return null;
+  }
+
   const scrollToTop = () => {
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });

@@ -11,7 +11,7 @@
   --color-bg-alt: #E4EBDD;
   --color-bg-sage: #C9D6C2;
   --color-bg-deep: #101B12;
-  /* Night field — matches the last row of /valley.png so the two never seam. */
+  /* Night field — matches the last row of /valley.webp so the two never seam. */
   --color-night: #010301;
   --color-night-text: #EEF5E6;
   --color-night-dim: rgba(222, 235, 212, 0.6);

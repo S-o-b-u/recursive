@@ -2,31 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { TRACKS, EVENT } from "@/data/hackathon";
+import { TRACKS, TRACK_CRITERIA, EVENT } from "@/data/hackathon";
 import Ornament from "@/components/ui/Ornament";
-
-const TRACK_CRITERIA: Record<string, string[]> = {
-  "generative-nature": [
-    "Algorithmic Depth — recursion, automata, or dynamic rule systems",
-    "Generative Craft — procedural variety without repetitive visual artifacts",
-    "Real-time Elegance — fluid, responsive interactive performance",
-  ],
-  "climate-regeneration": [
-    "Real-World Impact — practical utility for ecological measurement or recovery",
-    "Data Legibility — transforming complex environmental datasets into clarity",
-    "Resilience & Efficiency — low overhead, offline capability, or sensor design",
-  ],
-  "open-web": [
-    "Architectural Integrity — local-first sync, decentralized protocols, or dev tooling",
-    "Developer Ergonomics — intuitive APIs and seamless workflow speedups",
-    "Open Standards — interoperability and community extendability",
-  ],
-  "wildcard": [
-    "Uncompromising Originality — ideas that break conventional hackathon molds",
-    "Technical Execution — turning an unconventional premise into working code",
-    "Demo Polish — immediate, captivating presentation on stage",
-  ],
-};
 
 export default function Tracks({ detailed = true }: { detailed?: boolean }) {
   const [activeHash, setActiveHash] = useState<string>("");
@@ -59,7 +36,7 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
         </div>
 
         <div className="tr-header">
-          <span className="tr-eyebrow">THE FOUR CHAIRS</span>
+          <span className="tr-eyebrow">THE SIX TRACKS</span>
           <h2 className="tr-title">Pick your seat. Build your idea.</h2>
           <p className="tr-subtitle">
             Every track represents a fundamental direction of craft. Choose the seat that aligns with your team&rsquo;s vision — each track carries dedicated mentor support and its own prize purse.
@@ -97,8 +74,27 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
                   </div>
                 </div>
 
+                {/* ── Track Card Media ── */}
+                {track.media.src && (
+                  <Link href={`/tracks/${track.slug}`} className="tr-card-media-link" aria-label={`View full brief for ${track.title}`}>
+                    <div className="tr-card-media">
+                      <img
+                        src={track.media.src}
+                        alt={track.title}
+                        className="tr-card-img"
+                        loading="lazy"
+                      />
+                      <span className="tr-card-media-gloss" aria-hidden="true" />
+                    </div>
+                  </Link>
+                )}
+
                 {/* ── Title & Line ── */}
-                <h3 className="tr-card-title">{track.title}</h3>
+                <h3 className="tr-card-title">
+                  <Link href={`/tracks/${track.slug}`} className="tr-title-link">
+                    {track.title}
+                  </Link>
+                </h3>
                 <p className="tr-card-line">&ldquo;{track.line}&rdquo;</p>
 
                 <div className="tr-card-divider" />
@@ -148,17 +144,18 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
                     <span>Track Prize Eligible</span>
                   </div>
 
-                  <a
-                    href="https://docs.google.com/forms/d/e/1FAIpQLSdDTkIxyYih8bbSP0Ns1I_QMIyDjGpvUhcIXrlXjor9c7fE9w/viewform"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="tr-cta-btn"
-                  >
-                    <span>Claim this Seat</span>
-                    <svg viewBox="0 0 24 24" className="tr-cta-arrow" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 12h14M13 6l6 6-6 6" />
-                    </svg>
-                  </a>
+                  <div className="tr-card-actions">
+                    <Link
+                      href={`/tracks/${track.slug}`}
+                      className="tr-brief-btn"
+                      aria-label={`Read full brief for ${track.title}`}
+                    >
+                      <span>Read Brief</span>
+                      <svg viewBox="0 0 24 24" className="tr-cta-arrow" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M5 12h14M13 6l6 6-6 6" />
+                      </svg>
+                    </Link>
+                  </div>
                 </div>
               </article>
             );
@@ -290,7 +287,7 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
           align-items: center;
           gap: 0.5rem;
           padding: 0.28rem 0.75rem;
-          border-radius: var(--radius-pill);
+          border-radius: 4px;
           background: rgba(47, 85, 39, 0.08);
           border: 1px solid rgba(47, 85, 39, 0.16);
           font-family: var(--font-geist-mono), monospace;
@@ -302,7 +299,7 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
         .tr-seat-dot {
           width: 4px;
           height: 4px;
-          border-radius: 50%;
+          border-radius: 1px;
           background: #5C8C3A;
         }
 
@@ -311,7 +308,7 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
           height: 2rem;
           display: grid;
           place-items: center;
-          border-radius: 50%;
+          border-radius: 4px;
           color: #2F5527;
           background: rgba(255, 255, 255, 0.6);
           box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9);
@@ -322,6 +319,48 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
           height: 1.1rem;
         }
 
+        .tr-card-media {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 16 / 10;
+          border-radius: calc(var(--radius-lg, 18px) - 6px);
+          overflow: hidden;
+          margin-bottom: 1.25rem;
+          background: #060B05;
+          border: 1px solid rgba(47, 85, 39, 0.18);
+          box-shadow:
+            0 4px 14px rgba(18, 38, 16, 0.08),
+            inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        }
+
+        .tr-card-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center;
+          transition: transform 550ms cubic-bezier(0.16, 1, 0.3, 1);
+          display: block;
+        }
+
+        .tr-card:hover .tr-card-img {
+          transform: scale(1.05);
+        }
+
+        .tr-card-media-gloss {
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          pointer-events: none;
+          box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+        }
+
+        .tr-card-media-link {
+          display: block;
+          text-decoration: none;
+          border-radius: 12px;
+          cursor: pointer;
+        }
+
         .tr-card-title {
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
           font-size: clamp(1.0rem, 10.05px + 1.652vw, 1.95rem);
@@ -329,6 +368,16 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
           line-height: 1.15;
           letter-spacing: -0.02em;
           color: #111a12;
+        }
+
+        .tr-title-link {
+          color: inherit;
+          text-decoration: none;
+          transition: color 180ms ease;
+        }
+
+        .tr-title-link:hover {
+          color: #2F5527;
         }
 
         .tr-card-line {
@@ -432,12 +481,44 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
           color: #5C8C3A;
         }
 
+        .tr-card-actions {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+        }
+
+        .tr-brief-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          padding: 0.48rem 0.95rem;
+          border-radius: 4px;
+          background: rgba(47, 85, 39, 0.08);
+          border: 1px solid rgba(47, 85, 39, 0.22);
+          color: #1E3719;
+          font-size: 0.82rem;
+          font-weight: 600;
+          text-decoration: none;
+          transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+        }
+
+        .tr-brief-btn:hover {
+          background: rgba(47, 85, 39, 0.16);
+          border-color: rgba(47, 85, 39, 0.4);
+          transform: translateY(-1px);
+        }
+
+        .tr-brief-btn:hover .tr-cta-arrow {
+          transform: translateX(2.5px);
+        }
+
         .tr-cta-btn {
           display: inline-flex;
           align-items: center;
           gap: 0.45rem;
           padding: 0.5rem 1.1rem;
-          border-radius: var(--radius-pill);
+          border-radius: 4px;
           background: #1B2E16;
           color: #F4F8EE;
           font-size: 0.84rem;

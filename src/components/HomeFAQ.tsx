@@ -8,10 +8,28 @@ import { FAQS } from "@/data/hackathon";
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
+function renderFaqAnswer(text: string) {
+  const parts = text.split(/(\[[^\]]+\]\([^)]+\))/g);
+  return parts.map((part, i) => {
+    const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    if (match) {
+      return (
+        <a
+          key={i}
+          href={match[2]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="faq-inline-link"
+        >
+          {match[1]}
+        </a>
+      );
+    }
+    return part;
+  });
+}
+
 export default function HomeFAQ() {
-  // Starts fully closed. It previously forced item 2 open on load to match a
-  // reference screenshot, which read as the accordion "opening itself" rather
-  // than as a deliberate default.
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
@@ -101,7 +119,7 @@ export default function HomeFAQ() {
                       className="faq-answer-collapse"
                     >
                       <div className="faq-answer-inner">
-                        <p className="faq-answer-text">{faq.a}</p>
+                        <p className="faq-answer-text">{renderFaqAnswer(faq.a)}</p>
                       </div>
                     </motion.div>
                   )}
@@ -321,6 +339,19 @@ export default function HomeFAQ() {
           line-height: 1.7;
           color: #334438;
           font-weight: 400;
+          white-space: pre-line;
+        }
+
+        .faq-inline-link {
+          color: #2F5527;
+          text-decoration: underline;
+          text-underline-offset: 3px;
+          font-weight: 600;
+          transition: color 150ms ease;
+        }
+
+        .faq-inline-link:hover {
+          color: #5C8C3A;
         }
 
         /* ── Mobile Tweaks ── */

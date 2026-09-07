@@ -8,6 +8,27 @@ import { FAQS, EVENT } from "@/data/hackathon";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
+function renderFaqAnswer(text: string) {
+  const parts = text.split(/(\[[^\]]+\]\([^)]+\))/g);
+  return parts.map((part, i) => {
+    const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    if (match) {
+      return (
+        <a
+          key={i}
+          href={match[2]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#2F5527] underline underline-offset-4 hover:text-[#5C8C3A] font-semibold transition-colors"
+        >
+          {match[1]}
+        </a>
+      );
+    }
+    return part;
+  });
+}
+
 export default function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
   const reduced = useReducedMotion();
@@ -68,8 +89,8 @@ export default function FAQ() {
                       transition={{ duration: reduced ? 0 : 0.42, ease: EASE_OUT }}
                       className="overflow-hidden"
                     >
-                      <p className="px-6 pb-6 leading-[var(--leading-relaxed)] text-[var(--color-text-secondary)] max-w-[60ch]">
-                        {faq.a}
+                      <p className="px-6 pb-6 leading-[var(--leading-relaxed)] text-[var(--color-text-secondary)] max-w-[64ch] whitespace-pre-line">
+                        {renderFaqAnswer(faq.a)}
                       </p>
                     </motion.div>
                   )}

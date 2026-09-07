@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { NAV_LINKS, EVENT } from "@/data/hackathon";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
-import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import NavLink from "@/components/ui/NavLink";
 import { triggerScrollExpand } from "@/lib/scroll-expand";
 import { getLenis } from "@/lib/lenis";
@@ -64,16 +63,6 @@ export default function Navigation() {
                   <NavLink key={link.href} href={link.href} label={link.label} />
                 ))}
               </div>
-
-              <LiquidMetalButton
-                label="Register"
-                href="https://docs.google.com/forms/d/e/1FAIpQLSdDTkIxyYih8bbSP0Ns1I_QMIyDjGpvUhcIXrlXjor9c7fE9w/viewform"
-                target="_blank"
-                rel="noopener noreferrer"
-                width={104}
-                height={38}
-                className="nav-cta-liquid-metal"
-              />
 
               {/* Mobile toggle */}
               <button
@@ -190,115 +179,50 @@ export default function Navigation() {
                 { label: "Home", href: "/" },
                 { label: "The Chair", href: "/#about" },
                 { label: "Themes", href: "/#themes" },
+                { label: "Tracks", href: "/tracks" },
                 { label: "Judges", href: "/#judges" },
                 { label: "Sponsors", href: "/#sponsors" },
-                { label: "Tracks", href: "/tracks", locked: true },
-                { label: "Schedule", href: "/schedule", locked: true },
-                { label: "Prizes", href: "/prizes", locked: true },
                 { label: "FAQ", href: "/#faq" },
-              ].map((item, idx) =>
-                item.locked ? (
-                  <motion.div
-                    key={item.label}
-                    className="limelq-item limelq-item--locked"
-                    aria-disabled="true"
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      duration: 0.24,
-                      delay: 0.06 + idx * 0.022,
-                      ease: [0.22, 1, 0.36, 1],
+              ].map((item, idx) => (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{
+                    duration: 0.24,
+                    delay: 0.06 + idx * 0.022,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  <Link
+                    href={item.href}
+                    onClick={(e) => {
+                      setMenuOpen(false);
+                      const isSamePage =
+                        typeof window !== "undefined" &&
+                        (item.href.startsWith("#") ||
+                          (item.href.startsWith("/#") &&
+                            window.location.pathname === "/"));
+                      if (isSamePage) {
+                        const hash = item.href.startsWith("/#")
+                          ? item.href.slice(1)
+                          : item.href;
+                        const target = document.querySelector<HTMLElement>(hash);
+                        if (target) {
+                          e.preventDefault();
+                          window.setTimeout(() => triggerScrollExpand(target), 120);
+                          window.history.pushState(null, "", hash);
+                        }
+                      }
                     }}
+                    className="limelq-item"
                   >
                     <span className="limelq-bullet" aria-hidden="true" />
                     <span className="limelq-text">{item.label}</span>
-                    <span className="limelq-lock-badge">
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                      >
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                      </svg>
-                      LOCKED
-                    </span>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key={item.label}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      duration: 0.24,
-                      delay: 0.06 + idx * 0.022,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
-                  >
-                    <Link
-                      href={item.href}
-                      onClick={(e) => {
-                        setMenuOpen(false);
-                        const isSamePage =
-                          typeof window !== "undefined" &&
-                          (item.href.startsWith("#") ||
-                            (item.href.startsWith("/#") &&
-                              window.location.pathname === "/"));
-                        if (isSamePage) {
-                          const hash = item.href.startsWith("/#")
-                            ? item.href.slice(1)
-                            : item.href;
-                          const target = document.querySelector<HTMLElement>(hash);
-                          if (target) {
-                            e.preventDefault();
-                            window.setTimeout(() => triggerScrollExpand(target), 120);
-                            window.history.pushState(null, "", hash);
-                          }
-                        }
-                      }}
-                      className="limelq-item"
-                    >
-                      <span className="limelq-bullet" aria-hidden="true" />
-                      <span className="limelq-text">{item.label}</span>
-                    </Link>
-                  </motion.div>
-                )
-              )}
+                  </Link>
+                </motion.div>
+              ))}
             </div>
-
-            {/* Bottom Row */}
-            <motion.div
-              className="limelq-foot"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.28, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <a
-                href={EVENT.discordUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="limelq-foot-link"
-              >
-                Discord
-              </a>
-
-              <div onClick={() => setMenuOpen(false)}>
-                <LiquidMetalButton
-                  label="Register"
-                  href="https://docs.google.com/forms/d/e/1FAIpQLSdDTkIxyYih8bbSP0Ns1I_QMIyDjGpvUhcIXrlXjor9c7fE9w/viewform"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  width={185}
-                  height={44}
-                />
-              </div>
-            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -563,8 +487,10 @@ export default function Navigation() {
           min-height: 100vh;
           min-height: 100dvh;
           z-index: 99999;
-          /* Fully opaque linen canvas — prevents background hero elements, grass, and log divider from showing through */
-          background: #EAE5DC;
+          /* Translucent frosted linen glass canvas — highly transparent */
+          background: rgba(234, 229, 220, 0.52);
+          backdrop-filter: blur(36px) saturate(190%);
+          -webkit-backdrop-filter: blur(36px) saturate(190%);
           color: #121A12;
           display: flex;
           flex-direction: column;
@@ -761,15 +687,16 @@ export default function Navigation() {
           .nav-desktop-links, .nav-cta { display: none; }
           .nav-toggle { display: grid; }
 
-          /* On mobile the pill only holds the brand mark, Register, and the
-             toggle. The brand mark (logo + its own padding) is a few px wider
-             than the round toggle button, so Register — sandwiched between
-             them with an equal gap on both sides — reads as sitting slightly
-             right of the pill's true centre. A relative nudge corrects that
-             without disturbing the flex flow or the toggle's position. */
-          .nav-cta-liquid-metal {
-            position: relative;
-            left: -0.35rem;
+          /* Ultra-translucent crystal frosted glass on mobile phone navbar pill */
+          .nav-glass-container > div,
+          .nav-glass-container :global(.relative.isolate) {
+            background: rgba(255, 255, 255, 0.08) !important;
+            backdrop-filter: blur(28px) saturate(200%) !important;
+            -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
+            box-shadow:
+              0 8px 32px rgba(0, 0, 0, 0.06),
+              inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
+            border: 1px solid rgba(255, 255, 255, 0.22) !important;
           }
         }
       `}</style>
