@@ -302,8 +302,8 @@ export default function Navigation() {
         }
 
         @media (max-width: 520px) {
-          .nav-wordmark { font-size: 0.95rem; line-height: 1; }
-          .nav-brand { padding: 0.22rem 0.55rem; }
+          .nav-wordmark { font-size: 1.05rem; line-height: 1.1; }
+          .nav-brand { padding: 0.35rem 0.65rem; }
         }
 
         .nav-desktop-links {
@@ -736,45 +736,45 @@ export default function Navigation() {
 
         @media (max-width: 860px) {
           .nav-root {
-            top: clamp(0.4rem, 1.2vh, 0.65rem);
+            top: clamp(0.6rem, 1.8vh, 0.95rem);
           }
 
           .nav-glass-pill-layout {
-            padding: 0.18rem 0.25rem 0.18rem 0.35rem;
-            gap: 0.15rem;
+            padding: 0.32rem 0.4rem 0.32rem 0.45rem;
+            gap: 0.25rem;
           }
 
           .nav-brand {
-            padding: 0.22rem 0.55rem;
+            padding: 0.35rem 0.65rem;
           }
 
           .nav-wordmark {
-            font-size: 0.95rem;
-            line-height: 1;
+            font-size: 1.05rem;
+            line-height: 1.1;
           }
 
           .nav-desktop-links, .nav-cta { display: none; }
           .nav-toggle {
             display: grid;
-            width: 1.85rem;
-            height: 1.85rem;
+            width: 2.15rem;
+            height: 2.15rem;
           }
 
           .nav-toggle-icon {
-            width: 14px;
-            height: 10px;
+            width: 16px;
+            height: 11px;
           }
 
           .nav-toggle-bar {
-            width: 14px;
-            height: 2px;
+            width: 16px;
+            height: 2.2px;
           }
 
           .nav-toggle-icon.is-open .nav-toggle-bar-1 {
-            transform: translateY(4px) rotate(45deg);
+            transform: translateY(4.4px) rotate(45deg);
           }
           .nav-toggle-icon.is-open .nav-toggle-bar-2 {
-            transform: translateY(-4px) rotate(-45deg);
+            transform: translateY(-4.4px) rotate(-45deg);
           }
 
           /* Ultra-translucent crystal frosted glass on mobile phone navbar pill */
