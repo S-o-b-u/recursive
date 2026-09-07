@@ -449,8 +449,10 @@ export default function Hero() {
           pointer-events: none;
           user-select: none;
           -webkit-user-drag: none;
-          filter: none;
-          transform: translateZ(0);
+          image-rendering: -webkit-optimize-contrast;
+          filter: drop-shadow(0 14px 20px rgba(10, 24, 12, 0.12));
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
         }
 
         /* ── Bottom Unified Glass Dock ── */

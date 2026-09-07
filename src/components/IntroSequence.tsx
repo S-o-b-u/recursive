@@ -60,12 +60,12 @@ const LINES: Line[] = [
 // extra room. Exits are quick and accelerate away, so the outgoing line is
 // essentially gone by the time the next one starts — no smear between beats.
 const CUES: [number, number][] = [
-  [0.15, 0.95],
-  [1.15, 2.0],
-  [2.2, 3.2],
-  [3.45, 4.95],
-  [5.2, 6.1],
-  [6.35, 7.3],
+  [4.1, 5.05],
+  [5.25, 6.2],
+  [6.4, 7.5],
+  [7.75, 9.45],
+  [9.7, 10.75],
+  [10.95, 11.95],
 ];
 
 const WARP_RADIUS = 250;
@@ -114,6 +114,9 @@ export default function IntroSequence() {
   const bloomRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const skipRef = useRef<HTMLDivElement>(null);
+  const loaderOverlayRef = useRef<HTMLDivElement>(null);
+  const artifactMarkRef = useRef<HTMLDivElement>(null);
+  const welcomeBlockRef = useRef<HTMLDivElement>(null);
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const bailRef = useRef<(() => void) | null>(null);
@@ -270,6 +273,9 @@ export default function IntroSequence() {
     const bloom = bloomRef.current;
     const bar = barRef.current;
     const skipWrap = skipRef.current;
+    const loaderOverlay = loaderOverlayRef.current;
+    const artifactMark = artifactMarkRef.current;
+    const welcomeBlock = welcomeBlockRef.current;
     const lines = lineRefs.current.filter(Boolean) as HTMLDivElement[];
     if (!root || !scene || !media || !focus || !grade || !bloom || !bar) return;
 
@@ -519,14 +525,83 @@ export default function IntroSequence() {
         force3D: true,
       });
 
+      // ── Stage 1 & 2: Artifact & Welcome Reveal ──
+      if (loaderOverlay && artifactMark && welcomeBlock) {
+        tl.set(loaderOverlay, { autoAlpha: 1 }, 0);
+        tl.set(welcomeBlock, { opacity: 0, pointerEvents: "none" }, 0);
+
+        // Stage 1: Artifact fades in with gentle upward drift — steady & distraction-free
+        tl.fromTo(
+          artifactMark,
+          { opacity: 0, scale: 0.96, y: 14 },
+          { opacity: 1, scale: 1, y: 0, duration: 1.1, ease: "power2.out" },
+          0.05,
+        );
+
+        // ── Stage 2: Gentle continuous upward drift into crown position ──
+        tl.to(
+          artifactMark,
+          {
+            y: isMobileDevice ? -20 : -30,
+            duration: 0.9,
+            ease: "sine.inOut",
+          },
+          1.2,
+        );
+
+        // Welcome block: simple, clean, elegant fade & drift
+        tl.fromTo(
+          welcomeBlock,
+          { opacity: 0, y: 12 },
+          {
+            opacity: 1,
+            y: isMobileDevice ? -6 : -12,
+            duration: 0.8,
+            ease: "power2.out",
+            pointerEvents: "auto",
+          },
+          1.25,
+        );
+
+        // ── Gentle floating drift ──
+        tl.to(
+          [artifactMark, welcomeBlock],
+          {
+            y: "-=4",
+            duration: 1.1,
+            ease: "sine.inOut",
+          },
+          2.1,
+        );
+
+        // ── Transition: Dissolve Welcome, slowly start story animation ──
+        tl.to(
+          [welcomeBlock, artifactMark],
+          {
+            opacity: 0,
+            y: "-=10",
+            duration: 0.6,
+            ease: "power2.in",
+          },
+          3.35,
+        );
+
+        tl.to(
+          loaderOverlay,
+          { autoAlpha: 0, duration: 0.75, ease: "power2.inOut" },
+          3.45,
+        );
+      }
+
+      // ── Stage 3: Slowly the intro story animation starts ──
       tl.to(
         media,
-        { scale: 1, yPercent: 0, duration: 7.55, ease: "power1.inOut" },
-        0,
+        { scale: 1, yPercent: 0, duration: 8.5, ease: "power1.inOut" },
+        3.7,
       );
 
-      tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 6.9, ease: "sine.inOut" }, 0.3);
-      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 7.0, ease: "none" }, 0);
+      tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 7.6, ease: "sine.inOut" }, 3.8);
+      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 8.2, ease: "none" }, 3.9);
 
       lines.forEach((el, i) => {
         const [tin, tout] = CUES[i];
@@ -571,13 +646,13 @@ export default function IntroSequence() {
         tl.to(
           skipWrap,
           { opacity: 0, y: 8, duration: 0.35, ease: "power2.in", pointerEvents: "none" },
-          6.7,
+          11.5,
         );
       }
 
       // ── Hand-off ──────────────────────────────────────────────────────────
       if (!isMobileDevice) {
-        tl.call(warmHeroPlate, undefined, 6.6);
+        tl.call(warmHeroPlate, undefined, 11.3);
       }
 
       // 2. Last line eases out on its own with soft deceleration
@@ -585,7 +660,7 @@ export default function IntroSequence() {
       tl.to(
         lastWords,
         { opacity: 0, y: -12, scale: 0.98, duration: 0.58, ease: "power2.inOut", stagger: 0.024 },
-        7.15,
+        11.9,
       );
 
       // 3. A soft dawn glow rises from the hill line — masks the seam, then recedes.
@@ -593,21 +668,21 @@ export default function IntroSequence() {
         bloom,
         { opacity: 0, scale: 1.08 },
         { opacity: isMobileDevice ? 0.7 : 1, scale: 1, duration: 0.85, ease: "power1.inOut" },
-        7.25,
+        12.0,
       );
 
       // Pin the plate to exact identity at the dissolve start without micro-snap
-      tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 7.55);
+      tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 12.3);
 
-      // Hand off to Hero: signal at 7.4s so Hero starts playing smoothly right before the dissolve
-      const handoffTime = isMobileDevice ? 7.4 : 7.25;
+      // Hand off to Hero: signal at 12.15s so Hero starts playing smoothly right before the dissolve
+      const handoffTime = isMobileDevice ? 12.15 : 12.0;
       tl.call(() => {
         if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
         if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("recursive-intro-done"));
       }, undefined, handoffTime);
 
       const dissolveDuration = isMobileDevice ? 0.65 : 0.85;
-      tl.to(scene, { autoAlpha: 0, duration: dissolveDuration, ease: "power1.inOut" }, 7.55);
+      tl.to(scene, { autoAlpha: 0, duration: dissolveDuration, ease: "power1.inOut" }, 12.3);
 
       // Once scene is fully transparent, ensure hero is playing and release introVid
       tl.call(() => {
@@ -618,13 +693,13 @@ export default function IntroSequence() {
           } catch {}
         }
         resumeHeroPlate();
-      }, undefined, 7.55 + dissolveDuration + 0.1);
+      }, undefined, 12.3 + dissolveDuration + 0.1);
 
-      tl.set(root, { pointerEvents: "none" }, 7.8);
-      tl.call(releaseScroll, undefined, 8.3);
+      tl.set(root, { pointerEvents: "none" }, 12.55);
+      tl.call(releaseScroll, undefined, 13.0);
 
       // 5. Glow recedes over the settled landing page.
-      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 0.9, ease: "power1.inOut" }, 7.55 + dissolveDuration);
+      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 0.9, ease: "power1.inOut" }, 12.3 + dissolveDuration);
     }, root);
 
     const tl = tlRef.current!;
@@ -697,6 +772,9 @@ export default function IntroSequence() {
       const words = root.querySelectorAll<HTMLElement>(".intro-word");
       const wordInners = root.querySelectorAll<HTMLElement>(".intro-word-i");
       gsap.killTweensOf([scene, bloom, media, focus, grade, bar]);
+      if (loaderOverlay) {
+        gsap.killTweensOf([loaderOverlay, artifactMark, welcomeBlock]);
+      }
       if (skipWrap) gsap.killTweensOf(skipWrap);
       gsap.killTweensOf(words);
       gsap.killTweensOf(wordInners);
@@ -705,6 +783,9 @@ export default function IntroSequence() {
       warmHeroPlate();
 
       const q = gsap.timeline({ onComplete: finish });
+      if (loaderOverlay) {
+        q.to(loaderOverlay, { autoAlpha: 0, duration: 0.2, ease: "power2.in" }, 0);
+      }
       if (skipWrap) {
         q.to(skipWrap, { opacity: 0, scale: 0.9, y: 6, duration: 0.22, ease: "power2.in", pointerEvents: "none" }, 0);
       }
@@ -776,6 +857,7 @@ export default function IntroSequence() {
     return (
       <div
         aria-hidden="true"
+        className="intro-pending-plate"
         style={{
           position: "fixed",
           top: 0,
@@ -787,64 +869,39 @@ export default function IntroSequence() {
           minHeight: "100dvh",
           zIndex: 9998,
           overflow: "hidden",
-          background: "#0a140c",
+          background:
+            "radial-gradient(120% 70% at 50% 0%, rgba(52, 88, 38, 0.48) 0%, rgba(52, 88, 38, 0) 62%), linear-gradient(180deg, #0A160A 0%, #010301 65%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
-        className="intro-pending-plate"
       >
-        {/* This plate is what the document paints first, before hydration has
-            even decided whether the intro runs -- so on a reload it is on
-            screen for as long as the phone needs to boot React. It used to be
-            flat #0a140c, which is why reloading read as: finished page, hard
-            cut to a slab of black, long dead pause, and only then the intro.
-            Painting the intro's own opening frame here instead means the swap
-            to the real scene has nothing to cut between -- same still, same
-            framing, same grade -- so the black gap disappears.
-            The transform mirrors the media's frame-0 state, and the gradient
-            below is a copy of .intro-grade at opacity 1. */}
-        {/* The grade differs between the two frame-0 states -- the desktop
-            branch opens on brightness(0.46), the lite branch on no filter at
-            all -- and getting it wrong trades the black gap for a brightness
-            pop. prefersLiteMedia() is just media queries underneath, so the
-            plate can mirror the same predicate in CSS and be correct before any
-            JS has run. (saveData has no CSS equivalent; that path lands on the
-            lite value, which is what it wants anyway.) */}
-        <style>{
-          ".intro-pending-plate img{filter:brightness(0.46) saturate(0.74) contrast(1.04)}" +
-          "@media (pointer: coarse),(max-width: 860px),(prefers-reduced-motion: reduce){" +
-          ".intro-pending-plate img{filter:none}}"
-        }</style>
-        <img
-          src="/images/hero_poster.jpg"
-          alt=""
-          draggable={false}
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition: "center center",
-            transform: "scale(1.12) translateY(-5%)",
-            // A 32x18 blur of the poster, inline, ~400 bytes. The preload above
-            // makes the real still fast, but "fast" is still a network round
-            // trip: on a cold cache the plate would paint flat black until it
-            // lands, which is the whole bug coming back for first-time
-            // visitors. This is in the HTML itself, so the opening frame is on
-            // screen in the first paint no matter what the network is doing,
-            // and the full-resolution still simply replaces it in place.
-            backgroundImage: `url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABMNDhEODBMRDxEVFBMXHTAfHRoaHToqLCMwRT1JR0Q9Q0FMVm1dTFFoUkFDX4JgaHF1e3x7SlyGkIV3j214e3b/2wBDARQVFR0ZHTgfHzh2T0NPdnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnb/wAARCAASACADASIAAhEBAxEB/8QAGgAAAgIDAAAAAAAAAAAAAAAAAAUDBAEGB//EACUQAAICAQIEBwAAAAAAAAAAAAECAAMRBCEFMVFhBhQiQXGBkf/EABcBAQEBAQAAAAAAAAAAAAAAAAACAQP/xAAZEQEBAAMBAAAAAAAAAAAAAAAAAQIDMUH/2gAMAwEAAhEDEQA/ANrrVWXPOShRFz8So0qZutVe3uZWbxBW21VbN3JxIucnQ6KgyKxQq9DF1fGqzs6lT8yx52q5fQ4J6TJsxvKOeXu76hyzMTnmTCpjkbn9hCR4kwrJKbkzFbsGGGI+4QnCj//Z)`,
-            backgroundSize: "cover",
-            backgroundPosition: "center center",
-          }}
-        />
         <div
           style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(120% 90% at 50% 116%, rgba(6,14,9,0) 32%, rgba(6,14,9,0.8) 76%, rgba(4,10,7,0.96) 100%), linear-gradient(180deg, rgba(6,13,9,0.7) 0%, rgba(6,13,9,0.24) 46%, rgba(6,13,9,0.48) 100%)",
+            position: "relative",
+            width: "clamp(210px, 30vw, 360px)",
+            aspectRatio: "744 / 220",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            pointerEvents: "none",
+            userSelect: "none",
           }}
-        />
+        >
+          <img
+            src="/images/artifact.png"
+            alt=""
+            draggable={false}
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              filter: "brightness(1.22) saturate(1.18) drop-shadow(0 0 20px rgba(120, 185, 75, 0.35))",
+            }}
+          />
+        </div>
       </div>
     );
   }
@@ -871,6 +928,27 @@ export default function IntroSequence() {
         </div>
 
         <div ref={gradeRef} className="intro-grade" aria-hidden="true" />
+
+        {/* ── Initial Artifact & Welcome Screen ── */}
+        <div ref={loaderOverlayRef} className="intro-loader-veil">
+          <div className="intro-loader-content">
+            <div ref={artifactMarkRef} className="intro-artifact-mark">
+              <div className="intro-artifact-aura" aria-hidden="true" />
+              <img
+                src="/images/artifact.png"
+                alt=""
+                className="intro-artifact-img"
+                draggable={false}
+              />
+            </div>
+
+            {/* WELCOME Block */}
+            <div ref={welcomeBlockRef} className="intro-welcome-block">
+              <h1 className="intro-welcome-title">WELCOME</h1>
+              <span className="intro-welcome-sub">RECURSIVE 2026</span>
+            </div>
+          </div>
+        </div>
 
         <div className="intro-captions">
           {LINES.map((line, i) => (
@@ -945,6 +1023,104 @@ export default function IntroSequence() {
           background: #0a140c;
           opacity: 0;
           contain: layout paint style;
+        }
+
+        /* ── Initial Artifact Loader & Welcome Veil ── */
+        .intro-loader-veil {
+          position: absolute;
+          inset: 0;
+          z-index: 50;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background:
+            radial-gradient(120% 70% at 50% 0%, rgba(52, 88, 38, 0.48) 0%, rgba(52, 88, 38, 0) 62%),
+            linear-gradient(180deg, #0A160A 0%, #010301 65%);
+          pointer-events: none;
+          overflow: hidden;
+          will-change: opacity;
+        }
+
+        .intro-loader-content {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          width: 100%;
+          max-width: 680px;
+          padding: 0 1.5rem;
+        }
+
+        /* Artifact Mark */
+        .intro-artifact-mark {
+          position: relative;
+          width: clamp(210px, 30vw, 360px);
+          aspect-ratio: 744 / 220;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          pointer-events: none;
+          user-select: none;
+          will-change: transform, opacity;
+        }
+
+        .intro-artifact-aura {
+          position: absolute;
+          inset: -20% -15%;
+          border-radius: 50%;
+          background: radial-gradient(ellipse at center, rgba(143, 196, 90, 0.16) 0%, rgba(76, 133, 46, 0.04) 50%, transparent 70%);
+          filter: blur(28px);
+          pointer-events: none;
+        }
+
+        .intro-artifact-img {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          filter: brightness(1.18) saturate(1.12) drop-shadow(0 4px 24px rgba(0, 0, 0, 0.65));
+          pointer-events: none;
+          user-select: none;
+          -webkit-user-drag: none;
+        }
+
+        .intro-welcome-block {
+          position: absolute;
+          top: calc(100% + 14px);
+          left: 0;
+          right: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          pointer-events: none;
+          will-change: transform, opacity;
+        }
+
+        .intro-welcome-title {
+          margin: 0;
+          font-family: var(--font-display), var(--font-heading), var(--font-dm-sans), sans-serif;
+          font-size: clamp(2.4rem, 6.8vw, 4.4rem);
+          font-weight: 800;
+          line-height: 1;
+          letter-spacing: clamp(0.08em, 1.4vw, 0.16em);
+          text-transform: uppercase;
+          color: #ffffff;
+          text-shadow: 0 4px 28px rgba(0, 0, 0, 0.7);
+          filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.5));
+        }
+
+        .intro-welcome-sub {
+          font-family: var(--font-mono, monospace), monospace;
+          font-size: clamp(0.72rem, 1.4vw, 0.86rem);
+          font-weight: 600;
+          letter-spacing: clamp(0.24em, 0.6vw, 0.34em);
+          text-transform: uppercase;
+          color: rgba(255, 255, 255, 0.65);
+          margin-top: 10px;
         }
 
         .intro-media-clip { position: absolute; inset: 0; overflow: hidden; }
