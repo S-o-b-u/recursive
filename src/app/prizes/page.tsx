@@ -5,8 +5,18 @@ import RegisterCTA from "@/components/RegisterCTA";
 import { EVENT } from "@/data/hackathon";
 
 export const metadata: Metadata = {
-  title: "Prizes",
-  description: `Prize pool and judging criteria for ${EVENT.name}.`,
+  title: "Prizes & Awards",
+  description: `Cash prizes, category tracks awards, judging criteria, and sponsor bounties for ${EVENT.name} 2026, hosted by GNIT ACM Student Chapter.`,
+  keywords: [
+    "Recursive Prizes",
+    "ACM Hackathon Prizes",
+    "Kolkata Hackathon Cash Prize",
+    "GNIT ACM Awards",
+    "Hackathon Bounties",
+  ],
+  alternates: {
+    canonical: "/prizes",
+  },
 };
 
 const CRITERIA = [

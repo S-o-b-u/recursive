@@ -5,8 +5,18 @@ import RegisterCTA from "@/components/RegisterCTA";
 import { EVENT } from "@/data/hackathon";
 
 export const metadata: Metadata = {
-  title: "Sponsors",
-  description: `Partner with ${EVENT.name} — sponsorship tiers and what your money pays for.`,
+  title: "Sponsors & Partners",
+  description: `Partner with ${EVENT.name} 2026 — support collegiate builders and innovators at GNIT ACM Student Chapter's premier hackathon.`,
+  keywords: [
+    "Recursive Sponsors",
+    "ACM Hackathon Partners",
+    "GNIT ACM Sponsorship",
+    "Tech Sponsorship Kolkata",
+    "Devfolio Hackathon Partner",
+  ],
+  alternates: {
+    canonical: "/sponsors",
+  },
 };
 
 export default function SponsorsPage() {

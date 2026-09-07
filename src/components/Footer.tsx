@@ -1,6 +1,5 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
 import React, { useEffect, useRef } from "react";
 import { EVENT } from "@/data/hackathon";
@@ -373,13 +372,6 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
 };
 
 export default function Footer() {
-  const pathname = usePathname();
-
-  // Hide footer on individual track detail brief pages (/tracks/[slug])
-  if (pathname && /^\/tracks\/.+/.test(pathname)) {
-    return null;
-  }
-
   const scrollToTop = () => {
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -393,6 +385,9 @@ export default function Footer() {
 
       {/* ── Giant WebGL WarpText Wordmark behind the walking people with Rich Gradient ── */}
       <div className="footer-wordmark-wrap">
+        <span className="sr-only">
+          RECURSIVE — ACM Hackathon 2026 | GNIT ACM Student Chapter, Guru Nanak Institute of Technology, Kolkata
+        </span>
         <WarpText
           text={EVENT.name}
           color="linear-gradient(180deg, #070e08 0%, #0f1c12 36%, #1a301e 72%, #2c4e30 100%)"

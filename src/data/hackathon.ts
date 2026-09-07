@@ -53,6 +53,33 @@ export const COLLEGE = {
   acmFounded: "1947",
 } as const;
 
+/**
+ * The venue, in one place.
+ *
+ * The coordinates were previously written out three times and disagreed with
+ * each other: the map embed pinned 22.6997,88.3792 while the panel beside it
+ * printed 22.6907, and neither matched the campus -- the pin sat roughly half a
+ * kilometre north-east of it, in Panihati rather than on Nilgunj Road. These
+ * are the campus coordinates as recorded by Wikidata (Q5620408) and Wikipedia.
+ * Anything that shows a map, prints a coordinate, or emits Place schema reads
+ * from here.
+ */
+export const VENUE = {
+  name: "Guru Nanak Institute of Technology",
+  streetAddress: "157/F, Nilgunj Road, Sahid Colony, Panihati",
+  locality: "Sodepur, Kolkata",
+  region: "West Bengal",
+  postalCode: "700114",
+  country: "IN",
+  lat: 22.695132695547784,
+  lng: 88.37877130486947,
+  /** As displayed to a reader. */
+  display: "22.6951° N, 88.3788° E",
+  get full() {
+    return `${this.streetAddress}, ${this.locality}, ${this.region} ${this.postalCode}`;
+  },
+} as const;
+
 /** College / chapter logos. */
 export const COLLEGE_LOGOS: Slot[] = [
   { label: "GNIT ACM Student Chapter", expect: "/college_logo/gnitacm.png", src: "/college_logo/gnitacm.png" },
@@ -78,84 +105,84 @@ export const TRACKS: Track[] = [
     slug: "ai-intelligent-systems",
     title: "AI & Intelligent Systems",
     seat: "Seat 01",
-    line: "Autonomous agents, neural frontiers, and models that reason.",
+    line: "Kill the wrapper. Build intelligence that actually thinks, reasons, and executes.",
     media: { label: "AI & Intelligent Systems", expect: "/images/themes/ai.jpg", src: "/images/themes/ai.jpg" },
     summary:
-      "Push beyond wrappers. Build autonomous agents, multimodal intelligence, specialized reasoning pipelines, and generative workflows that solve real problems with depth and precision.",
+      "Stop building glorified prompt wrappers. Engineer multi-agent swarms, local edge models running with zero latency, autonomous execution loops, and neuro-symbolic engines that solve deep real-world chaos.",
     prompts: [
-      "Multi-agent orchestration and autonomous workflows",
-      "Edge AI, local inference, and real-time reasoning engines",
-      "Domain-specific reasoning assistants and multimodal interfaces",
+      "Autonomous agent swarms executing real-world action loops",
+      "Sub-second edge AI and zero-cloud local reasoning engines",
+      "Neuro-symbolic pipelines that eradicate hallucinations",
     ],
   },
   {
     slug: "fintech-digital-innovation",
     title: "FinTech & Digital Innovation",
     seat: "Seat 02",
-    line: "Code the future of capital — programmable, instant, and borderless.",
+    line: "Hack the velocity of money. Code capital that moves at the speed of light.",
     media: { label: "FinTech & Digital Innovation", expect: "/images/themes/finance.jpg", src: "/images/themes/finance.jpg" },
     summary:
-      "Reinvent how value is created, protected, and exchanged. Build high-frequency automated market makers, decentralized settlement protocols, zero-knowledge fraud shields, micro-wealth tooling, or autonomous AI financial agents that make capital accessible to everyone.",
+      "Re-engineer how billions flow. Build algorithmic financial copilots, zero-knowledge fraud shields, flash-settlement escrow protocols, and micro-wealth engines that democratize global capital.",
     prompts: [
-      "Autonomous AI financial agents & algorithmic micro-investing",
-      "Zero-knowledge proof payments & real-time fraud defense",
-      "Programmable escrow rails, smart commerce & borderless settlements",
+      "Autonomous AI financial agents executing split-second alpha",
+      "Zero-knowledge fraud shields and instant borderless settlements",
+      "Smart programmable escrow and next-gen creator economy rails",
     ],
   },
   {
     slug: "healthtech-wellness",
     title: "HealthTech & Wellness",
     seat: "Seat 03",
-    line: "Sensory diagnostic tools, proactive care, and human vitality.",
+    line: "Hardware for heartbeat, software for survival. Hack the human machine.",
     media: { label: "HealthTech & Wellness", expect: "/images/themes/heart.jpg", src: "/images/themes/heart.jpg" },
     summary:
-      "Software and hardware for the human body and mind. Build tools for preventative diagnostics, mental wellness telemetry, patient care coordination, and accessible assistive technology.",
+      "Where silicon meets biology. Engineer real-time bio-telemetry, AI diagnostic sentinels that catch illness before symptoms show, sensory accessibility gear, and mental wellness tools backed by hard neuroscience.",
     prompts: [
-      "Assistive tech and accessible sensory interfaces",
-      "Predictive health telemetry and wearable sensor integration",
-      "Mental wellness tools rooted in behavioral science",
+      "Real-time biometric telemetry and predictive early-warning sensors",
+      "Neural and tactile assistive tech breaking physical barriers",
+      "Cognitive wellness engines grounded in behavioral neuroscience",
     ],
   },
   {
     slug: "cybersecurity-digital-trust",
     title: "Cybersecurity & Digital Trust",
     seat: "Seat 04",
-    line: "Cryptographic guardrails, zero trust, and resilient systems.",
+    line: "Zero trust. Zero compromises. Defend the digital citadel before it burns.",
     media: { label: "Cybersecurity & Digital Trust", expect: "/images/themes/cyber.jpg", src: "/images/themes/cyber.jpg" },
     summary:
-      "Fortify the networks we rely on. Zero-knowledge authentication, threat telemetry, automated vulnerability patches, encrypted data enclaves, and cryptographic proofs of identity.",
+      "Break in or lock down. Forge unbreakable cryptographic perimeters, eBPF kernel sentinels, autonomous exploit self-healers, and zero-knowledge identity vaults that withstand nation-state attacks.",
     prompts: [
-      "Zero-knowledge proofs and cryptographic identity verification",
-      "Autonomous vulnerability discovery and automated patch generation",
-      "Privacy-preserving analytics and distributed zero-trust perimeters",
+      "Zero-knowledge proofs and tamper-proof cryptographic identity vaults",
+      "Autonomous eBPF kernel guardians that kill zero-day exploits live",
+      "Self-healing code sandboxes that patch vulnerabilities on the fly",
     ],
   },
   {
-    slug: "climatetech-sustainability",
-    title: "ClimateTech & Sustainability",
+    slug: "web3-blockchain",
+    title: "Web3 & Blockchain",
     seat: "Seat 05",
-    line: "Software for soil, energy transitions, and ecological accountability.",
-    media: { label: "ClimateTech & Sustainability", expect: "/images/themes/earth.jpg", src: "/images/themes/earth.jpg" },
+    line: "Decentralize everything. Uncensorable code, trustless consensus, and sovereign ownership.",
+    media: { label: "Web3 & Blockchain", expect: "/images/themes/web3.jpg", src: "/images/themes/web3.jpg" },
     summary:
-      "Software for the living world. Measure, restore, or protect — from carbon accounting to renewable energy dispatch, circular economy platforms, and ecological sensor networks.",
+      "Ditch the middlemen. Architect hyper-scalable dApps, cross-chain liquidity networks, decentralized physical infrastructure (DePIN), and unstoppable smart contracts that return ownership to the builders.",
     prompts: [
-      "Hyper-local environmental sensing and ecological monitors",
-      "Supply chain transparency and carbon accounting ledgers",
-      "Smart grid management and renewable energy optimization",
+      "DePIN networks bridging physical hardware with decentralized incentives",
+      "High-throughput smart contracts and gasless cross-chain bridges",
+      "Self-sovereign identity and censorship-resistant decentralized protocols",
     ],
   },
   {
     slug: "open-innovation",
     title: "Open Innovation",
     seat: "Seat 06",
-    line: "The wildcard idea that kept you up until 4am. Build that.",
+    line: "No guardrails. No blueprints. The raw 4 AM obsession you can't stop coding.",
     media: { label: "Open Innovation", expect: "/images/themes/openinvo.jpg", src: "/images/themes/openinvo.jpg" },
     summary:
-      "Unconstrained exploration. Cross-disciplinary hardware hacks, novel human-computer interfaces, decentralized protocols, creative dev tooling, or audacious ideas that defy standard categorization.",
+      "The wildcard arena for pure technical rebellion. Bizarre hardware hacks, brain-computer interfaces, mind-bending developer tools, and audacious experiments that defy every neat category.",
     prompts: [
-      "Radical human-computer interfaces and spatial computing",
-      "Developer tools and protocols that sharpen everyone's craft",
-      "Unclassifiable experiments, playful software, and raw ingenuity",
+      "Radical spatial computing and mind-bending human-computer interfaces",
+      "Unapologetic dev tools that supercharge builder craft 10x",
+      "Crazy hardware hacks and unclassifiable high-risk experiments",
     ],
   },
 ];
@@ -180,6 +207,11 @@ export const TRACK_CRITERIA: Record<string, string[]> = {
     "Cryptographic Rigor — sound threat modeling and sound security architecture",
     "Resilience & Hardening — defense against adversarial attacks and edge cases",
     "Operational Ergonomics — security that empowers users without friction",
+  ],
+  "web3-blockchain": [
+    "Decentralization & Security — sound smart contract design, trustless architecture, and reentrancy defense",
+    "On-Chain Utility & Ergonomics — seamless UX, gas efficiency, and genuine real-world application",
+    "Technical Architecture — innovative protocol design, cross-chain logic, or state management",
   ],
   "climatetech-sustainability": [
     "Ecological Impact — practical utility for conservation, efficiency, or restoration",

@@ -744,10 +744,6 @@ export default function SponsorStage() {
           letter-spacing: 0.16em;
           text-transform: uppercase;
           color: #2b5420;
-          background: rgba(43, 84, 32, 0.08);
-          border: 1px solid rgba(43, 84, 32, 0.18);
-          padding: 0.25rem 0.75rem;
-          border-radius: 9999px;
         }
 
         .sxp-partner-card {
