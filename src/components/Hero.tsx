@@ -125,14 +125,6 @@ export default function Hero() {
     };
   }, [introFinished]);
 
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
   return (
     <section id="hero" className="hero" ref={sectionRef}>
       {/* ── 100% Crisp, Pure Video Background (Zero filters, no blur/jitter transforms) ── */}
@@ -175,9 +167,6 @@ export default function Hero() {
             : { opacity: 0, y: 14 }
         }
         transition={{ duration: 0.7, ease: EASE_OUT, delay: 0.02 }}
-        style={{
-          top: isMobile ? "clamp(7.8rem, 18.5vh, 10.5rem)" : undefined,
-        }}
       >
         <div className="hero-warp-wrap">
           <WarpText
@@ -213,7 +202,23 @@ export default function Hero() {
       >
         <div className="hero-action-dock-split">
           <DevfolioButton />
-          {/* Discord button hidden for now alongside Devfolio button until launch */}
+          <a
+            href={EVENT.discordUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hero-discord-btn"
+            aria-label="Join Discord"
+          >
+            <svg
+              className="hero-discord-icon"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.893.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+            </svg>
+            <span>Join Discord</span>
+          </a>
         </div>
       </motion.div>
 
@@ -309,7 +314,7 @@ export default function Hero() {
         /* ── Top Center Block: Wordmark with WebGL Warp ── */
         .hero-center-content {
           position: absolute;
-          top: clamp(5.6rem, 12vh, 8.2rem);
+          top: clamp(4.6rem, 11.5vh, 7.2rem);
           left: 0;
           right: 0;
           width: 100%;
@@ -318,6 +323,7 @@ export default function Hero() {
           display: flex;
           flex-direction: column;
           align-items: center;
+          justify-content: center;
           text-align: center;
           z-index: 10;
           pointer-events: auto;
@@ -328,11 +334,12 @@ export default function Hero() {
         .hero-warp-wrap {
           position: relative;
           width: 100%;
-          max-width: min(92vw, 1120px);
-          height: clamp(165px, 24vw, 280px);
+          max-width: min(88vw, 1080px);
+          height: clamp(165px, 23vw, 270px);
           display: flex;
           justify-content: center;
           align-items: center;
+          margin-inline: auto;
         }
 
         .hero-wordmark {
@@ -485,56 +492,82 @@ export default function Hero() {
           filter: brightness(1.08);
         }
 
-        .hero-dock-btn-discord {
+        .hero-discord-btn {
           display: inline-flex;
           align-items: center;
           justify-content: center;
           gap: 0.55rem;
-          font-family: inherit;
-          font-size: 0.875rem;
+          height: 44px;
+          padding: 0 1.35rem;
+          border-radius: 6px;
+          background: #FFFFFF;
+          color: #23272A;
+          border: 1px solid rgba(0, 0, 0, 0.12);
+          font-family: var(--font-dm-sans), system-ui, sans-serif;
+          font-size: 0.88rem;
           font-weight: 600;
           letter-spacing: -0.01em;
-          color: #F3F8EE;
-          background: transparent;
-          padding: 0.65rem 1.35rem;
-          border-radius: var(--radius-pill);
-          transition: filter 250ms ease;
+          text-decoration: none;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+          transition: background 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
           white-space: nowrap;
         }
-        .block:hover .hero-dock-btn-discord {
-          filter: brightness(1.15);
+
+        .hero-discord-btn:hover {
+          background: #F8F9FE;
+          color: #5865F2;
+          border-color: rgba(88, 101, 242, 0.4);
+          transform: translateY(-1px);
+          box-shadow: 0 6px 18px rgba(88, 101, 242, 0.18);
+        }
+
+        .hero-discord-btn:active {
+          transform: scale(0.98);
+          background: #ECEFFB;
         }
 
         .hero-discord-icon {
-          color: #FFFFFF;
+          color: #5865F2;
           width: 1.15rem;
           height: 1.15rem;
+          flex-shrink: 0;
+          transition: transform 180ms ease;
+        }
+
+        .hero-discord-btn:hover .hero-discord-icon {
+          transform: scale(1.06);
         }
 
         @media (max-width: 1024px) {
           .hero-center-content {
-            top: clamp(5.0rem, 11vh, 7.0rem);
+            top: clamp(4.6rem, 11vh, 6.8rem);
           }
           .hero-warp-wrap {
-            max-width: min(94vw, 940px);
-            height: clamp(140px, 25vw, 230px);
+            max-width: min(86vw, 860px);
+            height: clamp(140px, 22vw, 220px);
+            margin-inline: auto;
           }
         }
 
         @media (max-width: 860px) {
           .hero-center-content {
-            top: clamp(7.5rem, 18vh, 10.5rem);
+            top: clamp(4.8rem, 12vh, 7.0rem);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin-inline: auto;
+            padding-inline: 1rem;
           }
           .hero-warp-wrap {
-            width: min(76vw, calc(22vh * 2.22)) !important;
-            max-width: min(76vw, 540px) !important;
+            width: min(80vw, 520px) !important;
+            max-width: min(80vw, 520px) !important;
             aspect-ratio: 1559 / 702 !important;
             height: auto !important;
-            max-height: 22vh !important;
+            max-height: 20vh !important;
             margin-inline: auto !important;
             display: flex;
             align-items: center;
@@ -598,24 +631,27 @@ export default function Hero() {
 
         @media (max-width: 600px) {
           .hero-center-content {
-            top: clamp(7.8rem, 18.5vh, 10.5rem) !important;
-            padding-inline: clamp(0.5rem, 2vw, 1rem);
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            top: clamp(7.4rem, 19vh, 9.6rem) !important;
+            padding-inline: clamp(0.5rem, 2.5vw, 1rem) !important;
+            width: 100% !important;
+            left: 0 !important;
+            right: 0 !important;
+            margin-inline: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
           }
           .hero-warp-wrap {
-            width: min(72vw, calc(19vh * 2.22)) !important;
-            max-width: min(72vw, 360px) !important;
+            width: min(82vw, 360px) !important;
+            max-width: min(82vw, 360px) !important;
             aspect-ratio: 1559 / 702 !important;
             height: auto !important;
-            max-height: 19vh !important;
+            max-height: 18vh !important;
             margin-inline: auto !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
           }
           .hero-warp-wrap canvas,
           .hero-warp-wrap img,
@@ -625,6 +661,7 @@ export default function Hero() {
             max-width: 100% !important;
             max-height: 100% !important;
             object-fit: contain !important;
+            margin-inline: auto !important;
           }
           .hero-chair-annotation {
             left: calc(50% + 36px);
@@ -687,8 +724,9 @@ export default function Hero() {
           }
           .hero-dock-btn-glass,
           .hero-dock-btn-primary,
-          .hero-dock-btn-discord {
+          .hero-discord-btn {
             width: 100%;
+            max-width: 312px;
           }
           .hero-log-img {
             width: clamp(720px, 160vw, 1000px);
@@ -705,13 +743,16 @@ export default function Hero() {
 
         @media (max-width: 480px) {
           .hero-center-content {
-            top: clamp(8rem, 17.5vh, 11rem);
-            padding-inline: 0;
+            top: clamp(7.2rem, 18.5vh, 9.2rem) !important;
+            padding-inline: 0.5rem !important;
           }
           .hero-warp-wrap {
-            height: clamp(165px, 44vw, 235px);
-            max-width: 100vw;
-            width: 100vw;
+            width: min(84vw, 320px) !important;
+            max-width: min(84vw, 320px) !important;
+            height: auto !important;
+            max-height: 17vh !important;
+            aspect-ratio: 1559 / 702 !important;
+            margin-inline: auto !important;
           }
           .hero-chair-annotation {
             left: calc(50% + 28px);
@@ -737,6 +778,14 @@ export default function Hero() {
 
         /* Specifically tailored for 6.0" and 6.1" phones (iPhone 12/13/14/15/16 at 390px/393px, Pixel, Galaxy) */
         @media (max-width: 420px) {
+          .hero-center-content {
+            top: clamp(7.0rem, 18vh, 8.8rem) !important;
+          }
+          .hero-warp-wrap {
+            width: min(86vw, 295px) !important;
+            max-width: min(86vw, 295px) !important;
+            margin-inline: auto !important;
+          }
           .hero-chair-annotation {
             left: calc(50% + 25px);
             top: 51.5%;

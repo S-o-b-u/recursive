@@ -15,7 +15,7 @@ export const EVENT = {
   venue: "Guru Nanak Institute of Technology",
   teamSize: "1 – 4 builders",
   seats: 4, // the four chairs on the hill
-  devfolioUrl: "https://devfolio.co",
+  devfolioUrl: "https://recursiveacm.devfolio.co",
   devfolioSlug: "recursiveacm", // Replace with your verified Devfolio hackathon slug (e.g. "recursive")
   devfolioTheme: "light" as "light" | "dark" | "dark-inverted",
   proposalTemplateUrl: "https://docs.google.com/presentation/d/1hWmofLq_oe_ZI_n_gTTszlc0AqkJIQyhz1n0iyBXEO8/copy", // Official Idea Submission PPT Template
