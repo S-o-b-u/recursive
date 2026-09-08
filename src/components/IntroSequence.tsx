@@ -605,7 +605,8 @@ export default function IntroSequence() {
 
       lines.forEach((el, i) => {
         const [tin, tout] = CUES[i];
-        const words = el.querySelectorAll<HTMLElement>(".intro-word");
+        const words = Array.from(el.querySelectorAll<HTMLElement>(".intro-word"));
+        if (words.length === 0) return;
 
         tl.fromTo(
           words,
@@ -656,12 +657,16 @@ export default function IntroSequence() {
       }
 
       // 2. Last line eases out on its own with soft deceleration
-      const lastWords = lines[lines.length - 1].querySelectorAll<HTMLElement>(".intro-word");
-      tl.to(
-        lastWords,
-        { opacity: 0, y: -12, scale: 0.98, duration: 0.58, ease: "power2.inOut", stagger: 0.024 },
-        11.9,
-      );
+      if (lines.length > 0) {
+        const lastWords = Array.from(lines[lines.length - 1].querySelectorAll<HTMLElement>(".intro-word"));
+        if (lastWords.length > 0) {
+          tl.to(
+            lastWords,
+            { opacity: 0, y: -12, scale: 0.98, duration: 0.58, ease: "power2.inOut", stagger: 0.024 },
+            11.9,
+          );
+        }
+      }
 
       // 3. A soft dawn glow rises from the hill line — masks the seam, then recedes.
       tl.fromTo(
@@ -942,9 +947,9 @@ export default function IntroSequence() {
               />
             </div>
 
-            {/* WELCOME Block */}
+            {/* Greeting Block */}
             <div ref={welcomeBlockRef} className="intro-welcome-block">
-              <h1 className="intro-welcome-title">WELCOME</h1>
+              <h1 className="intro-welcome-title">Hi There, Hackers!</h1>
               <span className="intro-welcome-sub">RECURSIVE 2026</span>
             </div>
           </div>
@@ -1103,14 +1108,24 @@ export default function IntroSequence() {
         .intro-welcome-title {
           margin: 0;
           font-family: var(--font-display), var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-size: clamp(2.4rem, 6.8vw, 4.4rem);
+          font-size: clamp(2rem, 5.4vw, 3.6rem);
           font-weight: 800;
-          line-height: 1;
-          letter-spacing: clamp(0.08em, 1.4vw, 0.16em);
-          text-transform: uppercase;
+          line-height: 1.1;
+          letter-spacing: clamp(0.01em, 0.4vw, 0.03em);
+          text-transform: none;
+          white-space: nowrap;
           color: #ffffff;
           text-shadow: 0 4px 28px rgba(0, 0, 0, 0.7);
           filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.5));
+        }
+
+        @media (max-width: 480px) {
+          .intro-welcome-title {
+            white-space: normal;
+            font-size: clamp(1.75rem, 6.8vw, 2.3rem);
+            line-height: 1.15;
+            padding: 0 0.5rem;
+          }
         }
 
         .intro-welcome-sub {
