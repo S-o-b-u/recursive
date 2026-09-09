@@ -303,7 +303,10 @@ export default function Navigation() {
 
         @media (max-width: 520px) {
           .nav-wordmark { font-size: 1.05rem; line-height: 1.1; }
-          .nav-brand { padding: 0.35rem 0.65rem; }
+          .nav-brand {
+            padding: 0.35rem 0.65rem;
+            transform: translate(3.5px, 2px);
+          }
         }
 
         .nav-desktop-links {
@@ -746,6 +749,7 @@ export default function Navigation() {
 
           .nav-brand {
             padding: 0.35rem 0.65rem;
+            transform: translate(3.5px, 2px);
           }
 
           .nav-wordmark {

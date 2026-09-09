@@ -381,7 +381,7 @@ export const FAQS: Faq[] = [
   },
   {
     q: "Where is the venue and what is the schedule?",
-    a: "The hackathon takes place in person at Guru Nanak Institute of Technology (GNIT), Sodepur, Kolkata. Check-in starts at 9:00 AM, the official 8-hour hacking sprint runs from 10:30 AM to 6:30 PM, followed immediately by project demos, judging, and the award ceremony.",
+    a: "The hackathon takes place in person at Guru Nanak Institute of Technology (GNIT), Sodepur, Kolkata. Check-in starts at 9:00 AM, the official 8-hour hacking sprint runs from 10:00 AM to 6:00 PM, followed immediately by project demos, judging, and the award ceremony.",
   },
   {
     q: "Can I work on a pre-existing project or start early?",

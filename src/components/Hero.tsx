@@ -504,9 +504,9 @@ export default function Hero() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          gap: 0.55rem;
+          gap: 0.5rem;
           height: 44px;
-          padding: 0 1.35rem;
+          padding: 0 1.15rem;
           border-radius: 6px;
           background: #FFFFFF;
           color: #23272A;
@@ -723,18 +723,19 @@ export default function Hero() {
           .hero-action-dock-split {
             flex-direction: column;
             width: calc(100vw - 2.5rem);
-            max-width: 20rem;
+            max-width: 17rem;
             align-items: center;
           }
 
           .hero-action-dock-split .block {
             width: 100%;
           }
+          .hero-action-dock-split .devfolio-button-wrapper,
           .hero-dock-btn-glass,
           .hero-dock-btn-primary,
           .hero-discord-btn {
             width: 100%;
-            max-width: 312px;
+            max-width: 255px;
           }
           .hero-log-img {
             width: clamp(720px, 160vw, 1000px);
