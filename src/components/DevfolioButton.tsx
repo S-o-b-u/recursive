@@ -55,7 +55,7 @@ export default function DevfolioButton({
       placeholder.setAttribute("data-hackathon-slug", slug);
       placeholder.setAttribute("data-button-theme", theme);
       placeholder.style.height = "44px";
-      placeholder.style.width = "312px";
+      placeholder.style.width = "255px";
       slot.appendChild(placeholder);
     }
 
@@ -84,7 +84,7 @@ export default function DevfolioButton({
         justifyContent: "center",
         minHeight: "44px",
         height: "44px",
-        width: "312px",
+        width: "255px",
         maxWidth: "100%",
         ...style,
       }}
@@ -108,7 +108,7 @@ export default function DevfolioButton({
           borderRadius: "4px",
           color: "#ffffff",
           fontFamily: "'Nunito Sans', var(--font-dm-sans), system-ui, sans-serif",
-          fontSize: "18px",
+          fontSize: "16px",
           fontWeight: 600,
           letterSpacing: "-0.01em",
           textDecoration: "none",
@@ -163,7 +163,7 @@ export default function DevfolioButton({
           overflow: "hidden",
         }}
         dangerouslySetInnerHTML={{
-          __html: `<div class="apply-button" data-hackathon-slug="${attr(slug)}" data-button-theme="${attr(theme)}" style="height:44px;width:312px"></div>`,
+          __html: `<div class="apply-button" data-hackathon-slug="${attr(slug)}" data-button-theme="${attr(theme)}" style="height:44px;width:255px"></div>`,
         }}
       />
 

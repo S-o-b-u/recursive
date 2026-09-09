@@ -31,7 +31,7 @@ export default function RegisterCTA() {
               href={EVENT.discordUrl}
               target="_blank"
               rel="noopener noreferrer"
-              width={145}
+              width={132}
               height={44}
             />
           </div>
