@@ -361,17 +361,36 @@ export default function SponsorStage() {
                     href="https://devfolio.co"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="sxp-partner-card"
+                    className="sxp-partner-card sxp-float-card"
                     title="Devfolio"
                   >
                     <img
-                      src="/images/devfolio.png"
+                      src="/images/devfolio-white.png"
                       alt="DEVFOLIO LOGO"
                       className="sxp-partner-logo"
                       width={220}
                       height={44}
                     />
                   </a>
+                </div>
+
+                {/* ── Innofusion 3.0 Partner ── */}
+                <div className="sxp-partner-tier sxp-innofusion-tier">
+                  <div
+                    className="sxp-partner-card sxp-float-card-alt sxp-innofusion-card"
+                    title="INNOFUSION 3.0"
+                    role="img"
+                    aria-label="INNOFUSION 3.0"
+                  >
+                    <img
+                      src="/images/INNOFUSION%203.0%20logo.png"
+                      alt="INNOFUSION 3.0"
+                      className="sxp-partner-logo sxp-innofusion-logo"
+                      width={42}
+                      height={42}
+                    />
+                    <span className="sxp-innofusion-brand">INNOFUSION 3.0</span>
+                  </div>
                   <span className="sxp-unrevealed-note">
                     More community partners &amp; sponsors revealing soon
                   </span>
@@ -731,61 +750,128 @@ export default function SponsorStage() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 0.65rem;
-          margin-top: clamp(1rem, 2.2vh, 1.8rem);
-          margin-bottom: clamp(0.6rem, 1.5vh, 1.2rem);
+          gap: 0.85rem;
+          margin-top: clamp(0.4rem, 1.1vh, 0.85rem);
+          margin-bottom: 0;
           z-index: 10;
+        }
+
+        .sxp-innofusion-tier {
+          margin-top: clamp(0.75rem, 1.8vh, 1.35rem);
+          margin-bottom: clamp(0.35rem, 0.9vh, 0.75rem);
         }
 
         .sxp-tier-badge {
           font-family: var(--font-label), var(--font-geist-mono), monospace;
           font-size: 0.72rem;
           font-weight: 600;
-          letter-spacing: 0.16em;
+          letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: #2b5420;
+          color: #142e1c;
+          margin-bottom: 0.25rem;
+          transform: translateY(-4px);
         }
 
         .sxp-partner-card {
+          position: relative;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 1.1rem 2.5rem;
-          background: rgba(255, 255, 255, 0.75);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.95);
-          border-radius: 1.25rem;
+          padding: 0.95rem clamp(2rem, 3.8vw, 3rem);
+          background: #142e1c;
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          border-top: 1px solid rgba(255, 255, 255, 0.28);
           box-shadow:
-            0 4px 20px -4px rgba(0, 0, 0, 0.06),
-            0 1px 3px rgba(0, 0, 0, 0.04);
-          transition: transform 200ms ease, box-shadow 200ms ease;
+            0 8px 24px -4px rgba(20, 46, 28, 0.32),
+            0 4px 14px rgba(20, 46, 28, 0.24),
+            inset 0 1px 1px rgba(255, 255, 255, 0.18);
+          border-radius: 1.35rem;
+          transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, border-color 260ms ease, background 260ms ease;
+          user-select: none;
+        }
+
+        /* ── Floating Animation (Organic alternating drift matching judges cards) ── */
+        .sxp-float-card {
+          animation: sxp-float 5.2s ease-in-out infinite;
+          will-change: transform;
+        }
+
+        .sxp-float-card-alt {
+          animation: sxp-float-alt 5.8s ease-in-out infinite -2.6s;
+          will-change: transform;
+        }
+
+        @keyframes sxp-float {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-7px);
+          }
+        }
+
+        @keyframes sxp-float-alt {
+          0%, 100% {
+            transform: translateY(-3px);
+          }
+          50% {
+            transform: translateY(5px);
+          }
         }
 
         .sxp-partner-card:hover {
-          transform: translateY(-2px);
+          animation-play-state: paused;
+          background: #1f4229;
+          transform: translateY(-4px) scale(1.015);
+          border-color: rgba(255, 255, 255, 0.32);
           box-shadow:
-            0 8px 30px -4px rgba(0, 0, 0, 0.12),
-            0 2px 6px rgba(0, 0, 0, 0.06);
+            0 14px 34px -6px rgba(20, 46, 28, 0.42),
+            0 6px 20px rgba(20, 46, 28, 0.3),
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.26);
         }
 
         .sxp-partner-logo {
-          height: clamp(34px, 4.2vh, 46px);
+          height: clamp(32px, 3.8vh, 42px);
           width: auto;
           object-fit: contain;
           display: block;
         }
 
+        .sxp-innofusion-card {
+          gap: clamp(0.85rem, 1.6vw, 1.25rem);
+          padding: 0.95rem clamp(2rem, 3.8vw, 3.2rem);
+        }
+
+        .sxp-innofusion-logo {
+          height: clamp(34px, 4vh, 44px);
+          width: clamp(34px, 4vh, 44px);
+          object-fit: contain;
+          display: block;
+          flex-shrink: 0;
+        }
+
+        .sxp-innofusion-brand {
+          font-family: var(--font-display), var(--font-heading), var(--font-dm-sans), sans-serif;
+          font-weight: 800;
+          font-size: clamp(1.4rem, 2.2vw, 1.85rem);
+          letter-spacing: 0.08em;
+          word-spacing: 0.28em;
+          color: #ffffff;
+          line-height: 1;
+          white-space: nowrap;
+          padding-right: 0.35rem;
+        }
+
         .sxp-unrevealed-note {
           font-family: var(--font-dm-sans), sans-serif;
           font-size: 0.85rem;
-          color: rgba(30, 50, 25, 0.65);
+          color: #26472d;
           letter-spacing: 0.01em;
-          margin-top: 0.25rem;
+          margin-top: clamp(0.75rem, 1.8vh, 1.25rem);
         }
 
         .sxp-cta-wrap {
-          margin-top: clamp(1rem, 2.4vh, 2rem);
+          margin-top: clamp(0.7rem, 1.8vh, 1.4rem);
           display: flex;
           justify-content: center;
           align-items: center;
@@ -937,6 +1023,13 @@ export default function SponsorStage() {
         @media (max-height: 720px) {
           .sxp-motif { display: none; }
           .sxp-wall { gap: 0.6rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .sxp-float-card,
+          .sxp-float-card-alt {
+            animation: none !important;
+          }
         }
       `}</style>
     </section>
