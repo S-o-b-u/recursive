@@ -247,7 +247,7 @@ export const JUDGES: Judge[] = [
 export const SPONSOR_SLOTS: Slot[] = [
   { label: "DEVFOLIO LOGO", expect: "/images/devfolio.png", src: "/images/devfolio.png" },
   { label: "INNOFUSION 3.0 LOGO", expect: "/images/INNOFUSION 3.0 logo.png", src: "/images/INNOFUSION 3.0 logo.png" },
-  { label: "Sponsor 03", expect: "/images/sponsors/03.svg", src: "" },
+  { label: "REACT KOLKATA LOGO", expect: "/images/react-kolkata-logo-full-light.png", src: "/images/react-kolkata-logo-full-light.png" },
   { label: "Sponsor 04", expect: "/images/sponsors/04.svg", src: "" },
   { label: "Sponsor 05", expect: "/images/sponsors/05.svg", src: "" },
   { label: "Sponsor 06", expect: "/images/sponsors/06.svg", src: "" },
