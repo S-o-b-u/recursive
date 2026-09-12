@@ -374,22 +374,41 @@ export default function SponsorStage() {
                   </a>
                 </div>
 
-                {/* ── Innofusion 3.0 Partner ── */}
-                <div className="sxp-partner-tier sxp-innofusion-tier">
-                  <div
-                    className="sxp-partner-card sxp-float-card-alt sxp-innofusion-card"
-                    title="INNOFUSION 3.0"
-                    role="img"
-                    aria-label="INNOFUSION 3.0"
-                  >
-                    <img
-                      src="/images/INNOFUSION%203.0%20logo.png"
-                      alt="INNOFUSION 3.0"
-                      className="sxp-partner-logo sxp-innofusion-logo"
-                      width={42}
-                      height={42}
-                    />
-                    <span className="sxp-innofusion-brand">INNOFUSION 3.0</span>
+                {/* ── Community Partners ── */}
+                <div className="sxp-partner-tier sxp-community-tier">
+                  <span className="sxp-tier-badge">COMMUNITY PARTNERS</span>
+                  <div className="sxp-partner-row">
+                    <a
+                      href="https://reactkolkata.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="sxp-partner-card sxp-float-card sxp-react-kolkata-card"
+                      title="React Kolkata"
+                      aria-label="React Kolkata"
+                    >
+                      <img
+                        src="/images/react-kolkata-logo-full-light.png"
+                        alt="React Kolkata"
+                        className="sxp-partner-logo sxp-react-kolkata-logo"
+                        width={138}
+                        height={44}
+                      />
+                    </a>
+                    <div
+                      className="sxp-partner-card sxp-float-card-alt sxp-innofusion-card"
+                      title="INNOFUSION 3.0"
+                      role="img"
+                      aria-label="INNOFUSION 3.0"
+                    >
+                      <img
+                        src="/images/INNOFUSION%203.0%20logo.png"
+                        alt="INNOFUSION 3.0"
+                        className="sxp-partner-logo sxp-innofusion-logo"
+                        width={42}
+                        height={42}
+                      />
+                      <span className="sxp-innofusion-brand">INNOFUSION 3.0</span>
+                    </div>
                   </div>
                   <span className="sxp-unrevealed-note">
                     More community partners &amp; sponsors revealing soon
@@ -756,9 +775,19 @@ export default function SponsorStage() {
           z-index: 10;
         }
 
+        .sxp-community-tier,
         .sxp-innofusion-tier {
           margin-top: clamp(0.75rem, 1.8vh, 1.35rem);
           margin-bottom: clamp(0.35rem, 0.9vh, 0.75rem);
+        }
+
+        .sxp-partner-row {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: clamp(0.85rem, 2vw, 1.4rem);
+          flex-wrap: wrap;
+          width: 100%;
         }
 
         .sxp-tier-badge {
@@ -860,6 +889,28 @@ export default function SponsorStage() {
           line-height: 1;
           white-space: nowrap;
           padding-right: 0.35rem;
+        }
+
+        .sxp-react-kolkata-card {
+          padding: 0.95rem clamp(1.8rem, 3.2vw, 2.6rem);
+          transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, border-color 260ms ease, background 260ms ease;
+          text-decoration: none;
+        }
+
+        .sxp-react-kolkata-card:hover {
+          border-color: rgba(56, 189, 248, 0.45);
+          box-shadow:
+            0 14px 34px -6px rgba(20, 46, 28, 0.45),
+            0 6px 20px rgba(56, 189, 248, 0.2),
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.28);
+        }
+
+        .sxp-react-kolkata-logo {
+          height: clamp(39px, 4.4vh, 46px);
+          width: auto;
+          min-width: 120px;
+          object-fit: contain;
+          display: block;
         }
 
         .sxp-unrevealed-note {
