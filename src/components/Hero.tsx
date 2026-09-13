@@ -332,7 +332,7 @@ export default function Hero() {
           overflow: hidden;
         }
 
-        /* ── Upper Zone (0 to 50svh): Sky above chair. Pushes logo to sit just above chair ── */
+        /* ── Upper Zone (0 to 50svh): Sky above chair. Positions logo with breathing room above chair ── */
         .hero-sky-zone {
           position: relative;
           width: 100%;
@@ -346,7 +346,7 @@ export default function Hero() {
           justify-content: flex-end;
           align-items: center;
           padding-top: clamp(4.2rem, 7svh, 5.5rem);
-          padding-bottom: clamp(0.35rem, 1.2svh, 0.85rem);
+          padding-bottom: clamp(1.5rem, 3.8svh, 3.2rem);
           padding-inline: clamp(0.75rem, 2vw, 1.5rem);
           box-sizing: border-box;
           pointer-events: none;
@@ -612,6 +612,7 @@ export default function Hero() {
         @media (max-width: 1024px) {
           .hero-sky-zone {
             padding-top: clamp(4.0rem, 6.8svh, 5.2rem);
+            padding-bottom: clamp(1.4rem, 3.6svh, 3.0rem);
           }
           .hero-ground-zone {
             padding-bottom: clamp(2.4rem, 4.8svh, 3.8rem);
@@ -693,7 +694,7 @@ export default function Hero() {
         @media (max-width: 600px) {
           .hero-sky-zone {
             padding-top: clamp(3.8rem, 6.2svh, 4.8rem);
-            padding-bottom: clamp(0.3rem, 1svh, 0.75rem);
+            padding-bottom: clamp(1.1rem, 3.2svh, 2.0rem);
             padding-inline: clamp(0.5rem, 2.5vw, 1rem);
           }
           .hero-ground-zone {
@@ -876,8 +877,8 @@ export default function Hero() {
           .hero-sky-zone {
             height: 52svh !important;
             flex: 0 0 52svh !important;
-            padding-top: 3.2rem !important;
-            padding-bottom: 0.25rem !important;
+            padding-top: 3.0rem !important;
+            padding-bottom: 0.75rem !important;
           }
           .hero-ground-zone {
             height: 48svh !important;
