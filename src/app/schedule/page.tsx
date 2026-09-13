@@ -6,7 +6,7 @@ import { EVENT } from "@/data/hackathon";
 
 export const metadata: Metadata = {
   title: "Schedule & Timeline",
-  description: `The complete 8-hour schedule for ${EVENT.name} on ${EVENT.dates} at Guru Nanak Institute of Technology, Kolkata. Organized by GNIT ACM Student Chapter.`,
+  description: `The complete 8-hour schedule for ${EVENT.name} on ${EVENT.dates} at Guru Nanak Institute of Technology, Kolkata. Organized by GNIT Kolkata ACM Student Chapter.`,
   keywords: [
     "Recursive Schedule",
     "ACM Hackathon Schedule",

@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "RECURSIVE 2026 — ACM Hackathon",
     short_name: "RECURSIVE ACM",
     description:
-      "RECURSIVE 2026 is the premier hackathon hosted by GNIT ACM Student Chapter at Guru Nanak Institute of Technology, Kolkata.",
+      "RECURSIVE 2026 is the premier hackathon hosted by GNIT Kolkata ACM Student Chapter at Guru Nanak Institute of Technology, Kolkata.",
     start_url: "/",
     display: "standalone",
     background_color: "#010301",

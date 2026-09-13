@@ -23,11 +23,12 @@ export default function JsonLd() {
       "Recursive",
       "Recursive ACM",
       "Recursive Hackathon",
+      "GNIT Kolkata ACM Hackathon",
       "GNIT ACM Hackathon",
       "recu",
       "recursiveacm",
     ],
-    description: `${EVENT.name} 2026 is an 8-hour premier national hackathon organized by the ${COLLEGE.collegeShort} ${COLLEGE.chapter} at ${COLLEGE.college}, ${COLLEGE.city}. Builders compete across AI & Intelligent Systems, Web3 & Blockchain, FinTech, HealthTech, CyberSecurity, and Open Innovation.`,
+    description: `${EVENT.name} 2026 is an 8-hour premier national hackathon organized by the ${COLLEGE.chapter} at ${COLLEGE.college}, ${COLLEGE.city}. Builders compete across AI & Intelligent Systems, Web3 & Blockchain, FinTech, HealthTech, CyberSecurity, and Open Innovation.`,
     startDate: EVENT.startsAt,
     endDate: "2026-10-08T17:00:00+05:30",
     eventStatus: "https://schema.org/EventScheduled",
@@ -62,10 +63,11 @@ export default function JsonLd() {
     ],
     organizer: {
       "@type": "Organization",
-      name: `${COLLEGE.collegeShort} ${COLLEGE.chapter}`,
+      name: COLLEGE.chapter,
       alternateName: [
         "ACM GNIT",
         "GNIT ACM",
+        "GNIT Kolkata ACM",
         "ACM Student Chapter",
         "Association for Computing Machinery Student Chapter",
       ],
@@ -86,18 +88,20 @@ export default function JsonLd() {
     },
     performer: {
       "@type": "Organization",
-      name: `${COLLEGE.collegeShort} ${COLLEGE.chapter}`,
+      name: COLLEGE.chapter,
     },
   };
 
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: `${COLLEGE.collegeShort} ${COLLEGE.chapter}`,
+    name: COLLEGE.chapter,
     alternateName: [
+      "GNIT Kolkata ACM",
       "GNIT ACM",
       "ACM GNIT",
       "ACM Student Chapter",
+      "GNIT Kolkata ACM Student Chapter",
       "GNIT ACM Student Chapter",
       "Association for Computing Machinery GNIT Chapter",
     ],
@@ -126,10 +130,11 @@ export default function JsonLd() {
       "RECURSIVE 2026",
       "recu",
       "recursiveacm",
+      "GNIT Kolkata ACM Hackathon",
       "GNIT ACM Hackathon",
     ],
     url: siteUrl,
-    description: `Official portal for ${EVENT.name} 2026, premier hackathon organized by ${COLLEGE.collegeShort} ${COLLEGE.chapter}.`,
+    description: `Official portal for ${EVENT.name} 2026, premier hackathon organized by ${COLLEGE.chapter}.`,
   };
 
   return (

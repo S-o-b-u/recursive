@@ -6,12 +6,12 @@ import { EVENT } from "@/data/hackathon";
 
 export const metadata: Metadata = {
   title: "Prizes & Awards",
-  description: `Cash prizes, category tracks awards, judging criteria, and sponsor bounties for ${EVENT.name} 2026, hosted by GNIT ACM Student Chapter.`,
+  description: `Cash prizes, category tracks awards, judging criteria, and sponsor bounties for ${EVENT.name} 2026, hosted by GNIT Kolkata ACM Student Chapter.`,
   keywords: [
     "Recursive Prizes",
     "ACM Hackathon Prizes",
     "Kolkata Hackathon Cash Prize",
-    "GNIT ACM Awards",
+    "GNIT Kolkata ACM Awards",
     "Hackathon Bounties",
   ],
   alternates: {

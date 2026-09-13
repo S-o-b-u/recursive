@@ -386,7 +386,7 @@ export default function Footer() {
       {/* ── Giant WebGL WarpText Wordmark behind the walking people with Rich Gradient ── */}
       <div className="footer-wordmark-wrap">
         <span className="sr-only">
-          RECURSIVE — ACM Hackathon 2026 | GNIT ACM Student Chapter, Guru Nanak Institute of Technology, Kolkata
+          RECURSIVE — ACM Hackathon 2026 | GNIT Kolkata ACM Student Chapter, Guru Nanak Institute of Technology, Kolkata
         </span>
         <WarpText
           text={EVENT.name}

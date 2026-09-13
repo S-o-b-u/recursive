@@ -409,6 +409,20 @@ export default function SponsorStage() {
                       />
                       <span className="sxp-innofusion-brand">INNOFUSION 3.0</span>
                     </div>
+                    <div
+                      className="sxp-partner-card sxp-float-card sxp-coderush-card"
+                      title="CodeRush X"
+                      role="img"
+                      aria-label="CodeRush X"
+                    >
+                      <img
+                        src="/images/CodeRush%20X%20Logo.png"
+                        alt="CodeRush X"
+                        className="sxp-partner-logo sxp-coderush-logo"
+                        width={180}
+                        height={45}
+                      />
+                    </div>
                   </div>
                   <span className="sxp-unrevealed-note">
                     More community partners &amp; sponsors revealing soon
@@ -909,6 +923,27 @@ export default function SponsorStage() {
           height: clamp(39px, 4.4vh, 46px);
           width: auto;
           min-width: 120px;
+          object-fit: contain;
+          display: block;
+        }
+
+        .sxp-coderush-card {
+          padding: 0.95rem clamp(1.8rem, 3.2vw, 2.6rem);
+          transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, border-color 260ms ease, background 260ms ease;
+        }
+
+        .sxp-coderush-card:hover {
+          border-color: rgba(34, 211, 238, 0.45);
+          box-shadow:
+            0 14px 34px -6px rgba(20, 46, 28, 0.45),
+            0 6px 20px rgba(34, 211, 238, 0.2),
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.28);
+        }
+
+        .sxp-coderush-logo {
+          height: clamp(38px, 4.3vh, 46px);
+          width: auto;
+          min-width: 140px;
           object-fit: contain;
           display: block;
         }

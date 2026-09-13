@@ -71,10 +71,10 @@ export default function ACM() {
 
         <RevealBlock y={16} delay={0.1}>
           <div className="acm-host">
-            <span className="acm-host-name">GNIT ACM Student Chapter</span>
+            <span className="acm-host-name">GNIT Kolkata ACM Student Chapter</span>
             <Image
               src="/college_logo/gnitacm.png"
-              alt="GNIT ACM Student Chapter"
+              alt="GNIT Kolkata ACM Student Chapter"
               width={360}
               height={110}
               className="acm-host-logo"
@@ -85,7 +85,7 @@ export default function ACM() {
               target="_blank"
               rel="noopener noreferrer"
               className="acm-chapter-link"
-              aria-label="Visit GNIT ACM Student Chapter"
+              aria-label="Visit GNIT Kolkata ACM Student Chapter"
             >
               <span className="acm-link-text">Visit Chapter Website</span>
               <svg viewBox="0 0 24 24" className="acm-link-arrow" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
