@@ -319,7 +319,7 @@ export default function Hero() {
         /* ── Top Center Block: Wordmark with WebGL Warp ── */
         .hero-center-content {
           position: absolute;
-          top: clamp(4.6rem, 11.5vh, 7.2rem);
+          top: clamp(6.0rem, 13.8vh, 7.8rem);
           left: 0;
           right: 0;
           width: 100%;
@@ -339,8 +339,9 @@ export default function Hero() {
         .hero-warp-wrap {
           position: relative;
           width: 100%;
-          max-width: min(88vw, 1080px);
-          height: clamp(165px, 23vw, 270px);
+          max-width: min(76vw, 760px);
+          aspect-ratio: 1559 / 702;
+          height: clamp(125px, min(18vw, 21vh), 185px);
           display: flex;
           justify-content: center;
           align-items: center;
@@ -362,8 +363,8 @@ export default function Hero() {
         /* ── Simple Clean Chair Annotation ── */
         .hero-chair-annotation {
           position: absolute;
-          left: calc(50% + 72px);
-          top: 53.5%;
+          left: calc(50% + 64px);
+          top: 52%;
           transform: translateY(-50%);
           z-index: 30;
           display: flex;
@@ -457,7 +458,7 @@ export default function Hero() {
         /* ── Bottom Unified Glass Dock ── */
         .hero-bottom-area {
           position: absolute;
-          bottom: clamp(5rem, 11vh, 7rem);
+          bottom: clamp(3.6rem, 8vh, 5.2rem);
           left: 0;
           right: 0;
           width: 100%;
@@ -547,18 +548,18 @@ export default function Hero() {
 
         @media (max-width: 1024px) {
           .hero-center-content {
-            top: clamp(4.6rem, 11vh, 6.8rem);
+            top: clamp(5.6rem, 13vh, 7.2rem);
           }
           .hero-warp-wrap {
-            max-width: min(86vw, 860px);
-            height: clamp(140px, 22vw, 220px);
+            max-width: min(78vw, 650px);
+            height: clamp(115px, min(18vw, 20vh), 170px);
             margin-inline: auto;
           }
         }
 
         @media (max-width: 860px) {
           .hero-center-content {
-            top: clamp(4.8rem, 12vh, 7.0rem);
+            top: clamp(5.8rem, 13.5vh, 7.5rem);
             display: flex;
             flex-direction: column;
             align-items: center;
