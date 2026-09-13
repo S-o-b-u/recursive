@@ -304,7 +304,7 @@ export default function Hero() {
         /* ── Top Center Block: Wordmark with WebGL Warp ── */
         .hero-center-content {
           position: absolute;
-          top: clamp(6.0rem, 13.8vh, 7.8rem);
+          top: clamp(4.6rem, 11.5vh, 7.2rem);
           left: 0;
           right: 0;
           width: 100%;
@@ -324,9 +324,8 @@ export default function Hero() {
         .hero-warp-wrap {
           position: relative;
           width: 100%;
-          max-width: min(76vw, 760px);
-          aspect-ratio: 1559 / 702;
-          height: clamp(125px, min(18vw, 21vh), 185px);
+          max-width: min(92vw, 1150px);
+          height: clamp(180px, 26vw, 340px);
           display: flex;
           justify-content: center;
           align-items: center;
@@ -533,18 +532,18 @@ export default function Hero() {
 
         @media (max-width: 1024px) {
           .hero-center-content {
-            top: clamp(5.6rem, 13vh, 7.2rem);
+            top: clamp(4.6rem, 11vh, 6.8rem);
           }
           .hero-warp-wrap {
-            max-width: min(78vw, 650px);
-            height: clamp(115px, min(18vw, 20vh), 170px);
+            max-width: min(90vw, 920px);
+            height: clamp(155px, 24vw, 255px);
             margin-inline: auto;
           }
         }
 
         @media (max-width: 860px) {
           .hero-center-content {
-            top: clamp(5.8rem, 13.5vh, 7.5rem);
+            top: clamp(4.8rem, 11.5vh, 6.8rem);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -556,11 +555,11 @@ export default function Hero() {
             padding-inline: 1rem;
           }
           .hero-warp-wrap {
-            width: min(80vw, 520px) !important;
-            max-width: min(80vw, 520px) !important;
-            aspect-ratio: 1559 / 702 !important;
-            height: auto !important;
-            max-height: 20vh !important;
+            width: 100% !important;
+            max-width: min(90vw, 720px) !important;
+            height: clamp(135px, 22vw, 210px) !important;
+            max-height: 25vh !important;
+            aspect-ratio: auto !important;
             margin-inline: auto !important;
             display: flex;
             align-items: center;
@@ -624,7 +623,7 @@ export default function Hero() {
 
         @media (max-width: 600px) {
           .hero-center-content {
-            top: clamp(7.4rem, 19vh, 9.6rem) !important;
+            top: clamp(5.0rem, 11vh, 7.2rem) !important;
             padding-inline: clamp(0.5rem, 2.5vw, 1rem) !important;
             width: 100% !important;
             left: 0 !important;
@@ -636,11 +635,11 @@ export default function Hero() {
             justify-content: center !important;
           }
           .hero-warp-wrap {
-            width: min(82vw, 360px) !important;
-            max-width: min(82vw, 360px) !important;
+            width: min(88vw, 420px) !important;
+            max-width: min(88vw, 420px) !important;
             aspect-ratio: 1559 / 702 !important;
             height: auto !important;
-            max-height: 18vh !important;
+            max-height: 20vh !important;
             margin-inline: auto !important;
             display: flex !important;
             align-items: center !important;
@@ -742,14 +741,14 @@ export default function Hero() {
 
         @media (max-width: 480px) {
           .hero-center-content {
-            top: clamp(7.2rem, 18.5vh, 9.2rem) !important;
+            top: clamp(4.8rem, 10.5vh, 6.8rem) !important;
             padding-inline: 0.5rem !important;
           }
           .hero-warp-wrap {
-            width: min(84vw, 320px) !important;
-            max-width: min(84vw, 320px) !important;
+            width: min(90vw, 370px) !important;
+            max-width: min(90vw, 370px) !important;
             height: auto !important;
-            max-height: 17vh !important;
+            max-height: 20vh !important;
             aspect-ratio: 1559 / 702 !important;
             margin-inline: auto !important;
           }
@@ -783,11 +782,11 @@ export default function Hero() {
         /* Specifically tailored for 6.0" and 6.1" phones (iPhone 12/13/14/15/16 at 390px/393px, Pixel, Galaxy) */
         @media (max-width: 420px) {
           .hero-center-content {
-            top: clamp(7.0rem, 18vh, 8.8rem) !important;
+            top: clamp(4.6rem, 10vh, 6.4rem) !important;
           }
           .hero-warp-wrap {
-            width: min(86vw, 295px) !important;
-            max-width: min(86vw, 295px) !important;
+            width: min(92vw, 345px) !important;
+            max-width: min(92vw, 345px) !important;
             margin-inline: auto !important;
           }
           .hero-chair-annotation {
