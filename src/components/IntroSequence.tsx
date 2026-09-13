@@ -56,16 +56,15 @@ const LINES: Line[] = [
   { words: ["Let's", "find", "out."] },
 ];
 
-// [enter, exit] in seconds. Short lines read fast; line 4 (the long one) gets
-// extra room. Exits are quick and accelerate away, so the outgoing line is
-// essentially gone by the time the next one starts — no smear between beats.
+// [enter, exit] in seconds. Perfectly paced with zero overlap between lines.
+// Every line completes its exit and leaves clean breathing room before the next starts.
 const CUES: [number, number][] = [
-  [4.1, 5.05],
-  [5.25, 6.2],
-  [6.4, 7.5],
-  [7.75, 9.45],
-  [9.7, 10.75],
-  [10.95, 11.95],
+  [4.05, 4.90],
+  [5.35, 6.25],
+  [6.70, 7.60],
+  [8.05, 9.40],
+  [9.85, 10.85],
+  [11.30, 12.05],
 ];
 
 const WARP_RADIUS = 250;
@@ -737,12 +736,16 @@ export default function IntroSequence() {
       );
 
       tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 7.6, ease: "sine.inOut" }, 3.8);
-      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 8.2, ease: "none" }, 3.9);
+      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 8.45, ease: "none" }, 3.9);
 
       lines.forEach((el, i) => {
         const [tin, tout] = CUES[i];
         const words = Array.from(el.querySelectorAll<HTMLElement>(".intro-word"));
         if (words.length === 0) return;
+
+        // Ensure container is hidden initially and becomes visible only when this cue enters
+        tl.set(el, { autoAlpha: 0 }, 0);
+        tl.set(el, { autoAlpha: 1 }, tin);
 
         tl.fromTo(
           words,
@@ -750,24 +753,28 @@ export default function IntroSequence() {
           {
             opacity: 1,
             y: 0,
-            duration: 0.62,
+            duration: 0.52,
             ease: "power3.out",
-            stagger: 0.036,
+            stagger: i === 3 ? 0.028 : 0.032,
           },
           tin,
         );
+
         if (i < lines.length - 1) {
           tl.to(
             words,
             {
               opacity: 0,
               y: -12,
-              duration: 0.34,
+              duration: 0.25,
               ease: "power2.in",
-              stagger: 0.018,
+              stagger: 0.01,
             },
             tout,
           );
+          // Strictly hide container once all words finish exiting so zero ghosting can ever occur
+          const exitEnd = tout + 0.25 + words.length * 0.01 + 0.02;
+          tl.set(el, { autoAlpha: 0 }, exitEnd);
         }
       });
 
@@ -783,24 +790,26 @@ export default function IntroSequence() {
         tl.to(
           skipWrap,
           { opacity: 0, y: 8, duration: 0.35, ease: "power2.in", pointerEvents: "none" },
-          11.5,
+          11.8,
         );
       }
 
       // ── Hand-off ──────────────────────────────────────────────────────────
       if (!isMobileDevice) {
-        tl.call(warmHeroPlate, undefined, 11.3);
+        tl.call(warmHeroPlate, undefined, 11.5);
       }
 
-      // 2. Last line eases out on its own with soft deceleration
+      // 2. Last line eases out on its own with soft deceleration into the bloom
       if (lines.length > 0) {
-        const lastWords = Array.from(lines[lines.length - 1].querySelectorAll<HTMLElement>(".intro-word"));
+        const lastEl = lines[lines.length - 1];
+        const lastWords = Array.from(lastEl.querySelectorAll<HTMLElement>(".intro-word"));
         if (lastWords.length > 0) {
           tl.to(
             lastWords,
-            { opacity: 0, y: -12, scale: 0.98, duration: 0.58, ease: "power2.inOut", stagger: 0.024 },
-            11.9,
+            { opacity: 0, y: -12, scale: 0.98, duration: 0.38, ease: "power2.inOut", stagger: 0.015 },
+            12.05,
           );
+          tl.set(lastEl, { autoAlpha: 0 }, 12.05 + 0.38 + lastWords.length * 0.015 + 0.02);
         }
       }
 
@@ -809,21 +818,21 @@ export default function IntroSequence() {
         bloom,
         { opacity: 0, scale: 1.08 },
         { opacity: isMobileDevice ? 0.7 : 1, scale: 1, duration: 0.85, ease: "power1.inOut" },
-        12.0,
+        12.1,
       );
 
       // Pin the plate to exact identity at the dissolve start without micro-snap
-      tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 12.3);
+      tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 12.35);
 
-      // Hand off to Hero: signal at 12.15s so Hero starts playing smoothly right before the dissolve
-      const handoffTime = isMobileDevice ? 12.15 : 12.0;
+      // Hand off to Hero: signal at 12.2s so Hero starts playing smoothly right before the dissolve
+      const handoffTime = isMobileDevice ? 12.2 : 12.15;
       tl.call(() => {
         if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
         if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("recursive-intro-done"));
       }, undefined, handoffTime);
 
       const dissolveDuration = isMobileDevice ? 0.65 : 0.85;
-      tl.to(scene, { autoAlpha: 0, duration: dissolveDuration, ease: "power1.inOut" }, 12.3);
+      tl.to(scene, { autoAlpha: 0, duration: dissolveDuration, ease: "power1.inOut" }, 12.35);
 
       // Once scene is fully transparent, ensure hero is playing and release introVid
       tl.call(() => {
@@ -834,13 +843,13 @@ export default function IntroSequence() {
           } catch {}
         }
         resumeHeroPlate();
-      }, undefined, 12.3 + dissolveDuration + 0.1);
+      }, undefined, 12.35 + dissolveDuration + 0.05);
 
       tl.set(root, { pointerEvents: "none" }, 12.55);
       tl.call(releaseScroll, undefined, 13.0);
 
       // 5. Glow recedes over the settled landing page.
-      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 0.9, ease: "power1.inOut" }, 12.3 + dissolveDuration);
+      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 0.9, ease: "power1.inOut" }, 12.35 + dissolveDuration);
     }, root);
 
     const tl = tlRef.current!;
@@ -927,6 +936,10 @@ export default function IntroSequence() {
       if (skipWrap) gsap.killTweensOf(skipWrap);
       gsap.killTweensOf(words);
       gsap.killTweensOf(wordInners);
+      if (lines.length > 0) {
+        gsap.killTweensOf(lines);
+        gsap.set(lines, { autoAlpha: 0 });
+      }
       gsap.set(wordInners, { clearProps: "transform,textShadow" });
 
       warmHeroPlate();
