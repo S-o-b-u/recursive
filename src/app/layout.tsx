@@ -114,6 +114,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistMono.variable} ${display.variable} ${hiruko.variable} ${dmSans.variable} ${headingNow.variable} ${bebasNeue.variable}`}
     >
       <head>
@@ -124,7 +125,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <JsonLd />
         {/* The intro's opening frame is this still. It is the very first thing
             the document paints (see the pending plate in IntroSequence), so it

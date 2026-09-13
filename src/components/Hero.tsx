@@ -70,18 +70,13 @@ export default function Hero() {
     };
   }, []);
 
-  const [introFinished, setIntroFinished] = useState(() => {
-    if (typeof window === "undefined") return true;
-    if (document.documentElement.dataset.intro === "done") return true;
-    if (document.documentElement.dataset.intro === "playing") return false;
-    // On the home page, default to false until intro explicitly signals done
-    if (window.location.pathname === "/" || window.location.pathname === "") return false;
-    return true;
-  });
+  const [introFinished, setIntroFinished] = useState(false);
 
-  // Re-check once after mount when intro lifecycle state settles
+  // Sync intro state on mount
   useEffect(() => {
-    if (document.documentElement.dataset.intro !== "done") setIntroFinished(false);
+    if (document.documentElement.dataset.intro === "done") {
+      setIntroFinished(true);
+    }
   }, []);
 
   useEffect(() => {
