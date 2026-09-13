@@ -694,7 +694,7 @@ export default function Hero() {
         @media (max-width: 600px) {
           .hero-sky-zone {
             padding-top: clamp(3.8rem, 6.2svh, 4.8rem);
-            padding-bottom: clamp(1.1rem, 3.2svh, 2.0rem);
+            padding-bottom: clamp(2.2rem, 6.0svh, 3.6rem);
             padding-inline: clamp(0.5rem, 2.5vw, 1rem);
           }
           .hero-ground-zone {
@@ -838,6 +838,9 @@ export default function Hero() {
 
         /* Specifically tailored for 6.0" and 6.1" phones (iPhone 12/13/14/15/16 at 390px/393px, Pixel, Galaxy) */
         @media (max-width: 420px) {
+          .hero-sky-zone {
+            padding-bottom: clamp(2.4rem, 6.6svh, 4.0rem);
+          }
           .hero-warp-wrap {
             width: min(94vw, 345px) !important;
             max-width: min(94vw, 345px) !important;
