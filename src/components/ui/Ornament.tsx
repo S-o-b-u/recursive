@@ -2,7 +2,7 @@ import React from "react";
 
 /**
  * Ornament — botanical section divider rendered above section headings.
- * Uses /images/artifact.png across all pages and sections.
+ * Uses /images/ui/artifact.png across all pages and sections.
  */
 export default function Ornament({
   className = "",
@@ -13,7 +13,7 @@ export default function Ornament({
 }) {
   return (
     <img
-      src="/images/artifact.png"
+      src="/images/ui/artifact.png"
       alt=""
       aria-hidden="true"
       draggable={false}

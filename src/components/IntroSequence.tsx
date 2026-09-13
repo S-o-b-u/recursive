@@ -525,71 +525,191 @@ export default function IntroSequence() {
         force3D: true,
       });
 
-      // ── Stage 1 & 2: Artifact & Welcome Reveal ──
+      // ── Stage 1 & 2: Artifact & Welcome Cascade ──
       if (loaderOverlay && artifactMark && welcomeBlock) {
         tl.set(loaderOverlay, { autoAlpha: 1 }, 0);
         tl.set(welcomeBlock, { opacity: 0, pointerEvents: "none" }, 0);
 
-        // Stage 1: Artifact fades in with gentle upward drift — steady & distraction-free
-        tl.fromTo(
-          artifactMark,
-          { opacity: 0, scale: 0.96, y: 14 },
-          { opacity: 1, scale: 1, y: 0, duration: 1.1, ease: "power2.out" },
-          0.05,
+        const welcomeWordInners = Array.from(
+          welcomeBlock.querySelectorAll<HTMLElement>(".intro-welcome-word-i"),
         );
+        const welcomeSub = welcomeBlock.querySelector<HTMLElement>(".intro-welcome-sub");
 
-        // ── Stage 2: Gentle continuous upward drift into crown position ──
+        if (welcomeWordInners.length > 0) {
+          tl.set(welcomeWordInners, { opacity: 0, y: 18, filter: "blur(8px)" }, 0);
+        }
+        if (welcomeSub) {
+          tl.set(welcomeSub, { opacity: 0, y: 10, letterSpacing: "0.12em" }, 0);
+        }
+
+        const artifactImg = artifactMark.querySelector<HTMLElement>(".intro-artifact-img");
+        const artifactAura = artifactMark.querySelector<HTMLElement>(".intro-artifact-aura");
+
+        // Pin starting states synchronously BEFORE paint — eliminates any 1-frame jitter or pop
+        gsap.set(artifactMark, { y: 0, opacity: 1, force3D: true });
+        if (welcomeWordInners.length > 0) {
+          gsap.set(welcomeWordInners, { opacity: 0, y: 18, filter: "blur(8px)" });
+        }
+        if (welcomeSub) {
+          gsap.set(welcomeSub, { opacity: 0, y: 10, letterSpacing: "0.12em" });
+        }
+        if (artifactImg) {
+          gsap.set(artifactImg, {
+            opacity: 0,
+            scaleX: 0.28,
+            scaleY: 0.72,
+            clipPath: "inset(0% 42% 0% 42%)",
+            filter: "brightness(2.2) saturate(1.4) drop-shadow(0 0 32px rgba(162, 235, 98, 0.95))",
+            transformOrigin: "center center",
+            force3D: true,
+          });
+        }
+        if (artifactAura) {
+          gsap.set(artifactAura, {
+            scale: 0.35,
+            opacity: 0,
+            transformOrigin: "center center",
+            force3D: true,
+          });
+        }
+
+        // Stage 1: Relic Awakening (Center-Out Wings Unfurl)
+        // Emerges smoothly from bright luminous center core and expands outward
+        if (artifactImg) {
+          tl.to(
+            artifactImg,
+            {
+              opacity: 1,
+              scaleX: 1,
+              scaleY: 1,
+              clipPath: "inset(0% 0% 0% 0%)",
+              filter: "brightness(1.2) saturate(1.15) drop-shadow(0 4px 24px rgba(0, 0, 0, 0.65))",
+              duration: 1.05,
+              ease: "power3.out",
+            },
+            0.05,
+          );
+        } else {
+          tl.fromTo(
+            artifactMark,
+            { opacity: 0, scale: 0.94, y: 16 },
+            { opacity: 1, scale: 1, y: 0, duration: 1.0, ease: "power3.out" },
+            0.05,
+          );
+        }
+
+        // Luminous emerald aura expands smoothly from the core
+        if (artifactAura) {
+          tl.to(
+            artifactAura,
+            {
+              scale: 1.25,
+              opacity: 1,
+              duration: 0.65,
+              ease: "power2.out",
+            },
+            0.05,
+          );
+          tl.to(
+            artifactAura,
+            { scale: 1, opacity: 0.8, duration: 0.45, ease: "sine.out" },
+            0.7,
+          );
+        }
+
+        // Stage 2: Gentle continuous upward drift into crown position as wings settle
         tl.to(
           artifactMark,
           {
-            y: isMobileDevice ? -20 : -30,
-            duration: 0.9,
+            y: isMobileDevice ? -20 : -32,
+            duration: 0.85,
             ease: "sine.inOut",
           },
-          1.2,
+          1.1,
         );
 
-        // Welcome block: simple, clean, elegant fade & drift
-        tl.fromTo(
-          welcomeBlock,
-          { opacity: 0, y: 12 },
-          {
-            opacity: 1,
-            y: isMobileDevice ? -6 : -12,
-            duration: 0.8,
-            ease: "power2.out",
-            pointerEvents: "auto",
-          },
-          1.25,
-        );
+        // "Hi There, Hackers!" word-level upward lift and blur-to-focus fade-in
+        tl.set(welcomeBlock, { opacity: 1, pointerEvents: "auto" }, 1.15);
+        if (welcomeWordInners.length > 0) {
+          tl.to(
+            welcomeWordInners,
+            {
+              opacity: 1,
+              y: 0,
+              filter: "blur(0px)",
+              duration: 0.68,
+              ease: "power3.out",
+              stagger: 0.09,
+            },
+            1.18,
+          );
+        }
 
-        // ── Gentle floating drift ──
+        // "RECURSIVE 2026" slides in with letter-spacing tracking expansion
+        if (welcomeSub) {
+          tl.to(
+            welcomeSub,
+            {
+              opacity: 1,
+              y: 0,
+              letterSpacing: isWideScreen ? "0.34em" : "0.26em",
+              duration: 0.65,
+              ease: "power2.out",
+            },
+            1.48,
+          );
+        }
+
+        // Holding drift: Gentle, ambient float of the complete greeting lockup
         tl.to(
           [artifactMark, welcomeBlock],
           {
-            y: "-=4",
+            y: "-=5",
             duration: 1.1,
             ease: "sine.inOut",
           },
-          2.1,
+          2.0,
         );
 
-        // ── Transition: Dissolve Welcome, slowly start story animation ──
+        // Transition: Welcome words & artifact ease out with upward drift (matching intro lines exit)
+        if (welcomeWordInners.length > 0) {
+          tl.to(
+            welcomeWordInners,
+            {
+              opacity: 0,
+              y: -14,
+              filter: "blur(6px)",
+              duration: 0.45,
+              ease: "power2.in",
+              stagger: 0.03,
+            },
+            3.05,
+          );
+        }
+        if (welcomeSub) {
+          tl.to(
+            welcomeSub,
+            { opacity: 0, y: -8, duration: 0.4, ease: "power2.in" },
+            3.08,
+          );
+        }
         tl.to(
-          [welcomeBlock, artifactMark],
+          artifactMark,
           {
             opacity: 0,
-            y: "-=10",
-            duration: 0.6,
+            y: "-=12",
+            filter: "blur(8px)",
+            duration: 0.5,
             ease: "power2.in",
           },
-          3.35,
+          3.1,
         );
 
+        // Fade in animation to intro start: Veil smoothly dissolves into cinematic climbing scene
         tl.to(
           loaderOverlay,
-          { autoAlpha: 0, duration: 0.75, ease: "power2.inOut" },
-          3.45,
+          { autoAlpha: 0, duration: 0.85, ease: "power2.inOut" },
+          3.25,
         );
       }
 
@@ -779,7 +899,15 @@ export default function IntroSequence() {
       gsap.killTweensOf([scene, bloom, media, focus, grade, bar]);
       if (loaderOverlay) {
         gsap.killTweensOf([loaderOverlay, artifactMark, welcomeBlock]);
+        const artImg = root.querySelector<HTMLElement>(".intro-artifact-img");
+        const artAura = root.querySelector<HTMLElement>(".intro-artifact-aura");
+        if (artImg) gsap.killTweensOf(artImg);
+        if (artAura) gsap.killTweensOf(artAura);
       }
+      const welcomeWordInners = root.querySelectorAll<HTMLElement>(".intro-welcome-word-i");
+      const welcomeSub = root.querySelector<HTMLElement>(".intro-welcome-sub");
+      if (welcomeWordInners.length > 0) gsap.killTweensOf(welcomeWordInners);
+      if (welcomeSub) gsap.killTweensOf(welcomeSub);
       if (skipWrap) gsap.killTweensOf(skipWrap);
       gsap.killTweensOf(words);
       gsap.killTweensOf(wordInners);
@@ -881,31 +1009,8 @@ export default function IntroSequence() {
           justifyContent: "center",
         }}
       >
-        <div
-          style={{
-            position: "relative",
-            width: "clamp(210px, 30vw, 360px)",
-            aspectRatio: "744 / 220",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            pointerEvents: "none",
-            userSelect: "none",
-          }}
-        >
-          <img
-            src="/images/artifact.png"
-            alt=""
-            draggable={false}
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-              filter: "brightness(1.22) saturate(1.18) drop-shadow(0 0 20px rgba(120, 185, 75, 0.35))",
-            }}
-          />
+        <div className="intro-pending-mark">
+          <div className="intro-artifact-aura" aria-hidden="true" style={{ opacity: 0 }} />
         </div>
       </div>
     );
@@ -920,7 +1025,7 @@ export default function IntroSequence() {
               <video
                 ref={videoRef}
                 src="/bg/hero_bg.mp4"
-                poster="/images/hero_poster.jpg"
+                poster="/images/hero/hero_poster.jpg"
                 autoPlay
                 loop
                 muted
@@ -940,7 +1045,7 @@ export default function IntroSequence() {
             <div ref={artifactMarkRef} className="intro-artifact-mark">
               <div className="intro-artifact-aura" aria-hidden="true" />
               <img
-                src="/images/artifact.png"
+                src="/images/ui/artifact.png"
                 alt=""
                 className="intro-artifact-img"
                 draggable={false}
@@ -949,7 +1054,17 @@ export default function IntroSequence() {
 
             {/* Greeting Block */}
             <div ref={welcomeBlockRef} className="intro-welcome-block">
-              <h1 className="intro-welcome-title">Hi There, Hackers!</h1>
+              <h1 className="intro-welcome-title" aria-label="Hi There, Hackers!">
+                <span className="intro-welcome-word">
+                  <span className="intro-welcome-word-i">Hi</span>
+                </span>
+                <span className="intro-welcome-word">
+                  <span className="intro-welcome-word-i">There,</span>
+                </span>
+                <span className="intro-welcome-word">
+                  <span className="intro-welcome-word-i">Hackers!</span>
+                </span>
+              </h1>
               <span className="intro-welcome-sub">RECURSIVE 2026</span>
             </div>
           </div>
@@ -1059,7 +1174,8 @@ export default function IntroSequence() {
         }
 
         /* Artifact Mark */
-        .intro-artifact-mark {
+        .intro-artifact-mark,
+        .intro-pending-mark {
           position: relative;
           width: clamp(210px, 30vw, 360px);
           aspect-ratio: 744 / 220;
@@ -1068,16 +1184,19 @@ export default function IntroSequence() {
           justify-content: center;
           pointer-events: none;
           user-select: none;
-          will-change: transform, opacity;
+          will-change: transform, opacity, filter;
         }
 
         .intro-artifact-aura {
           position: absolute;
-          inset: -20% -15%;
+          inset: -25% -20%;
           border-radius: 50%;
-          background: radial-gradient(ellipse at center, rgba(143, 196, 90, 0.16) 0%, rgba(76, 133, 46, 0.04) 50%, transparent 70%);
+          background: radial-gradient(ellipse at center, rgba(143, 196, 90, 0.22) 0%, rgba(76, 133, 46, 0.06) 50%, transparent 72%);
           filter: blur(28px);
           pointer-events: none;
+          opacity: 0;
+          transform: scale(0.35);
+          will-change: transform, opacity;
         }
 
         .intro-artifact-img {
@@ -1086,10 +1205,15 @@ export default function IntroSequence() {
           width: 100%;
           height: 100%;
           object-fit: contain;
-          filter: brightness(1.18) saturate(1.12) drop-shadow(0 4px 24px rgba(0, 0, 0, 0.65));
+          opacity: 0;
+          transform: scale(0.28, 0.72);
+          clip-path: inset(0% 42% 0% 42%);
+          -webkit-clip-path: inset(0% 42% 0% 42%);
+          filter: brightness(2.2) saturate(1.4) drop-shadow(0 0 32px rgba(162, 235, 98, 0.95));
           pointer-events: none;
           user-select: none;
           -webkit-user-drag: none;
+          will-change: transform, opacity, filter, clip-path;
         }
 
         .intro-welcome-block {
@@ -1113,19 +1237,32 @@ export default function IntroSequence() {
           line-height: 1.1;
           letter-spacing: clamp(0.01em, 0.4vw, 0.03em);
           text-transform: none;
-          white-space: nowrap;
           color: #ffffff;
           text-shadow: 0 4px 28px rgba(0, 0, 0, 0.7);
           filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.5));
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.3em;
+          flex-wrap: wrap;
         }
 
         @media (max-width: 480px) {
           .intro-welcome-title {
-            white-space: normal;
             font-size: clamp(1.75rem, 6.8vw, 2.3rem);
             line-height: 1.15;
             padding: 0 0.5rem;
+            gap: 0.22em;
           }
+        }
+
+        .intro-welcome-word {
+          display: inline-block;
+        }
+
+        .intro-welcome-word-i {
+          display: inline-block;
+          will-change: transform, opacity, filter;
         }
 
         .intro-welcome-sub {
@@ -1134,8 +1271,11 @@ export default function IntroSequence() {
           font-weight: 600;
           letter-spacing: clamp(0.24em, 0.6vw, 0.34em);
           text-transform: uppercase;
-          color: rgba(255, 255, 255, 0.65);
+          color: rgba(255, 255, 255, 0.72);
+          text-shadow: 0 0 16px rgba(120, 185, 75, 0.4);
           margin-top: 10px;
+          display: inline-block;
+          will-change: transform, opacity, letter-spacing;
         }
 
         .intro-media-clip { position: absolute; inset: 0; overflow: hidden; }

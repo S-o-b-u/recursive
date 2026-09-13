@@ -365,7 +365,7 @@ export default function SponsorStage() {
                     title="Devfolio"
                   >
                     <img
-                      src="/images/devfolio-white.png"
+                      src="/images/sponsors/devfolio-white.png"
                       alt="DEVFOLIO LOGO"
                       className="sxp-partner-logo"
                       width={220}
@@ -387,7 +387,7 @@ export default function SponsorStage() {
                       aria-label="React Kolkata"
                     >
                       <img
-                        src="/images/react-kolkata-logo-full-light.png"
+                        src="/images/sponsors/react-kolkata-logo-full-light.png"
                         alt="React Kolkata"
                         className="sxp-partner-logo sxp-react-kolkata-logo"
                         width={138}
@@ -401,7 +401,7 @@ export default function SponsorStage() {
                       aria-label="INNOFUSION 3.0"
                     >
                       <img
-                        src="/images/INNOFUSION%203.0%20logo.png"
+                        src="/images/sponsors/INNOFUSION%203.0%20logo.png"
                         alt="INNOFUSION 3.0"
                         className="sxp-partner-logo sxp-innofusion-logo"
                         width={42}
@@ -416,7 +416,7 @@ export default function SponsorStage() {
                       aria-label="CodeRush X"
                     >
                       <img
-                        src="/images/CodeRush%20X%20Logo.png"
+                        src="/images/sponsors/CodeRush%20X%20Logo.png"
                         alt="CodeRush X"
                         className="sxp-partner-logo sxp-coderush-logo"
                         width={180}
@@ -651,7 +651,7 @@ export default function SponsorStage() {
           position: absolute;
           inset: 0;
           background-color: var(--color-bg);
-          background-image: url("/images/cloud.jpg");
+          background-image: url("/images/bg/cloud.jpg");
           background-size: cover;
           background-position: center top;
           background-repeat: no-repeat;

@@ -245,10 +245,10 @@ export const JUDGES: Judge[] = [
 
 /** Sponsor logo wall. Add a slot per signed sponsor, drop the logo in, set `src`. */
 export const SPONSOR_SLOTS: Slot[] = [
-  { label: "DEVFOLIO LOGO", expect: "/images/devfolio.png", src: "/images/devfolio.png" },
-  { label: "INNOFUSION 3.0 LOGO", expect: "/images/INNOFUSION 3.0 logo.png", src: "/images/INNOFUSION 3.0 logo.png" },
-  { label: "REACT KOLKATA LOGO", expect: "/images/react-kolkata-logo-full-light.png", src: "/images/react-kolkata-logo-full-light.png" },
-  { label: "CODERUSH X LOGO", expect: "/images/CodeRush X Logo.png", src: "/images/CodeRush X Logo.png" },
+  { label: "DEVFOLIO LOGO", expect: "/images/sponsors/devfolio.png", src: "/images/sponsors/devfolio.png" },
+  { label: "INNOFUSION 3.0 LOGO", expect: "/images/sponsors/INNOFUSION 3.0 logo.png", src: "/images/sponsors/INNOFUSION 3.0 logo.png" },
+  { label: "REACT KOLKATA LOGO", expect: "/images/sponsors/react-kolkata-logo-full-light.png", src: "/images/sponsors/react-kolkata-logo-full-light.png" },
+  { label: "CODERUSH X LOGO", expect: "/images/sponsors/CodeRush X Logo.png", src: "/images/sponsors/CodeRush X Logo.png" },
   { label: "Sponsor 05", expect: "/images/sponsors/05.svg", src: "" },
   { label: "Sponsor 06", expect: "/images/sponsors/06.svg", src: "" },
   { label: "Sponsor 07", expect: "/images/sponsors/07.svg", src: "" },

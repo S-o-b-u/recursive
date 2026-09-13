@@ -6,7 +6,6 @@ import { EVENT } from "@/data/hackathon";
 import { prefersLiteMedia } from "@/lib/device";
 import WarpText from "@/components/ui/WarpText";
 import DevfolioButton from "@/components/DevfolioButton";
-import logoImg from "../../public/images/logo.png";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
@@ -135,7 +134,7 @@ export default function Hero() {
             else — so the hero is never a flat empty plate. */}
         <img
           className="hero-video hero-poster"
-          src="/images/hero_poster.jpg"
+          src="/images/hero/hero_poster.jpg"
           alt=""
           aria-hidden="true"
           draggable={false}
@@ -145,7 +144,7 @@ export default function Hero() {
             ref={videoRef}
             className="hero-video"
             src="/bg/hero_bg.mp4"
-            poster="/images/hero_poster.jpg"
+            poster="/images/hero/hero_poster.jpg"
             autoPlay={false}
             loop
             muted
@@ -176,7 +175,7 @@ export default function Hero() {
         </p>
         <div className="hero-warp-wrap">
           <WarpText
-            src={logoImg.src || "/images/logo.png"}
+            src="/images/brand/logo.png"
             color="linear-gradient(180deg, #070e08 0%, #111c14 55%, #1d3320 100%)"
             warpStrength={0.035}
             warpScale={1.5}
@@ -231,7 +230,7 @@ export default function Hero() {
       {/* ── Mossy Log Natural Divider Over Seam ── */}
       <div className="hero-log-divider" aria-hidden="true">
         <img
-          src="/images/log.png"
+          src="/images/hero/log.png"
           alt=""
           className="hero-log-img"
           loading="eager"

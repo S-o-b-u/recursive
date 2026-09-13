@@ -3,19 +3,19 @@ export default function RootLoading() {
     <div className="track-loading-veil" aria-live="polite" aria-busy="true">
       <div className="track-loading-mark">
         <img
-          src="/images/artifact.png"
+          src="/images/ui/artifact.png"
           alt=""
           className="track-artifact-base track-artifact-center"
           draggable={false}
         />
         <img
-          src="/images/artifact.png"
+          src="/images/ui/artifact.png"
           alt=""
           className="track-artifact-base track-artifact-left"
           draggable={false}
         />
         <img
-          src="/images/artifact.png"
+          src="/images/ui/artifact.png"
           alt="Loading..."
           className="track-artifact-base track-artifact-right"
           draggable={false}

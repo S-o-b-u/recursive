@@ -82,7 +82,7 @@ export const metadata: Metadata = {
         // from these numbers, so a wrong one produces a letterboxed or cropped
         // share card on WhatsApp, where most of this event's links get passed
         // around.
-        url: "/images/og-card.jpg",
+        url: "/images/brand/og-card.jpg",
         width: 1200,
         height: 630,
         alt: `${EVENT.name} 2026 — ACM Hackathon at ${COLLEGE.collegeShort}`,
@@ -93,7 +93,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${EVENT.name} 2026 — ACM Hackathon | ${COLLEGE.collegeShort} Kolkata`,
     description: `Flagship national hackathon organized by ${COLLEGE.chapter} at ${COLLEGE.college}. 8 hours, 6 tracks, real prizes.`,
-    images: ["/images/og-card.jpg"],
+    images: ["/images/brand/og-card.jpg"],
   },
   robots: {
     index: true,
@@ -126,13 +126,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <link
           rel="preload"
           as="image"
-          href="/images/hero_poster.jpg"
+          href="/images/hero/hero_poster.jpg"
           fetchPriority="high"
         />
         <link
           rel="preload"
           as="image"
-          href="/images/cloud.jpg"
+          href="/images/bg/cloud.jpg"
         />
         <div className="fixed-cloud-plate" aria-hidden="true" />
         <SmoothScroll>
