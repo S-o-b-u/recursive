@@ -365,7 +365,7 @@ export default function SponsorStage() {
                     title="Devfolio"
                   >
                     <img
-                      src="/images/devfolio-white.png"
+                      src="/images/sponsors/devfolio-white.png"
                       alt="DEVFOLIO LOGO"
                       className="sxp-partner-logo"
                       width={220}
@@ -387,7 +387,7 @@ export default function SponsorStage() {
                       aria-label="React Kolkata"
                     >
                       <img
-                        src="/images/react-kolkata-logo-full-light.png"
+                        src="/images/sponsors/react-kolkata-logo-full-light.png"
                         alt="React Kolkata"
                         className="sxp-partner-logo sxp-react-kolkata-logo"
                         width={138}
@@ -401,13 +401,27 @@ export default function SponsorStage() {
                       aria-label="INNOFUSION 3.0"
                     >
                       <img
-                        src="/images/INNOFUSION%203.0%20logo.png"
+                        src="/images/sponsors/INNOFUSION%203.0%20logo.png"
                         alt="INNOFUSION 3.0"
                         className="sxp-partner-logo sxp-innofusion-logo"
                         width={42}
                         height={42}
                       />
                       <span className="sxp-innofusion-brand">INNOFUSION 3.0</span>
+                    </div>
+                    <div
+                      className="sxp-partner-card sxp-float-card sxp-coderush-card"
+                      title="CodeRush X"
+                      role="img"
+                      aria-label="CodeRush X"
+                    >
+                      <img
+                        src="/images/sponsors/CodeRush%20X%20Logo.png"
+                        alt="CodeRush X"
+                        className="sxp-partner-logo sxp-coderush-logo"
+                        width={180}
+                        height={45}
+                      />
                     </div>
                   </div>
                   <span className="sxp-unrevealed-note">
@@ -637,7 +651,7 @@ export default function SponsorStage() {
           position: absolute;
           inset: 0;
           background-color: var(--color-bg);
-          background-image: url("/images/cloud.jpg");
+          background-image: url("/images/bg/cloud.jpg");
           background-size: cover;
           background-position: center top;
           background-repeat: no-repeat;
@@ -909,6 +923,27 @@ export default function SponsorStage() {
           height: clamp(39px, 4.4vh, 46px);
           width: auto;
           min-width: 120px;
+          object-fit: contain;
+          display: block;
+        }
+
+        .sxp-coderush-card {
+          padding: 0.95rem clamp(1.8rem, 3.2vw, 2.6rem);
+          transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, border-color 260ms ease, background 260ms ease;
+        }
+
+        .sxp-coderush-card:hover {
+          border-color: rgba(34, 211, 238, 0.45);
+          box-shadow:
+            0 14px 34px -6px rgba(20, 46, 28, 0.45),
+            0 6px 20px rgba(34, 211, 238, 0.2),
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.28);
+        }
+
+        .sxp-coderush-logo {
+          height: clamp(38px, 4.3vh, 46px);
+          width: auto;
+          min-width: 140px;
           object-fit: contain;
           display: block;
         }

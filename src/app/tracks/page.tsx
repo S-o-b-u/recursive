@@ -5,14 +5,14 @@ import { EVENT } from "@/data/hackathon";
 
 export const metadata: Metadata = {
   title: "Tracks & Themes",
-  description: `Explore the 6 innovation tracks at ${EVENT.name} 2026: AI & Intelligent Systems, Web3 & Blockchain, FinTech, HealthTech, CyberSecurity, and Open Innovation. Hosted by GNIT ACM.`,
+  description: `Explore the 6 innovation tracks at ${EVENT.name} 2026: AI & Intelligent Systems, Web3 & Blockchain, FinTech, HealthTech, CyberSecurity, and Open Innovation. Hosted by GNIT Kolkata ACM.`,
   keywords: [
     "Recursive Tracks",
     "ACM Hackathon Themes",
     "Web3 Blockchain Hackathon",
     "AI Hackathon Kolkata",
     "FinTech Hackathon",
-    "GNIT ACM",
+    "GNIT Kolkata ACM",
     "Recursive Hackathon Tracks",
   ],
   alternates: {

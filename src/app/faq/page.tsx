@@ -7,7 +7,7 @@ import { EVENT } from "@/data/hackathon";
 
 export const metadata: Metadata = {
   title: "Frequently Asked Questions (FAQ)",
-  description: `Find answers to common questions about ${EVENT.name} 2026: registration on Devfolio, team size, venue location at GNIT Kolkata, eligibility, and rules. Organized by GNIT ACM.`,
+  description: `Find answers to common questions about ${EVENT.name} 2026: registration on Devfolio, team size, venue location at GNIT Kolkata, eligibility, and rules. Organized by GNIT Kolkata ACM.`,
   keywords: [
     "Recursive FAQ",
     "ACM Hackathon Questions",

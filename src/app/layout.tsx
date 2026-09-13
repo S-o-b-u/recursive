@@ -24,12 +24,13 @@ export const metadata: Metadata = {
     default: `${EVENT.name} 2026 — ACM Hackathon | ${COLLEGE.collegeShort} Kolkata`,
     template: `%s | ${EVENT.name} — ACM Hackathon 2026`,
   },
-  description: `${EVENT.name} 2026 is the flagship national hackathon organized by the ${COLLEGE.collegeShort} ${COLLEGE.chapter} at ${COLLEGE.college}, ${COLLEGE.city}. An 8-hour sprint across AI & Intelligent Systems, Web3 & Blockchain, FinTech, HealthTech, CyberSecurity, and Open Innovation. Register now on Devfolio.`,
+  description: `${EVENT.name} 2026 is the flagship national hackathon organized by the ${COLLEGE.chapter} at ${COLLEGE.college}, ${COLLEGE.city}. An 8-hour sprint across AI & Intelligent Systems, Web3 & Blockchain, FinTech, HealthTech, CyberSecurity, and Open Innovation. Register now on Devfolio.`,
   keywords: [
     "ACM",
     "ACM Student Chapter",
     "GNIT ACM",
-    "GNIT ACM Student Chapter",
+    "GNIT Kolkata ACM",
+    "GNIT Kolkata ACM Student Chapter",
     "ACM Hackathon",
     "ACM India",
     "Association for Computing Machinery",
@@ -54,12 +55,12 @@ export const metadata: Metadata = {
   ],
   authors: [
     {
-      name: `${COLLEGE.collegeShort} ${COLLEGE.chapter}`,
+      name: COLLEGE.chapter,
       url: "https://gnitkolkata.acm.org/",
     },
     { name: COLLEGE.college, url: "https://gnit.ac.in/" },
   ],
-  creator: `${COLLEGE.collegeShort} ${COLLEGE.chapter}`,
+  creator: COLLEGE.chapter,
   publisher: COLLEGE.college,
   applicationName: `${EVENT.name} 2026`,
   category: "technology",
@@ -68,7 +69,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: `${EVENT.name} 2026 — ACM Hackathon | ${COLLEGE.collegeShort} Kolkata`,
-    description: `${EVENT.name} 2026 is the premier hackathon hosted by ${COLLEGE.collegeShort} ${COLLEGE.chapter} at ${COLLEGE.college}. Build something that matters across 6 cutting-edge tracks.`,
+    description: `${EVENT.name} 2026 is the premier hackathon hosted by ${COLLEGE.chapter} at ${COLLEGE.college}. Build something that matters across 6 cutting-edge tracks.`,
     url: "/",
     siteName: `${EVENT.name} — ACM Hackathon`,
     locale: "en_US",
@@ -81,7 +82,7 @@ export const metadata: Metadata = {
         // from these numbers, so a wrong one produces a letterboxed or cropped
         // share card on WhatsApp, where most of this event's links get passed
         // around.
-        url: "/images/og-card.jpg",
+        url: "/images/brand/og-card.jpg",
         width: 1200,
         height: 630,
         alt: `${EVENT.name} 2026 — ACM Hackathon at ${COLLEGE.collegeShort}`,
@@ -91,8 +92,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: `${EVENT.name} 2026 — ACM Hackathon | ${COLLEGE.collegeShort} Kolkata`,
-    description: `Flagship national hackathon organized by ${COLLEGE.collegeShort} ${COLLEGE.chapter} at ${COLLEGE.college}. 8 hours, 6 tracks, real prizes.`,
-    images: ["/images/og-card.jpg"],
+    description: `Flagship national hackathon organized by ${COLLEGE.chapter} at ${COLLEGE.college}. 8 hours, 6 tracks, real prizes.`,
+    images: ["/images/brand/og-card.jpg"],
   },
   robots: {
     index: true,
@@ -125,13 +126,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <link
           rel="preload"
           as="image"
-          href="/images/hero_poster.jpg"
+          href="/images/hero/hero_poster.jpg"
           fetchPriority="high"
         />
         <link
           rel="preload"
           as="image"
-          href="/images/cloud.jpg"
+          href="/images/bg/cloud.jpg"
         />
         <div className="fixed-cloud-plate" aria-hidden="true" />
         <SmoothScroll>

@@ -45,7 +45,7 @@ export type Slot = {
  * The chapter and college running the event.
  */
 export const COLLEGE = {
-  chapter: "ACM Student Chapter",
+  chapter: "GNIT Kolkata ACM Student Chapter",
   collaboration: "Department of Information Technology",
   college: "Guru Nanak Institute of Technology",
   collegeShort: "GNIT",
@@ -82,7 +82,7 @@ export const VENUE = {
 
 /** College / chapter logos. */
 export const COLLEGE_LOGOS: Slot[] = [
-  { label: "GNIT ACM Student Chapter", expect: "/college_logo/gnitacm.png", src: "/college_logo/gnitacm.png" },
+  { label: "GNIT Kolkata ACM Student Chapter", expect: "/college_logo/gnitacm.png", src: "/college_logo/gnitacm.png" },
 ];
 
 export type Track = {
@@ -245,10 +245,10 @@ export const JUDGES: Judge[] = [
 
 /** Sponsor logo wall. Add a slot per signed sponsor, drop the logo in, set `src`. */
 export const SPONSOR_SLOTS: Slot[] = [
-  { label: "DEVFOLIO LOGO", expect: "/images/devfolio.png", src: "/images/devfolio.png" },
-  { label: "INNOFUSION 3.0 LOGO", expect: "/images/INNOFUSION 3.0 logo.png", src: "/images/INNOFUSION 3.0 logo.png" },
-  { label: "REACT KOLKATA LOGO", expect: "/images/react-kolkata-logo-full-light.png", src: "/images/react-kolkata-logo-full-light.png" },
-  { label: "Sponsor 04", expect: "/images/sponsors/04.svg", src: "" },
+  { label: "DEVFOLIO LOGO", expect: "/images/sponsors/devfolio.png", src: "/images/sponsors/devfolio.png" },
+  { label: "INNOFUSION 3.0 LOGO", expect: "/images/sponsors/INNOFUSION 3.0 logo.png", src: "/images/sponsors/INNOFUSION 3.0 logo.png" },
+  { label: "REACT KOLKATA LOGO", expect: "/images/sponsors/react-kolkata-logo-full-light.png", src: "/images/sponsors/react-kolkata-logo-full-light.png" },
+  { label: "CODERUSH X LOGO", expect: "/images/sponsors/CodeRush X Logo.png", src: "/images/sponsors/CodeRush X Logo.png" },
   { label: "Sponsor 05", expect: "/images/sponsors/05.svg", src: "" },
   { label: "Sponsor 06", expect: "/images/sponsors/06.svg", src: "" },
   { label: "Sponsor 07", expect: "/images/sponsors/07.svg", src: "" },
@@ -267,7 +267,7 @@ export const SCHEDULE: ScheduleDay[] = [
     date: "Thursday, October 8, 2026",
     items: [
       { time: "09:00", title: "Check-in & Registration", note: "Collect your badges, swag kits, and morning refreshments." },
-      { time: "09:45", title: "Opening Ceremony & Track Briefing", note: "Welcome by GNIT ACM Chapter, track deep dive, and rules breakdown." },
+      { time: "09:45", title: "Opening Ceremony & Track Briefing", note: "Welcome by GNIT Kolkata ACM Chapter, track deep dive, and rules breakdown." },
       { time: "10:30", title: "Hacking Begins (8-Hour Sprint)", note: "The clock starts. Brainstorm, design, and code." },
       { time: "13:00", title: "Lunch & Mentor Walkthrough", note: "Fuel up and receive 1-on-1 technical feedback from mentors." },
       { time: "16:00", title: "Mid-Sprint Checkpoint & Snacks", note: "Progress sync, coffee break, and debugging assistance." },
@@ -357,7 +357,7 @@ export type Faq = { q: string; a: string };
 export const FAQS: Faq[] = [
   {
     q: "What is Recursive and who is organizing it?",
-    a: "Recursive is the inaugural flagship 8-hour in-person hackathon hosted by the GNIT ACM Student Chapter in collaboration with the Department of Information Technology at Guru Nanak Institute of Technology (GNIT), Kolkata. It brings together developers, designers, and builders for eight hours of rapid prototyping, honest software craft, and collaborative problem-solving.",
+    a: "Recursive is the inaugural flagship 8-hour in-person hackathon hosted by the GNIT Kolkata ACM Student Chapter in collaboration with the Department of Information Technology at Guru Nanak Institute of Technology (GNIT), Kolkata. It brings together developers, designers, and builders for eight hours of rapid prototyping, honest software craft, and collaborative problem-solving.",
   },
   {
     q: "Who is eligible to participate?",

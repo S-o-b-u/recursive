@@ -103,7 +103,7 @@ export default function RegisterCTA() {
           bottom: -2%;
           height: clamp(16rem, 34vw, 28rem);
           z-index: 1;
-          background-image: url("/images/valley.webp");
+          background-image: url("/images/bg/valley.webp");
           background-size: cover;
           background-position: center 78%;
           background-repeat: no-repeat;

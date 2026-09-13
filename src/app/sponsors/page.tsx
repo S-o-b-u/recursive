@@ -6,11 +6,11 @@ import { EVENT } from "@/data/hackathon";
 
 export const metadata: Metadata = {
   title: "Sponsors & Partners",
-  description: `Partner with ${EVENT.name} 2026 — support collegiate builders and innovators at GNIT ACM Student Chapter's premier hackathon.`,
+  description: `Partner with ${EVENT.name} 2026 — support collegiate builders and innovators at GNIT Kolkata ACM Student Chapter's premier hackathon.`,
   keywords: [
     "Recursive Sponsors",
     "ACM Hackathon Partners",
-    "GNIT ACM Sponsorship",
+    "GNIT Kolkata ACM Sponsorship",
     "Tech Sponsorship Kolkata",
     "Devfolio Hackathon Partner",
   ],

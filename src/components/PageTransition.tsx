@@ -309,19 +309,19 @@ export default function PageTransition() {
     <div ref={veilRef} className="pt-veil" aria-hidden="true">
       <div ref={markRef} className="pt-mark">
         <img
-          src="/images/artifact.png"
+          src="/images/ui/artifact.png"
           alt=""
           className="pt-artifact-base pt-artifact-center"
           draggable={false}
         />
         <img
-          src="/images/artifact.png"
+          src="/images/ui/artifact.png"
           alt=""
           className="pt-artifact-base pt-artifact-left"
           draggable={false}
         />
         <img
-          src="/images/artifact.png"
+          src="/images/ui/artifact.png"
           alt=""
           className="pt-artifact-base pt-artifact-right"
           draggable={false}

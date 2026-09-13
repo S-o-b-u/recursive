@@ -1,6 +1,6 @@
 # RECURSIVE
 
-Site for the RECURSIVE hackathon — GNIT ACM Student Chapter.
+Site for the RECURSIVE hackathon — GNIT Kolkata ACM Student Chapter.
 
 Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind CSS v4 ·
 GSAP + ScrollTrigger · Lenis.
