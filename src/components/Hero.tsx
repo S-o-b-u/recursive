@@ -35,7 +35,7 @@ export default function Hero() {
 
     const isIntroPlaying =
       typeof document !== "undefined" &&
-      document.documentElement.dataset.intro === "playing";
+      document.documentElement.dataset.intro !== "done";
 
     if (isIntroPlaying) {
       window.addEventListener("recursive-intro-done", playHero, { once: true });
@@ -72,25 +72,15 @@ export default function Hero() {
 
   const [introFinished, setIntroFinished] = useState(() => {
     if (typeof window === "undefined") return true;
-    return (
-      document.documentElement.dataset.intro === "done" ||
-      (!document.querySelector(".intro-scene") && !document.querySelector(".intro-root"))
-    );
+    if (document.documentElement.dataset.intro === "done") return true;
+    if (document.documentElement.dataset.intro === "playing") return false;
+    // On the home page, default to false until intro explicitly signals done
+    if (window.location.pathname === "/" || window.location.pathname === "") return false;
+    return true;
   });
 
-  // The initializer above runs during render -- before IntroSequence has
-  // committed its DOM or set data-intro -- so "no intro elements on the page"
-  // is indistinguishable from "the intro has not mounted yet". Left alone, the
-  // hero concludes the intro is already over, plays its entrance behind the
-  // curtain, and is sitting perfectly still by the time the curtain lifts.
-  // That is what made the hand-off read flat. Re-check once after mount, when
-  // the sibling's DOM definitely exists.
+  // Re-check once after mount when intro lifecycle state settles
   useEffect(() => {
-    // data-intro is the dependable signal: IntroSequence is rendered before
-    // this component, so its effect (which sets "playing", or "done" when the
-    // intro is skipped) has already run by the time this one does. Querying for
-    // .intro-root instead is not reliable -- the pending phase renders
-    // different markup.
     if (document.documentElement.dataset.intro !== "done") setIntroFinished(false);
   }, []);
 
@@ -115,7 +105,7 @@ export default function Hero() {
       });
     }
 
-    const fallbackTimer = setTimeout(() => setIntroFinished(true), 8500);
+    const fallbackTimer = setTimeout(() => setIntroFinished(true), 16000);
 
     return () => {
       window.removeEventListener("recursive-intro-done", onIntroDone);

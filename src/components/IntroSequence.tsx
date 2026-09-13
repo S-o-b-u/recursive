@@ -802,6 +802,7 @@ export default function IntroSequence() {
       // Hand off to Hero: signal at 12.15s so Hero starts playing smoothly right before the dissolve
       const handoffTime = isMobileDevice ? 12.15 : 12.0;
       tl.call(() => {
+        gsap.set(root, { background: "transparent" });
         if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
         if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("recursive-intro-done"));
       }, undefined, handoffTime);
@@ -937,6 +938,7 @@ export default function IntroSequence() {
       );
       q.call(
         () => {
+          gsap.set(root, { background: "transparent" });
           if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
           if (typeof window !== "undefined")
             window.dispatchEvent(new CustomEvent("recursive-intro-done"));
@@ -1000,13 +1002,14 @@ export default function IntroSequence() {
           width: "100vw",
           height: "100%",
           minHeight: "100dvh",
-          zIndex: 9998,
+          zIndex: 9999,
           overflow: "hidden",
           background:
             "radial-gradient(120% 70% at 50% 0%, rgba(52, 88, 38, 0.48) 0%, rgba(52, 88, 38, 0) 62%), linear-gradient(180deg, #0A160A 0%, #010301 65%)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          pointerEvents: "auto",
         }}
       >
         <div className="intro-pending-mark">
@@ -1121,7 +1124,7 @@ export default function IntroSequence() {
           min-height: 100dvh;
           z-index: 9999;
           overflow: hidden;
-          background: transparent;
+          background: #0a140c;
           opacity: 1;
           pointer-events: auto;
           -webkit-tap-highlight-color: transparent;
@@ -1141,7 +1144,7 @@ export default function IntroSequence() {
           min-height: 100dvh;
           overflow: hidden;
           background: #0a140c;
-          opacity: 0;
+          opacity: 1;
           contain: layout paint style;
         }
 
