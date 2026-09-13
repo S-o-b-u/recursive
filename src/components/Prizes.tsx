@@ -2,18 +2,27 @@ import SectionWrapper from "./SectionWrapper";
 import Reveal from "./Reveal";
 import { PRIZES, TRACK_PRIZE, SPECIAL_PRIZES } from "@/data/hackathon";
 
-export default function Prizes({ detailed = false }: { detailed?: boolean }) {
+export default function Prizes({
+  detailed = false,
+  showHeader = true,
+}: {
+  detailed?: boolean;
+  showHeader?: boolean;
+}) {
   return (
     <SectionWrapper
       id="prizes"
-      label="Prizes"
-      heading={<>₹4.5 lakh in prizes, and a reason to finish.</>}
+      label={showHeader ? "Prizes" : undefined}
+      heading={showHeader ? <>₹4.5 lakh in prizes, and a reason to finish.</> : undefined}
       lede={
-        <p>
-          Money helps, but the point is the deadline. Everything below is on top of
-          food, workspace, and hardware for the weekend.
-        </p>
+        showHeader ? (
+          <p>
+            Money helps, but the point is the deadline. Everything below is on top of
+            food, workspace, and hardware for the sprint.
+          </p>
+        ) : undefined
       }
+      className={!showHeader ? "pt-0" : ""}
     >
       {/* Podium */}
       <div className="grid items-end gap-4 sm:grid-cols-3">
@@ -60,7 +69,7 @@ export default function Prizes({ detailed = false }: { detailed?: boolean }) {
           >
             {TRACK_PRIZE.amount}
             <span className="ml-2 align-middle text-[length:var(--font-size-sm)] text-[color:var(--color-text-tertiary)]">
-              × 4
+              × 6
             </span>
           </p>
         </div>

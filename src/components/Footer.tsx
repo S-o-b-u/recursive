@@ -450,7 +450,7 @@ export default function Footer() {
         .footer-wordmark-wrap {
           position: absolute;
           inset-inline: 0;
-          bottom: clamp(-0.25rem, 0vh, 0.5rem);
+          bottom: clamp(-2.8rem, -4.8vh, -1.5rem);
           height: min(clamp(280px, 56vh, 640px), 92%);
           z-index: 10;
           display: flex;
@@ -468,7 +468,7 @@ export default function Footer() {
             margin-top: clamp(2rem, 4vh, 3.5rem);
           }
           .footer-wordmark-wrap {
-            bottom: 0;
+            bottom: clamp(-1.8rem, -3.2vh, -0.9rem);
             height: 94%;
             padding-inline: 1vw;
           }

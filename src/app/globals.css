@@ -236,6 +236,54 @@ body::before {
   -webkit-transform: translateZ(0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  transition: opacity 0.8s ease;
+}
+
+/* ── Intro Loading Lifecycle Lock ──
+   While the intro loader animation is playing, the underlying website content
+   (background clouds, navigation dock, page content sections, and footer)
+   must remain completely hidden to eliminate any flash, flicker, or peeking. */
+html[data-intro="playing"] {
+  overflow: hidden !important;
+}
+
+html[data-intro="playing"] .fixed-cloud-plate,
+html[data-intro="playing"] body::before {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+html[data-intro="playing"] .nav-root {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+html[data-intro="playing"] main > *:not(.intro-root):not(.intro-pending-plate) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+html[data-intro="playing"] #about,
+html[data-intro="playing"] #countdown,
+html[data-intro="playing"] .night,
+html[data-intro="playing"] #sponsors,
+html[data-intro="playing"] #faq,
+html[data-intro="playing"] #venue,
+html[data-intro="playing"] #acm,
+html[data-intro="playing"] footer.footer-shell {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Smooth reveal transitions when data-intro transitions from "playing" to "done" */
+.nav-root {
+  transition: opacity 0.6s ease;
+}
+
+main > *:not(.intro-root):not(.intro-pending-plate) {
+  transition: opacity 0.5s ease;
 }
 
 /* ─── Typography ─── */

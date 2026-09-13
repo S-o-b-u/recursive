@@ -23,16 +23,15 @@ export default function SchedulePage() {
     <main>
       <PageHeader
         label="Schedule"
-        title="Thirty-six hours, hour by hour."
+        title="Eight hours, start to stage."
         lede={
           <p>
-            All times are IST. Workshops are optional and recorded. The only two
-            immovable moments are the opening ceremony and the submission deadline —
-            everything else bends around your build.
+            All times are IST. The only two immovable moments are the opening ceremony
+            and the submission deadline — everything else bends around your build.
           </p>
         }
       />
-      <Timeline />
+      <Timeline showHeader={false} />
       <RegisterCTA />
     </main>
   );

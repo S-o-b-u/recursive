@@ -7,12 +7,12 @@ const ALLOCATION = [
   {
     pct: "40%",
     label: "Fuel & Workspace",
-    desc: "36 hours of hot meals, endless specialty coffee, quiet rest zones, and high-speed dedicated network lines.",
+    desc: "8-hour sprint of hot meals, endless specialty coffee, rest zones, and high-speed dedicated network lines.",
   },
   {
     pct: "25%",
     label: "Direct Cash Prizes",
-    desc: "Empowering winners with non-dilutive grant money to continue developing their projects beyond the weekend.",
+    desc: "Empowering winners with non-dilutive grant money to continue developing their projects beyond the sprint.",
   },
   {
     pct: "20%",
@@ -33,7 +33,7 @@ const CUSTOM_OFFERINGS = [
   },
   {
     title: "Hands-on Technical Workshop",
-    desc: "Host a 45-minute live builder workshop on Day 1 to teach participants how to build with your tools.",
+    desc: "Host a 45-minute live builder workshop during the sprint to teach participants how to build with your tools.",
   },
   {
     title: "Hardware Lab Sponsorship",
@@ -45,23 +45,35 @@ const CUSTOM_OFFERINGS = [
   },
 ];
 
-export default function Sponsors({ detailed = true }: { detailed?: boolean }) {
+export default function Sponsors({
+  detailed = true,
+  showHeader = false,
+}: {
+  detailed?: boolean;
+  showHeader?: boolean;
+}) {
   return (
-    <section id="sponsors-tiers" className="sp-section" aria-label="Sponsorship Tiers and Packages">
+    <section
+      id="sponsors-tiers"
+      className={`sp-section ${!showHeader ? "sp-section-compact" : ""}`}
+      aria-label="Sponsorship Tiers and Packages"
+    >
       <div className="sp-inner">
-        <div className="sp-header">
-          <span className="sp-eyebrow">PARTNERSHIP TIERS</span>
-          
-          {/* ── Section Motif ── */}
-          <div className="sp-ornament-wrap">
-            <Ornament className="sp-motif" />
-          </div>
+        {showHeader && (
+          <div className="sp-header">
+            <span className="sp-eyebrow">PARTNERSHIP TIERS</span>
+            
+            {/* ── Section Motif ── */}
+            <div className="sp-ornament-wrap">
+              <Ornament className="sp-motif" />
+            </div>
 
-          <h2 className="sp-title">Empower the builders on the hill.</h2>
-          <p className="sp-subtitle">
-            Every rupee of sponsorship goes directly toward the event: feeding four hundred builders, funding travel grants, and providing hardware rigs. We publish a full breakdown after the hackathon.
-          </p>
-        </div>
+            <h2 className="sp-title">Empower the builders on the hill.</h2>
+            <p className="sp-subtitle">
+              Every rupee of sponsorship goes directly toward the event: feeding four hundred builders, funding travel grants, and providing hardware rigs. We publish a full breakdown after the hackathon.
+            </p>
+          </div>
+        )}
 
         {/* ── Tiers Grid ── */}
         <div className="sp-grid">
@@ -176,6 +188,10 @@ export default function Sponsors({ detailed = true }: { detailed?: boolean }) {
           width: 100%;
           padding: clamp(3rem, 6vh, 5rem) var(--padding-x) clamp(5rem, 10vh, 8rem);
           color: #111a12;
+        }
+
+        .sp-section-compact {
+          padding-top: clamp(1.2rem, 3vh, 2.5rem);
         }
 
         .sp-inner {

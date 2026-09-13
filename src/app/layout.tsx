@@ -114,9 +114,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistMono.variable} ${display.variable} ${hiruko.variable} ${dmSans.variable} ${headingNow.variable} ${bebasNeue.variable}`}
     >
-      <body>
+      <head>
+        {/* Synchronous bootstrap: locks underlying website content and scroll before initial paint */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var p=window.location.pathname;var s=window.location.search;var h=window.location.hash;var isHome=p==='/'||p==='';var f=s.match(/[?&]intro=([^&]+)/);var fv=f?f[1]:null;var ha=(h&&h!=='#')||Boolean(sessionStorage.getItem('recursive:skip-intro-for-anchor'));var r=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(isHome&&fv!=='0'&&!ha&&(!r||fv==='1')){document.documentElement.dataset.intro='playing';if('scrollRestoration' in history){history.scrollRestoration='manual';}window.scrollTo(0,0);}else{document.documentElement.dataset.intro='done';}}catch(e){document.documentElement.dataset.intro='done';}})();`,
+          }}
+        />
+      </head>
+      <body suppressHydrationWarning>
         <JsonLd />
         {/* The intro's opening frame is this still. It is the very first thing
             the document paints (see the pending plate in IntroSequence), so it
