@@ -435,7 +435,6 @@ export const WarpText: React.FC<WarpTextProps> = ({
     preloaded && preloaded.complete && preloaded.naturalWidth > 0 ? preloaded : null
   );
   const [webglFailed, setWebglFailed] = useState(false);
-  const [imgFallbackFailed, setImgFallbackFailed] = useState(false);
 
   const propsRef = useRef<WarpTextProps>({
     text,
@@ -655,7 +654,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
       };
 
       const onError = () => {
-        console.warn("WarpText: Failed to load image for WebGL, falling back to text", targetSrc);
+        console.warn("WarpText: Failed to load image for WebGL, falling back to basic <img>", targetSrc);
         // Clean up WebGL
         if (raf) cancelAnimationFrame(raf);
         raf = 0;
@@ -668,7 +667,19 @@ export const WarpText: React.FC<WarpTextProps> = ({
         if (canvas && canvas.parentNode === container) {
           container.removeChild(canvas);
         }
-        setWebglFailed(true);
+        
+        // Add fallback image
+        const fallbackImg = document.createElement("img");
+        fallbackImg.src = targetSrc;
+        fallbackImg.alt = propsRef.current.text || "Logo";
+        fallbackImg.style.width = "100%";
+        fallbackImg.style.height = "100%";
+        fallbackImg.style.objectFit = "contain";
+        fallbackImg.style.objectPosition = "center bottom";
+        if (propsRef.current.color !== "original" && propsRef.current.color !== "#ffffff") {
+          fallbackImg.style.filter = "invert(1) brightness(0)";
+        }
+        container.appendChild(fallbackImg);
       };
 
       img.onload = onLoaded;
@@ -711,7 +722,6 @@ export const WarpText: React.FC<WarpTextProps> = ({
       contextLost = true;
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
-      setWebglFailed(true);
     };
 
     const onVisibility = () => {
@@ -822,7 +832,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
       aria-label={typeof text === "string" ? text : "heading"}
     >
       {webglFailed &&
-        (effectiveSrc && !imgFallbackFailed ? (
+        (effectiveSrc ? (
           <img
             src={effectiveSrc}
             alt={typeof text === "string" ? text : "Recursive Logo"}
@@ -839,7 +849,6 @@ export const WarpText: React.FC<WarpTextProps> = ({
               filter: color !== "original" && color !== "#ffffff" ? "invert(1) brightness(0)" : undefined,
             }}
             loading="eager"
-            onError={() => setImgFallbackFailed(true)}
           />
         ) : (
           <div
