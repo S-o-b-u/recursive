@@ -388,6 +388,10 @@ export default function Footer() {
         <span className="sr-only">
           RECURSIVE — ACM Hackathon 2026 | GNIT Kolkata ACM Student Chapter, Guru Nanak Institute of Technology, Kolkata
         </span>
+        {/* Permanent CSS gradient wordmark baseline: guarantees crisp immediate visibility with zero WebGL dependency */}
+        <div className="footer-wordmark-base" aria-hidden="true">
+          {EVENT.name}
+        </div>
         <WarpText
           text={EVENT.name}
           color="linear-gradient(180deg, #070e08 0%, #0f1c12 36%, #1a301e 72%, #2c4e30 100%)"
@@ -404,6 +408,8 @@ export default function Footer() {
           letterSpacing="-0.035em"
           lineHeight={0.82}
           style={{
+            position: "absolute",
+            inset: 0,
             width: "100%",
             maxWidth: "100vw",
             height: "100%",
@@ -459,6 +465,29 @@ export default function Footer() {
           pointer-events: auto;
           user-select: none;
           padding-inline: clamp(0.2rem, 1.2vw, 1rem);
+        }
+
+        .footer-wordmark-base {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+          font-family: var(--font-hiruko), var(--font-display), sans-serif;
+          font-weight: 900;
+          font-size: min(clamp(7.5rem, 34vw, 42rem), 60vh);
+          letter-spacing: -0.035em;
+          line-height: 0.82;
+          background: linear-gradient(180deg, #070e08 0%, #0f1c12 36%, #1a301e 72%, #2c4e30 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          color: transparent;
+          text-align: center;
+          user-select: none;
+          pointer-events: none;
+          white-space: nowrap;
+          z-index: 1;
         }
 
         @media (max-width: 1024px) {

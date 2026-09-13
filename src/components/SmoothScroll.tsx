@@ -24,10 +24,18 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       return;
     }
 
+    try {
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+    } catch {}
+
     // On mobile and touch screens, native momentum scrolling is handled by GPU compositor at 120Hz.
+    // Use pointer / width checks rather than maxTouchPoints so touchscreen laptops retain Lenis.
     const isTouch =
       typeof window !== 'undefined' &&
-      ('ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth < 860);
+      ((window.matchMedia('(pointer: coarse) and (hover: none)').matches && window.innerWidth < 860) ||
+        window.innerWidth < 860);
 
     if (isTouch) {
       ScrollTrigger.config({ ignoreMobileResize: true });
@@ -96,6 +104,10 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     setLenis(lenis);
     if (typeof window !== 'undefined') {
       (window as any).lenis = lenis;
+    }
+
+    if (!window.location.hash || window.location.hash === '#') {
+      lenis.scrollTo(0, { immediate: true, force: true });
     }
 
     lenis.on('scroll', ScrollTrigger.update);

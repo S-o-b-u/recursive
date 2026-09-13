@@ -173,8 +173,12 @@ export default function IntroSequence() {
     };
 
     const refreshTriggers = () => {
+      if (typeof ScrollTrigger !== "undefined" && typeof ScrollTrigger.clearScrollMemory === "function") {
+        ScrollTrigger.clearScrollMemory();
+      }
       scrollHome();
       ScrollTrigger.refresh();
+      scrollHome();
     };
 
     const unmount = () => {
@@ -218,6 +222,16 @@ export default function IntroSequence() {
       if (typeof window !== "undefined") {
         isInternalAnchorNav = Boolean(sessionStorage.getItem("recursive:skip-intro-for-anchor"));
         hasHash = Boolean(window.location.hash && window.location.hash !== "#");
+        try {
+          if ("scrollRestoration" in history) {
+            history.scrollRestoration = "manual";
+          }
+        } catch {}
+        if (!hasHash) {
+          window.scrollTo(0, 0);
+          const l = getLenis();
+          if (l) l.scrollTo(0, { immediate: true, force: true });
+        }
       }
     } catch {}
 
@@ -285,6 +299,7 @@ export default function IntroSequence() {
     } catch {}
     // Belt-and-suspenders lock for the frame before Lenis is reachable. Only
     // safe when the scrollbar gutter is reserved — see GUTTER_STABLE.
+    window.scrollTo(0, 0);
     if (GUTTER_STABLE) {
       document.documentElement.style.overflow = "hidden";
       document.body.style.overflow = "hidden";
@@ -381,7 +396,8 @@ export default function IntroSequence() {
     // work stacked on the busiest, least-headroom window of the whole page.
     const isTouch =
       typeof window !== "undefined" &&
-      ("ontouchstart" in window || navigator.maxTouchPoints > 0 || window.innerWidth < 860);
+      ((window.matchMedia("(pointer: coarse) and (hover: none)").matches && window.innerWidth < 860) ||
+        window.innerWidth < 860);
 
     let lenisHooked = false;
     let lenisRaf = 0;

@@ -117,6 +117,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistMono.variable} ${display.variable} ${hiruko.variable} ${dmSans.variable} ${headingNow.variable} ${bebasNeue.variable}`}
     >
       <body>
+        {/* Force manual scroll restoration immediately so browser never restores previous scroll position on reload / navigation */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "if(typeof history!=='undefined'&&'scrollRestoration' in history){history.scrollRestoration='manual';}if(!window.location.hash||window.location.hash==='#'){window.scrollTo(0,0);}",
+          }}
+        />
         <JsonLd />
         {/* The intro's opening frame is this still. It is the very first thing
             the document paints (see the pending plate in IntroSequence), so it
