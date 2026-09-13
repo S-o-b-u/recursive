@@ -30,29 +30,32 @@ function renderFaqAnswer(text: string) {
   });
 }
 
-export default function FAQ() {
+export default function FAQ({ showHeader = true }: { showHeader?: boolean }) {
   const [open, setOpen] = useState<number | null>(0);
   const reduced = useReducedMotion();
 
   return (
     <SectionWrapper
       id="faq"
-      label="FAQ"
-      heading={<>Questions people actually ask.</>}
+      label={showHeader ? "FAQ" : undefined}
+      heading={showHeader ? <>Questions people actually ask.</> : undefined}
       lede={
-        <p>
-          Anything missing?{" "}
-          <a
-            href={EVENT.discordUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline decoration-[var(--color-accent)] decoration-1 underline-offset-4"
-          >
-            Ask in Discord
-          </a>{" "}
-          — we answer fast.
-        </p>
+        showHeader ? (
+          <p>
+            Anything missing?{" "}
+            <a
+              href={EVENT.discordUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline decoration-[var(--color-accent)] decoration-1 underline-offset-4"
+            >
+              Ask in Discord
+            </a>{" "}
+            — we answer fast.
+          </p>
+        ) : undefined
       }
+      className={!showHeader ? "pt-0" : ""}
     >
       <div className="grid gap-2.5">
         {FAQS.map((faq, i) => {

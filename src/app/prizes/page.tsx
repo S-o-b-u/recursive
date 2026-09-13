@@ -41,7 +41,7 @@ export default function PrizesPage() {
           </p>
         }
       />
-      <Prizes detailed />
+      <Prizes detailed showHeader={false} />
 
       <section className="section pt-0">
         <div className="section-inner">

@@ -27,12 +27,12 @@ export default function SponsorsPage() {
         title="Help four hundred people build something."
         lede={
           <p>
-            Every rupee goes directly to the room: hot meals for 36 hours, travel grants for teams
+            Every rupee goes directly to the room: hot meals for the 8-hour sprint, travel grants for teams
             coming from outside Kolkata, hardware prototype kits to borrow, and the non-dilutive prize pool.
           </p>
         }
       />
-      <Sponsors detailed />
+      <Sponsors detailed showHeader={false} />
       <RegisterCTA />
     </main>
   );

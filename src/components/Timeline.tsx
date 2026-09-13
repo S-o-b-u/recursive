@@ -3,16 +3,22 @@ import SectionWrapper from "./SectionWrapper";
 import Reveal from "./Reveal";
 import { SCHEDULE } from "@/data/hackathon";
 
-export default function Timeline({ compact = false }: { compact?: boolean }) {
+export default function Timeline({
+  compact = false,
+  showHeader = true,
+}: {
+  compact?: boolean;
+  showHeader?: boolean;
+}) {
   return (
     <SectionWrapper
       id="schedule"
-      label="Schedule"
-      heading={<>Thirty-six hours, start to stage.</>}
+      label={showHeader ? "Schedule" : undefined}
+      heading={showHeader ? <>Eight hours, start to stage.</> : undefined}
       lede={
-        compact ? (
+        showHeader && compact ? (
           <p>
-            The shape of the weekend. Times are indicative and will be locked two weeks
+            The shape of the sprint. Times are indicative and will be locked two weeks
             out —{" "}
             <Link href="/schedule" className="underline decoration-[var(--color-accent)] decoration-1 underline-offset-4">
               see the full schedule
@@ -21,8 +27,9 @@ export default function Timeline({ compact = false }: { compact?: boolean }) {
           </p>
         ) : undefined
       }
+      className={!showHeader ? "pt-0" : ""}
     >
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className={SCHEDULE.length === 1 ? "max-w-2xl mx-auto" : "grid gap-4 md:grid-cols-3"}>
         {SCHEDULE.map((day, di) => (
           <Reveal key={day.day} delay={di * 0.08}>
             <div className="glass glass-sheen h-full p-6">

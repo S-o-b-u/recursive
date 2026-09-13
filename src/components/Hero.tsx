@@ -657,11 +657,13 @@ export default function Hero() {
             margin-inline: auto !important;
           }
           .hero-chair-annotation {
-            left: calc(50% + 36px);
+            left: calc(50% + 14px);
+            right: 10px;
+            width: auto;
+            max-width: calc(50% - 16px);
             top: 51.5%;
             transform: translateY(-50%);
             gap: 0.35rem;
-            max-width: 44vw;
             display: flex;
             flex-direction: row;
             align-items: center;
@@ -669,8 +671,8 @@ export default function Hero() {
             z-index: 30;
           }
           .chair-arrow {
-            width: 34px;
-            height: 26px;
+            width: 30px;
+            height: 24px;
             margin-top: 0;
             transform: none;
             opacity: 1 !important;
@@ -679,23 +681,26 @@ export default function Hero() {
             flex-shrink: 0;
           }
           .chair-arrow path {
-            stroke-width: 6;
+            stroke-width: 5.5;
           }
           .chair-note {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
             text-align: left;
+            min-width: 0;
           }
           .chair-text {
-            font-size: clamp(0.58rem, 2vw, 0.68rem) !important;
+            font-size: clamp(0.56rem, 2.2vw, 0.68rem) !important;
             font-weight: 800 !important;
             line-height: 1.22 !important;
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
             text-align: left !important;
             text-shadow: none !important;
-            white-space: normal;
+            white-space: normal !important;
+            word-break: normal !important;
+            overflow-wrap: break-word !important;
           }
           .chair-sub {
             font-size: clamp(0.48rem, 1.5vw, 0.56rem) !important;
@@ -749,10 +754,12 @@ export default function Hero() {
             margin-inline: auto !important;
           }
           .hero-chair-annotation {
-            left: calc(50% + 28px);
+            left: calc(50% + 12px);
+            right: 8px;
+            width: auto;
+            max-width: calc(50% - 14px);
             top: 51.5%;
             gap: 0.28rem;
-            max-width: 42vw;
           }
           .chair-arrow {
             width: 26px;
@@ -764,6 +771,9 @@ export default function Hero() {
           .chair-text {
             font-size: 0.52rem !important;
             line-height: 1.15 !important;
+            white-space: normal !important;
+            word-break: normal !important;
+            overflow-wrap: break-word !important;
           }
           .chair-sub {
             font-size: 0.42rem !important;
@@ -781,13 +791,15 @@ export default function Hero() {
             margin-inline: auto !important;
           }
           .hero-chair-annotation {
-            left: calc(50% + 25px);
+            left: calc(50% + 10px);
+            right: 6px;
+            width: auto;
+            max-width: calc(50% - 12px);
             top: 51.5%;
             gap: 0.25rem;
-            max-width: 42vw;
           }
           .chair-arrow {
-            width: 23px;
+            width: 22px;
             height: 18px;
           }
           .chair-arrow path {
@@ -796,6 +808,9 @@ export default function Hero() {
           .chair-text {
             font-size: 0.49rem !important;
             line-height: 1.14 !important;
+            white-space: normal !important;
+            word-break: normal !important;
+            overflow-wrap: break-word !important;
           }
           .chair-sub {
             font-size: 0.39rem !important;

@@ -25,10 +25,23 @@ export default function FaqPage() {
     <main>
       <PageHeader
         label="FAQ"
-        title="Everything you asked us last year."
-        lede={<p>If it is not here, Discord is faster than email.</p>}
+        title="Questions people actually ask."
+        lede={
+          <p>
+            If it is not here,{" "}
+            <a
+              href={EVENT.discordUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline decoration-[var(--color-accent)] decoration-1 underline-offset-4"
+            >
+              Discord
+            </a>{" "}
+            is faster than email.
+          </p>
+        }
       />
-      <FAQ />
+      <FAQ showHeader={false} />
       <VenueLocation />
       <RegisterCTA />
     </main>
