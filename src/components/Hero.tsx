@@ -319,7 +319,7 @@ export default function Hero() {
         /* ── Top Center Block: Wordmark with WebGL Warp ── */
         .hero-center-content {
           position: absolute;
-          top: clamp(5.8rem, 12.8vh, 7.4rem);
+          top: clamp(4.6rem, 11.5vh, 7.2rem);
           left: 0;
           right: 0;
           width: 100%;
@@ -339,9 +339,8 @@ export default function Hero() {
         .hero-warp-wrap {
           position: relative;
           width: 100%;
-          max-width: min(76vw, 750px);
-          aspect-ratio: 1559 / 702;
-          height: clamp(125px, min(18vw, 21vh), 185px);
+          max-width: min(88vw, 1080px);
+          height: clamp(165px, 23vw, 270px);
           display: flex;
           justify-content: center;
           align-items: center;
@@ -363,8 +362,8 @@ export default function Hero() {
         /* ── Simple Clean Chair Annotation ── */
         .hero-chair-annotation {
           position: absolute;
-          left: calc(50% + 64px);
-          top: 52%;
+          left: calc(50% + 72px);
+          top: 53.5%;
           transform: translateY(-50%);
           z-index: 30;
           display: flex;
@@ -458,7 +457,7 @@ export default function Hero() {
         /* ── Bottom Unified Glass Dock ── */
         .hero-bottom-area {
           position: absolute;
-          bottom: clamp(3.5rem, 7.5vh, 5.0rem);
+          bottom: clamp(5rem, 11vh, 7rem);
           left: 0;
           right: 0;
           width: 100%;
@@ -548,11 +547,11 @@ export default function Hero() {
 
         @media (max-width: 1024px) {
           .hero-center-content {
-            top: clamp(4.0rem, 8.8vh, 5.5rem);
+            top: clamp(4.6rem, 11vh, 6.8rem);
           }
           .hero-warp-wrap {
-            max-width: min(78vw, 640px);
-            height: clamp(110px, min(18vw, 19vh), 165px);
+            max-width: min(86vw, 860px);
+            height: clamp(140px, 22vw, 220px);
             margin-inline: auto;
           }
         }
