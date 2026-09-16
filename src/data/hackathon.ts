@@ -250,7 +250,7 @@ export const SPONSOR_SLOTS: Slot[] = [
   { label: "REACT KOLKATA LOGO", expect: "/images/sponsors/react-kolkata-logo-full-light.png", src: "/images/sponsors/react-kolkata-logo-full-light.png" },
   { label: "CODERUSH X LOGO", expect: "/images/sponsors/CodeRush X Logo.png", src: "/images/sponsors/CodeRush X Logo.png" },
   { label: "LNC LOGO", expect: "/images/sponsors/LNC.png", src: "/images/sponsors/LNC.png" },
-  { label: "Sponsor 06", expect: "/images/sponsors/06.svg", src: "" },
+  { label: "MICROSOFT STUDENT AMBASSADOR LOGO", expect: "/images/sponsors/Stu amb.png", src: "/images/sponsors/Stu amb.png" },
   { label: "Sponsor 07", expect: "/images/sponsors/07.svg", src: "" },
   { label: "Sponsor 08", expect: "/images/sponsors/08.svg", src: "" },
 ];
