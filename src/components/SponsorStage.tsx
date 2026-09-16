@@ -435,8 +435,8 @@ export default function SponsorStage() {
                         src="/images/sponsors/Stu%20amb.png"
                         alt="Microsoft Student Ambassador"
                         className="sxp-partner-logo sxp-stuamb-logo"
-                        width={129}
-                        height={152}
+                        width={143}
+                        height={168}
                       />
                     </div>
                   </div>
@@ -1004,7 +1004,8 @@ export default function SponsorStage() {
             0 8px 24px -4px rgba(20, 46, 28, 0.16),
             0 4px 14px rgba(20, 46, 28, 0.1),
             inset 0 1px 1.5px rgba(255, 255, 255, 0.9);
-          padding: 0.85rem clamp(2.2rem, 4.2vw, 3.2rem);
+          padding: 0.35rem clamp(1.2rem, 2.4vw, 1.8rem);
+          border-radius: 1.25rem;
           transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, border-color 260ms ease, background 260ms ease;
         }
 
@@ -1018,7 +1019,7 @@ export default function SponsorStage() {
         }
 
         .sxp-stuamb-logo {
-          height: clamp(112px, 14vh, 152px);
+          height: clamp(124px, 16vh, 168px);
           width: auto;
           object-fit: contain;
           display: block;
@@ -1197,10 +1198,11 @@ export default function SponsorStage() {
             transform: scale(0.96);
           }
           .sxp-stuamb-card {
-            padding: 0.75rem 1.6rem;
+            padding: 0.35rem 1.1rem;
+            border-radius: 1.1rem;
           }
           .sxp-stuamb-logo {
-            height: clamp(80px, 18vw, 108px);
+            height: clamp(90px, 22vw, 128px);
           }
         }
 
