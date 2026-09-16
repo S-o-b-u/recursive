@@ -424,6 +424,29 @@ export default function SponsorStage() {
                       />
                     </div>
                   </div>
+                </div>
+
+                {/* ── Media Partner ── */}
+                <div className="sxp-partner-tier sxp-media-tier">
+                  <span className="sxp-tier-badge">MEDIA PARTNER</span>
+                  <div className="sxp-partner-row">
+                    <a
+                      href="https://lnc-community.vercel.app"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="sxp-partner-card sxp-float-card sxp-lnc-card"
+                      title="LNC Community"
+                      aria-label="LNC Community"
+                    >
+                      <img
+                        src="/images/sponsors/LNC.png"
+                        alt="LNC Community"
+                        className="sxp-partner-logo sxp-lnc-logo"
+                        width={130}
+                        height={44}
+                      />
+                    </a>
+                  </div>
                   <span className="sxp-unrevealed-note">
                     More community partners &amp; sponsors revealing soon
                   </span>
@@ -739,7 +762,7 @@ export default function SponsorStage() {
           flex-direction: column;
           align-items: center;
           text-align: center;
-          gap: clamp(0.45rem, 1.2vh, 0.85rem);
+          gap: clamp(0.32rem, 0.9vh, 0.65rem);
         }
 
         .sxp-motif {
@@ -791,8 +814,13 @@ export default function SponsorStage() {
 
         .sxp-community-tier,
         .sxp-innofusion-tier {
-          margin-top: clamp(0.75rem, 1.8vh, 1.35rem);
-          margin-bottom: clamp(0.35rem, 0.9vh, 0.75rem);
+          margin-top: clamp(0.55rem, 1.3vh, 1rem);
+          margin-bottom: clamp(0.15rem, 0.4vh, 0.35rem);
+        }
+
+        .sxp-media-tier {
+          margin-top: clamp(0.55rem, 1.3vh, 1rem);
+          margin-bottom: clamp(0.15rem, 0.4vh, 0.35rem);
         }
 
         .sxp-partner-row {
@@ -944,6 +972,35 @@ export default function SponsorStage() {
           height: clamp(38px, 4.3vh, 46px);
           width: auto;
           min-width: 140px;
+          object-fit: contain;
+          display: block;
+        }
+
+        .sxp-lnc-card {
+          background: #ffffff;
+          border: 1px solid rgba(20, 46, 28, 0.14);
+          border-top: 1px solid rgba(255, 255, 255, 0.95);
+          box-shadow:
+            0 8px 24px -4px rgba(20, 46, 28, 0.16),
+            0 4px 14px rgba(20, 46, 28, 0.1),
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.9);
+          padding: 0.85rem clamp(1.8rem, 3.2vw, 2.6rem);
+          text-decoration: none;
+        }
+
+        .sxp-lnc-card:hover {
+          background: #ffffff;
+          border-color: rgba(142, 36, 170, 0.45);
+          box-shadow:
+            0 14px 34px -6px rgba(20, 46, 28, 0.22),
+            0 6px 20px rgba(142, 36, 170, 0.2),
+            inset 0 1px 1.5px rgba(255, 255, 255, 1);
+        }
+
+        .sxp-lnc-logo {
+          height: clamp(34px, 4vh, 42px);
+          width: auto;
+          min-width: 105px;
           object-fit: contain;
           display: block;
         }
