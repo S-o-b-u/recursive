@@ -424,6 +424,22 @@ export default function SponsorStage() {
                       />
                     </div>
                   </div>
+                  <div className="sxp-partner-row sxp-partner-subrow">
+                    <div
+                      className="sxp-partner-card sxp-float-card-alt sxp-stuamb-card"
+                      title="Microsoft Student Ambassador"
+                      role="img"
+                      aria-label="Microsoft Student Ambassador"
+                    >
+                      <img
+                        src="/images/sponsors/Stu%20amb.png"
+                        alt="Microsoft Student Ambassador"
+                        className="sxp-partner-logo sxp-stuamb-logo"
+                        width={143}
+                        height={168}
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {/* ── Media Partner ── */}
@@ -976,6 +992,39 @@ export default function SponsorStage() {
           display: block;
         }
 
+        .sxp-partner-subrow {
+          margin-top: clamp(0.2rem, 0.6vh, 0.45rem);
+        }
+
+        .sxp-stuamb-card {
+          background: #ffffff;
+          border: 1px solid rgba(20, 46, 28, 0.14);
+          border-top: 1px solid rgba(255, 255, 255, 0.95);
+          box-shadow:
+            0 8px 24px -4px rgba(20, 46, 28, 0.16),
+            0 4px 14px rgba(20, 46, 28, 0.1),
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.9);
+          padding: 0.35rem clamp(1.2rem, 2.4vw, 1.8rem);
+          border-radius: 1.25rem;
+          transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, border-color 260ms ease, background 260ms ease;
+        }
+
+        .sxp-stuamb-card:hover {
+          background: #ffffff;
+          border-color: rgba(0, 120, 212, 0.45);
+          box-shadow:
+            0 14px 34px -6px rgba(20, 46, 28, 0.22),
+            0 6px 20px rgba(0, 120, 212, 0.2),
+            inset 0 1px 1.5px rgba(255, 255, 255, 1);
+        }
+
+        .sxp-stuamb-logo {
+          height: clamp(124px, 16vh, 168px);
+          width: auto;
+          object-fit: contain;
+          display: block;
+        }
+
         .sxp-lnc-card {
           background: #ffffff;
           border: 1px solid rgba(20, 46, 28, 0.14);
@@ -1147,6 +1196,13 @@ export default function SponsorStage() {
           .sxp-cta-wrap {
             margin-top: clamp(0.45rem, 1.2vh, 0.85rem);
             transform: scale(0.96);
+          }
+          .sxp-stuamb-card {
+            padding: 0.35rem 1.1rem;
+            border-radius: 1.1rem;
+          }
+          .sxp-stuamb-logo {
+            height: clamp(90px, 22vw, 128px);
           }
         }
 
