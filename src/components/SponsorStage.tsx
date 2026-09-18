@@ -374,11 +374,6 @@ export default function SponsorStage() {
                   </div>
                   <span className="sxp-eyebrow">Supporters &amp; partners</span>
                   <h2 className="sxp-heading">Our Sponsors</h2>
-                  <p className="sxp-lede">
-                    {sealed
-                      ? "The backers are lined up. Organization names stay sealed until the official reveal."
-                      : "Organizations and platforms empowering the builders on the hill."}
-                  </p>
 
                   {/* ── Top Tier: Platform Partner (Devfolio) + Sponsor (OSEN) + Domain Sponsor (.xyz) ── */}
                   <div className="sxp-top-tier-row">
@@ -525,6 +520,22 @@ export default function SponsorStage() {
                             height={160}
                           />
                         </div>
+                        <a
+                          href="https://gdg.community.dev/gdg-on-campus-guru-nanak-institute-of-technology-kolkata-india/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="sxp-partner-card sxp-float-card-alt sxp-gdg-card"
+                          title="Google Developer Groups On Campus • Guru Nanak Institute of Technology"
+                          aria-label="Google Developer Groups On Campus GNIT"
+                        >
+                          <img
+                            src="/images/sponsors/gdg-gnit-logo.png"
+                            alt="GDG On Campus GNIT"
+                            className="sxp-partner-logo sxp-gdg-logo"
+                            width={857}
+                            height={344}
+                          />
+                        </a>
                       </div>
 
                       {/* Right column */}
@@ -1391,6 +1402,22 @@ export default function SponsorStage() {
           display: block;
         }
 
+        .sxp-gdg-card {
+          width: clamp(185px, 15.5vw, 235px) !important;
+          height: clamp(74px, 8.4vh, 88px) !important;
+          text-decoration: none;
+          padding: 0.4rem 0.8rem !important;
+        }
+
+        .sxp-gdg-logo {
+          width: clamp(150px, 13.5vw, 205px);
+          height: auto;
+          max-height: clamp(58px, 6.8vh, 72px);
+          max-width: 94%;
+          object-fit: contain;
+          display: block;
+        }
+
         .sxp-eventopia-logo {
           width: clamp(110px, 11vw, 145px);
           height: auto;
@@ -1571,13 +1598,17 @@ export default function SponsorStage() {
           /* Reset all vertical transform staggers so cards never collide */
           .sxp-react-kolkata-card,
           .sxp-coderush-card,
-          .sxp-mahakash-card {
+          .sxp-mahakash-card,
+          .sxp-gdg-card,
+          .sxp-stuamb-card {
             transform: none !important;
           }
 
           .sxp-react-kolkata-card:hover,
           .sxp-coderush-card:hover,
-          .sxp-mahakash-card:hover {
+          .sxp-mahakash-card:hover,
+          .sxp-gdg-card:hover,
+          .sxp-stuamb-card:hover {
             transform: translateY(-2px) scale(1.015) !important;
           }
 
@@ -1606,6 +1637,16 @@ export default function SponsorStage() {
             width: auto !important;
             max-height: 94% !important;
             max-width: 92% !important;
+          }
+
+          .sxp-community-grid .sxp-gdg-card {
+            width: clamp(170px, 18vw, 215px) !important;
+            height: clamp(66px, 7.6vh, 78px) !important;
+          }
+
+          .sxp-community-grid .sxp-gdg-logo {
+            max-height: clamp(50px, 5.8vh, 60px) !important;
+            width: clamp(135px, 15vw, 175px) !important;
           }
 
           /* Fixed INNOFUSION: ensure logo & brand stay comfortably inside the card */
@@ -1813,6 +1854,16 @@ export default function SponsorStage() {
             width: auto !important;
             max-height: 94% !important;
             max-width: 92% !important;
+          }
+
+          .sxp-community-grid .sxp-gdg-card {
+            width: clamp(145px, 18vw, 175px) !important;
+            height: 60px !important;
+          }
+
+          .sxp-community-grid .sxp-gdg-logo {
+            max-height: clamp(44px, 5.0vh, 50px) !important;
+            width: clamp(115px, 15vw, 145px) !important;
           }
 
           /* Fixed INNOFUSION on portrait tablet */
@@ -2067,6 +2118,8 @@ export default function SponsorStage() {
           .sxp-react-kolkata-card,
           .sxp-coderush-card,
           .sxp-mahakash-card,
+          .sxp-gdg-card,
+          .sxp-stuamb-card,
           .sxp-osen-card,
           .sxp-xyz-card {
             transform: none !important;
@@ -2074,6 +2127,8 @@ export default function SponsorStage() {
           .sxp-react-kolkata-card:hover,
           .sxp-coderush-card:hover,
           .sxp-mahakash-card:hover,
+          .sxp-gdg-card:hover,
+          .sxp-stuamb-card:hover,
           .sxp-osen-card:hover,
           .sxp-xyz-card:hover {
             transform: translateY(-2px) scale(1.015) !important;
@@ -2114,6 +2169,15 @@ export default function SponsorStage() {
             max-height: 64px !important;
             width: auto !important;
             max-width: 88% !important;
+          }
+          .sxp-gdg-card {
+            width: clamp(96px, 27vw, 114px) !important;
+            height: 48px !important;
+          }
+          .sxp-gdg-logo {
+            max-height: 32px !important;
+            width: clamp(78px, 22vw, 96px) !important;
+            max-width: 90% !important;
           }
           .sxp-coderush-logo {
             max-height: 16px !important;
