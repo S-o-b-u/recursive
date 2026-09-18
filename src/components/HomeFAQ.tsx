@@ -361,7 +361,7 @@ export default function HomeFAQ() {
           .faq-section {
             padding-top: clamp(1.2rem, 3vw, 1.8rem);
             padding-bottom: clamp(3.2rem, 6vw, 4.5rem);
-            margin-top: clamp(-4.5rem, -8vh, -3rem);
+            margin-top: clamp(-1.5rem, -2.5vh, -0.5rem);
           }
 
           .faq-header {

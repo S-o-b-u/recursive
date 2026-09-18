@@ -18,7 +18,7 @@ export const EVENT = {
   devfolioUrl: "https://recursiveacm.devfolio.co",
   devfolioSlug: "recursiveacm", // Replace with your verified Devfolio hackathon slug (e.g. "recursive")
   devfolioTheme: "light" as "light" | "dark" | "dark-inverted",
-  proposalTemplateUrl: "https://docs.google.com/presentation/d/1hWmofLq_oe_ZI_n_gTTszlc0AqkJIQyhz1n0iyBXEO8/copy", // Official Idea Submission PPT Template
+  proposalTemplateUrl: "https://docs.google.com/presentation/d/1Heaa2d_DUVpFmt4Oo2dKZWUOvAVtXQrn1OnsHCBEWEQ/copy", // Official Idea Submission PPT Template
   sponsorUrl: "https://forms.gle/6WMzt855AmDqDUac8",
   discordUrl: "https://discord.gg/SMYB7tJQf",
   email: "team@recursive.dev",
@@ -370,7 +370,7 @@ export const FAQS: Faq[] = [
   },
   {
     q: "How do I apply, and what is the idea submission process?",
-    a: "Applying for Recursive is done via Devfolio with an idea review round:\n\n1. Register on Devfolio: Click the 'Apply with Devfolio' button and complete your profile. Form a team of 2 to 4 members (min 2, max 4 builders).\n2. Download the Idea Template: Access the official [Recursive ACM Idea Submission Template](https://docs.google.com/presentation/d/1hWmofLq_oe_ZI_n_gTTszlc0AqkJIQyhz1n0iyBXEO8/copy) on Google Slides.\n3. Prepare Your Proposal: Fill out the slides with your problem statement, target track, technical architecture, and impact.\n4. Export as PDF & Upload: Save your completed deck as a PDF (max 5–6 slides) and upload it directly in your Devfolio application form before registration closes.\n5. Review & RSVP: Applications will be reviewed by the organizing committee. Shortlisted teams will receive an acceptance invitation on Devfolio and email to confirm their attendance (RSVP) for the in-person hackathon at GNIT.",
+    a: "Applying for Recursive is done via Devfolio with an idea review round:\n\n1. Register on Devfolio: Click the 'Apply with Devfolio' button and complete your profile. Form a team of 2 to 4 members (min 2, max 4 builders).\n2. Download the Idea Template: Access the official [Recursive ACM Idea Submission Template](https://docs.google.com/presentation/d/1Heaa2d_DUVpFmt4Oo2dKZWUOvAVtXQrn1OnsHCBEWEQ/copy) on Google Slides.\n3. Prepare Your Proposal: Fill out the slides with your problem statement, target track, technical architecture, and impact.\n4. Export as PDF & Upload: Save your completed deck as a PDF (max 5–6 slides) and upload it directly in your Devfolio application form before registration closes.\n5. Review & RSVP: Applications will be reviewed by the organizing committee. Shortlisted teams will receive an acceptance invitation on Devfolio and email to confirm their attendance (RSVP) for the in-person hackathon at GNIT.",
   },
   {
     q: "What should be included in our Idea Submission PPT?",

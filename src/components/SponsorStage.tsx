@@ -44,6 +44,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const RATIO = "16 / 9";
 
+
 export default function SponsorStage() {
   const trackRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -379,41 +380,70 @@ export default function SponsorStage() {
                       : "Organizations and platforms empowering the builders on the hill."}
                   </p>
 
-                  {/* ── Platform Partner: Devfolio with doodle rays ── */}
-                  <div className="sxp-partner-tier sxp-platform-tier">
-                    <span className="sxp-tier-badge">PLATFORM PARTNER</span>
-                    <div className="sxp-devfolio-card-wrap">
-                      <img
-                        src="/images/ui/devfolio_rays.png"
-                        alt=""
-                        className="sxp-devfolio-rays"
-                        aria-hidden="true"
-                        width={48}
-                        height={48}
-                      />
-                      <a
-                        href="https://devfolio.co"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="sxp-partner-card sxp-float-card sxp-devfolio-card"
-                        title="Devfolio"
-                      >
-                        <div className="sxp-devfolio-content">
-                          <img
-                            src="/images/sponsors/devfolio.png"
-                            alt="Devfolio"
-                            className="sxp-devfolio-logo"
-                            width={175}
-                            height={42}
-                          />
-                          <div className="sxp-devfolio-divider" aria-hidden="true" />
-                          <div className="sxp-devfolio-tagline">
-                            <span>BUILD</span>
-                            <span>FOR</span>
-                            <span>BUILDERS</span>
+                  {/* ── Top Tier: Platform Partner (Devfolio) + Sponsor (OSEN) ── */}
+                  <div className="sxp-top-tier-row">
+                    <div className="sxp-top-card-col">
+                      <span className="sxp-tier-badge">PLATFORM PARTNER</span>
+                      <div className="sxp-devfolio-card-wrap">
+                        <img
+                          src="/images/ui/devfolio_rays.png"
+                          alt=""
+                          className="sxp-rays sxp-rays-left"
+                          aria-hidden="true"
+                          width={48}
+                          height={48}
+                        />
+                        <a
+                          href="https://devfolio.co"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="sxp-partner-card sxp-float-card sxp-devfolio-card"
+                          title="Devfolio"
+                        >
+                          <div className="sxp-devfolio-content">
+                            <img
+                              src="/images/sponsors/devfolio.png"
+                              alt="Devfolio"
+                              className="sxp-devfolio-logo"
+                              width={175}
+                              height={42}
+                            />
+                            <div className="sxp-devfolio-divider" aria-hidden="true" />
+                            <div className="sxp-devfolio-tagline">
+                              <span>BUILD</span>
+                              <span>FOR</span>
+                              <span>BUILDERS</span>
+                            </div>
                           </div>
+                        </a>
+                      </div>
+                    </div>
+                    <div className="sxp-top-card-col">
+                      <span className="sxp-tier-badge">SPONSOR</span>
+                      <div className="sxp-osen-card-wrap">
+                        <div
+                          className="sxp-partner-card sxp-float-card-alt sxp-osen-card"
+                          title="OSEN"
+                          role="img"
+                          aria-label="OSEN"
+                        >
+                          <img
+                            src="/images/sponsors/OSEN.png"
+                            alt="OSEN"
+                            className="sxp-partner-logo sxp-osen-logo"
+                            width={200}
+                            height={54}
+                          />
                         </div>
-                      </a>
+                        <img
+                          src="/images/ui/devfolio_rays.png"
+                          alt=""
+                          className="sxp-rays sxp-rays-right"
+                          aria-hidden="true"
+                          width={48}
+                          height={48}
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -421,120 +451,99 @@ export default function SponsorStage() {
                   <div className="sxp-partner-tier sxp-community-tier">
                     <span className="sxp-tier-badge">COMMUNITY PARTNERS</span>
                     <div className="sxp-community-grid">
-                      <a
-                        href="https://reactkolkata.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="sxp-partner-card sxp-float-card sxp-react-kolkata-card"
-                        title="React Kolkata"
-                        aria-label="React Kolkata"
-                      >
-                        <img
-                          src="/images/sponsors/react-kolkata-logo-dark.png"
-                          alt="React Kolkata"
-                          className="sxp-partner-logo sxp-react-kolkata-logo"
-                          width={216}
-                          height={69}
-                        />
-                      </a>
-                      <div
-                        className="sxp-partner-card sxp-float-card-alt sxp-innofusion-card"
-                        title="INNOFUSION 3.0"
-                        role="img"
-                        aria-label="INNOFUSION 3.0"
-                      >
-                        <div className="sxp-innofusion-content">
+                      {/* Left column */}
+                      <div className="sxp-community-col">
+                        <a
+                          href="https://reactkolkata.com"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="sxp-partner-card sxp-float-card sxp-react-kolkata-card"
+                          title="React Kolkata"
+                          aria-label="React Kolkata"
+                        >
                           <img
-                            src="/images/sponsors/INNOFUSION%203.0%20logo.png"
-                            alt="INNOFUSION 3.0"
-                            className="sxp-innofusion-logo"
-                            width={40}
-                            height={40}
+                            src="/images/sponsors/react-kolkata-logo-dark.png"
+                            alt="React Kolkata"
+                            className="sxp-partner-logo sxp-react-kolkata-logo"
+                            width={216}
+                            height={69}
                           />
-                          <span className="sxp-innofusion-brand">INNOFUSION 3.0</span>
+                        </a>
+                        <div
+                          className="sxp-partner-card sxp-float-card-alt sxp-innofusion-card"
+                          title="INNOFUSION 3.0"
+                          role="img"
+                          aria-label="INNOFUSION 3.0"
+                        >
+                          <div className="sxp-innofusion-content">
+                            <img
+                              src="/images/sponsors/INNOFUSION%203.0%20logo.png"
+                              alt="INNOFUSION 3.0"
+                              className="sxp-innofusion-logo"
+                              width={40}
+                              height={40}
+                            />
+                            <span className="sxp-innofusion-brand">INNOFUSION 3.0</span>
+                          </div>
                         </div>
                       </div>
-                      <div
-                        className="sxp-partner-card sxp-float-card sxp-coderush-card"
-                        title="CodeRush X"
-                        role="img"
-                        aria-label="CodeRush X"
-                      >
-                        <img
-                          src="/images/sponsors/CodeRush%20X%20Logo-dark.png"
-                          alt="CodeRush X"
-                          className="sxp-partner-logo sxp-coderush-logo"
-                          width={225}
-                          height={52}
-                        />
+
+                      {/* Center column */}
+                      <div className="sxp-community-col sxp-community-center">
+                        <div
+                          className="sxp-partner-card sxp-float-card sxp-stuamb-card"
+                          title="Microsoft Student Ambassador"
+                          role="img"
+                          aria-label="Microsoft Student Ambassador"
+                        >
+                          <img
+                            src="/images/sponsors/Stu_amb_clean.png"
+                            alt="Microsoft Student Ambassador"
+                            className="sxp-partner-logo sxp-stuamb-logo"
+                            width={140}
+                            height={160}
+                          />
+                        </div>
                       </div>
-                      <div
-                        className="sxp-partner-card sxp-float-card-alt sxp-mahakash-card"
-                        title="GNIT Mahakash - The Space Club"
-                        role="img"
-                        aria-label="GNIT Mahakash - The Space Club"
-                      >
-                        <img
-                          src="/images/sponsors/FinalBlack.png"
-                          alt="GNIT Mahakash"
-                          className="sxp-partner-logo sxp-mahakash-logo"
-                          width={190}
-                          height={52}
-                        />
-                      </div>
-                      <div
-                        className="sxp-partner-card sxp-float-card sxp-stuamb-card"
-                        title="Microsoft Student Ambassador"
-                        role="img"
-                        aria-label="Microsoft Student Ambassador"
-                      >
-                        <img
-                          src="/images/sponsors/Stu_amb_clean.png"
-                          alt="Microsoft Student Ambassador"
-                          className="sxp-partner-logo sxp-stuamb-logo"
-                          width={140}
-                          height={160}
-                        />
-                      </div>
-                      <div
-                        className="sxp-partner-card sxp-float-card-alt sxp-eventopia-card"
-                        title="Eventopia"
-                        role="img"
-                        aria-label="Eventopia"
-                      >
-                        <img
-                          src="/images/sponsors/Eventopia-Logo-04.png"
-                          alt="Eventopia"
-                          className="sxp-partner-logo sxp-eventopia-logo"
-                          width={170}
-                          height={44}
-                        />
+
+                      {/* Right column */}
+                      <div className="sxp-community-col">
+                        <div
+                          className="sxp-partner-card sxp-float-card sxp-coderush-card"
+                          title="CodeRush X"
+                          role="img"
+                          aria-label="CodeRush X"
+                        >
+                          <img
+                            src="/images/sponsors/CodeRush%20X%20Logo-dark.png"
+                            alt="CodeRush X"
+                            className="sxp-partner-logo sxp-coderush-logo"
+                            width={225}
+                            height={52}
+                          />
+                        </div>
+                        <div
+                          className="sxp-partner-card sxp-float-card-alt sxp-mahakash-card"
+                          title="GNIT Mahakash - The Space Club"
+                          role="img"
+                          aria-label="GNIT Mahakash - The Space Club"
+                        >
+                          <img
+                            src="/images/sponsors/FinalBlack.png"
+                            alt="GNIT Mahakash"
+                            className="sxp-partner-logo sxp-mahakash-logo"
+                            width={190}
+                            height={52}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* ── Bottom Row: Sponsor OSEN & Media Partner LNC Community ── */}
-                  <div className="sxp-bottom-tier-row">
-                    <div className="sxp-bottom-card-col sxp-osen-col">
-                      <span className="sxp-tier-badge">SPONSOR</span>
-                      <div
-                        className="sxp-partner-card sxp-float-card-alt sxp-osen-card"
-                        title="OSEN"
-                        role="img"
-                        aria-label="OSEN"
-                      >
-                        <img
-                          src="/images/sponsors/OSEN.png"
-                          alt="OSEN"
-                          className="sxp-partner-logo sxp-osen-logo"
-                          width={200}
-                          height={54}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sxp-bottom-card-col sxp-media-col">
-                      <span className="sxp-tier-badge">MEDIA PARTNER</span>
+                  {/* ── Media Partners ── */}
+                  <div className="sxp-partner-tier sxp-media-tier">
+                    <span className="sxp-tier-badge">MEDIA PARTNERS</span>
+                    <div className="sxp-media-grid">
                       <a
                         href="https://lnc-community.vercel.app"
                         target="_blank"
@@ -551,6 +560,20 @@ export default function SponsorStage() {
                           height={52}
                         />
                       </a>
+                      <div
+                        className="sxp-partner-card sxp-float-card-alt sxp-eventopia-card"
+                        title="Eventopia"
+                        role="img"
+                        aria-label="Eventopia"
+                      >
+                        <img
+                          src="/images/sponsors/Eventopia-Logo-04.png"
+                          alt="Eventopia"
+                          className="sxp-partner-logo sxp-eventopia-logo"
+                          width={170}
+                          height={44}
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -1093,8 +1116,20 @@ export default function SponsorStage() {
           z-index: 10;
         }
 
-        .sxp-platform-tier {
+        .sxp-top-tier-row {
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+          gap: clamp(14px, 1.8vw, 24px);
           margin-top: clamp(0.05rem, 0.2vh, 0.2rem);
+          z-index: 10;
+        }
+
+        .sxp-top-card-col {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.25rem;
         }
 
         .sxp-community-tier {
@@ -1102,21 +1137,15 @@ export default function SponsorStage() {
           margin-bottom: 0;
         }
 
-        .sxp-bottom-tier-row {
-          display: flex;
-          align-items: flex-start;
-          justify-content: center;
-          gap: clamp(14px, 1.8vw, 24px);
-          width: 100%;
-          max-width: 1020px;
+        .sxp-media-tier {
           margin-top: clamp(0.25rem, 0.6vh, 0.5rem);
         }
 
-        .sxp-bottom-card-col {
+        .sxp-media-grid {
           display: flex;
-          flex-direction: column;
           align-items: center;
-          gap: 0.2rem;
+          justify-content: center;
+          gap: clamp(12px, 1.5vw, 20px);
         }
 
         .sxp-tier-badge-placeholder {
@@ -1135,14 +1164,23 @@ export default function SponsorStage() {
         }
 
         .sxp-community-grid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, clamp(195px, 16.5vw, 245px)));
-          justify-content: center;
+          display: flex;
           align-items: center;
-          justify-items: center;
-          gap: clamp(10px, 1.2vw, 16px);
+          justify-content: center;
+          gap: clamp(12px, 1.5vw, 20px);
           width: 100%;
           max-width: 1020px;
+        }
+
+        .sxp-community-col {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: clamp(8px, 1vw, 14px);
+        }
+
+        .sxp-community-center {
+          flex-shrink: 0;
         }
 
         .sxp-tier-badge {
@@ -1200,22 +1238,34 @@ export default function SponsorStage() {
           display: block;
         }
 
-        /* ── Platform Partner: Devfolio Wide Tablet & Doodle Rays ── */
-        .sxp-devfolio-card-wrap {
+        /* ── Top Tier: Devfolio & OSEN Card Wraps with Radiant Rays ── */
+        .sxp-devfolio-card-wrap,
+        .sxp-osen-card-wrap {
           position: relative;
           display: inline-flex;
           align-items: center;
           justify-content: center;
         }
 
-        .sxp-devfolio-rays {
+        .sxp-rays {
           position: absolute;
-          top: -24px;
-          right: -16px;
-          width: clamp(38px, 3.8vw, 46px);
+          width: clamp(36px, 3.6vw, 46px);
           height: auto;
           pointer-events: none;
           z-index: 4;
+        }
+
+        /* Shifted to left of Devfolio card, mirrored to radiate upwards-left */
+        .sxp-rays-left {
+          top: -24px;
+          left: -16px;
+          transform: scaleX(-1);
+        }
+
+        /* Positioned on right side of OSEN card, radiating upwards-right */
+        .sxp-rays-right {
+          top: -24px;
+          right: -16px;
         }
 
         .sxp-devfolio-card {
@@ -1302,26 +1352,7 @@ export default function SponsorStage() {
           white-space: nowrap;
         }
 
-        /* ── Flanking Partners Vertical Staggering (React & CodeRush lower, Mahakash & Eventopia upper) ── */
-        .sxp-react-kolkata-card,
-        .sxp-coderush-card {
-          transform: translateY(clamp(16px, 1.8vh, 20px));
-        }
 
-        .sxp-react-kolkata-card:hover,
-        .sxp-coderush-card:hover {
-          transform: translateY(calc(clamp(16px, 1.8vh, 20px) - 3px)) scale(1.015);
-        }
-
-        .sxp-mahakash-card,
-        .sxp-eventopia-card {
-          transform: translateY(clamp(-20px, -1.8vh, -16px));
-        }
-
-        .sxp-mahakash-card:hover,
-        .sxp-eventopia-card:hover {
-          transform: translateY(calc(clamp(-20px, -1.8vh, -16px) - 3px)) scale(1.015);
-        }
 
         .sxp-coderush-logo {
           width: clamp(120px, 12vw, 155px);
@@ -1489,44 +1520,59 @@ export default function SponsorStage() {
             filter: brightness(1.35) contrast(1.15) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.18)) !important;
           }
 
-          /* ── Community Partners: pure flexbox layout with NO overlapping ── */
+          /* ── Community Partners: 3-column layout matching desktop ── */
           .sxp-community-grid {
             display: flex !important;
-            flex-wrap: wrap !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
             justify-content: center !important;
             align-items: center !important;
             gap: clamp(12px, 1.8vw, 18px) !important;
             width: 100% !important;
-            max-width: clamp(560px, 82vw, 720px) !important;
+            max-width: none !important;
+          }
+
+          .sxp-community-col {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: clamp(8px, 1vw, 12px) !important;
+            flex: 0 0 auto !important;
+          }
+
+          .sxp-community-center {
+            flex: 0 0 auto !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
           }
 
           /* Reset all vertical transform staggers so cards never collide */
           .sxp-react-kolkata-card,
           .sxp-coderush-card,
-          .sxp-mahakash-card,
-          .sxp-eventopia-card {
+          .sxp-mahakash-card {
             transform: none !important;
           }
 
           .sxp-react-kolkata-card:hover,
           .sxp-coderush-card:hover,
-          .sxp-mahakash-card:hover,
-          .sxp-eventopia-card:hover {
+          .sxp-mahakash-card:hover {
             transform: translateY(-2px) scale(1.015) !important;
           }
 
           .sxp-community-grid .sxp-partner-card:not(.sxp-stuamb-card) {
-            flex: 0 0 clamp(180px, 22vw, 220px) !important;
-            width: clamp(180px, 22vw, 220px) !important;
-            height: clamp(62px, 7vh, 72px) !important;
+            flex: 0 0 auto !important;
+            width: clamp(170px, 20vw, 215px) !important;
+            height: clamp(58px, 6.8vh, 68px) !important;
             border-radius: 18px;
           }
 
           /* Restored student ambassador card size */
           .sxp-community-grid .sxp-stuamb-card {
-            flex: 0 0 clamp(146px, 12.2vw, 175px) !important;
-            width: clamp(146px, 12.2vw, 175px) !important;
-            height: clamp(146px, 12.2vw, 175px) !important;
+            flex: 0 0 auto !important;
+            width: clamp(134px, 13.5vw, 160px) !important;
+            height: clamp(134px, 13.5vw, 160px) !important;
             aspect-ratio: 1 / 1 !important;
             border-radius: clamp(20px, 1.6vw, 24px) !important;
             padding: 0.35rem !important;
@@ -1536,7 +1582,7 @@ export default function SponsorStage() {
           }
 
           .sxp-community-grid .sxp-stuamb-card .sxp-stuamb-logo {
-            height: clamp(118px, 13.5vh, 150px) !important;
+            height: clamp(108px, 12vh, 135px) !important;
             width: auto !important;
             max-height: 94% !important;
             max-width: 92% !important;
@@ -1573,23 +1619,22 @@ export default function SponsorStage() {
             border-radius: 18px !important;
           }
 
-          .sxp-bottom-tier-row {
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: clamp(14px, 2vw, 20px) !important;
-            width: 100% !important;
-            margin-top: 0.35rem !important;
+          .sxp-top-tier-row {
+            gap: clamp(12px, 1.6vw, 18px) !important;
           }
 
-          .sxp-bottom-card-col {
-            flex: 0 0 auto !important;
+          .sxp-osen-card {
+            width: clamp(170px, 22vw, 215px) !important;
+            height: clamp(56px, 6.5vh, 66px) !important;
+            border-radius: 18px !important;
           }
 
-          .sxp-osen-card,
-          .sxp-lnc-card {
-            flex: 0 0 auto !important;
+          .sxp-media-grid {
+            gap: clamp(12px, 1.6vw, 18px) !important;
+          }
+
+          .sxp-lnc-card,
+          .sxp-media-grid .sxp-eventopia-card {
             width: clamp(170px, 22vw, 215px) !important;
             height: clamp(56px, 6.5vh, 66px) !important;
             border-radius: 18px !important;
@@ -1665,23 +1710,39 @@ export default function SponsorStage() {
           }
 
           .sxp-community-grid {
-            max-width: clamp(520px, 76vw, 620px) !important;
-            gap: 12px !important;
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: 10px !important;
+            width: 100% !important;
+            max-width: none !important;
+          }
+
+          .sxp-community-col {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+            flex: 0 0 auto !important;
           }
 
           .sxp-community-grid .sxp-partner-card:not(.sxp-stuamb-card) {
-            flex: 0 0 clamp(160px, 21vw, 185px) !important;
-            width: clamp(160px, 21vw, 185px) !important;
-            height: 60px !important;
+            flex: 0 0 auto !important;
+            width: clamp(140px, 18vw, 168px) !important;
+            height: 52px !important;
+            border-radius: 16px !important;
           }
 
           /* Restored student ambassador card size */
           .sxp-community-grid .sxp-stuamb-card {
-            flex: 0 0 clamp(130px, 15vw, 150px) !important;
-            width: clamp(130px, 15vw, 150px) !important;
-            height: clamp(130px, 15vw, 150px) !important;
+            flex: 0 0 auto !important;
+            width: clamp(112px, 14.5vw, 126px) !important;
+            height: clamp(112px, 14.5vw, 126px) !important;
             aspect-ratio: 1 / 1 !important;
-            border-radius: 22px !important;
+            border-radius: 18px !important;
             padding: 0.35rem !important;
             display: flex !important;
             align-items: center !important;
@@ -1689,7 +1750,7 @@ export default function SponsorStage() {
           }
 
           .sxp-community-grid .sxp-stuamb-card .sxp-stuamb-logo {
-            height: clamp(105px, 11.5vh, 130px) !important;
+            height: clamp(88px, 10.5vh, 104px) !important;
             width: auto !important;
             max-height: 94% !important;
             max-width: 92% !important;
@@ -1722,11 +1783,27 @@ export default function SponsorStage() {
             border-radius: 18px !important;
           }
 
-          .sxp-osen-card,
-          .sxp-lnc-card {
+          .sxp-top-tier-row {
+            flex-wrap: wrap;
+            gap: 10px !important;
+          }
+
+          .sxp-osen-card {
+            width: clamp(155px, 21vw, 185px) !important;
+            height: 54px !important;
+            border-radius: 18px !important;
+          }
+
+          .sxp-media-grid {
+            gap: 10px !important;
+          }
+
+          .sxp-lnc-card,
+          .sxp-media-grid .sxp-eventopia-card {
             flex: 0 0 auto !important;
             width: clamp(155px, 21vw, 185px) !important;
             height: 54px !important;
+            border-radius: 18px !important;
           }
         }
 
@@ -1736,39 +1813,47 @@ export default function SponsorStage() {
           }
           .sxp { --sxp-track: 250vh; }
           .sxp-body {
-            justify-content: flex-start;
-            padding-top: clamp(4.8rem, 11vh, 5.8rem);
-            padding-bottom: clamp(1.6rem, 4vh, 2.6rem);
+            justify-content: center !important;
+            align-items: center !important;
+            padding-top: clamp(2.6rem, 5.5vh, 4rem) !important;
+            padding-bottom: clamp(1.2rem, 2.5vh, 2rem) !important;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
           }
+          .sxp-ornament-wrap {
+            margin-bottom: clamp(0.15rem, 0.5vh, 0.35rem) !important;
+          }
           .sxp-crown {
-            width: clamp(85px, 24vw, 120px) !important;
-            margin-bottom: 0.2rem !important;
+            width: clamp(114px, 56.87px + 15.87vw, 260px) !important;
+            height: auto !important;
+            margin-bottom: 0.05rem !important;
           }
           .sxp-eyebrow {
-            font-size: 0.64rem;
-            margin-bottom: 0.2rem;
+            font-size: 0.54rem !important;
+            letter-spacing: 0.14em !important;
+            margin-bottom: 0.05rem !important;
             color: #1b381a;
             font-weight: 600;
           }
           .sxp-heading {
-            font-size: clamp(1.75rem, 6.5vw, 2.2rem);
-            margin-bottom: 0.2rem;
+            font-size: clamp(1.4rem, 5.2vw, 1.85rem) !important;
+            margin-bottom: 0.05rem !important;
           }
           .sxp-lede {
-            font-size: 0.82rem;
-            line-height: 1.35;
-            max-width: 22rem;
-            margin-bottom: 0.35rem;
+            font-size: 0.72rem !important;
+            line-height: 1.28 !important;
+            max-width: 19rem !important;
+            margin-bottom: 0.15rem !important;
             color: #263e24;
           }
           .sxp-tier-badge {
-            font-size: 0.62rem;
-            margin-bottom: 0.1rem;
+            font-size: 0.54rem !important;
+            letter-spacing: 0.12em !important;
+            margin-bottom: 0.04rem !important;
           }
           .sxp-inner {
-            gap: clamp(0.2rem, 0.6vh, 0.4rem);
+            gap: 0.1rem !important;
+            align-items: center !important;
           }
           .sxp-inner::before {
             width: 100vw;
@@ -1783,142 +1868,196 @@ export default function SponsorStage() {
             filter: blur(28px);
           }
           .sxp-partner-tier {
-            gap: 0.15rem;
+            gap: 0.1rem !important;
+            margin-top: 0.05rem !important;
+            align-items: center !important;
           }
-          .sxp-devfolio-card-wrap {
-            margin-top: 0.1rem;
+          .sxp-platform-tier {
+            margin-top: 0 !important;
           }
-          .sxp-devfolio-rays {
-            width: 28px;
-            top: -16px;
-            right: -8px;
+          .sxp-community-tier {
+            margin-top: 0.15rem !important;
+            margin-bottom: 0 !important;
+          }
+
+          /* Top tier: Devfolio + OSEN side-by-side row on mobile */
+          .sxp-top-tier-row {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: flex-end !important;
+            justify-content: center !important;
+            gap: 8px !important;
+            width: min(94vw, 350px) !important;
+          }
+          .sxp-top-card-col {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+          }
+          .sxp-devfolio-card-wrap,
+          .sxp-osen-card-wrap {
+            margin-top: 0 !important;
+          }
+          .sxp-devfolio-rays,
+          .sxp-rays {
+            display: none !important;
           }
           .sxp-devfolio-card {
             flex: 0 0 auto !important;
-            width: min(90vw, 320px) !important;
-            height: 52px !important;
-            border-radius: 16px !important;
+            width: clamp(170px, 48vw, 195px) !important;
+            height: 46px !important;
+            border-radius: 14px !important;
           }
           .sxp-devfolio-content {
-            padding-inline: 1rem;
+            padding-inline: 0.6rem !important;
           }
           .sxp-devfolio-logo {
-            height: 20px;
+            height: 16px !important;
+            width: auto !important;
           }
           .sxp-devfolio-divider {
-            height: 20px;
-            margin-inline: 0.75rem;
+            height: 15px !important;
+            margin-inline: 0.4rem !important;
           }
           .sxp-devfolio-tagline {
-            font-size: 0.48rem;
-            gap: 1.5px;
+            font-size: 0.42rem !important;
+            gap: 1px !important;
           }
-          .sxp-community-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            align-items: center;
-            justify-items: center;
-            gap: 7px;
-            width: min(90vw, 320px);
-          }
-          .sxp-partner-card {
+          .sxp-osen-card {
             flex: 0 0 auto !important;
+            width: clamp(116px, 33vw, 135px) !important;
+            height: 46px !important;
+            border-radius: 14px !important;
+            padding: 0 0.4rem !important;
+          }
+          .sxp-osen-logo {
+            max-height: 20px !important;
+            width: auto !important;
+            max-width: 85% !important;
+          }
+
+          /* Community grid: 3-column balanced composition fitting within viewport */
+          .sxp-community-grid {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: 6px !important;
             width: 100% !important;
-            height: 48px !important;
-            border-radius: 16px;
-            padding: 0 0.5rem;
+            max-width: 350px !important;
+            margin-inline: auto !important;
+          }
+          .sxp-community-col {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            flex: 0 0 auto !important;
+          }
+          .sxp-community-grid .sxp-partner-card:not(.sxp-stuamb-card) {
+            flex: 0 0 auto !important;
+            width: clamp(100px, 28vw, 114px) !important;
+            height: 42px !important;
+            border-radius: 12px !important;
+            padding: 0 0.35rem !important;
           }
           .sxp-react-kolkata-card,
           .sxp-coderush-card,
-          .sxp-mahakash-card,
-          .sxp-eventopia-card {
+          .sxp-mahakash-card {
             transform: none !important;
           }
           .sxp-react-kolkata-card:hover,
           .sxp-coderush-card:hover,
-          .sxp-mahakash-card:hover,
-          .sxp-eventopia-card:hover {
+          .sxp-mahakash-card:hover {
             transform: translateY(-2px) scale(1.015) !important;
           }
-          .sxp-stuamb-card {
-            width: clamp(84px, 24vw, 100px) !important;
-            height: clamp(84px, 24vw, 100px) !important;
-            aspect-ratio: 1 / 1 !important;
-            border-radius: 18px !important;
-            padding: 0.4rem !important;
-          }
           .sxp-react-kolkata-logo {
-            max-height: 22px;
-            width: auto;
-            max-width: 88%;
+            max-height: 18px !important;
+            width: auto !important;
+            max-width: 88% !important;
+          }
+          .sxp-innofusion-card {
+            padding: 0 0.35rem !important;
+          }
+          .sxp-innofusion-content {
+            gap: 0.25rem !important;
           }
           .sxp-innofusion-logo {
-            height: 18px;
-            width: 18px;
+            height: 14px !important;
+            width: 14px !important;
           }
           .sxp-innofusion-brand {
-            font-size: 0.8rem;
+            font-size: 0.60rem !important;
+            letter-spacing: 0.01em !important;
+            font-weight: 700 !important;
+            white-space: nowrap !important;
           }
-          .sxp-coderush-logo {
-            max-height: 20px;
-            width: auto;
-            max-width: 88%;
-          }
-          .sxp-mahakash-logo {
-            max-height: 27px;
-            width: auto;
-            max-width: 90%;
+          .sxp-stuamb-card {
+            flex: 0 0 auto !important;
+            width: clamp(84px, 23vw, 92px) !important;
+            height: clamp(84px, 23vw, 92px) !important;
+            aspect-ratio: 1 / 1 !important;
+            border-radius: 14px !important;
+            padding: 0.25rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
           }
           .sxp-stuamb-logo {
-            max-height: 68px !important;
+            max-height: 64px !important;
             width: auto !important;
-            max-width: 86% !important;
+            max-width: 88% !important;
           }
-          .sxp-eventopia-logo {
-            max-height: 18px;
-            width: auto;
-            max-width: 88%;
+          .sxp-coderush-logo {
+            max-height: 16px !important;
+            width: auto !important;
+            max-width: 88% !important;
           }
-          .sxp-bottom-tier-row {
-            display: flex;
-            flex-direction: row;
-            align-items: flex-end;
-            justify-content: center;
-            gap: 8px;
-            width: min(90vw, 320px);
-            margin-top: 0.2rem;
+          .sxp-mahakash-logo {
+            max-height: 20px !important;
+            width: auto !important;
+            max-width: 90% !important;
           }
-          .sxp-bottom-card-col {
-            flex: 1 1 calc(50% - 4px);
-            width: calc(50% - 4px);
-            min-width: 0;
+
+          /* Media partners: side by side on phone */
+          .sxp-media-grid {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: 8px !important;
+            width: min(94vw, 350px) !important;
           }
-          .sxp-osen-card, .sxp-lnc-card {
+          .sxp-media-grid .sxp-lnc-card,
+          .sxp-media-grid .sxp-eventopia-card {
             flex: 0 0 auto !important;
-            width: 100% !important;
-            height: 48px !important;
-            border-radius: 16px !important;
-            padding: 0 0.5rem !important;
-          }
-          .sxp-osen-logo {
-            max-height: 24px !important;
-            width: auto !important;
-            max-width: 85% !important;
+            width: clamp(140px, 42vw, 156px) !important;
+            height: 44px !important;
+            border-radius: 12px !important;
+            padding: 0 0.4rem !important;
           }
           .sxp-lnc-logo {
-            max-height: 24px !important;
+            max-height: 20px !important;
             width: auto !important;
             max-width: 85% !important;
           }
+          .sxp-eventopia-logo {
+            max-height: 15px !important;
+            width: auto !important;
+            max-width: 88% !important;
+          }
           .sxp-unrevealed-note {
-            font-size: 0.72rem;
-            margin-top: 0.4rem;
-            text-align: center;
-            padding-inline: 1rem;
+            font-size: 0.64rem !important;
+            margin-top: 0.15rem !important;
+            margin-bottom: 0 !important;
+            text-align: center !important;
+            padding-inline: 0.6rem !important;
           }
           .sxp-cta-wrap {
-            margin-top: 0.45rem;
-            transform: scale(0.92);
+            margin-top: 0.18rem !important;
+            transform: scale(0.85) !important;
           }
         }
 
