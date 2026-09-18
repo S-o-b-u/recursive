@@ -50,6 +50,7 @@ export function triggerScrollExpand(
     target;
 
   const isSponsors = target.id === "sponsors" || target.classList.contains("sxp");
+
   if (isTouch) {
     target.scrollIntoView({ behavior: "smooth", block: "start" });
     if (!isSponsors) {
@@ -80,15 +81,19 @@ export function triggerScrollExpand(
         );
 
   // 1. Smooth scroll to target with fluid Apple curve
+  const scrollOffset = options.offset ?? 0;
+
   if (lenis) {
     lenis.scrollTo(target, {
-      offset: options.offset ?? 0,
+      offset: scrollOffset,
       duration: scrollDuration,
       easing: (t) => 1 - Math.pow(1 - t, 4.2),
     });
   } else {
     target.scrollIntoView({ behavior: "smooth" });
   }
+
+  if (isSponsors) return;
 
   // 2. Ultra-smooth physical expansion on the targeted section
   gsap.killTweensOf(content);

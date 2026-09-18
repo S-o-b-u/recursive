@@ -13,7 +13,41 @@ const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export default function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
   const reduced = useReducedMotion();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const checkHash = () => {
+      const h = window.location.hash || "";
+      if (h) setActiveSection(h);
+    };
+    checkHash();
+    window.addEventListener("hashchange", checkHash);
+
+    const sectionIds = ["about", "themes", "judges", "sponsors", "faq"];
+    const elements = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveSection("#" + entry.target.id);
+          }
+        }
+      },
+      { rootMargin: "-25% 0px -45% 0px" }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+
+    return () => {
+      window.removeEventListener("hashchange", checkHash);
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -59,9 +93,18 @@ export default function Navigation() {
               </NavLink>
 
               <div className="nav-desktop-links">
-                {NAV_LINKS.map((link) => (
-                  <NavLink key={link.href} href={link.href} label={link.label} />
-                ))}
+                {NAV_LINKS.map((link) => {
+                  const hash = link.href.startsWith("/#") ? link.href.slice(1) : link.href;
+                  const isAct = activeSection === hash;
+                  return (
+                    <NavLink
+                      key={link.href}
+                      href={link.href}
+                      label={link.label}
+                      isActive={isAct}
+                    />
+                  );
+                })}
               </div>
 
               {/* Mobile toggle */}
@@ -330,6 +373,11 @@ export default function Navigation() {
         .nav-link:hover {
           color: var(--color-accent-deep);
           background-color: rgba(255, 255, 255, 0.5);
+        }
+        .nav-link.is-active {
+          color: #121A12;
+          background-color: rgba(143, 196, 90, 0.32);
+          font-weight: 600;
         }
         /* full static outline under the travelling highlight */
         .nav-link.is-hovered,

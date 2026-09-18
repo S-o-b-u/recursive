@@ -35,12 +35,14 @@ export default function NavLink({
   children,
   className = "nav-link",
   ariaLabel,
+  isActive,
 }: {
   href: string;
   label?: string;
   children?: ReactNode;
   className?: string;
   ariaLabel?: string;
+  isActive?: boolean;
 }) {
   const [hovered, setHovered] = useState(false);
   const [tapped, setTapped] = useState(false);
@@ -84,6 +86,7 @@ export default function NavLink({
 
   const cls = [
     className,
+    isActive ? "is-active" : "",
     hovered ? "is-hovered" : "",
     tapped ? "is-tapped" : "",
   ]
