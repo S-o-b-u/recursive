@@ -251,8 +251,9 @@ export const SPONSOR_SLOTS: Slot[] = [
   { label: "CODERUSH X LOGO", expect: "/images/sponsors/CodeRush X Logo.png", src: "/images/sponsors/CodeRush X Logo.png" },
   { label: "LNC LOGO", expect: "/images/sponsors/LNC.png", src: "/images/sponsors/LNC.png" },
   { label: "MICROSOFT STUDENT AMBASSADOR LOGO", expect: "/images/sponsors/Stu amb.png", src: "/images/sponsors/Stu amb.png" },
-  { label: "Sponsor 07", expect: "/images/sponsors/07.svg", src: "" },
-  { label: "Sponsor 08", expect: "/images/sponsors/08.svg", src: "" },
+  { label: "OSEN LOGO", expect: "/images/sponsors/OSEN.png", src: "/images/sponsors/OSEN.png" },
+  { label: "EVENTOPIA LOGO", expect: "/images/sponsors/Eventopia-Logo-04.png", src: "/images/sponsors/Eventopia-Logo-04.png" },
+  { label: "GNIT MAHAKASH LOGO", expect: "/images/sponsors/FinalBlack.png", src: "/images/sponsors/FinalBlack.png" },
 ];
 
 export type ScheduleDay = {

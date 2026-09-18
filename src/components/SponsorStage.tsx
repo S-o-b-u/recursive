@@ -4,9 +4,8 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SPONSOR_SLOTS, EVENT } from "@/data/hackathon";
-import MediaSlot from "@/components/ui/MediaSlot";
-import Ornament from "@/components/ui/Ornament";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
+import Ornament from "@/components/ui/Ornament";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -223,13 +222,13 @@ export default function SponsorStage() {
           }
         }
 
-        // 2. Smooth bidirectional crossfade for the night field and local plate.
+        // 2. Smooth bidirectional crossfade for the night field.
         const op = Math.max(0, Math.min(1, (1 - p) * 2.8));
         if (Math.abs(op - lastOp) > 0.008 || (op === 0 && lastOp !== 0) || (op === 1 && lastOp !== 1)) {
           lastOp = op;
           const opStr = op.toFixed(3);
-          if (plate) plate.style.opacity = opStr;
           if (night) night.style.opacity = opStr;
+          if (plate) plate.style.opacity = opStr;
         }
 
         // 3. The night-side labels step aside smoothly and return gracefully on close.
@@ -344,156 +343,270 @@ export default function SponsorStage() {
             </div>
 
             <div ref={bodyRef} className="sxp-body">
-              <div className="sxp-inner">
-                <Ornament className="sxp-motif" />
-                <span className="sxp-eyebrow">Supporters &amp; partners</span>
-                <h2 className="sxp-heading">Our Sponsors</h2>
-                <p className="sxp-lede">
-                  {sealed
-                    ? "The backers are lined up. Organization names stay sealed until the official reveal."
-                    : "Organizations and platforms empowering the builders on the hill."}
-                </p>
-
-                {/* ── Devfolio Platform Partner ── */}
-                <div className="sxp-partner-tier">
-                  <span className="sxp-tier-badge">PLATFORM PARTNER</span>
-                  <a
-                    href="https://devfolio.co"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="sxp-partner-card sxp-float-card"
-                    title="Devfolio"
-                  >
+              <div className="sxp-stage-layout">
+                {/* ── Left Artifacts Wing (Ideas doodle, Victoria Memorial polaroid with botanical branch) ── */}
+                <div className="sxp-artifacts-wing sxp-wing-left" aria-hidden="true">
+                  <div className="sxp-artifact-item sxp-art-doodle-left">
                     <img
-                      src="/images/sponsors/devfolio-white.png"
-                      alt="DEVFOLIO LOGO"
-                      className="sxp-partner-logo"
-                      width={220}
-                      height={44}
+                      src="/images/ui/doodle_ideas_impact.png"
+                      alt=""
+                      className="sxp-art-img sxp-doodle-ideas-img"
+                      width={159}
+                      height={127}
                     />
-                  </a>
-                </div>
-
-                {/* ── Community Partners ── */}
-                <div className="sxp-partner-tier sxp-community-tier">
-                  <span className="sxp-tier-badge">COMMUNITY PARTNERS</span>
-                  <div className="sxp-partner-row">
-                    <a
-                      href="https://reactkolkata.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="sxp-partner-card sxp-float-card sxp-react-kolkata-card"
-                      title="React Kolkata"
-                      aria-label="React Kolkata"
-                    >
-                      <img
-                        src="/images/sponsors/react-kolkata-logo-full-light.png"
-                        alt="React Kolkata"
-                        className="sxp-partner-logo sxp-react-kolkata-logo"
-                        width={138}
-                        height={44}
-                      />
-                    </a>
-                    <div
-                      className="sxp-partner-card sxp-float-card-alt sxp-innofusion-card"
-                      title="INNOFUSION 3.0"
-                      role="img"
-                      aria-label="INNOFUSION 3.0"
-                    >
-                      <img
-                        src="/images/sponsors/INNOFUSION%203.0%20logo.png"
-                        alt="INNOFUSION 3.0"
-                        className="sxp-partner-logo sxp-innofusion-logo"
-                        width={42}
-                        height={42}
-                      />
-                      <span className="sxp-innofusion-brand">INNOFUSION 3.0</span>
-                    </div>
-                    <div
-                      className="sxp-partner-card sxp-float-card sxp-coderush-card"
-                      title="CodeRush X"
-                      role="img"
-                      aria-label="CodeRush X"
-                    >
-                      <img
-                        src="/images/sponsors/CodeRush%20X%20Logo.png"
-                        alt="CodeRush X"
-                        className="sxp-partner-logo sxp-coderush-logo"
-                        width={180}
-                        height={45}
-                      />
-                    </div>
                   </div>
-                  <div className="sxp-partner-row sxp-partner-subrow">
-                    <div
-                      className="sxp-partner-card sxp-float-card-alt sxp-stuamb-card"
-                      title="Microsoft Student Ambassador"
-                      role="img"
-                      aria-label="Microsoft Student Ambassador"
-                    >
-                      <img
-                        src="/images/sponsors/Stu%20amb.png"
-                        alt="Microsoft Student Ambassador"
-                        className="sxp-partner-logo sxp-stuamb-logo"
-                        width={143}
-                        height={168}
-                      />
-                    </div>
+                  <div className="sxp-polaroid-group sxp-polaroid-group-left">
+                    <img
+                      src="/images/ui/polaroid_victoria.png"
+                      alt=""
+                      className="sxp-art-img sxp-polaroid-victoria-img"
+                      width={240}
+                      height={217}
+                    />
                   </div>
                 </div>
 
-                {/* ── Media Partner ── */}
-                <div className="sxp-partner-tier sxp-media-tier">
-                  <span className="sxp-tier-badge">MEDIA PARTNER</span>
-                  <div className="sxp-partner-row">
-                    <a
-                      href="https://lnc-community.vercel.app"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="sxp-partner-card sxp-float-card sxp-lnc-card"
-                      title="LNC Community"
-                      aria-label="LNC Community"
-                    >
-                      <img
-                        src="/images/sponsors/LNC.png"
-                        alt="LNC Community"
-                        className="sxp-partner-logo sxp-lnc-logo"
-                        width={130}
-                        height={44}
-                      />
-                    </a>
+                {/* ── Center Stage Content (Headers, Cards, CTA) ── */}
+                <div className="sxp-inner">
+                  <div className="sxp-ornament-wrap">
+                    <Ornament className="sxp-crown" tone="light" />
                   </div>
-                  <span className="sxp-unrevealed-note">
-                    More community partners &amp; sponsors revealing soon
-                  </span>
-                </div>
+                  <span className="sxp-eyebrow">Supporters &amp; partners</span>
+                  <h2 className="sxp-heading">Our Sponsors</h2>
+                  <p className="sxp-lede">
+                    {sealed
+                      ? "The backers are lined up. Organization names stay sealed until the official reveal."
+                      : "Organizations and platforms empowering the builders on the hill."}
+                  </p>
 
-                <div className="sxp-cta-wrap">
-                  <LiquidMetalButton
-                    label="Partner with this edition"
-                    href={EVENT.sponsorUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    iconPosition="right"
-                    icon={
-                      <svg
-                        viewBox="0 0 24 24"
-                        width={14}
-                        height={14}
-                        style={{ marginLeft: 2, display: "inline-block" }}
+                  {/* ── Platform Partner: Devfolio with doodle rays ── */}
+                  <div className="sxp-partner-tier sxp-platform-tier">
+                    <span className="sxp-tier-badge">PLATFORM PARTNER</span>
+                    <div className="sxp-devfolio-card-wrap">
+                      <img
+                        src="/images/ui/devfolio_rays.png"
+                        alt=""
+                        className="sxp-devfolio-rays"
                         aria-hidden="true"
+                        width={48}
+                        height={48}
+                      />
+                      <a
+                        href="https://devfolio.co"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="sxp-partner-card sxp-float-card sxp-devfolio-card"
+                        title="Devfolio"
                       >
-                        <path
-                          d="M5 12h14M13 6l6 6-6 6"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                        <div className="sxp-devfolio-content">
+                          <img
+                            src="/images/sponsors/devfolio.png"
+                            alt="Devfolio"
+                            className="sxp-devfolio-logo"
+                            width={175}
+                            height={42}
+                          />
+                          <div className="sxp-devfolio-divider" aria-hidden="true" />
+                          <div className="sxp-devfolio-tagline">
+                            <span>BUILD</span>
+                            <span>FOR</span>
+                            <span>BUILDERS</span>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* ── Community Partners ── */}
+                  <div className="sxp-partner-tier sxp-community-tier">
+                    <span className="sxp-tier-badge">COMMUNITY PARTNERS</span>
+                    <div className="sxp-community-grid">
+                      <a
+                        href="https://reactkolkata.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="sxp-partner-card sxp-float-card sxp-react-kolkata-card"
+                        title="React Kolkata"
+                        aria-label="React Kolkata"
+                      >
+                        <img
+                          src="/images/sponsors/react-kolkata-logo-dark.png"
+                          alt="React Kolkata"
+                          className="sxp-partner-logo sxp-react-kolkata-logo"
+                          width={216}
+                          height={69}
                         />
-                      </svg>
-                    }
-                  />
+                      </a>
+                      <div
+                        className="sxp-partner-card sxp-float-card-alt sxp-innofusion-card"
+                        title="INNOFUSION 3.0"
+                        role="img"
+                        aria-label="INNOFUSION 3.0"
+                      >
+                        <div className="sxp-innofusion-content">
+                          <img
+                            src="/images/sponsors/INNOFUSION%203.0%20logo.png"
+                            alt="INNOFUSION 3.0"
+                            className="sxp-innofusion-logo"
+                            width={40}
+                            height={40}
+                          />
+                          <span className="sxp-innofusion-brand">INNOFUSION 3.0</span>
+                        </div>
+                      </div>
+                      <div
+                        className="sxp-partner-card sxp-float-card sxp-coderush-card"
+                        title="CodeRush X"
+                        role="img"
+                        aria-label="CodeRush X"
+                      >
+                        <img
+                          src="/images/sponsors/CodeRush%20X%20Logo-dark.png"
+                          alt="CodeRush X"
+                          className="sxp-partner-logo sxp-coderush-logo"
+                          width={225}
+                          height={52}
+                        />
+                      </div>
+                      <div
+                        className="sxp-partner-card sxp-float-card-alt sxp-mahakash-card"
+                        title="GNIT Mahakash - The Space Club"
+                        role="img"
+                        aria-label="GNIT Mahakash - The Space Club"
+                      >
+                        <img
+                          src="/images/sponsors/FinalBlack.png"
+                          alt="GNIT Mahakash"
+                          className="sxp-partner-logo sxp-mahakash-logo"
+                          width={190}
+                          height={52}
+                        />
+                      </div>
+                      <div
+                        className="sxp-partner-card sxp-float-card sxp-stuamb-card"
+                        title="Microsoft Student Ambassador"
+                        role="img"
+                        aria-label="Microsoft Student Ambassador"
+                      >
+                        <img
+                          src="/images/sponsors/Stu_amb_clean.png"
+                          alt="Microsoft Student Ambassador"
+                          className="sxp-partner-logo sxp-stuamb-logo"
+                          width={140}
+                          height={160}
+                        />
+                      </div>
+                      <div
+                        className="sxp-partner-card sxp-float-card-alt sxp-eventopia-card"
+                        title="Eventopia"
+                        role="img"
+                        aria-label="Eventopia"
+                      >
+                        <img
+                          src="/images/sponsors/Eventopia-Logo-04.png"
+                          alt="Eventopia"
+                          className="sxp-partner-logo sxp-eventopia-logo"
+                          width={170}
+                          height={44}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ── Bottom Row: Sponsor OSEN & Media Partner LNC Community ── */}
+                  <div className="sxp-bottom-tier-row">
+                    <div className="sxp-bottom-card-col sxp-osen-col">
+                      <span className="sxp-tier-badge">SPONSOR</span>
+                      <div
+                        className="sxp-partner-card sxp-float-card-alt sxp-osen-card"
+                        title="OSEN"
+                        role="img"
+                        aria-label="OSEN"
+                      >
+                        <img
+                          src="/images/sponsors/OSEN.png"
+                          alt="OSEN"
+                          className="sxp-partner-logo sxp-osen-logo"
+                          width={200}
+                          height={54}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sxp-bottom-card-col sxp-media-col">
+                      <span className="sxp-tier-badge">MEDIA PARTNER</span>
+                      <a
+                        href="https://lnc-community.vercel.app"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="sxp-partner-card sxp-float-card sxp-lnc-card"
+                        title="LNC Community"
+                        aria-label="LNC Community"
+                      >
+                        <img
+                          src="/images/sponsors/LNC.png"
+                          alt="LNC Community"
+                          className="sxp-partner-logo sxp-lnc-logo"
+                          width={195}
+                          height={52}
+                        />
+                      </a>
+                    </div>
+                  </div>
+
+                  <span className="sxp-unrevealed-note">
+                    More community partners &amp; sponsors revealing soon.
+                  </span>
+
+                  <div className="sxp-cta-wrap">
+                    <LiquidMetalButton
+                      label="Partner with this edition"
+                      href={EVENT.sponsorUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      iconPosition="right"
+                      icon={
+                        <svg
+                          viewBox="0 0 24 24"
+                          width={14}
+                          height={14}
+                          style={{ marginLeft: 2, display: "inline-block" }}
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M5 12h14M13 6l6 6-6 6"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      }
+                    />
+                  </div>
+                </div>
+
+                {/* ── Right Artifacts Wing (Howrah Bridge polaroid with washi tape & botanical branch, Tomorrow doodle) ── */}
+                <div className="sxp-artifacts-wing sxp-wing-right" aria-hidden="true">
+                  <div className="sxp-polaroid-group sxp-polaroid-group-right">
+                    <img
+                      src="/images/ui/polaroid_howrah.png"
+                      alt=""
+                      className="sxp-art-img sxp-polaroid-howrah-img"
+                      width={250}
+                      height={189}
+                    />
+                  </div>
+                  <div className="sxp-artifact-item sxp-art-doodle-right">
+                    <img
+                      src="/images/ui/doodle_building_tomorrow.png"
+                      alt=""
+                      className="sxp-art-img sxp-doodle-tomorrow-img"
+                      width={165}
+                      height={134}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -692,9 +805,8 @@ export default function SponsorStage() {
           background-color: var(--color-bg);
           background-image: url("/images/bg/cloud.jpg");
           background-size: cover;
-          background-position: center top;
+          background-position: center 25%;
           background-repeat: no-repeat;
-          will-change: opacity;
           transform: translateZ(0);
           -webkit-transform: translateZ(0);
           backface-visibility: hidden;
@@ -758,8 +870,8 @@ export default function SponsorStage() {
           align-items: center;
           justify-content: center;
           padding-inline: var(--padding-x);
-          padding-top: clamp(2.5rem, 5vh, 4.5rem);
-          padding-bottom: clamp(2.5rem, 5vh, 4.5rem);
+          padding-top: clamp(4.5rem, 8vh, 5.8rem);
+          padding-bottom: clamp(1.2rem, 2.5vh, 2.2rem);
           opacity: 0;
           pointer-events: none;
           will-change: transform, opacity;
@@ -768,53 +880,206 @@ export default function SponsorStage() {
           backface-visibility: hidden;
         }
 
+        /* ── Main Stage Layout wrapping Wings & Center ── */
+        .sxp-stage-layout {
+          position: relative;
+          width: 100%;
+          max-width: min(98vw, 98rem);
+          margin-inline: auto;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        /* ── Side Artifacts Wings ── */
+        .sxp-artifacts-wing {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: clamp(210px, 19vw, 280px);
+          pointer-events: none;
+          z-index: 1;
+          user-select: none;
+        }
+
+        .sxp-wing-left {
+          left: max(0.5rem, calc(50% - 33.5rem));
+        }
+
+        .sxp-wing-right {
+          right: max(0.5rem, calc(50% - 33.5rem));
+        }
+
+        /* ── Left wing: doodle on top, polaroid on bottom ── */
+        .sxp-art-doodle-left {
+          position: absolute;
+          top: clamp(23%, 25vh, 28%);
+          left: clamp(5rem, 7vw, 7.5rem);
+          z-index: 3;
+        }
+
+        .sxp-polaroid-group.sxp-polaroid-group-left {
+          position: absolute;
+          top: clamp(44%, 47vh, 50%);
+          left: clamp(-5.0rem, -4.6vw, -3.2rem);
+          z-index: 1;
+        }
+
+        /* ── Right wing: polaroid behind CodeRush X, doodle on bottom ── */
+        .sxp-polaroid-group.sxp-polaroid-group-right {
+          position: absolute;
+          top: clamp(27%, 30vh, 33%);
+          left: clamp(0.8rem, 1.4vw, 2.4rem);
+          right: auto;
+          z-index: 1;
+        }
+
+        .sxp-art-doodle-right {
+          position: absolute;
+          top: clamp(62%, 66vh, 69%);
+          right: clamp(0.2rem, 1.2vw, 1.8rem);
+          z-index: 3;
+        }
+
+        /* Polaroid groups */
+        .sxp-polaroid-group {
+          position: relative;
+        }
+
+        .sxp-polaroid-victoria-img {
+          position: relative;
+          z-index: 2;
+          width: clamp(200px, 18vw, 255px);
+          height: auto;
+          transform: rotate(-10deg);
+          filter: drop-shadow(0 20px 38px rgba(0, 0, 0, 0.40)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.25));
+          transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .sxp-wing-left:hover .sxp-polaroid-victoria-img {
+          transform: scale(1.03) rotate(-8deg);
+        }
+
+        .sxp-polaroid-howrah-img {
+          position: relative;
+          z-index: 2;
+          width: clamp(205px, 18.5vw, 265px);
+          height: auto;
+          transform: rotate(8.5deg);
+          filter: drop-shadow(0 20px 38px rgba(0, 0, 0, 0.40)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.25));
+          transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .sxp-wing-right:hover .sxp-polaroid-howrah-img {
+          transform: scale(1.03) rotate(10.5deg);
+        }
+
+        .sxp-doodle-ideas-img {
+          width: clamp(115px, 10.5vw, 155px);
+          height: auto;
+          display: block;
+          transform: rotate(-9deg);
+          filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+          transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .sxp-wing-left:hover .sxp-doodle-ideas-img {
+          transform: scale(1.04) rotate(-7deg);
+        }
+
+        .sxp-doodle-tomorrow-img {
+          width: clamp(120px, 11vw, 160px);
+          height: auto;
+          display: block;
+          transform: rotate(9deg);
+          filter: brightness(1.25) contrast(1.1) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.22));
+          transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1), filter 280ms ease;
+        }
+
+        .sxp-wing-right:hover .sxp-doodle-tomorrow-img {
+          transform: scale(1.04) rotate(11deg);
+          filter: brightness(1.35) contrast(1.15) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.18));
+        }
+
+        /* ── Center Content Cluster ── */
         .sxp-inner {
           position: relative;
-          z-index: 1;
+          z-index: 2;
           width: 100%;
-          max-width: min(90vw, 68rem);
+          max-width: min(90vw, 64rem);
           margin-inline: auto;
           display: flex;
           flex-direction: column;
           align-items: center;
           text-align: center;
-          gap: clamp(0.32rem, 0.9vh, 0.65rem);
+          gap: 0;
         }
 
-        .sxp-motif {
-          width: clamp(114px, 56.87px + 15.87vw, 260px);
-          height: auto;
+        /* Ambient cloud mist aura behind the cards (matches reference mockup) */
+        .sxp-inner::before {
+          content: "";
+          position: absolute;
+          top: 48%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: min(100%, 64rem);
+          height: min(100%, 42rem);
+          background: radial-gradient(
+            ellipse 65% 58% at 50% 50%,
+            rgba(255, 255, 255, 0.88) 0%,
+            rgba(255, 255, 255, 0.65) 35%,
+            rgba(255, 255, 255, 0.28) 60%,
+            transparent 82%
+          );
+          pointer-events: none;
+          z-index: -1;
+          filter: blur(44px);
+        }
+
+        .sxp-ornament-wrap {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: clamp(0.35rem, 0.8vh, 0.65rem);
+        }
+
+        .sxp-crown {
+          width: clamp(114px, 56.87px + 15.87vw, 260px) !important;
+          height: auto !important;
           opacity: 0.88;
-          margin-bottom: 0.25rem;
+          display: block;
+          user-select: none;
+          pointer-events: none;
         }
 
         .sxp-eyebrow {
           font-family: var(--font-geist-mono), monospace;
-          font-size: clamp(0.72rem, 0.95vw, 0.85rem);
-          font-weight: 600;
+          font-size: 0.72rem;
+          font-weight: 500;
           letter-spacing: 0.22em;
           text-transform: uppercase;
-          color: #3D6B22;
+          color: #2e4b2a;
+          opacity: 0.95;
+          margin-bottom: 0.45rem;
         }
 
         .sxp-heading {
-          margin: 0.15rem 0 0;
-          font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-weight: 500;
-          font-size: clamp(1.6rem, 9.53px + 4.38vw, 4.2rem);
+          margin: 0 0 clamp(0.35rem, 0.8vh, 0.6rem);
+          font-family: var(--font-dm-sans), sans-serif;
+          font-weight: 700;
+          font-size: clamp(2.4rem, 5.2vw, 3.8rem);
           line-height: 1.05;
           letter-spacing: -0.035em;
-          word-spacing: -0.01em;
-          color: #111a12;
+          color: #122415;
         }
 
         .sxp-lede {
-          margin: 0;
-          max-width: 48rem;
+          margin: 0 0 clamp(0.35rem, 0.7vh, 0.6rem);
+          max-width: 44rem;
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: clamp(0.95rem, 1.35vw, 1.15rem);
-          line-height: 1.55;
-          color: #2A3B28;
+          font-size: clamp(0.95rem, 1.35vw, 1.12rem);
+          line-height: 1.48;
+          color: #384f36;
           text-wrap: pretty;
         }
 
@@ -822,116 +1087,205 @@ export default function SponsorStage() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 0.85rem;
-          margin-top: clamp(0.4rem, 1.1vh, 0.85rem);
+          gap: 0.25rem;
+          margin-top: clamp(0.1rem, 0.3vh, 0.25rem);
           margin-bottom: 0;
           z-index: 10;
         }
 
-        .sxp-community-tier,
-        .sxp-innofusion-tier {
-          margin-top: clamp(0.55rem, 1.3vh, 1rem);
-          margin-bottom: clamp(0.15rem, 0.4vh, 0.35rem);
+        .sxp-platform-tier {
+          margin-top: clamp(0.05rem, 0.2vh, 0.2rem);
         }
 
-        .sxp-media-tier {
-          margin-top: clamp(0.55rem, 1.3vh, 1rem);
-          margin-bottom: clamp(0.15rem, 0.4vh, 0.35rem);
+        .sxp-community-tier {
+          margin-top: clamp(0.25rem, 0.6vh, 0.5rem);
+          margin-bottom: 0;
+        }
+
+        .sxp-bottom-tier-row {
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
+          gap: clamp(14px, 1.8vw, 24px);
+          width: 100%;
+          max-width: 1020px;
+          margin-top: clamp(0.25rem, 0.6vh, 0.5rem);
+        }
+
+        .sxp-bottom-card-col {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.2rem;
+        }
+
+        .sxp-tier-badge-placeholder {
+          opacity: 0 !important;
+          pointer-events: none !important;
+          user-select: none !important;
         }
 
         .sxp-partner-row {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: clamp(0.85rem, 2vw, 1.4rem);
-          flex-wrap: wrap;
+          gap: clamp(12px, 1.5vw, 20px);
           width: 100%;
+          max-width: 1020px;
+        }
+
+        .sxp-community-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, clamp(195px, 16.5vw, 245px)));
+          justify-content: center;
+          align-items: center;
+          justify-items: center;
+          gap: clamp(10px, 1.2vw, 16px);
+          width: 100%;
+          max-width: 1020px;
         }
 
         .sxp-tier-badge {
-          font-family: var(--font-label), var(--font-geist-mono), monospace;
+          font-family: var(--font-geist-mono), monospace;
           font-size: 0.72rem;
-          font-weight: 600;
-          letter-spacing: 0.18em;
+          font-weight: 500;
+          letter-spacing: 0.2em;
           text-transform: uppercase;
-          color: #142e1c;
-          margin-bottom: 0.25rem;
-          transform: translateY(-4px);
+          color: #2d4c29;
+          margin-bottom: 0.15rem;
+          opacity: 0.92;
         }
 
+        /* ── Unified Frosted White Tablet Card ── */
         .sxp-partner-card {
           position: relative;
-          display: inline-flex;
+          width: clamp(195px, 16.5vw, 245px);
+          height: clamp(66px, 7.2vh, 78px);
+          flex: 0 0 auto;
+          display: flex;
           align-items: center;
           justify-content: center;
-          padding: 0.95rem clamp(2rem, 3.8vw, 3rem);
-          background: #142e1c;
-          border: 1px solid rgba(255, 255, 255, 0.16);
-          border-top: 1px solid rgba(255, 255, 255, 0.28);
+          padding: 0 1.2rem;
+          box-sizing: border-box;
+          /* Frosted translucent glass matching mockup */
+          background: linear-gradient(155deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.22) 100%);
+          backdrop-filter: blur(20px) saturate(140%) brightness(1.03);
+          -webkit-backdrop-filter: blur(20px) saturate(140%) brightness(1.03);
+          border: 1px solid rgba(255, 255, 255, 0.58);
+          border-top: 1.5px solid rgba(255, 255, 255, 0.82);
           box-shadow:
-            0 8px 24px -4px rgba(20, 46, 28, 0.32),
-            0 4px 14px rgba(20, 46, 28, 0.24),
-            inset 0 1px 1px rgba(255, 255, 255, 0.18);
-          border-radius: 1.35rem;
-          transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, border-color 260ms ease, background 260ms ease;
+            0 16px 36px -10px rgba(0, 0, 0, 0.12),
+            0 4px 14px -4px rgba(0, 0, 0, 0.05),
+            0 0 16px rgba(255, 255, 255, 0.25),
+            inset 0 1.5px 1px rgba(255, 255, 255, 0.75);
+          border-radius: 20px;
+          transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, background 260ms ease, border-color 260ms ease;
           user-select: none;
         }
 
-        /* ── Floating Animation (Organic alternating drift matching judges cards) ── */
-        .sxp-float-card {
-          animation: sxp-float 5.2s ease-in-out infinite;
-          will-change: transform;
-        }
-
-        .sxp-float-card-alt {
-          animation: sxp-float-alt 5.8s ease-in-out infinite -2.6s;
-          will-change: transform;
-        }
-
-        @keyframes sxp-float {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-7px);
-          }
-        }
-
-        @keyframes sxp-float-alt {
-          0%, 100% {
-            transform: translateY(-3px);
-          }
-          50% {
-            transform: translateY(5px);
-          }
-        }
-
         .sxp-partner-card:hover {
-          animation-play-state: paused;
-          background: #1f4229;
-          transform: translateY(-4px) scale(1.015);
-          border-color: rgba(255, 255, 255, 0.32);
+          background: linear-gradient(155deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.38) 100%);
+          transform: translateY(-3px) scale(1.015);
+          border-color: rgba(255, 255, 255, 0.88);
           box-shadow:
-            0 14px 34px -6px rgba(20, 46, 28, 0.42),
-            0 6px 20px rgba(20, 46, 28, 0.3),
-            inset 0 1px 1.5px rgba(255, 255, 255, 0.26);
+            0 24px 44px -10px rgba(0, 0, 0, 0.16),
+            0 0 24px rgba(255, 255, 255, 0.4),
+            inset 0 1.5px 1px #ffffff;
         }
 
         .sxp-partner-logo {
-          height: clamp(32px, 3.8vh, 42px);
+          height: clamp(24px, 3vh, 32px);
           width: auto;
           object-fit: contain;
           display: block;
         }
 
-        .sxp-innofusion-card {
-          gap: clamp(0.85rem, 1.6vw, 1.25rem);
-          padding: 0.95rem clamp(2rem, 3.8vw, 3.2rem);
+        /* ── Platform Partner: Devfolio Wide Tablet & Doodle Rays ── */
+        .sxp-devfolio-card-wrap {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .sxp-devfolio-rays {
+          position: absolute;
+          top: -24px;
+          right: -16px;
+          width: clamp(38px, 3.8vw, 46px);
+          height: auto;
+          pointer-events: none;
+          z-index: 4;
+        }
+
+        .sxp-devfolio-card {
+          flex: 0 0 auto !important;
+          width: clamp(270px, 24vw, 340px) !important;
+          height: clamp(68px, 7.5vh, 80px) !important;
+          border-radius: 20px !important;
+          padding: 0 !important;
+          text-decoration: none;
+          background: linear-gradient(155deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.22) 100%) !important;
+          backdrop-filter: blur(20px) saturate(140%) brightness(1.03) !important;
+          -webkit-backdrop-filter: blur(20px) saturate(140%) brightness(1.03) !important;
+        }
+
+        .sxp-devfolio-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          padding-inline: clamp(1.2rem, 2.2vw, 2rem);
+        }
+
+        .sxp-devfolio-logo {
+          height: clamp(22px, 2.8vh, 30px);
+          width: auto;
+          object-fit: contain;
+        }
+
+        .sxp-devfolio-divider {
+          width: 1px;
+          height: clamp(22px, 2.8vh, 30px);
+          background: rgba(0, 0, 0, 0.12);
+          margin-inline: clamp(0.8rem, 1.5vw, 1.3rem);
+          flex-shrink: 0;
+        }
+
+        .sxp-devfolio-tagline {
+          display: flex;
+          flex-direction: column;
+          gap: 2.5px;
+          font-family: var(--font-geist-mono), monospace;
+          font-size: clamp(0.52rem, 0.62vw, 0.58rem);
+          font-weight: 600;
+          letter-spacing: 0.22em;
+          line-height: 1.25;
+          color: #172c1a;
+          text-align: left;
+          flex-shrink: 0;
+        }
+
+        /* ── Individual Partner Card Branding & Logo Sizes ── */
+        .sxp-react-kolkata-logo {
+          width: clamp(120px, 12vw, 155px);
+          height: auto;
+          max-height: 38px;
+          object-fit: contain;
+          display: block;
+        }
+
+        .sxp-innofusion-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: clamp(0.45rem, 0.8vw, 0.7rem);
         }
 
         .sxp-innofusion-logo {
-          height: clamp(34px, 4vh, 44px);
-          width: clamp(34px, 4vh, 44px);
+          height: clamp(22px, 2.8vh, 28px);
+          width: clamp(22px, 2.8vh, 28px);
           object-fit: contain;
           display: block;
           flex-shrink: 0;
@@ -940,199 +1294,321 @@ export default function SponsorStage() {
         .sxp-innofusion-brand {
           font-family: var(--font-display), var(--font-heading), var(--font-dm-sans), sans-serif;
           font-weight: 800;
-          font-size: clamp(1.4rem, 2.2vw, 1.85rem);
-          letter-spacing: 0.08em;
-          word-spacing: 0.28em;
-          color: #ffffff;
+          font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+          letter-spacing: 0.05em;
+          word-spacing: 0.2em;
+          color: #111a12;
           line-height: 1;
           white-space: nowrap;
-          padding-right: 0.35rem;
         }
 
-        .sxp-react-kolkata-card {
-          padding: 0.95rem clamp(1.8rem, 3.2vw, 2.6rem);
-          transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, border-color 260ms ease, background 260ms ease;
-          text-decoration: none;
-        }
-
-        .sxp-react-kolkata-card:hover {
-          border-color: rgba(56, 189, 248, 0.45);
-          box-shadow:
-            0 14px 34px -6px rgba(20, 46, 28, 0.45),
-            0 6px 20px rgba(56, 189, 248, 0.2),
-            inset 0 1px 1.5px rgba(255, 255, 255, 0.28);
-        }
-
-        .sxp-react-kolkata-logo {
-          height: clamp(39px, 4.4vh, 46px);
-          width: auto;
-          min-width: 120px;
-          object-fit: contain;
-          display: block;
-        }
-
+        /* ── Flanking Partners Vertical Staggering (React & CodeRush lower, Mahakash & Eventopia upper) ── */
+        .sxp-react-kolkata-card,
         .sxp-coderush-card {
-          padding: 0.95rem clamp(1.8rem, 3.2vw, 2.6rem);
-          transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, border-color 260ms ease, background 260ms ease;
+          transform: translateY(clamp(16px, 1.8vh, 20px));
         }
 
+        .sxp-react-kolkata-card:hover,
         .sxp-coderush-card:hover {
-          border-color: rgba(34, 211, 238, 0.45);
-          box-shadow:
-            0 14px 34px -6px rgba(20, 46, 28, 0.45),
-            0 6px 20px rgba(34, 211, 238, 0.2),
-            inset 0 1px 1.5px rgba(255, 255, 255, 0.28);
+          transform: translateY(calc(clamp(16px, 1.8vh, 20px) - 3px)) scale(1.015);
+        }
+
+        .sxp-mahakash-card,
+        .sxp-eventopia-card {
+          transform: translateY(clamp(-20px, -1.8vh, -16px));
+        }
+
+        .sxp-mahakash-card:hover,
+        .sxp-eventopia-card:hover {
+          transform: translateY(calc(clamp(-20px, -1.8vh, -16px) - 3px)) scale(1.015);
         }
 
         .sxp-coderush-logo {
-          height: clamp(38px, 4.3vh, 46px);
-          width: auto;
-          min-width: 140px;
+          width: clamp(120px, 12vw, 155px);
+          height: auto;
+          max-height: 36px;
           object-fit: contain;
           display: block;
         }
 
-        .sxp-partner-subrow {
-          margin-top: clamp(0.2rem, 0.6vh, 0.45rem);
+        .sxp-mahakash-logo {
+          width: clamp(140px, 13.5vw, 180px);
+          height: auto;
+          max-height: clamp(46px, 5.2vh, 56px);
+          object-fit: contain;
+          display: block;
         }
 
         .sxp-stuamb-card {
-          background: #ffffff;
-          border: 1px solid rgba(20, 46, 28, 0.14);
-          border-top: 1px solid rgba(255, 255, 255, 0.95);
-          box-shadow:
-            0 8px 24px -4px rgba(20, 46, 28, 0.16),
-            0 4px 14px rgba(20, 46, 28, 0.1),
-            inset 0 1px 1.5px rgba(255, 255, 255, 0.9);
-          padding: 0.35rem clamp(1.2rem, 2.4vw, 1.8rem);
-          border-radius: 1.25rem;
-          transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, border-color 260ms ease, background 260ms ease;
-        }
-
-        .sxp-stuamb-card:hover {
-          background: #ffffff;
-          border-color: rgba(0, 120, 212, 0.45);
-          box-shadow:
-            0 14px 34px -6px rgba(20, 46, 28, 0.22),
-            0 6px 20px rgba(0, 120, 212, 0.2),
-            inset 0 1px 1.5px rgba(255, 255, 255, 1);
+          width: clamp(146px, 12.2vw, 175px) !important;
+          height: clamp(146px, 12.2vw, 175px) !important;
+          aspect-ratio: 1 / 1;
+          border-radius: clamp(20px, 1.6vw, 24px) !important;
+          padding: 0.35rem !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
         }
 
         .sxp-stuamb-logo {
-          height: clamp(124px, 16vh, 168px);
+          height: clamp(118px, 13.5vh, 150px);
           width: auto;
+          max-height: 94%;
+          max-width: 92%;
+          object-fit: contain;
+          display: block;
+        }
+
+        .sxp-eventopia-logo {
+          width: clamp(110px, 11vw, 145px);
+          height: auto;
+          max-height: 32px;
+          object-fit: contain;
+          display: block;
+        }
+
+        .sxp-osen-card {
+          width: clamp(195px, 16.5vw, 245px) !important;
+          height: clamp(66px, 7.2vh, 78px) !important;
+          border-radius: 20px !important;
+        }
+
+        .sxp-osen-logo {
+          width: clamp(110px, 11vw, 145px);
+          height: auto;
+          max-height: 38px;
           object-fit: contain;
           display: block;
         }
 
         .sxp-lnc-card {
-          background: #ffffff;
-          border: 1px solid rgba(20, 46, 28, 0.14);
-          border-top: 1px solid rgba(255, 255, 255, 0.95);
-          box-shadow:
-            0 8px 24px -4px rgba(20, 46, 28, 0.16),
-            0 4px 14px rgba(20, 46, 28, 0.1),
-            inset 0 1px 1.5px rgba(255, 255, 255, 0.9);
-          padding: 0.85rem clamp(1.8rem, 3.2vw, 2.6rem);
+          width: clamp(195px, 16.5vw, 245px) !important;
+          height: clamp(66px, 7.2vh, 78px) !important;
+          border-radius: 20px !important;
           text-decoration: none;
         }
 
-        .sxp-lnc-card:hover {
-          background: #ffffff;
-          border-color: rgba(142, 36, 170, 0.45);
-          box-shadow:
-            0 14px 34px -6px rgba(20, 46, 28, 0.22),
-            0 6px 20px rgba(142, 36, 170, 0.2),
-            inset 0 1px 1.5px rgba(255, 255, 255, 1);
-        }
-
         .sxp-lnc-logo {
-          height: clamp(34px, 4vh, 42px);
-          width: auto;
-          min-width: 105px;
+          width: clamp(110px, 11vw, 145px);
+          height: auto;
+          max-height: 38px;
           object-fit: contain;
           display: block;
         }
 
         .sxp-unrevealed-note {
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: 0.85rem;
-          color: #26472d;
-          letter-spacing: 0.01em;
-          margin-top: clamp(0.75rem, 1.8vh, 1.25rem);
+          font-size: clamp(0.74rem, 0.88vw, 0.82rem);
+          color: #3b5039;
+          letter-spacing: -0.01em;
+          margin-top: clamp(0.35rem, 0.7vh, 0.6rem);
+          margin-bottom: 0;
+          opacity: 0.88;
         }
 
         .sxp-cta-wrap {
-          margin-top: clamp(0.7rem, 1.8vh, 1.4rem);
+          margin-top: clamp(0.35rem, 0.8vh, 0.65rem);
           display: flex;
-          justify-content: center;
           align-items: center;
-          z-index: 10;
+          justify-content: center;
+        }
+        /* ── Narrower viewports responsive adjustments for wings ── */
+        @media (max-width: 1440px) {
+          .sxp-wing-left {
+            left: clamp(0.1rem, 1vw, 1.4rem);
+            transform: scale(0.92);
+          }
+          .sxp-wing-right {
+            right: clamp(0.1rem, 1vw, 1.4rem);
+            transform: scale(0.92);
+          }
         }
 
-        /* ── Scroll Navigation to Exit Frame (Beside Nav Bar) ── */
+        @media (max-width: 1260px) {
+          .sxp-wing-left {
+            left: -0.4rem;
+            transform: scale(0.78);
+            opacity: 0.88;
+          }
+          .sxp-wing-right {
+            right: -0.4rem;
+            transform: scale(0.78);
+            opacity: 0.88;
+          }
+        }
+
+        @media (max-width: 1080px) {
+          /* ── Artifacts side wings positioning matching desktop reference ── */
+          .sxp-artifacts-wing {
+            width: clamp(180px, 21vw, 240px);
+          }
+
+          .sxp-wing-left {
+            left: clamp(0.2rem, 1vw, 1.2rem);
+            transform-origin: left center;
+            transform: scale(0.78);
+            opacity: 0.90;
+          }
+
+          .sxp-wing-right {
+            right: clamp(0.2rem, 1vw, 1.2rem);
+            transform-origin: right center;
+            transform: scale(0.78);
+            opacity: 0.90;
+          }
+
+          /* Left Doodle: shifted right alongside Devfolio */
+          .sxp-art-doodle-left {
+            top: clamp(22%, 24vh, 27%);
+            left: clamp(3.5rem, 5.5vw, 5.5rem);
+            transform: scale(0.9);
+          }
+
+          /* Victoria Memorial: positioned lower alongside partners */
+          .sxp-polaroid-group.sxp-polaroid-group-left {
+            top: clamp(48%, 51vh, 55%);
+            left: clamp(-1.2rem, -1.6vw, 0.4rem);
+          }
+
+          /* Howrah Bridge: starts alongside Devfolio / CodeRush X */
+          .sxp-polaroid-group.sxp-polaroid-group-right {
+            top: clamp(26%, 28vh, 32%);
+            left: auto;
+            right: clamp(-1.2rem, -1.6vw, 0.4rem);
+          }
+
+          /* Right Doodle: brighter and larger for tablet */
+          .sxp-art-doodle-right {
+            top: clamp(56%, 59vh, 64%);
+            right: clamp(0.8rem, 2vw, 2.4rem);
+            transform: scale(1);
+          }
+
+          .sxp-doodle-tomorrow-img {
+            width: clamp(135px, 13vw, 175px) !important;
+            filter: brightness(1.35) contrast(1.15) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.18)) !important;
+          }
+
+          /* ── Community Partners: pure flexbox layout with NO overlapping ── */
+          .sxp-community-grid {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: clamp(12px, 1.8vw, 18px) !important;
+            width: 100% !important;
+            max-width: clamp(560px, 82vw, 720px) !important;
+          }
+
+          /* Reset all vertical transform staggers so cards never collide */
+          .sxp-react-kolkata-card,
+          .sxp-coderush-card,
+          .sxp-mahakash-card,
+          .sxp-eventopia-card {
+            transform: none !important;
+          }
+
+          .sxp-react-kolkata-card:hover,
+          .sxp-coderush-card:hover,
+          .sxp-mahakash-card:hover,
+          .sxp-eventopia-card:hover {
+            transform: translateY(-2px) scale(1.015) !important;
+          }
+
+          .sxp-community-grid .sxp-partner-card:not(.sxp-stuamb-card) {
+            flex: 0 0 clamp(180px, 22vw, 220px) !important;
+            width: clamp(180px, 22vw, 220px) !important;
+            height: clamp(62px, 7vh, 72px) !important;
+            border-radius: 18px;
+          }
+
+          /* Restored student ambassador card size */
+          .sxp-community-grid .sxp-stuamb-card {
+            flex: 0 0 clamp(146px, 12.2vw, 175px) !important;
+            width: clamp(146px, 12.2vw, 175px) !important;
+            height: clamp(146px, 12.2vw, 175px) !important;
+            aspect-ratio: 1 / 1 !important;
+            border-radius: clamp(20px, 1.6vw, 24px) !important;
+            padding: 0.35rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+
+          .sxp-community-grid .sxp-stuamb-card .sxp-stuamb-logo {
+            height: clamp(118px, 13.5vh, 150px) !important;
+            width: auto !important;
+            max-height: 94% !important;
+            max-width: 92% !important;
+          }
+
+          /* Fixed INNOFUSION: ensure logo & brand stay comfortably inside the card */
+          .sxp-innofusion-card {
+            padding: 0 clamp(0.5rem, 0.8vw, 0.8rem) !important;
+          }
+
+          .sxp-innofusion-content {
+            gap: clamp(0.35rem, 0.5vw, 0.55rem) !important;
+            width: 100% !important;
+            justify-content: center !important;
+          }
+
+          .sxp-innofusion-logo {
+            height: clamp(20px, 2.4vh, 24px) !important;
+            width: clamp(20px, 2.4vh, 24px) !important;
+            flex-shrink: 0 !important;
+          }
+
+          .sxp-innofusion-brand {
+            font-size: clamp(0.78rem, 1.1vw, 0.95rem) !important;
+            letter-spacing: 0.02em !important;
+            word-spacing: 0.08em !important;
+            white-space: nowrap !important;
+          }
+
+          .sxp-devfolio-card {
+            flex: 0 0 auto !important;
+            width: clamp(260px, 35vw, 320px) !important;
+            height: 64px !important;
+            border-radius: 18px !important;
+          }
+
+          .sxp-bottom-tier-row {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: clamp(14px, 2vw, 20px) !important;
+            width: 100% !important;
+            margin-top: 0.35rem !important;
+          }
+
+          .sxp-bottom-card-col {
+            flex: 0 0 auto !important;
+          }
+
+          .sxp-osen-card,
+          .sxp-lnc-card {
+            flex: 0 0 auto !important;
+            width: clamp(170px, 22vw, 215px) !important;
+            height: clamp(56px, 6.5vh, 66px) !important;
+            border-radius: 18px !important;
+          }
+        }
+
+        /* ── Scroll Navigation to Exit Frame (Hidden to match mockup) ── */
         .sxp-scrollup-wrap {
-          position: absolute;
-          top: clamp(1.25rem, 3.2vh, 2.25rem);
-          right: clamp(1rem, 3.5vw, 2.2rem);
-          z-index: 105;
-          display: flex;
-          align-items: center;
-          gap: 0.45rem;
-          opacity: 0;
-          pointer-events: none;
-          will-change: transform, opacity;
+          display: none;
         }
 
-        .sxp-scrollup-btn {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: auto;
-          height: auto;
-          padding: 0.35rem;
-          background: transparent;
-          backdrop-filter: none;
-          -webkit-backdrop-filter: none;
-          border: none;
-          color: #1b3519;
-          cursor: pointer;
-          box-shadow: none;
-          transition: all 220ms cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        .sxp-scrollup-btn:hover {
-          background: transparent;
-          border: none;
-          color: #2F5527;
-          box-shadow: none;
-        }
-
-        .sxp-scrollup-btn:hover .sxp-arrow-icon {
-          transform: translateY(-3px);
-        }
-
-        .sxp-arrow-icon {
-          width: 22px;
-          height: 22px;
-          transition: transform 200ms ease, color 200ms ease;
-          filter: drop-shadow(0 1px 3px rgba(255, 255, 255, 0.9));
-        }
-
-        .sxp-scrollup-btn:active {
-          transform: scale(0.92);
-        }
-
-        /* ── Narrower viewports ── */
         @media (max-width: 900px) {
           .sxp { --sxp-track: 280vh; }
           .sxp-stage {
             --sxp-win-w: min(88vw, 34rem);
           }
-          .sxp-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); }
           .sxp-body {
-            padding-top: clamp(3rem, 6vh, 4.5rem);
-            padding-bottom: clamp(2rem, 5vh, 4rem);
+            padding-top: clamp(3.5rem, 7vh, 4.8rem);
+            padding-bottom: clamp(1.8rem, 4vh, 3rem);
           }
         }
 
@@ -1147,62 +1623,302 @@ export default function SponsorStage() {
             box-shadow: 0 0 0 1px rgba(238, 248, 228, 0.22);
           }
 
-          /* The big blurred "?" behind YET TO REVEAL breathes (opacity + scale)
-             on an 8s loop for as long as this section is mounted -- not just
-             during the scroll-expand motion, but the whole time the user is
-             anywhere near it, including while scrubbing through the section.
-             filter: blur() on a large, continuously-transforming element is a
-             real per-frame rasterisation cost, stacked on top of the clip-path
-             recalculation the window itself already does every scrubbed frame.
-             Freezing it keeps the soft blurred mark in place without repainting
-             it every frame; the blur itself is untouched. */
-          .sxp-seal-q {
-            animation: none;
+          .sxp-body {
+            justify-content: center;
+            padding-top: clamp(3.2rem, 4.5vh, 4.2rem);
+            padding-bottom: clamp(2rem, 3.5vh, 3.2rem);
+            overflow-y: auto;
+          }
+
+          .sxp-wing-left {
+            left: clamp(0.2rem, 1vw, 1rem);
+            transform: scale(0.68);
+          }
+
+          .sxp-wing-right {
+            right: clamp(0.2rem, 1vw, 1rem);
+            transform: scale(0.68);
+          }
+
+          /* Shift ideas doodle rightward on tablet */
+          .sxp-art-doodle-left {
+            left: clamp(4rem, 6vw, 6rem);
+          }
+
+          /* Brighter & larger tomorrow doodle on tablet */
+          .sxp-doodle-tomorrow-img {
+            width: clamp(130px, 14vw, 170px) !important;
+            filter: brightness(1.4) contrast(1.15) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.16)) !important;
+          }
+
+          .sxp-art-doodle-right {
+            transform: scale(1);
+          }
+
+          .sxp-polaroid-group.sxp-polaroid-group-left {
+            top: clamp(49%, 52vh, 57%);
+            left: clamp(-1.8rem, -2.4vw, -0.6rem);
+          }
+
+          .sxp-polaroid-group.sxp-polaroid-group-right {
+            right: clamp(-1.8rem, -2.4vw, -0.6rem);
+          }
+
+          .sxp-community-grid {
+            max-width: clamp(520px, 76vw, 620px) !important;
+            gap: 12px !important;
+          }
+
+          .sxp-community-grid .sxp-partner-card:not(.sxp-stuamb-card) {
+            flex: 0 0 clamp(160px, 21vw, 185px) !important;
+            width: clamp(160px, 21vw, 185px) !important;
+            height: 60px !important;
+          }
+
+          /* Restored student ambassador card size */
+          .sxp-community-grid .sxp-stuamb-card {
+            flex: 0 0 clamp(130px, 15vw, 150px) !important;
+            width: clamp(130px, 15vw, 150px) !important;
+            height: clamp(130px, 15vw, 150px) !important;
+            aspect-ratio: 1 / 1 !important;
+            border-radius: 22px !important;
+            padding: 0.35rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+
+          .sxp-community-grid .sxp-stuamb-card .sxp-stuamb-logo {
+            height: clamp(105px, 11.5vh, 130px) !important;
+            width: auto !important;
+            max-height: 94% !important;
+            max-width: 92% !important;
+          }
+
+          /* Fixed INNOFUSION on portrait tablet */
+          .sxp-innofusion-card {
+            padding: 0 0.45rem !important;
+          }
+
+          .sxp-innofusion-content {
+            gap: 0.35rem !important;
+          }
+
+          .sxp-innofusion-logo {
+            height: 19px !important;
+            width: 19px !important;
+          }
+
+          .sxp-innofusion-brand {
+            font-size: 0.76rem !important;
+            letter-spacing: 0.01em !important;
+            word-spacing: 0.05em !important;
+          }
+
+          .sxp-devfolio-card {
+            flex: 0 0 auto !important;
+            width: clamp(260px, 35vw, 320px) !important;
+            height: 60px !important;
+            border-radius: 18px !important;
+          }
+
+          .sxp-osen-card,
+          .sxp-lnc-card {
+            flex: 0 0 auto !important;
+            width: clamp(155px, 21vw, 185px) !important;
+            height: 54px !important;
           }
         }
 
         @media (max-width: 620px) {
-          .sxp-scrollup-wrap {
-            top: clamp(1.2rem, 3vh, 1.85rem);
-            right: clamp(0.6rem, 2.5vw, 1rem);
+          .sxp-artifacts-wing {
+            display: none !important;
           }
           .sxp { --sxp-track: 250vh; }
-          .sxp-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .sxp-body {
-            justify-content: center;
-            padding-top: clamp(3.5rem, 8vh, 5rem);
-            padding-bottom: clamp(2rem, 4vh, 3.5rem);
+            justify-content: flex-start;
+            padding-top: clamp(4.8rem, 11vh, 5.8rem);
+            padding-bottom: clamp(1.6rem, 4vh, 2.6rem);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+          }
+          .sxp-crown {
+            width: clamp(85px, 24vw, 120px) !important;
+            margin-bottom: 0.2rem !important;
+          }
+          .sxp-eyebrow {
+            font-size: 0.64rem;
+            margin-bottom: 0.2rem;
+            color: #1b381a;
+            font-weight: 600;
+          }
+          .sxp-heading {
+            font-size: clamp(1.75rem, 6.5vw, 2.2rem);
+            margin-bottom: 0.2rem;
+          }
+          .sxp-lede {
+            font-size: 0.82rem;
+            line-height: 1.35;
+            max-width: 22rem;
+            margin-bottom: 0.35rem;
+            color: #263e24;
+          }
+          .sxp-tier-badge {
+            font-size: 0.62rem;
+            margin-bottom: 0.1rem;
           }
           .sxp-inner {
-            gap: clamp(0.42rem, 1.1vh, 0.75rem);
+            gap: clamp(0.2rem, 0.6vh, 0.4rem);
           }
-          .sxp-motif {
-            width: clamp(114px, 30vw, 160px);
-            margin-bottom: 0.15rem;
+          .sxp-inner::before {
+            width: 100vw;
+            height: 100%;
+            background: radial-gradient(
+              ellipse 90% 75% at 50% 45%,
+              rgba(255, 255, 255, 0.98) 0%,
+              rgba(255, 255, 255, 0.88) 45%,
+              rgba(255, 255, 255, 0.5) 75%,
+              transparent 95%
+            );
+            filter: blur(28px);
           }
-          .sxp-seal {
-            margin-top: clamp(0.35rem, 1.1vh, 0.65rem);
+          .sxp-partner-tier {
+            gap: 0.15rem;
           }
-          .sxp-seal-word {
-            font-size: 1.28rem;
-            letter-spacing: 0.15em;
+          .sxp-devfolio-card-wrap {
+            margin-top: 0.1rem;
           }
-          .sxp-seal-q {
-            font-size: clamp(6rem, 15vh, 9rem);
-            filter: none !important;
-            animation: none !important;
-            color: rgba(38, 70, 32, 0.18) !important;
+          .sxp-devfolio-rays {
+            width: 28px;
+            top: -16px;
+            right: -8px;
           }
-          .sxp-cta-wrap {
-            margin-top: clamp(0.45rem, 1.2vh, 0.85rem);
-            transform: scale(0.96);
+          .sxp-devfolio-card {
+            flex: 0 0 auto !important;
+            width: min(90vw, 320px) !important;
+            height: 52px !important;
+            border-radius: 16px !important;
+          }
+          .sxp-devfolio-content {
+            padding-inline: 1rem;
+          }
+          .sxp-devfolio-logo {
+            height: 20px;
+          }
+          .sxp-devfolio-divider {
+            height: 20px;
+            margin-inline: 0.75rem;
+          }
+          .sxp-devfolio-tagline {
+            font-size: 0.48rem;
+            gap: 1.5px;
+          }
+          .sxp-community-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            align-items: center;
+            justify-items: center;
+            gap: 7px;
+            width: min(90vw, 320px);
+          }
+          .sxp-partner-card {
+            flex: 0 0 auto !important;
+            width: 100% !important;
+            height: 48px !important;
+            border-radius: 16px;
+            padding: 0 0.5rem;
+          }
+          .sxp-react-kolkata-card,
+          .sxp-coderush-card,
+          .sxp-mahakash-card,
+          .sxp-eventopia-card {
+            transform: none !important;
+          }
+          .sxp-react-kolkata-card:hover,
+          .sxp-coderush-card:hover,
+          .sxp-mahakash-card:hover,
+          .sxp-eventopia-card:hover {
+            transform: translateY(-2px) scale(1.015) !important;
           }
           .sxp-stuamb-card {
-            padding: 0.35rem 1.1rem;
-            border-radius: 1.1rem;
+            width: clamp(84px, 24vw, 100px) !important;
+            height: clamp(84px, 24vw, 100px) !important;
+            aspect-ratio: 1 / 1 !important;
+            border-radius: 18px !important;
+            padding: 0.4rem !important;
+          }
+          .sxp-react-kolkata-logo {
+            max-height: 22px;
+            width: auto;
+            max-width: 88%;
+          }
+          .sxp-innofusion-logo {
+            height: 18px;
+            width: 18px;
+          }
+          .sxp-innofusion-brand {
+            font-size: 0.8rem;
+          }
+          .sxp-coderush-logo {
+            max-height: 20px;
+            width: auto;
+            max-width: 88%;
+          }
+          .sxp-mahakash-logo {
+            max-height: 27px;
+            width: auto;
+            max-width: 90%;
           }
           .sxp-stuamb-logo {
-            height: clamp(90px, 22vw, 128px);
+            max-height: 68px !important;
+            width: auto !important;
+            max-width: 86% !important;
+          }
+          .sxp-eventopia-logo {
+            max-height: 18px;
+            width: auto;
+            max-width: 88%;
+          }
+          .sxp-bottom-tier-row {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 8px;
+            width: min(90vw, 320px);
+            margin-top: 0.2rem;
+          }
+          .sxp-bottom-card-col {
+            flex: 1 1 calc(50% - 4px);
+            width: calc(50% - 4px);
+            min-width: 0;
+          }
+          .sxp-osen-card, .sxp-lnc-card {
+            flex: 0 0 auto !important;
+            width: 100% !important;
+            height: 48px !important;
+            border-radius: 16px !important;
+            padding: 0 0.5rem !important;
+          }
+          .sxp-osen-logo {
+            max-height: 24px !important;
+            width: auto !important;
+            max-width: 85% !important;
+          }
+          .sxp-lnc-logo {
+            max-height: 24px !important;
+            width: auto !important;
+            max-width: 85% !important;
+          }
+          .sxp-unrevealed-note {
+            font-size: 0.72rem;
+            margin-top: 0.4rem;
+            text-align: center;
+            padding-inline: 1rem;
+          }
+          .sxp-cta-wrap {
+            margin-top: 0.45rem;
+            transform: scale(0.92);
           }
         }
 
@@ -1224,12 +1940,7 @@ export default function SponsorStage() {
           .sxp-wall { gap: 0.6rem; }
         }
 
-        @media (prefers-reduced-motion: reduce) {
-          .sxp-float-card,
-          .sxp-float-card-alt {
-            animation: none !important;
-          }
-        }
+
       `}</style>
     </section>
   );

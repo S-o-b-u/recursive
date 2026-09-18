@@ -358,6 +358,20 @@ export default function HomeFAQ() {
 
         /* ── Mobile Tweaks ── */
         @media (max-width: 640px) {
+          .faq-section {
+            padding-top: clamp(1.2rem, 3vw, 1.8rem);
+            padding-bottom: clamp(3.2rem, 6vw, 4.5rem);
+            margin-top: clamp(-4.5rem, -8vh, -3rem);
+          }
+
+          .faq-header {
+            margin-bottom: clamp(1.8rem, 3.5vw, 2.5rem);
+          }
+
+          .faq-ornament-wrap {
+            margin-bottom: clamp(0.5rem, 1.2vh, 0.8rem);
+          }
+
           .faq-trigger {
             padding: 1.15rem 0.5rem;
             gap: 0.75rem;

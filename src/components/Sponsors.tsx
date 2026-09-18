@@ -59,7 +59,7 @@ export default function Sponsors({
       aria-label="Sponsorship Tiers and Packages"
     >
       <div className="sp-inner">
-        {showHeader && (
+        {showHeader ? (
           <div className="sp-header">
             <span className="sp-eyebrow">PARTNERSHIP TIERS</span>
             
@@ -72,6 +72,10 @@ export default function Sponsors({
             <p className="sp-subtitle">
               Every rupee of sponsorship goes directly toward the event: feeding four hundred builders, funding travel grants, and providing hardware rigs. We publish a full breakdown after the hackathon.
             </p>
+          </div>
+        ) : (
+          <div className="sp-ornament-wrap sp-ornament-compact">
+            <Ornament className="sp-motif" />
           </div>
         )}
 
@@ -203,6 +207,10 @@ export default function Sponsors({
           display: flex;
           justify-content: center;
           margin-bottom: 1.5rem;
+        }
+
+        .sp-ornament-compact {
+          margin-bottom: clamp(2rem, 4.5vh, 3.5rem);
         }
 
         .sp-motif {

@@ -33,8 +33,8 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       ScrollTrigger.config({ ignoreMobileResize: true });
 
       const triggerScrollExpand = (target: HTMLElement) => {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
         const isSponsors = target.id === "sponsors" || target.classList.contains("sxp");
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
         if (!isSponsors) {
           target.classList.add("is-scroll-expanded");
           window.setTimeout(() => target.classList.remove("is-scroll-expanded"), 1200);
@@ -118,11 +118,16 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
         ) ||
         target;
 
+      const isSponsors = target.id === "sponsors" || target.classList.contains("sxp");
+      const targetOffset = 0;
+
       lenis.scrollTo(target, {
-        offset: 0,
+        offset: targetOffset,
         duration: 1.25,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       });
+
+      if (isSponsors) return;
 
       gsap.killTweensOf(content);
       if (isTouch) {

@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AI tool configs
+.agents/
+.claude/
+skills-lock.json
+
+# Stray screenshots & reference images in root
+/Screenshot *.png
+/ChatGPT *.png

@@ -584,6 +584,19 @@ a { color: inherit; text-decoration: none; }
   animation: scroll-expand-glow 1.2s var(--ease-out) forwards;
 }
 
+/* Safeguard: Prevent full-width sponsors section from scaling down or showing glow border */
+#sponsors,
+.sxp,
+.sxp-track,
+.sxp-stage {
+  transform: none !important;
+}
+
+#sponsors.is-scroll-expanded::after,
+.sxp.is-scroll-expanded::after {
+  display: none !important;
+}
+
         /* Glow enabled on all viewports with GPU transform */
 
 @keyframes scroll-expand-glow {
