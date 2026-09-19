@@ -18,7 +18,6 @@ export default function Hero() {
 
   // Background video plate showing the hill and moving grass on all devices
   const [useVideo, setUseVideo] = useState(true);
-
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -26,78 +25,48 @@ export default function Hero() {
     video.muted = true;
     video.defaultMuted = true;
     video.playsInline = true;
-    video.loop = true;
-    video.autoplay = true;
     video.setAttribute("playsinline", "");
     video.setAttribute("webkit-playsinline", "");
     video.setAttribute("muted", "");
-    video.setAttribute("autoplay", "");
-    video.setAttribute("loop", "");
 
     const playHero = () => {
-      const p = video.play();
-      if (p && typeof p.catch === "function") p.catch(() => {});
+      video.play().catch(() => {});
     };
 
     const isIntroPlaying =
       typeof document !== "undefined" &&
-      document.documentElement.dataset.intro === "playing";
-
-    const onIntroComplete = () => {
-      playHero();
-      video.addEventListener("loadedmetadata", playHero);
-      video.addEventListener("loadeddata", playHero);
-      video.addEventListener("canplay", playHero);
-    };
+      document.documentElement.dataset.intro !== "done";
 
     if (isIntroPlaying) {
-      try {
-        video.pause();
-      } catch {}
-      window.addEventListener("recursive-intro-done", onIntroComplete, { once: true });
+      window.addEventListener("recursive-intro-done", playHero, { once: true });
     } else {
       playHero();
-      video.addEventListener("loadedmetadata", playHero);
-      video.addEventListener("loadeddata", playHero);
-      video.addEventListener("canplay", playHero);
     }
 
-    const onUserInteraction = () => {
-      if (typeof document !== "undefined" && document.documentElement.dataset.intro === "playing") return;
-      if (video.paused) playHero();
-    };
-    window.addEventListener("touchstart", onUserInteraction, { passive: true });
-    window.addEventListener("pointerdown", onUserInteraction, { passive: true });
-    window.addEventListener("click", onUserInteraction, { passive: true });
-
-    let io: IntersectionObserver | null = null;
     if (typeof IntersectionObserver !== "undefined") {
-      io = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              if (typeof document === "undefined" || document.documentElement.dataset.intro !== "playing") {
-                playHero();
-              }
-            } else {
-              video.pause();
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            if (
+              typeof document === "undefined" ||
+              document.documentElement.dataset.intro === "done"
+            ) {
+              video.play().catch(() => {});
             }
+          } else {
+            video.pause();
           }
-        },
-        { threshold: 0.05 },
-      );
+        }
+      }, { threshold: 0.05 });
       io.observe(video);
+      return () => {
+        window.removeEventListener("recursive-intro-done", playHero);
+        io.disconnect();
+      };
     }
 
     return () => {
-      window.removeEventListener("recursive-intro-done", onIntroComplete);
-      window.removeEventListener("touchstart", onUserInteraction);
-      window.removeEventListener("pointerdown", onUserInteraction);
-      window.removeEventListener("click", onUserInteraction);
-      video.removeEventListener("loadedmetadata", playHero);
-      video.removeEventListener("loadeddata", playHero);
-      video.removeEventListener("canplay", playHero);
-      if (io) io.disconnect();
+      window.removeEventListener("recursive-intro-done", playHero);
     };
   }, []);
 
@@ -161,7 +130,7 @@ export default function Hero() {
             className="hero-video"
             src="/bg/hero_bg.mp4"
             poster="/images/hero/hero_poster.jpg"
-            autoPlay
+            autoPlay={false}
             loop
             muted
             playsInline

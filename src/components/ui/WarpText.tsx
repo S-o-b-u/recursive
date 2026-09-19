@@ -225,6 +225,30 @@ const buildTextCanvas = ({
       ctx.imageSmoothingQuality = "high";
       ctx.drawImage(loadedImage, drawX, drawY, drawW, drawH);
 
+      // Check if image has solid black background that needs luminance-as-alpha conversion
+      try {
+        const imgData = ctx.getImageData(0, 0, width, height);
+        const data = imgData.data;
+        // Check corners to see if black background is present
+        const cornerAlpha = data[3];
+        const cornerBrightness = data[0] + data[1] + data[2];
+        if (cornerAlpha > 200 && cornerBrightness < 20) {
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const lum = Math.max(r, g, b);
+            data[i] = 255;
+            data[i + 1] = 255;
+            data[i + 2] = 255;
+            data[i + 3] = lum;
+          }
+          ctx.putImageData(imgData, 0, 0);
+        }
+      } catch {
+        // Ignore CORS errors on canvas inspection
+      }
+
       if (props.color && props.color !== "original") {
         ctx.globalCompositeOperation = "source-in";
         if (props.color.includes("gradient")) {
@@ -768,25 +792,10 @@ export const WarpText: React.FC<WarpTextProps> = ({
     document.addEventListener("visibilitychange", onVisibility);
     mediaQuery?.addEventListener("change", onReducedMotion);
 
-    const isIntroPlaying = () =>
-      typeof document !== "undefined" &&
-      document.documentElement.dataset.intro === "playing";
-
-    const onIntroDone = () => {
-      if (!raf && pageVisible && visible && !disposed && !contextLost) {
-        raf = requestAnimationFrame(loop);
-      }
-    };
-    window.addEventListener("recursive-intro-done", onIntroDone);
-
     syncUniforms(program, propsRef.current);
     contextRef.current = { program, rasterize };
     resize();
-
-    // Do not churn GPU frames during the intro sequence — render once and resume on intro-done
-    if (!isIntroPlaying()) {
-      raf = requestAnimationFrame(loop);
-    }
+    raf = requestAnimationFrame(loop);
 
     return () => {
       disposed = true;
@@ -798,7 +807,6 @@ export const WarpText: React.FC<WarpTextProps> = ({
       canvas.removeEventListener("pointerleave", onPointerLeave);
       canvas.removeEventListener("webglcontextlost", onContextLost);
       document.removeEventListener("visibilitychange", onVisibility);
-      window.removeEventListener("recursive-intro-done", onIntroDone);
       mediaQuery?.removeEventListener("change", onReducedMotion);
 
       if (!contextLost) {

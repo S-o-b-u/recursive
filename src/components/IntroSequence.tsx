@@ -299,63 +299,76 @@ export default function IntroSequence() {
       introVid.muted = true;
       introVid.defaultMuted = true;
       introVid.playsInline = true;
-      introVid.loop = true;
-      introVid.autoplay = true;
       introVid.setAttribute("playsinline", "");
       introVid.setAttribute("webkit-playsinline", "");
       introVid.setAttribute("muted", "");
-      introVid.setAttribute("autoplay", "");
-      introVid.setAttribute("loop", "");
 
-      const attemptPlay = () => {
+      // Every one of the listeners below exists to fight a plate that stopped
+      // on its own (a decoder stall, a backgrounded tab, a mid-loop hiccup).
+      // But the hand-off *deliberately* stops it, and these were winning that
+      // argument too: introVid.pause() at the end of the dissolve fired
+      // "pause", ensurePlaying() restarted it, and the intro's decoder kept
+      // running over the hero's for as long as the subtree stayed mounted --
+      // two 4K streams competing at precisely the moment the hero arrives.
+      // Once the plate is deliberately released, these stand down.
+      const ensurePlaying = () => {
         if (plateReleased || doneRef.current) return;
-        const p = introVid.play();
-        if (p && typeof p.catch === "function") {
-          p.catch(() => {});
+        if (introVid.paused) {
+          introVid.play().catch(() => {});
         }
       };
 
-      // Ensure playback on all ready events
-      attemptPlay();
-      introVid.addEventListener("loadedmetadata", attemptPlay);
-      introVid.addEventListener("loadeddata", attemptPlay);
-      introVid.addEventListener("canplay", attemptPlay);
-      introVid.addEventListener("canplaythrough", attemptPlay);
-
+      introVid.addEventListener("waiting", ensurePlaying);
+      introVid.addEventListener("stalled", ensurePlaying);
       const onPause = () => {
-        if (!doneRef.current && !plateReleased && introVid.paused) {
-          attemptPlay();
+        if (!doneRef.current) {
+          ensurePlaying();
         }
       };
       introVid.addEventListener("pause", onPause);
 
-      // Loop fallback
+      // Handle seamless video loop without freeze on mobile
+      let looping = false;
+      const onTimeUpdate = () => {
+        if (looping) return;
+        if (introVid.duration && Number.isFinite(introVid.duration)) {
+          if (introVid.currentTime >= introVid.duration - 0.35) {
+            looping = true;
+            introVid.currentTime = 0;
+            ensurePlaying();
+            window.setTimeout(() => {
+              looping = false;
+            }, 300);
+          }
+        }
+      };
+      introVid.addEventListener("timeupdate", onTimeUpdate);
+      introVid.addEventListener("seeked", ensurePlaying);
       const onEnded = () => {
-        if (plateReleased || doneRef.current) return;
         introVid.currentTime = 0;
-        attemptPlay();
+        ensurePlaying();
       };
       introVid.addEventListener("ended", onEnded);
 
+      ensurePlaying();
+
       cleanupVidListeners = () => {
-        introVid.removeEventListener("loadedmetadata", attemptPlay);
-        introVid.removeEventListener("loadeddata", attemptPlay);
-        introVid.removeEventListener("canplay", attemptPlay);
-        introVid.removeEventListener("canplaythrough", attemptPlay);
+        introVid.removeEventListener("waiting", ensurePlaying);
+        introVid.removeEventListener("stalled", ensurePlaying);
         introVid.removeEventListener("pause", onPause);
+        introVid.removeEventListener("timeupdate", onTimeUpdate);
+        introVid.removeEventListener("seeked", ensurePlaying);
         introVid.removeEventListener("ended", onEnded);
       };
     }
 
-    const onUserInteraction = () => {
-      if (plateReleased || doneRef.current) return;
-      if (videoRef.current && videoRef.current.paused) {
+    const onTouchKick = () => {
+      if (plateReleased) return;
+      if (videoRef.current && videoRef.current.paused && !doneRef.current) {
         videoRef.current.play().catch(() => {});
       }
     };
-    window.addEventListener("touchstart", onUserInteraction, { passive: true });
-    window.addEventListener("pointerdown", onUserInteraction, { passive: true });
-    window.addEventListener("click", onUserInteraction, { passive: true });
+    window.addEventListener("touchstart", onTouchKick, { passive: true });
 
     // Hold the scroll through Lenis. <SmoothScroll> mounts after this layout
     // effect, so the instance can be a frame or two late — retry briefly.
@@ -476,6 +489,11 @@ export default function IntroSequence() {
       const isLite = liteMedia || prefersLiteMedia();
 
       tl.set(root, { autoAlpha: 1 });
+      // Not at effect time: <Hero> is a sibling whose mount effect calls play()
+      // on its own plate, and passive effects run after this layout effect, so
+      // a pause taken now is undone a tick later. The timeline does not start
+      // until the warm gate opens, which is comfortably after that.
+      tl.call(suspendHeroPlate, undefined, 0);
 
       // Opaque from frame 0, not faded up.
       //
@@ -518,7 +536,7 @@ export default function IntroSequence() {
         const welcomeSub = welcomeBlock.querySelector<HTMLElement>(".intro-welcome-sub");
 
         if (welcomeWordInners.length > 0) {
-          tl.set(welcomeWordInners, { opacity: 0, y: 18, filter: isMobileDevice ? "none" : "blur(8px)" }, 0);
+          tl.set(welcomeWordInners, { opacity: 0, y: 18, filter: "blur(8px)" }, 0);
         }
         if (welcomeSub) {
           tl.set(welcomeSub, { opacity: 0, y: 10, letterSpacing: "0.12em" }, 0);
@@ -530,7 +548,7 @@ export default function IntroSequence() {
         // Pin starting states synchronously BEFORE paint — eliminates any 1-frame jitter or pop
         gsap.set(artifactMark, { y: 0, opacity: 1, force3D: true });
         if (welcomeWordInners.length > 0) {
-          gsap.set(welcomeWordInners, { opacity: 0, y: 18, filter: isMobileDevice ? "none" : "blur(8px)" });
+          gsap.set(welcomeWordInners, { opacity: 0, y: 18, filter: "blur(8px)" });
         }
         if (welcomeSub) {
           gsap.set(welcomeSub, { opacity: 0, y: 10, letterSpacing: "0.12em" });
@@ -541,9 +559,7 @@ export default function IntroSequence() {
             scaleX: 0.28,
             scaleY: 0.72,
             clipPath: "inset(0% 42% 0% 42%)",
-            filter: isMobileDevice
-              ? "brightness(1.5) drop-shadow(0 0 14px rgba(162, 235, 98, 0.75))"
-              : "brightness(2.2) saturate(1.4) drop-shadow(0 0 32px rgba(162, 235, 98, 0.95))",
+            filter: "brightness(2.2) saturate(1.4) drop-shadow(0 0 32px rgba(162, 235, 98, 0.95))",
             transformOrigin: "center center",
             force3D: true,
           });
@@ -567,9 +583,7 @@ export default function IntroSequence() {
               scaleX: 1,
               scaleY: 1,
               clipPath: "inset(0% 0% 0% 0%)",
-              filter: isMobileDevice
-                ? "brightness(1.15) drop-shadow(0 2px 12px rgba(0, 0, 0, 0.55))"
-                : "brightness(1.2) saturate(1.15) drop-shadow(0 4px 24px rgba(0, 0, 0, 0.65))",
+              filter: "brightness(1.2) saturate(1.15) drop-shadow(0 4px 24px rgba(0, 0, 0, 0.65))",
               duration: 1.05,
               ease: "power3.out",
             },
@@ -622,7 +636,7 @@ export default function IntroSequence() {
             {
               opacity: 1,
               y: 0,
-              filter: isMobileDevice ? "none" : "blur(0px)",
+              filter: "blur(0px)",
               duration: 0.68,
               ease: "power3.out",
               stagger: 0.09,
@@ -664,7 +678,7 @@ export default function IntroSequence() {
             {
               opacity: 0,
               y: -14,
-              filter: isMobileDevice ? "none" : "blur(6px)",
+              filter: "blur(6px)",
               duration: 0.45,
               ease: "power2.in",
               stagger: 0.03,
@@ -684,7 +698,7 @@ export default function IntroSequence() {
           {
             opacity: 0,
             y: "-=12",
-            filter: isMobileDevice ? "none" : "blur(8px)",
+            filter: "blur(8px)",
             duration: 0.5,
             ease: "power2.in",
           },
@@ -758,19 +772,9 @@ export default function IntroSequence() {
       }
 
       // ── Hand-off ──────────────────────────────────────────────────────────
-      // Synchronize Hero video plate to exact current time before dissolve so grass movement is 100% continuous
-      tl.call(() => {
-        const hv = heroVideo();
-        if (hv && introVid) {
-          try {
-            if (Math.abs(hv.currentTime - introVid.currentTime) > 0.08) {
-              hv.currentTime = introVid.currentTime;
-            }
-          } catch {}
-          const p = hv.play();
-          if (p && typeof p.catch === "function") p.catch(() => {});
-        }
-      }, undefined, 11.8);
+      if (!isMobileDevice) {
+        tl.call(warmHeroPlate, undefined, 11.3);
+      }
 
       // 2. Last line eases out on its own with soft deceleration
       if (lines.length > 0) {
@@ -778,8 +782,8 @@ export default function IntroSequence() {
         if (lastWords.length > 0) {
           tl.to(
             lastWords,
-            { opacity: 0, y: -12, scale: 0.98, duration: 0.55, ease: "power2.inOut", stagger: 0.02 },
-            11.85,
+            { opacity: 0, y: -12, scale: 0.98, duration: 0.58, ease: "power2.inOut", stagger: 0.024 },
+            11.9,
           );
         }
       }
@@ -787,47 +791,41 @@ export default function IntroSequence() {
       // 3. A soft dawn glow rises from the hill line — masks the seam, then recedes.
       tl.fromTo(
         bloom,
-        { opacity: 0, scale: 1.05 },
-        { opacity: isMobileDevice ? 0.35 : 0.75, scale: 1, duration: 0.75, ease: "power1.inOut" },
-        11.95,
+        { opacity: 0, scale: 1.08 },
+        { opacity: isMobileDevice ? 0.7 : 1, scale: 1, duration: 0.85, ease: "power1.inOut" },
+        12.0,
       );
 
       // Pin the plate to exact identity at the dissolve start without micro-snap
-      tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 12.0);
+      tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 12.3);
 
-      // Make root backing transparent BEFORE scene dissolve starts so we dissolve directly into Hero
+      // Hand off to Hero: signal at 12.15s so Hero starts playing smoothly right before the dissolve
+      const handoffTime = isMobileDevice ? 12.15 : 12.0;
       tl.call(() => {
         gsap.set(root, { background: "transparent" });
-      }, undefined, 12.0);
-
-      // Start the luxurious dissolve of the intro scene
-      const dissolveDuration = isMobileDevice ? 0.85 : 0.95;
-      tl.to(scene, { autoAlpha: 0, duration: dissolveDuration, ease: "power2.inOut" }, 12.05);
-
-      // Hand off to Hero: dispatch recursive-intro-done as scene begins to dissolve (12.2s)
-      // This allows the Hero logo, action buttons, and chair note to emerge gracefully in full view
-      tl.call(() => {
         if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
         if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("recursive-intro-done"));
-      }, undefined, 12.2);
+      }, undefined, handoffTime);
 
-      // Allow clicks/touches on Hero UI as it becomes visible
-      tl.set(root, { pointerEvents: "none" }, 12.6);
-      tl.call(releaseScroll, undefined, 12.85);
+      const dissolveDuration = isMobileDevice ? 0.65 : 0.85;
+      tl.to(scene, { autoAlpha: 0, duration: dissolveDuration, ease: "power1.inOut" }, 12.3);
 
-      // Glow gently recedes over the settled hero page
-      tl.to(bloom, { opacity: 0, scale: 1.02, duration: 0.8, ease: "power2.out" }, 12.55);
-
-      // Once scene is completely transparent and dissolved, safely release intro video
+      // Once scene is fully transparent, ensure hero is playing and release introVid
       tl.call(() => {
-        if (introVid) {
+        if (isMobileDevice && introVid) {
           try {
             plateReleased = true;
             introVid.pause();
           } catch {}
         }
         resumeHeroPlate();
-      }, undefined, 12.05 + dissolveDuration + 0.15);
+      }, undefined, 12.3 + dissolveDuration + 0.1);
+
+      tl.set(root, { pointerEvents: "none" }, 12.55);
+      tl.call(releaseScroll, undefined, 13.0);
+
+      // 5. Glow recedes over the settled landing page.
+      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 0.9, ease: "power1.inOut" }, 12.3 + dissolveDuration);
     }, root);
 
     const tl = tlRef.current!;
@@ -839,6 +837,11 @@ export default function IntroSequence() {
       if (started || doneRef.current) return;
       started = true;
       if (vid) {
+        if (vid.currentTime > 0.05) {
+          try {
+            vid.currentTime = 0;
+          } catch {}
+        }
         const p = vid.play();
         if (p && typeof p.catch === "function") p.catch(() => {});
       }
@@ -958,10 +961,11 @@ export default function IntroSequence() {
       root.removeEventListener("touchmove", block);
       window.clearInterval(watchdog);
       window.removeEventListener("keydown", blockKeys);
-      window.removeEventListener("touchstart", onUserInteraction);
-      window.removeEventListener("pointerdown", onUserInteraction);
-      window.removeEventListener("click", onUserInteraction);
-      cleanupVidListeners?.();
+      // Was never removed: a window-level touchstart listener outliving the
+      // intro, holding its closure alive and running on every tap for the rest
+      // of the session. Harmless in effect (doneRef short-circuits it) but a
+      // leak all the same.
+      window.removeEventListener("touchstart", onTouchKick);
       window.removeEventListener("lenis:ready", onLenisReady);
       cancelAnimationFrame(lenisRaf);
       // If we unmount before the timeline releases scroll itself, undo the lock.
@@ -1321,10 +1325,6 @@ export default function IntroSequence() {
           position: absolute;
           inset: 0;
           pointer-events: none;
-          will-change: opacity;
-          transform: translateZ(0);
-          -webkit-transform: translateZ(0);
-          backface-visibility: hidden;
           background:
             radial-gradient(120% 90% at 50% 116%, rgba(6,14,9,0) 32%, rgba(6,14,9,0.8) 76%, rgba(4,10,7,0.96) 100%),
             linear-gradient(180deg, rgba(6,13,9,0.7) 0%, rgba(6,13,9,0.24) 46%, rgba(6,13,9,0.48) 100%);
@@ -1353,8 +1353,8 @@ export default function IntroSequence() {
           .intro-bloom {
             mix-blend-mode: normal !important;
             background: radial-gradient(72% 46% at 50% 74%,
-              rgba(255, 244, 214, 0.28) 0%,
-              rgba(252, 236, 198, 0.14) 32%,
+              rgba(255, 244, 214, 0.42) 0%,
+              rgba(252, 236, 198, 0.22) 30%,
               rgba(214, 230, 196, 0) 65%) !important;
           }
         }
