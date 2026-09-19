@@ -95,6 +95,7 @@ export default function IntroSequence() {
   const [phase, setPhase] = useState<"pending" | "playing" | "done">("pending");
   // Video plate enabled on all devices so grass animates during intro
   const [liteMedia, setLiteMedia] = useState(false);
+  const [videoSrc, setVideoSrc] = useState("/bg/hero_bg.mp4");
   // The skip button is shader-backed. Its wrapper is always mounted -- the
   // timeline tweens it, and a null ref would silently drop those tweens -- but
   // the button itself waits. Mounted with the scene, it put a WebGL context
@@ -209,6 +210,12 @@ export default function IntroSequence() {
   useLayoutEffect(() => {
     if (doneRef.current) return;
     setLiteMedia(false);
+    const isMobile =
+      typeof window !== "undefined" &&
+      ("ontouchstart" in window || window.innerWidth < 860 || prefersLiteMedia());
+    if (isMobile) {
+      setVideoSrc("/bg/hero_bg_mobile.mp4");
+    }
     const params = new URLSearchParams(window.location.search);
     const force = params.get("intro");
 
@@ -303,61 +310,45 @@ export default function IntroSequence() {
       introVid.setAttribute("webkit-playsinline", "");
       introVid.setAttribute("muted", "");
 
-      // Every one of the listeners below exists to fight a plate that stopped
-      // on its own (a decoder stall, a backgrounded tab, a mid-loop hiccup).
-      // But the hand-off *deliberately* stops it, and these were winning that
-      // argument too: introVid.pause() at the end of the dissolve fired
-      // "pause", ensurePlaying() restarted it, and the intro's decoder kept
-      // running over the hero's for as long as the subtree stayed mounted --
-      // two 4K streams competing at precisely the moment the hero arrives.
-      // Once the plate is deliberately released, these stand down.
+      let playTimeout: ReturnType<typeof setTimeout> | null = null;
       const ensurePlaying = () => {
         if (plateReleased || doneRef.current) return;
-        if (introVid.paused) {
-          introVid.play().catch(() => {});
-        }
+        if (playTimeout) return;
+        playTimeout = setTimeout(() => {
+          playTimeout = null;
+          if (plateReleased || doneRef.current) return;
+          if (introVid && introVid.paused) {
+            introVid.play().catch(() => {});
+          }
+        }, 120);
       };
 
-      introVid.addEventListener("waiting", ensurePlaying);
+      introVid.addEventListener("canplay", ensurePlaying);
       introVid.addEventListener("stalled", ensurePlaying);
       const onPause = () => {
-        if (!doneRef.current) {
+        if (!doneRef.current && !plateReleased) {
           ensurePlaying();
         }
       };
       introVid.addEventListener("pause", onPause);
 
-      // Handle seamless video loop without freeze on mobile
-      let looping = false;
-      const onTimeUpdate = () => {
-        if (looping) return;
-        if (introVid.duration && Number.isFinite(introVid.duration)) {
-          if (introVid.currentTime >= introVid.duration - 0.35) {
-            looping = true;
-            introVid.currentTime = 0;
-            ensurePlaying();
-            window.setTimeout(() => {
-              looping = false;
-            }, 300);
-          }
-        }
-      };
-      introVid.addEventListener("timeupdate", onTimeUpdate);
-      introVid.addEventListener("seeked", ensurePlaying);
+      // HTML5 video natively loops when `loop` attribute is present.
+      // If ended triggers on any browser that does not auto-loop, restart playback smoothly:
       const onEnded = () => {
-        introVid.currentTime = 0;
-        ensurePlaying();
+        if (plateReleased || doneRef.current) return;
+        introVid.play().catch(() => {});
       };
       introVid.addEventListener("ended", onEnded);
 
-      ensurePlaying();
+      if (introVid.readyState >= 2 && introVid.paused) {
+        introVid.play().catch(() => {});
+      }
 
       cleanupVidListeners = () => {
-        introVid.removeEventListener("waiting", ensurePlaying);
+        if (playTimeout) clearTimeout(playTimeout);
+        introVid.removeEventListener("canplay", ensurePlaying);
         introVid.removeEventListener("stalled", ensurePlaying);
         introVid.removeEventListener("pause", onPause);
-        introVid.removeEventListener("timeupdate", onTimeUpdate);
-        introVid.removeEventListener("seeked", ensurePlaying);
         introVid.removeEventListener("ended", onEnded);
       };
     }
@@ -536,7 +527,7 @@ export default function IntroSequence() {
         const welcomeSub = welcomeBlock.querySelector<HTMLElement>(".intro-welcome-sub");
 
         if (welcomeWordInners.length > 0) {
-          tl.set(welcomeWordInners, { opacity: 0, y: 18, filter: "blur(8px)" }, 0);
+          tl.set(welcomeWordInners, { opacity: 0, y: 18, filter: isMobileDevice ? "none" : "blur(8px)" }, 0);
         }
         if (welcomeSub) {
           tl.set(welcomeSub, { opacity: 0, y: 10, letterSpacing: "0.12em" }, 0);
@@ -548,7 +539,7 @@ export default function IntroSequence() {
         // Pin starting states synchronously BEFORE paint — eliminates any 1-frame jitter or pop
         gsap.set(artifactMark, { y: 0, opacity: 1, force3D: true });
         if (welcomeWordInners.length > 0) {
-          gsap.set(welcomeWordInners, { opacity: 0, y: 18, filter: "blur(8px)" });
+          gsap.set(welcomeWordInners, { opacity: 0, y: 18, filter: isMobileDevice ? "none" : "blur(8px)" });
         }
         if (welcomeSub) {
           gsap.set(welcomeSub, { opacity: 0, y: 10, letterSpacing: "0.12em" });
@@ -559,7 +550,9 @@ export default function IntroSequence() {
             scaleX: 0.28,
             scaleY: 0.72,
             clipPath: "inset(0% 42% 0% 42%)",
-            filter: "brightness(2.2) saturate(1.4) drop-shadow(0 0 32px rgba(162, 235, 98, 0.95))",
+            filter: isMobileDevice
+              ? "brightness(1.5) drop-shadow(0 0 14px rgba(162, 235, 98, 0.75))"
+              : "brightness(2.2) saturate(1.4) drop-shadow(0 0 32px rgba(162, 235, 98, 0.95))",
             transformOrigin: "center center",
             force3D: true,
           });
@@ -583,7 +576,9 @@ export default function IntroSequence() {
               scaleX: 1,
               scaleY: 1,
               clipPath: "inset(0% 0% 0% 0%)",
-              filter: "brightness(1.2) saturate(1.15) drop-shadow(0 4px 24px rgba(0, 0, 0, 0.65))",
+              filter: isMobileDevice
+                ? "brightness(1.15) drop-shadow(0 2px 12px rgba(0, 0, 0, 0.55))"
+                : "brightness(1.2) saturate(1.15) drop-shadow(0 4px 24px rgba(0, 0, 0, 0.65))",
               duration: 1.05,
               ease: "power3.out",
             },
@@ -636,7 +631,7 @@ export default function IntroSequence() {
             {
               opacity: 1,
               y: 0,
-              filter: "blur(0px)",
+              filter: isMobileDevice ? "none" : "blur(0px)",
               duration: 0.68,
               ease: "power3.out",
               stagger: 0.09,
@@ -678,7 +673,7 @@ export default function IntroSequence() {
             {
               opacity: 0,
               y: -14,
-              filter: "blur(6px)",
+              filter: isMobileDevice ? "none" : "blur(6px)",
               duration: 0.45,
               ease: "power2.in",
               stagger: 0.03,
@@ -698,7 +693,7 @@ export default function IntroSequence() {
           {
             opacity: 0,
             y: "-=12",
-            filter: "blur(8px)",
+            filter: isMobileDevice ? "none" : "blur(8px)",
             duration: 0.5,
             ease: "power2.in",
           },
@@ -1027,7 +1022,7 @@ export default function IntroSequence() {
             <div ref={focusRef} className="intro-focus">
               <video
                 ref={videoRef}
-                src="/bg/hero_bg.mp4"
+                src={videoSrc}
                 poster="/images/hero/hero_poster.jpg"
                 autoPlay
                 loop
@@ -1325,6 +1320,10 @@ export default function IntroSequence() {
           position: absolute;
           inset: 0;
           pointer-events: none;
+          will-change: opacity;
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
+          backface-visibility: hidden;
           background:
             radial-gradient(120% 90% at 50% 116%, rgba(6,14,9,0) 32%, rgba(6,14,9,0.8) 76%, rgba(4,10,7,0.96) 100%),
             linear-gradient(180deg, rgba(6,13,9,0.7) 0%, rgba(6,13,9,0.24) 46%, rgba(6,13,9,0.48) 100%);

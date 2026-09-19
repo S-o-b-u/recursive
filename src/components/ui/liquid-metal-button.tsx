@@ -34,6 +34,7 @@ const EASE_SIZE = `${EASE}, width 0.4s ease, height 0.4s ease`;
  */
 function preferLiteButton(): boolean {
   if (typeof window === "undefined") return true;
+  if (prefersLiteMedia()) return true;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return true;
   try {
     const canvas = document.createElement("canvas");

@@ -18,6 +18,16 @@ export default function Hero() {
 
   // Background video plate showing the hill and moving grass on all devices
   const [useVideo, setUseVideo] = useState(true);
+  const [videoSrc, setVideoSrc] = useState("/bg/hero_bg.mp4");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isMobile = window.innerWidth < 860 || prefersLiteMedia();
+      if (isMobile) {
+        setVideoSrc("/bg/hero_bg_mobile.mp4");
+      }
+    }
+  }, []);
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -128,13 +138,13 @@ export default function Hero() {
           <video
             ref={videoRef}
             className="hero-video"
-            src="/bg/hero_bg.mp4"
+            src={videoSrc}
             poster="/images/hero/hero_poster.jpg"
             autoPlay={false}
             loop
             muted
             playsInline
-            preload="auto"
+            preload={introFinished ? "auto" : "none"}
             aria-hidden="true"
           />
         )}
