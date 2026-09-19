@@ -28,6 +28,9 @@ export default function Hero() {
     video.setAttribute("playsinline", "");
     video.setAttribute("webkit-playsinline", "");
     video.setAttribute("muted", "");
+    try {
+      video.load();
+    } catch {}
 
     const playHero = () => {
       video.play().catch(() => {});
@@ -47,12 +50,7 @@ export default function Hero() {
       const io = new IntersectionObserver((entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            if (
-              typeof document === "undefined" ||
-              document.documentElement.dataset.intro === "done"
-            ) {
-              video.play().catch(() => {});
-            }
+            video.play().catch(() => {});
           } else {
             video.pause();
           }
@@ -305,6 +303,7 @@ export default function Hero() {
           object-position: center center;
           pointer-events: none;
           transform: translate3d(0, 0, 0);
+          will-change: transform;
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
         }

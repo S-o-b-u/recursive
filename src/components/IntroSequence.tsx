@@ -304,116 +304,25 @@ export default function IntroSequence() {
     }
     window.scrollTo(0, 0);
 
-    const introVid = videoRef.current;
-    let cleanupVidListeners: (() => void) | null = null;
-    /** Set once the hand-off intentionally stops the intro's plate. */
-    let plateReleased = false;
-    /**
-     * Set once the timeline deliberately starts the plate. Until then every
-     * keep-alive listener below stands down, because a paused plate is the
-     * intended state: the video used to autoplay from mount, decoding 1080p
-     * for three seconds behind a veil that is fully opaque until 3.25s -- pure
-     * contention with the artifact stage, which runs in exactly that window.
-     * It now starts at 2.9s, in time to have frames up before the veil lifts.
-     */
-    let plateStarted = false;
-    if (introVid) {
-      introVid.muted = true;
-      introVid.defaultMuted = true;
-      introVid.playsInline = true;
-      introVid.setAttribute("playsinline", "");
-      introVid.setAttribute("webkit-playsinline", "");
-      introVid.setAttribute("muted", "");
-
-      // Every one of the listeners below exists to fight a plate that stopped
-      // on its own (a decoder stall, a backgrounded tab, a mid-loop hiccup).
-      // But the hand-off *deliberately* stops it, and these were winning that
-      // argument too: introVid.pause() at the end of the dissolve fired
-      // "pause", ensurePlaying() restarted it, and the intro's decoder kept
-      // running over the hero's for as long as the subtree stayed mounted --
-      // two 4K streams competing at precisely the moment the hero arrives.
-      // Once the plate is deliberately released, these stand down.
-      const ensurePlaying = () => {
-        if (!plateStarted || plateReleased || doneRef.current) return;
-        if (introVid.paused) {
-          introVid.play().catch(() => {});
-        }
-      };
-
-      introVid.addEventListener("waiting", ensurePlaying);
-      introVid.addEventListener("stalled", ensurePlaying);
-      const onPause = () => {
-        if (!doneRef.current) {
-          ensurePlaying();
-        }
-      };
-      introVid.addEventListener("pause", onPause);
-
-      // The element carries autoPlay purely so iOS starts fetching at load
-      // (see the JSX). Any playback the browser starts on its own before the
-      // timeline asks for it is stopped on the spot: the bytes keep arriving,
-      // the decoder does not run. onPause stands down because plateStarted is
-      // still false.
-      const holdUntilStarted = () => {
-        if (!plateStarted && !introVid.paused) {
-          try {
-            introVid.pause();
-          } catch {}
-        }
-      };
-      introVid.addEventListener("play", holdUntilStarted);
-      holdUntilStarted();
-
-      // No manual loop, and no fear of the native one.
-      //
-      // hero_loop_pp.mp4 is a palindrome: the source played forward, then in
-      // reverse. Both the turnaround and the loop point are ordinary one-frame
-      // steps, so the native `loop` attribute has no seam to show, and the
-      // sway's *phase* is continuous by construction -- it just changes
-      // direction, which is what wind does. (A crossfade loop was tried first
-      // and rejected: blending two sway states smeared the blades for a full
-      // second, every 7s, on every device.) The original hard loop cut from
-      // one sway pose straight to another and read as a snap. This also
-      // removes two workarounds this file
-      // used to carry: a timeupdate handler that hard-seeked to 0 before the
-      // end (a freeze-then-jump on phones), and a 0.76x playback rate that
-      // stretched the clip so it could not reach its end while visible. Both
-      // plates now run at natural speed and loop whenever they like.
-      //
-      // This is also what fixed the hand-off. The hero's plate is seeked to the
-      // intro's frame at the cut; with a non-seamless clip that put it a second
-      // from the end, so it looped to frame 0 under the tail of the dissolve --
-      // a lateral snap in the grass on desktop, a shake on phones.
-      introVid.addEventListener("seeked", ensurePlaying);
-
-      ensurePlaying();
-
-      cleanupVidListeners = () => {
-        introVid.removeEventListener("waiting", ensurePlaying);
-        introVid.removeEventListener("stalled", ensurePlaying);
-        introVid.removeEventListener("pause", onPause);
-        introVid.removeEventListener("play", holdUntilStarted);
-        introVid.removeEventListener("seeked", ensurePlaying);
-      };
-    }
+    const heroVideo = () =>
+      document.querySelector<HTMLVideoElement>("video.hero-video");
+    const heroMediaTargets = () =>
+      document.querySelectorAll<HTMLElement>("#hero .hero-video");
 
     const onTouchKick = () => {
-      if (!plateStarted || plateReleased) return;
-      if (videoRef.current && videoRef.current.paused && !doneRef.current) {
-        videoRef.current.play().catch(() => {});
+      const hv = heroVideo();
+      if (hv && hv.paused && !doneRef.current) {
+        hv.play().catch(() => {});
       }
     };
     window.addEventListener("touchstart", onTouchKick, { passive: true });
 
+    let cleanupVidListeners: (() => void) | null = () => {
+      window.removeEventListener("touchstart", onTouchKick);
+    };
+
     // Hold the scroll through Lenis. <SmoothScroll> mounts after this layout
     // effect, so the instance can be a frame or two late — retry briefly.
-    //
-    // <SmoothScroll> never constructs a Lenis instance on touch/mobile at all
-    // (native momentum scroll instead) — same isTouch check as there. Without
-    // this guard, grabLenis() polled every animation frame for the intro's
-    // entire ~9s runtime on every phone, never finding one, purely because
-    // there was nothing to give up on: one more source of needless per-frame
-    // work stacked on the busiest, least-headroom window of the whole page.
     const isTouch =
       typeof window !== "undefined" &&
       ("ontouchstart" in window || navigator.maxTouchPoints > 0 || window.innerWidth < 860);
@@ -446,77 +355,11 @@ export default function IntroSequence() {
     };
     window.addEventListener("keydown", blockKeys, { passive: false });
 
-    const heroVideo = () =>
-      document.querySelector<HTMLVideoElement>("video.hero-video");
-
-    // The hero mounts under the curtain and starts its own plate immediately,
-    // so for the whole cold-open the device is decoding two copies of the same
-    // 4K file -- and exactly one of them is on screen. The hidden one is pure
-    // contention for the frames the intro is trying to hit, and it is worst on
-    // the phones that can least afford it. Park it until warmHeroPlate wants it
-    // back; finish() and the skip path both restart it, so it cannot be
-    // stranded paused.
-    const suspendHeroPlate = () => {
-      const heroVid = heroVideo();
-      if (!heroVid) return;
-      try {
-        heroVid.pause();
-      } catch {}
-    };
-
     const isMobileDevice = isTouch || liteMedia || prefersLiteMedia();
-
-    /**
-     * Seek the hero's plate to the intro's current frame.
-     *
-     * Both plates are the same file, and the dissolve crossfades one into the
-     * other over 0.65-0.85s. The hero used to start from currentTime 0 while
-     * the intro was ~12s in, so the crossfade blended two different moments
-     * of the same grass: a ghosted double image for the whole hand-off, which
-     * is precisely what a "not smooth" transition looks like. Aligned, the two
-     * plates are pixel-identical and the dissolve has nothing to show.
-     */
-    const alignHeroPlate = () => {
-      const heroVid = heroVideo();
-      if (!heroVid || !introVid || introVid.readyState < 2) return;
-      try {
-        const dur = heroVid.duration || introVid.duration;
-        const t =
-          dur && Number.isFinite(dur) ? introVid.currentTime % dur : introVid.currentTime;
-        if (Math.abs(heroVid.currentTime - t) > 0.04) heroVid.currentTime = t;
-      } catch {}
-    };
-
-    // Coarse warm-up: start the hero's plate playing and aligned on desktop.
-    // On mobile / touch devices, do not spin up the second video early —
-    // iOS WebKit will pause the active intro video if a second video starts playing!
-    const warmHeroPlate = () => {
-      if (isMobileDevice) return;
-      const heroVid = heroVideo();
-      if (!heroVid) return;
-      try {
-        alignHeroPlate();
-        const p = heroVid.play();
-        if (p && typeof p.catch === "function") p.catch(() => {});
-      } catch {}
-    };
-
-
-
-    // Resumes the hero's plate under the dissolve.
-    const resumeHeroPlate = () => {
-      const heroVid = heroVideo();
-      if (!heroVid) return;
-      try {
-        const p = heroVid.play();
-        if (p && typeof p.catch === "function") p.catch(() => {});
-      } catch {}
-    };
 
     // Give scroll back the moment the scene is gone rather than at the end of
     // the bloom. finish() cannot be brought forward for this because it also
-    // sets phase to "done", and the component returns null in that phase --
-    // which would cut the bloom recede off mid-fade.
+    // sets phase to "done", and the component returns null in that phase.
     let released = false;
     const releaseScroll = () => {
       if (released || doneRef.current) return;
@@ -546,26 +389,6 @@ export default function IntroSequence() {
       const isLite = liteMedia || prefersLiteMedia();
 
       tl.set(root, { autoAlpha: 1 });
-      // Not at effect time: <Hero> is a sibling whose mount effect calls play()
-      // on its own plate, and passive effects run after this layout effect, so
-      // a pause taken now is undone a tick later. The timeline does not start
-      // until the warm gate opens, which is comfortably after that.
-      tl.call(suspendHeroPlate, undefined, 0);
-
-      // Opaque from frame 0, not faded up.
-      //
-      // This was a 0.35s fade from opacity 0, added to cover a 1-frame position
-      // snap, and it was the entire black gap after a reload: the pending plate
-      // has already unmounted by the time it runs and .intro-root is
-      // transparent, so every frame of the fade was also a frame of dead dark
-      // (or, with a warm cache, of the finished hero bleeding through the
-      // half-opaque scene). Shortening it only shrinks the dip -- it still dips.
-      //
-      // There is nothing left to cover now: the pending plate paints this same
-      // still, at this same frame-0 transform and grade, so the swap has no
-      // visible seam. And the snap it guarded against cannot happen anyway --
-      // fromTo applies its from-state via immediateRender, synchronously, before
-      // the browser paints the frame the scene first appears on.
       tl.set(scene, { opacity: 1 }, 0);
 
       const isWideScreen = typeof window !== "undefined" && window.innerWidth >= 768;
@@ -574,7 +397,16 @@ export default function IntroSequence() {
       const initialScale = isWideScreen ? 1.07 : 1.12;
       const initialYPercent = isWideScreen ? -3.2 : -5;
 
-      // Pin media to starting transform immediately before paint — eliminates 1s jump
+      // Pin media to starting transform immediately before paint
+      const hm = heroMediaTargets();
+      if (hm.length > 0) {
+        gsap.set(hm, {
+          scale: initialScale,
+          yPercent: initialYPercent,
+          transformOrigin: "center center",
+          force3D: true,
+        });
+      }
       gsap.set(media, {
         scale: initialScale,
         yPercent: initialYPercent,
@@ -798,17 +630,15 @@ export default function IntroSequence() {
       }
 
       // Start the plate 0.35s before the veil begins to lift (3.25s) and 1.2s
-      // before it is gone. Enough lead for a preloaded, muted, inline video to
-      // have real frames up on a phone; short enough that it is not decoding
-      // under the artifact.
+      // before it is gone.
       tl.call(
         () => {
-          if (!introVid || doneRef.current) return;
-          plateStarted = true;
+          const heroVid = heroVideo();
+          if (!heroVid || doneRef.current) return;
           try {
-            if (introVid.currentTime > 0.05) introVid.currentTime = 0;
+            if (heroVid.currentTime > 0.05) heroVid.currentTime = 0;
           } catch {}
-          const p = introVid.play();
+          const p = heroVid.play();
           if (p && typeof p.catch === "function") p.catch(() => {});
         },
         undefined,
@@ -816,6 +646,11 @@ export default function IntroSequence() {
       );
 
       // ── Stage 3: Slowly the intro story animation starts ──
+      tl.to(
+        heroMediaTargets(),
+        { scale: 1, yPercent: 0, duration: 8.5, ease: "power1.inOut" },
+        3.7,
+      );
       tl.to(
         media,
         { scale: 1, yPercent: 0, duration: 8.5, ease: "power1.inOut" },
@@ -874,10 +709,6 @@ export default function IntroSequence() {
       }
 
       // ── Hand-off ──────────────────────────────────────────────────────────
-      if (!isMobileDevice) {
-        tl.call(warmHeroPlate, undefined, 11.3);
-      }
-
       // 2. Last line eases out on its own with soft deceleration
       if (lines.length > 0) {
         const lastWords = Array.from(lines[lines.length - 1].querySelectorAll<HTMLElement>(".intro-word"));
@@ -890,82 +721,39 @@ export default function IntroSequence() {
         }
       }
 
-      // 3. A soft dawn glow rises from the hill line — masks the seam, then recedes.
+      // 3. A soft dawn glow rises from the hill line, then recedes.
       tl.fromTo(
         bloom,
-        { opacity: 0, scale: 1.08 },
-        { opacity: isMobileDevice ? 0.7 : 1, scale: 1, duration: 0.85, ease: "power1.inOut" },
+        { opacity: 0, scale: 1.05 },
+        { opacity: isMobileDevice ? 0.35 : 0.45, scale: 1, duration: 0.75, ease: "sine.out" },
         12.0,
       );
 
-      // Pin the plate to exact identity at the dissolve start without micro-snap
-
-      // Hand off to Hero.
-      //
-      // On touch devices the plate swap and the dissolve happen at the same
-      // instant, and the intro's plate is frozen *deliberately* the moment the
-      // hero's starts. This is the fix for the hand-off shaking on phones.
-      //
-      // iOS runs one inline video at a time: starting the hero's plate pauses
-      // the intro's. That fired "pause", the keep-alive answered with play(),
-      // which paused the hero, whose keep-alive played it back, which paused
-      // the intro again... and plateReleased -- the flag that makes the intro
-      // stand down -- was not set until 0.75s later. So for the entire
-      // crossfade the two plates took turns freezing and jumping each other.
-      // Since both are the same clip and are frame-aligned first, freezing the
-      // intro's copy on the frame the hero's starts from costs nothing
-      // visible: the dissolve crosses from a held frame to the same frame in
-      // motion. Only one decoder ever runs.
-      //
-      // Desktop keeps both plates playing (aligned) through the dissolve, as
-      // it can, and pauses the intro's once it is fully transparent.
-      const handoffTime = isMobileDevice ? 12.15 : 12.0;
-      const dissolveStart = isMobileDevice ? handoffTime : 12.3;
-      const dissolveDuration = isMobileDevice ? 0.75 : 0.85;
-
-      // Pin the plate to exact identity once its climb has finished. The climb
-      // tween ends at 12.2s (3.7 + 8.5); this must not land before that, or it
-      // snaps the plate 50ms early and the still-running tween flicks it back
-      // for a frame. 12.3s is after the tween on every device and, on mobile,
-      // 150ms into a dissolve the plate is already at ~identity for anyway.
-      tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 12.3);
+      // Hand off to Hero: single unified video plate continues uninterrupted at 60fps
+      const handoffTime = 12.15;
+      const dissolveStart = 12.2;
+      const dissolveDuration = 0.75;
 
       tl.call(() => {
         gsap.set(root, { background: "transparent" });
-        // Before the event: <Hero> plays its plate in response to it, and the
-        // seek has to land first so it starts on the intro's frame. On desktop
-        // this is a re-sync after the 11.3s warm-up; on mobile it is the only
-        // alignment, taken the instant before the hero's first play().
-        alignHeroPlate();
-        if (isMobileDevice && introVid) {
-          plateReleased = true;
-          try {
-            introVid.pause();
-          } catch {}
-        }
         if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
         if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("recursive-intro-done"));
       }, undefined, handoffTime);
 
       tl.to(scene, { autoAlpha: 0, duration: dissolveDuration, ease: "power1.inOut" }, dissolveStart);
 
-      // Once the scene is fully transparent: desktop releases its plate here
-      // (mobile already did, above); both make sure the hero's is running.
       tl.call(() => {
-        if (introVid) {
-          plateReleased = true;
-          try {
-            introVid.pause();
-          } catch {}
+        const hm = heroMediaTargets();
+        if (hm.length > 0) {
+          gsap.set(hm, { clearProps: "transform" });
         }
-        resumeHeroPlate();
-      }, undefined, dissolveStart + dissolveDuration + 0.1);
+      }, undefined, 12.25);
 
-      tl.set(root, { pointerEvents: "none" }, dissolveStart + 0.25);
+      tl.set(root, { pointerEvents: "none" }, dissolveStart + 0.15);
       tl.call(releaseScroll, undefined, dissolveStart + dissolveDuration + 0.05);
 
       // 5. Glow recedes over the settled landing page.
-      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 0.9, ease: "power1.inOut" }, dissolveStart + dissolveDuration);
+      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 0.85, ease: "power1.inOut" }, dissolveStart + dissolveDuration);
     }, root);
 
     const tl = tlRef.current!;
@@ -1047,7 +835,22 @@ export default function IntroSequence() {
       gsap.killTweensOf(wordInners);
       gsap.set(wordInners, { clearProps: "transform,textShadow" });
 
-      warmHeroPlate();
+      const hm = heroMediaTargets();
+      gsap.killTweensOf(hm);
+      gsap.to(hm, {
+        scale: 1,
+        yPercent: 0,
+        duration: 0.5,
+        ease: "power2.out",
+        onComplete: () => {
+          gsap.set(hm, { clearProps: "transform" });
+        },
+      });
+
+      const heroVid = heroVideo();
+      if (heroVid && heroVid.paused) {
+        heroVid.play().catch(() => {});
+      }
 
       const q = gsap.timeline({ onComplete: finish });
       if (loaderOverlay) {
@@ -1072,16 +875,6 @@ export default function IntroSequence() {
       q.call(
         () => {
           gsap.set(root, { background: "transparent" });
-          // Same seam as the full hand-off: land the seek before <Hero> plays,
-          // and on touch devices freeze this plate so the two never fight for
-          // the single decoder.
-          alignHeroPlate();
-          if (isMobileDevice && introVid) {
-            plateReleased = true;
-            try {
-              introVid.pause();
-            } catch {}
-          }
           if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
           if (typeof window !== "undefined")
             window.dispatchEvent(new CustomEvent("recursive-intro-done"));
@@ -1090,9 +883,6 @@ export default function IntroSequence() {
         0.4,
       );
       q.to(scene, { autoAlpha: 0, duration: 0.6, ease: "sine.inOut" }, 0.66);
-      // No-ops when the plate is already running, so it is safe on the lite
-      // path where freezePlates never paused it.
-      q.call(resumeHeroPlate, undefined, 1.02);
       q.set(root, { pointerEvents: "none" }, 1.0);
       q.call(releaseScroll, undefined, 1.26);
       q.to(bloom, { opacity: 0, scale: 1.04, duration: 0.65, ease: "power1.inOut" }, 1.05);
@@ -1104,18 +894,13 @@ export default function IntroSequence() {
       root.removeEventListener("touchmove", block);
       window.clearInterval(watchdog);
       window.removeEventListener("keydown", blockKeys);
-      // Was never removed: a window-level touchstart listener outliving the
-      // intro, holding its closure alive and running on every tap for the rest
-      // of the session. Harmless in effect (doneRef short-circuits it) but a
-      // leak all the same.
-      window.removeEventListener("touchstart", onTouchKick);
+      cleanupVidListeners?.();
       window.removeEventListener("lenis:ready", onLenisReady);
       cancelAnimationFrame(lenisRaf);
       // If we unmount before the timeline releases scroll itself, undo the lock.
       if (lenisHooked && !doneRef.current) getLenis()?.start();
-      // Same reasoning for the parked hero plate: finish() restarts it on the
-      // normal routes, so this only covers an unmount that skipped them.
-      if (!doneRef.current) resumeHeroPlate();
+      const hv = heroVideo();
+      if (hv && hv.paused) hv.play().catch(() => {});
       try {
         history.scrollRestoration = prevRestoration;
       } catch {}
@@ -1202,29 +987,7 @@ export default function IntroSequence() {
       <div ref={sceneRef} className="intro-scene">
         <div className="intro-media-clip">
           <div ref={mediaRef} className="intro-media">
-            <div ref={focusRef} className="intro-focus">
-              {/* autoPlay is kept, but only as a FETCH trigger. iOS Safari will
-                  not download a byte of a video until playback is requested,
-                  preload="auto" or not -- so without autoPlay the 7MB plate
-                  starts downloading at 2.9s and on cellular the grass arrives
-                  late and abruptly. The effect below pauses it on its very
-                  first "play" so the decoder does not run under the artifact;
-                  the timeline starts it for real at 2.9s.
-                  /bg/ is served Cache-Control: immutable (next.config.ts), so a
-                  replacement clip MUST get a new filename -- this is already the
-                  third name for exactly that reason. Update <Hero> too. */}
-              <video
-                ref={videoRef}
-                src="/bg/hero_loop_pp.mp4"
-                poster="/images/hero/hero_poster_v3.jpg"
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="auto"
-                aria-hidden="true"
-              />
-            </div>
+            <div ref={focusRef} className="intro-focus" />
           </div>
         </div>
 
@@ -1312,7 +1075,7 @@ export default function IntroSequence() {
           min-height: 100dvh;
           z-index: 9999;
           overflow: hidden;
-          background: #0a140c;
+          background: transparent;
           opacity: 1;
           pointer-events: auto;
           -webkit-tap-highlight-color: transparent;
@@ -1331,8 +1094,9 @@ export default function IntroSequence() {
           min-height: 100vh;
           min-height: 100dvh;
           overflow: hidden;
-          background: #0a140c;
+          background: transparent;
           opacity: 1;
+          pointer-events: none;
           contain: layout paint style;
         }
 
@@ -1552,10 +1316,10 @@ export default function IntroSequence() {
 
         @media (max-width: 860px), (pointer: coarse) {
           .intro-bloom {
-            mix-blend-mode: normal !important;
+            mix-blend-mode: screen !important;
             background: radial-gradient(72% 46% at 50% 74%,
-              rgba(255, 244, 214, 0.42) 0%,
-              rgba(252, 236, 198, 0.22) 30%,
+              rgba(255, 244, 214, 0.35) 0%,
+              rgba(252, 236, 198, 0.18) 30%,
               rgba(214, 230, 196, 0) 65%) !important;
           }
         }
