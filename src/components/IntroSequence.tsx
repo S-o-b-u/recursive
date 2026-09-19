@@ -476,11 +476,6 @@ export default function IntroSequence() {
       const isLite = liteMedia || prefersLiteMedia();
 
       tl.set(root, { autoAlpha: 1 });
-      // Not at effect time: <Hero> is a sibling whose mount effect calls play()
-      // on its own plate, and passive effects run after this layout effect, so
-      // a pause taken now is undone a tick later. The timeline does not start
-      // until the warm gate opens, which is comfortably after that.
-      tl.call(suspendHeroPlate, undefined, 0);
 
       // Opaque from frame 0, not faded up.
       //
@@ -541,45 +536,63 @@ export default function IntroSequence() {
           gsap.set(welcomeSub, { opacity: 0, y: 10, letterSpacing: "0.12em" });
         }
         if (artifactImg) {
-          gsap.set(artifactImg, {
-            opacity: 0,
-            scaleX: 0.28,
-            scaleY: 0.72,
-            clipPath: "inset(0% 42% 0% 42%)",
-            filter: isMobileDevice
-              ? "brightness(1.5) drop-shadow(0 0 14px rgba(162, 235, 98, 0.75))"
-              : "brightness(2.2) saturate(1.4) drop-shadow(0 0 32px rgba(162, 235, 98, 0.95))",
-            transformOrigin: "center center",
-            force3D: true,
-          });
+          if (isMobileDevice) {
+            gsap.set(artifactImg, {
+              opacity: 0,
+              scale: 0.8,
+              transformOrigin: "center center",
+              force3D: true,
+            });
+          } else {
+            gsap.set(artifactImg, {
+              opacity: 0,
+              scaleX: 0.28,
+              scaleY: 0.72,
+              clipPath: "inset(0% 42% 0% 42%)",
+              filter: "brightness(2.2) saturate(1.4) drop-shadow(0 0 32px rgba(162, 235, 98, 0.95))",
+              transformOrigin: "center center",
+              force3D: true,
+            });
+          }
         }
         if (artifactAura) {
           gsap.set(artifactAura, {
-            scale: 0.35,
+            scale: isMobileDevice ? 0.4 : 0.35,
             opacity: 0,
             transformOrigin: "center center",
             force3D: true,
           });
         }
 
-        // Stage 1: Relic Awakening (Center-Out Wings Unfurl)
-        // Emerges smoothly from bright luminous center core and expands outward
+        // Stage 1: Relic Awakening
+        // Emerges smoothly from bright luminous center core with pure GPU transforms on mobile
         if (artifactImg) {
-          tl.to(
-            artifactImg,
-            {
-              opacity: 1,
-              scaleX: 1,
-              scaleY: 1,
-              clipPath: "inset(0% 0% 0% 0%)",
-              filter: isMobileDevice
-                ? "brightness(1.15) drop-shadow(0 2px 12px rgba(0, 0, 0, 0.55))"
-                : "brightness(1.2) saturate(1.15) drop-shadow(0 4px 24px rgba(0, 0, 0, 0.65))",
-              duration: 1.05,
-              ease: "power3.out",
-            },
-            0.05,
-          );
+          if (isMobileDevice) {
+            tl.to(
+              artifactImg,
+              {
+                opacity: 1,
+                scale: 1,
+                duration: 0.95,
+                ease: "power2.out",
+              },
+              0.05,
+            );
+          } else {
+            tl.to(
+              artifactImg,
+              {
+                opacity: 1,
+                scaleX: 1,
+                scaleY: 1,
+                clipPath: "inset(0% 0% 0% 0%)",
+                filter: "brightness(1.2) saturate(1.15) drop-shadow(0 4px 24px rgba(0, 0, 0, 0.65))",
+                duration: 1.05,
+                ease: "power3.out",
+              },
+              0.05,
+            );
+          }
         } else {
           tl.fromTo(
             artifactMark,
@@ -594,8 +607,8 @@ export default function IntroSequence() {
           tl.to(
             artifactAura,
             {
-              scale: 1.25,
-              opacity: 1,
+              scale: isMobileDevice ? 1.15 : 1.25,
+              opacity: isMobileDevice ? 0.8 : 1,
               duration: 0.65,
               ease: "power2.out",
             },
@@ -603,7 +616,7 @@ export default function IntroSequence() {
           );
           tl.to(
             artifactAura,
-            { scale: 1, opacity: 0.8, duration: 0.45, ease: "sine.out" },
+            { scale: 1, opacity: isMobileDevice ? 0.55 : 0.8, duration: 0.45, ease: "sine.out" },
             0.7,
           );
         }
@@ -613,14 +626,14 @@ export default function IntroSequence() {
           artifactMark,
           {
             y: isMobileDevice ? -20 : -32,
-            duration: 0.85,
-            ease: "sine.inOut",
+            duration: 0.8,
+            ease: "power2.out",
           },
-          1.1,
+          0.95,
         );
 
-        // "Hi There, Hackers!" word-level upward lift and blur-to-focus fade-in
-        tl.set(welcomeBlock, { opacity: 1, pointerEvents: "auto" }, 1.15);
+        // "Hi There, Hackers!" word-level upward lift
+        tl.set(welcomeBlock, { opacity: 1, pointerEvents: "auto" }, 1.05);
         if (welcomeWordInners.length > 0) {
           tl.to(
             welcomeWordInners,
@@ -628,11 +641,11 @@ export default function IntroSequence() {
               opacity: 1,
               y: 0,
               filter: isMobileDevice ? "none" : "blur(0px)",
-              duration: 0.68,
-              ease: "power3.out",
-              stagger: 0.09,
+              duration: 0.65,
+              ease: "power2.out",
+              stagger: isMobileDevice ? 0.05 : 0.08,
             },
-            1.18,
+            1.08,
           );
         }
 
@@ -643,11 +656,11 @@ export default function IntroSequence() {
             {
               opacity: 1,
               y: 0,
-              letterSpacing: isWideScreen ? "0.34em" : "0.26em",
-              duration: 0.65,
+              letterSpacing: isWideScreen ? "0.34em" : "0.28em",
+              duration: 0.6,
               ease: "power2.out",
             },
-            1.48,
+            1.35,
           );
         }
 
@@ -655,64 +668,64 @@ export default function IntroSequence() {
         tl.to(
           [artifactMark, welcomeBlock],
           {
-            y: "-=5",
-            duration: 1.1,
+            y: "-=4",
+            duration: 1.0,
             ease: "sine.inOut",
           },
-          2.0,
+          1.8,
         );
 
-        // Transition: Welcome words & artifact ease out with upward drift (matching intro lines exit)
+        // Transition: Welcome words & artifact ease out together smoothly
         if (welcomeWordInners.length > 0) {
           tl.to(
             welcomeWordInners,
             {
               opacity: 0,
-              y: -14,
+              y: -12,
               filter: isMobileDevice ? "none" : "blur(6px)",
-              duration: 0.45,
-              ease: "power2.in",
-              stagger: 0.03,
+              duration: 0.48,
+              ease: "power2.inOut",
+              stagger: isMobileDevice ? 0.02 : 0.03,
             },
-            3.05,
+            2.85,
           );
         }
         if (welcomeSub) {
           tl.to(
             welcomeSub,
-            { opacity: 0, y: -8, duration: 0.4, ease: "power2.in" },
-            3.08,
+            { opacity: 0, y: -6, duration: 0.45, ease: "power2.inOut" },
+            2.88,
           );
         }
         tl.to(
           artifactMark,
           {
             opacity: 0,
-            y: "-=12",
+            y: "-=10",
             filter: isMobileDevice ? "none" : "blur(8px)",
-            duration: 0.5,
-            ease: "power2.in",
+            duration: 0.52,
+            ease: "power2.inOut",
           },
-          3.1,
+          2.9,
         );
 
-        // Fade in animation to intro start: Veil smoothly dissolves into cinematic climbing scene
+        // Veil smoothly dissolves into cinematic climbing scene
         tl.to(
           loaderOverlay,
           { autoAlpha: 0, duration: 0.85, ease: "power2.inOut" },
-          3.25,
+          3.05,
         );
       }
 
       // ── Stage 3: Slowly the intro story animation starts ──
       tl.to(
         media,
-        { scale: 1, yPercent: 0, duration: 8.5, ease: "power1.inOut" },
-        3.7,
+        { scale: 1, yPercent: 0, duration: 8.6, ease: "power1.inOut" },
+        3.5,
       );
 
-      tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 7.6, ease: "sine.inOut" }, 3.8);
-      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 8.2, ease: "none" }, 3.9);
+      tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 7.7, ease: "sine.inOut" }, 3.55);
+      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 8.3, ease: "none" }, 3.6);
 
       lines.forEach((el, i) => {
         const [tin, tout] = CUES[i];
@@ -763,9 +776,19 @@ export default function IntroSequence() {
       }
 
       // ── Hand-off ──────────────────────────────────────────────────────────
-      if (!isMobileDevice) {
-        tl.call(warmHeroPlate, undefined, 11.3);
-      }
+      // Synchronize Hero video plate to exact current time before dissolve so grass movement is 100% continuous
+      tl.call(() => {
+        const hv = heroVideo();
+        if (hv && introVid) {
+          try {
+            if (Math.abs(hv.currentTime - introVid.currentTime) > 0.08) {
+              hv.currentTime = introVid.currentTime;
+            }
+          } catch {}
+          const p = hv.play();
+          if (p && typeof p.catch === "function") p.catch(() => {});
+        }
+      }, undefined, 11.8);
 
       // 2. Last line eases out on its own with soft deceleration
       if (lines.length > 0) {
@@ -773,8 +796,8 @@ export default function IntroSequence() {
         if (lastWords.length > 0) {
           tl.to(
             lastWords,
-            { opacity: 0, y: -12, scale: 0.98, duration: 0.58, ease: "power2.inOut", stagger: 0.024 },
-            11.9,
+            { opacity: 0, y: -12, scale: 0.98, duration: 0.55, ease: "power2.inOut", stagger: 0.02 },
+            11.85,
           );
         }
       }
@@ -782,41 +805,43 @@ export default function IntroSequence() {
       // 3. A soft dawn glow rises from the hill line — masks the seam, then recedes.
       tl.fromTo(
         bloom,
-        { opacity: 0, scale: 1.08 },
-        { opacity: isMobileDevice ? 0.7 : 1, scale: 1, duration: 0.85, ease: "power1.inOut" },
-        12.0,
+        { opacity: 0, scale: 1.05 },
+        { opacity: isMobileDevice ? 0.35 : 0.75, scale: 1, duration: 0.75, ease: "power1.inOut" },
+        11.95,
       );
 
       // Pin the plate to exact identity at the dissolve start without micro-snap
-      tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 12.3);
+      tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 12.0);
 
-      // Hand off to Hero: signal at 12.15s so Hero starts playing smoothly right before the dissolve
-      const handoffTime = isMobileDevice ? 12.15 : 12.0;
+      // Start the luxurious dissolve of the intro scene
+      const dissolveDuration = isMobileDevice ? 0.85 : 0.95;
+      tl.to(scene, { autoAlpha: 0, duration: dissolveDuration, ease: "power2.inOut" }, 12.05);
+
+      // Hand off to Hero: dispatch recursive-intro-done as scene becomes translucent (12.35s)
+      // This allows the Hero logo, action buttons, and chair note to emerge gracefully in full view
       tl.call(() => {
         gsap.set(root, { background: "transparent" });
         if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
         if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("recursive-intro-done"));
-      }, undefined, handoffTime);
+      }, undefined, 12.35);
 
-      const dissolveDuration = isMobileDevice ? 0.65 : 0.85;
-      tl.to(scene, { autoAlpha: 0, duration: dissolveDuration, ease: "power1.inOut" }, 12.3);
+      // Allow clicks/touches on Hero UI as it becomes visible
+      tl.set(root, { pointerEvents: "none" }, 12.6);
+      tl.call(releaseScroll, undefined, 12.85);
 
-      // Once scene is fully transparent, ensure hero is playing and release introVid
+      // Glow gently recedes over the settled hero page
+      tl.to(bloom, { opacity: 0, scale: 1.02, duration: 0.8, ease: "power2.out" }, 12.55);
+
+      // Once scene is completely transparent and dissolved, safely release intro video
       tl.call(() => {
-        if (isMobileDevice && introVid) {
+        if (introVid) {
           try {
             plateReleased = true;
             introVid.pause();
           } catch {}
         }
         resumeHeroPlate();
-      }, undefined, 12.3 + dissolveDuration + 0.1);
-
-      tl.set(root, { pointerEvents: "none" }, 12.55);
-      tl.call(releaseScroll, undefined, 13.0);
-
-      // 5. Glow recedes over the settled landing page.
-      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 0.9, ease: "power1.inOut" }, 12.3 + dissolveDuration);
+      }, undefined, 12.05 + dissolveDuration + 0.15);
     }, root);
 
     const tl = tlRef.current!;
@@ -1204,6 +1229,16 @@ export default function IntroSequence() {
           will-change: transform, opacity, filter, clip-path;
         }
 
+        @media (max-width: 860px), (pointer: coarse) {
+          .intro-artifact-img {
+            transform: scale(0.8) !important;
+            clip-path: none !important;
+            -webkit-clip-path: none !important;
+            filter: brightness(1.2) drop-shadow(0 0 16px rgba(162, 235, 98, 0.75)) !important;
+            will-change: transform, opacity !important;
+          }
+        }
+
         .intro-welcome-block {
           position: absolute;
           top: calc(100% + 14px);
@@ -1342,8 +1377,8 @@ export default function IntroSequence() {
           .intro-bloom {
             mix-blend-mode: normal !important;
             background: radial-gradient(72% 46% at 50% 74%,
-              rgba(255, 244, 214, 0.42) 0%,
-              rgba(252, 236, 198, 0.22) 30%,
+              rgba(255, 244, 214, 0.28) 0%,
+              rgba(252, 236, 198, 0.14) 32%,
               rgba(214, 230, 196, 0) 65%) !important;
           }
         }
