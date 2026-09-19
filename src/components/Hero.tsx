@@ -39,35 +39,46 @@ export default function Hero() {
       if (p && typeof p.catch === "function") p.catch(() => {});
     };
 
-    // Ensure it plays on all readiness states
-    playHero();
-    video.addEventListener("loadedmetadata", playHero);
-    video.addEventListener("loadeddata", playHero);
-    video.addEventListener("canplay", playHero);
-
     const isIntroPlaying =
       typeof document !== "undefined" &&
-      document.documentElement.dataset.intro !== "done";
+      document.documentElement.dataset.intro === "playing";
+
+    const onIntroComplete = () => {
+      playHero();
+      video.addEventListener("loadedmetadata", playHero);
+      video.addEventListener("loadeddata", playHero);
+      video.addEventListener("canplay", playHero);
+    };
 
     if (isIntroPlaying) {
-      window.addEventListener("recursive-intro-done", playHero);
+      try {
+        video.pause();
+      } catch {}
+      window.addEventListener("recursive-intro-done", onIntroComplete, { once: true });
     } else {
       playHero();
+      video.addEventListener("loadedmetadata", playHero);
+      video.addEventListener("loadeddata", playHero);
+      video.addEventListener("canplay", playHero);
     }
 
     const onUserInteraction = () => {
+      if (typeof document !== "undefined" && document.documentElement.dataset.intro === "playing") return;
       if (video.paused) playHero();
     };
     window.addEventListener("touchstart", onUserInteraction, { passive: true });
     window.addEventListener("pointerdown", onUserInteraction, { passive: true });
     window.addEventListener("click", onUserInteraction, { passive: true });
 
+    let io: IntersectionObserver | null = null;
     if (typeof IntersectionObserver !== "undefined") {
-      const io = new IntersectionObserver(
+      io = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
             if (entry.isIntersecting) {
-              playHero();
+              if (typeof document === "undefined" || document.documentElement.dataset.intro !== "playing") {
+                playHero();
+              }
             } else {
               video.pause();
             }
@@ -76,26 +87,17 @@ export default function Hero() {
         { threshold: 0.05 },
       );
       io.observe(video);
-      return () => {
-        window.removeEventListener("recursive-intro-done", playHero);
-        window.removeEventListener("touchstart", onUserInteraction);
-        window.removeEventListener("pointerdown", onUserInteraction);
-        window.removeEventListener("click", onUserInteraction);
-        video.removeEventListener("loadedmetadata", playHero);
-        video.removeEventListener("loadeddata", playHero);
-        video.removeEventListener("canplay", playHero);
-        io.disconnect();
-      };
     }
 
     return () => {
-      window.removeEventListener("recursive-intro-done", playHero);
+      window.removeEventListener("recursive-intro-done", onIntroComplete);
       window.removeEventListener("touchstart", onUserInteraction);
       window.removeEventListener("pointerdown", onUserInteraction);
       window.removeEventListener("click", onUserInteraction);
       video.removeEventListener("loadedmetadata", playHero);
       video.removeEventListener("loadeddata", playHero);
       video.removeEventListener("canplay", playHero);
+      if (io) io.disconnect();
     };
   }, []);
 
