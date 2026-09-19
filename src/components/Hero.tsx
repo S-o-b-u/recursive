@@ -18,16 +18,7 @@ export default function Hero() {
 
   // Background video plate showing the hill and moving grass on all devices
   const [useVideo, setUseVideo] = useState(true);
-  const [videoSrc, setVideoSrc] = useState("/bg/hero_bg.mp4");
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const isMobile = window.innerWidth < 860 || prefersLiteMedia();
-      if (isMobile) {
-        setVideoSrc("/bg/hero_bg_mobile.mp4");
-      }
-    }
-  }, []);
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -35,48 +26,76 @@ export default function Hero() {
     video.muted = true;
     video.defaultMuted = true;
     video.playsInline = true;
+    video.loop = true;
+    video.autoplay = true;
     video.setAttribute("playsinline", "");
     video.setAttribute("webkit-playsinline", "");
     video.setAttribute("muted", "");
+    video.setAttribute("autoplay", "");
+    video.setAttribute("loop", "");
 
     const playHero = () => {
-      video.play().catch(() => {});
+      const p = video.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
     };
+
+    // Ensure it plays on all readiness states
+    playHero();
+    video.addEventListener("loadedmetadata", playHero);
+    video.addEventListener("loadeddata", playHero);
+    video.addEventListener("canplay", playHero);
 
     const isIntroPlaying =
       typeof document !== "undefined" &&
       document.documentElement.dataset.intro !== "done";
 
     if (isIntroPlaying) {
-      window.addEventListener("recursive-intro-done", playHero, { once: true });
+      window.addEventListener("recursive-intro-done", playHero);
     } else {
       playHero();
     }
 
+    const onUserInteraction = () => {
+      if (video.paused) playHero();
+    };
+    window.addEventListener("touchstart", onUserInteraction, { passive: true });
+    window.addEventListener("pointerdown", onUserInteraction, { passive: true });
+    window.addEventListener("click", onUserInteraction, { passive: true });
+
     if (typeof IntersectionObserver !== "undefined") {
-      const io = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            if (
-              typeof document === "undefined" ||
-              document.documentElement.dataset.intro === "done"
-            ) {
-              video.play().catch(() => {});
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              playHero();
+            } else {
+              video.pause();
             }
-          } else {
-            video.pause();
           }
-        }
-      }, { threshold: 0.05 });
+        },
+        { threshold: 0.05 },
+      );
       io.observe(video);
       return () => {
         window.removeEventListener("recursive-intro-done", playHero);
+        window.removeEventListener("touchstart", onUserInteraction);
+        window.removeEventListener("pointerdown", onUserInteraction);
+        window.removeEventListener("click", onUserInteraction);
+        video.removeEventListener("loadedmetadata", playHero);
+        video.removeEventListener("loadeddata", playHero);
+        video.removeEventListener("canplay", playHero);
         io.disconnect();
       };
     }
 
     return () => {
       window.removeEventListener("recursive-intro-done", playHero);
+      window.removeEventListener("touchstart", onUserInteraction);
+      window.removeEventListener("pointerdown", onUserInteraction);
+      window.removeEventListener("click", onUserInteraction);
+      video.removeEventListener("loadedmetadata", playHero);
+      video.removeEventListener("loadeddata", playHero);
+      video.removeEventListener("canplay", playHero);
     };
   }, []);
 
@@ -138,13 +157,13 @@ export default function Hero() {
           <video
             ref={videoRef}
             className="hero-video"
-            src={videoSrc}
+            src="/bg/hero_bg.mp4"
             poster="/images/hero/hero_poster.jpg"
-            autoPlay={false}
+            autoPlay
             loop
             muted
             playsInline
-            preload={introFinished ? "auto" : "none"}
+            preload="auto"
             aria-hidden="true"
           />
         )}

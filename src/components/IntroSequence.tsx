@@ -95,7 +95,6 @@ export default function IntroSequence() {
   const [phase, setPhase] = useState<"pending" | "playing" | "done">("pending");
   // Video plate enabled on all devices so grass animates during intro
   const [liteMedia, setLiteMedia] = useState(false);
-  const [videoSrc, setVideoSrc] = useState("/bg/hero_bg.mp4");
   // The skip button is shader-backed. Its wrapper is always mounted -- the
   // timeline tweens it, and a null ref would silently drop those tweens -- but
   // the button itself waits. Mounted with the scene, it put a WebGL context
@@ -210,12 +209,6 @@ export default function IntroSequence() {
   useLayoutEffect(() => {
     if (doneRef.current) return;
     setLiteMedia(false);
-    const isMobile =
-      typeof window !== "undefined" &&
-      ("ontouchstart" in window || window.innerWidth < 860 || prefersLiteMedia());
-    if (isMobile) {
-      setVideoSrc("/bg/hero_bg_mobile.mp4");
-    }
     const params = new URLSearchParams(window.location.search);
     const force = params.get("intro");
 
@@ -306,60 +299,63 @@ export default function IntroSequence() {
       introVid.muted = true;
       introVid.defaultMuted = true;
       introVid.playsInline = true;
+      introVid.loop = true;
+      introVid.autoplay = true;
       introVid.setAttribute("playsinline", "");
       introVid.setAttribute("webkit-playsinline", "");
       introVid.setAttribute("muted", "");
+      introVid.setAttribute("autoplay", "");
+      introVid.setAttribute("loop", "");
 
-      let playTimeout: ReturnType<typeof setTimeout> | null = null;
-      const ensurePlaying = () => {
+      const attemptPlay = () => {
         if (plateReleased || doneRef.current) return;
-        if (playTimeout) return;
-        playTimeout = setTimeout(() => {
-          playTimeout = null;
-          if (plateReleased || doneRef.current) return;
-          if (introVid && introVid.paused) {
-            introVid.play().catch(() => {});
-          }
-        }, 120);
+        const p = introVid.play();
+        if (p && typeof p.catch === "function") {
+          p.catch(() => {});
+        }
       };
 
-      introVid.addEventListener("canplay", ensurePlaying);
-      introVid.addEventListener("stalled", ensurePlaying);
+      // Ensure playback on all ready events
+      attemptPlay();
+      introVid.addEventListener("loadedmetadata", attemptPlay);
+      introVid.addEventListener("loadeddata", attemptPlay);
+      introVid.addEventListener("canplay", attemptPlay);
+      introVid.addEventListener("canplaythrough", attemptPlay);
+
       const onPause = () => {
-        if (!doneRef.current && !plateReleased) {
-          ensurePlaying();
+        if (!doneRef.current && !plateReleased && introVid.paused) {
+          attemptPlay();
         }
       };
       introVid.addEventListener("pause", onPause);
 
-      // HTML5 video natively loops when `loop` attribute is present.
-      // If ended triggers on any browser that does not auto-loop, restart playback smoothly:
+      // Loop fallback
       const onEnded = () => {
         if (plateReleased || doneRef.current) return;
-        introVid.play().catch(() => {});
+        introVid.currentTime = 0;
+        attemptPlay();
       };
       introVid.addEventListener("ended", onEnded);
 
-      if (introVid.readyState >= 2 && introVid.paused) {
-        introVid.play().catch(() => {});
-      }
-
       cleanupVidListeners = () => {
-        if (playTimeout) clearTimeout(playTimeout);
-        introVid.removeEventListener("canplay", ensurePlaying);
-        introVid.removeEventListener("stalled", ensurePlaying);
+        introVid.removeEventListener("loadedmetadata", attemptPlay);
+        introVid.removeEventListener("loadeddata", attemptPlay);
+        introVid.removeEventListener("canplay", attemptPlay);
+        introVid.removeEventListener("canplaythrough", attemptPlay);
         introVid.removeEventListener("pause", onPause);
         introVid.removeEventListener("ended", onEnded);
       };
     }
 
-    const onTouchKick = () => {
-      if (plateReleased) return;
-      if (videoRef.current && videoRef.current.paused && !doneRef.current) {
+    const onUserInteraction = () => {
+      if (plateReleased || doneRef.current) return;
+      if (videoRef.current && videoRef.current.paused) {
         videoRef.current.play().catch(() => {});
       }
     };
-    window.addEventListener("touchstart", onTouchKick, { passive: true });
+    window.addEventListener("touchstart", onUserInteraction, { passive: true });
+    window.addEventListener("pointerdown", onUserInteraction, { passive: true });
+    window.addEventListener("click", onUserInteraction, { passive: true });
 
     // Hold the scroll through Lenis. <SmoothScroll> mounts after this layout
     // effect, so the instance can be a frame or two late — retry briefly.
@@ -832,11 +828,6 @@ export default function IntroSequence() {
       if (started || doneRef.current) return;
       started = true;
       if (vid) {
-        if (vid.currentTime > 0.05) {
-          try {
-            vid.currentTime = 0;
-          } catch {}
-        }
         const p = vid.play();
         if (p && typeof p.catch === "function") p.catch(() => {});
       }
@@ -956,11 +947,10 @@ export default function IntroSequence() {
       root.removeEventListener("touchmove", block);
       window.clearInterval(watchdog);
       window.removeEventListener("keydown", blockKeys);
-      // Was never removed: a window-level touchstart listener outliving the
-      // intro, holding its closure alive and running on every tap for the rest
-      // of the session. Harmless in effect (doneRef short-circuits it) but a
-      // leak all the same.
-      window.removeEventListener("touchstart", onTouchKick);
+      window.removeEventListener("touchstart", onUserInteraction);
+      window.removeEventListener("pointerdown", onUserInteraction);
+      window.removeEventListener("click", onUserInteraction);
+      cleanupVidListeners?.();
       window.removeEventListener("lenis:ready", onLenisReady);
       cancelAnimationFrame(lenisRaf);
       // If we unmount before the timeline releases scroll itself, undo the lock.
@@ -1022,7 +1012,7 @@ export default function IntroSequence() {
             <div ref={focusRef} className="intro-focus">
               <video
                 ref={videoRef}
-                src={videoSrc}
+                src="/bg/hero_bg.mp4"
                 poster="/images/hero/hero_poster.jpg"
                 autoPlay
                 loop
