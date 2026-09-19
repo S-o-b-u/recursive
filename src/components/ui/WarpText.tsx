@@ -523,6 +523,31 @@ export const WarpText: React.FC<WarpTextProps> = ({
   ]);
 
   useEffect(() => {
+    // Under the intro's curtain, the whole init -- a WebGL2 context, a shader
+    // compile, and rasterising the wordmark to a texture -- used to run in this
+    // effect at mount: a synchronous stall of a few hundred milliseconds that
+    // landed on the same frames as hydration, the artifact's opening tweens and
+    // the first video decode. Nothing needs this canvas for ~12s, so when the
+    // intro is playing the init waits 800ms: past the busiest frames, still
+    // deep inside the veil, and long before the reveal. With no intro (a
+    // subpage, ?intro=0, reduced motion) it mounts immediately as before.
+    const introPlaying =
+      typeof document !== "undefined" &&
+      document.documentElement.dataset.intro === "playing";
+    if (!introPlaying) return mountWarp();
+
+    let dispose: (() => void) | undefined;
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      if (!cancelled) dispose = mountWarp();
+    }, 800);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      dispose?.();
+    };
+
+    function mountWarp(): (() => void) | undefined {
     const container = containerRef.current;
     if (!container || typeof window === "undefined") return undefined;
 
@@ -724,13 +749,41 @@ export const WarpText: React.FC<WarpTextProps> = ({
       raf = 0;
     };
 
-    const onVisibility = () => {
-      pageVisible = !document.hidden;
-      if (pageVisible && visible && !raf) raf = requestAnimationFrame(loop);
-      if (!pageVisible && raf) {
+    // The render loop is held while the intro is on screen.
+    //
+    // The hero mounts under the intro's curtain, and this canvas sits in the
+    // viewport the whole time -- so the IntersectionObserver below reports it
+    // visible, and the loop ran a full-DPR warp draw on every frame of a
+    // ~13s intro that nobody could see. On a phone that is a GPU pass per
+    // frame, spent on an invisible wordmark, in the one window the page has
+    // the least headroom. One frame is drawn at init so the reveal is ready;
+    // the loop starts when the intro hands off.
+    let introHeld =
+      typeof document !== "undefined" &&
+      document.documentElement.dataset.intro === "playing";
+
+    const startLoop = () => {
+      if (introHeld || !pageVisible || !visible || raf || disposed || contextLost) return;
+      raf = requestAnimationFrame(loop);
+    };
+    const stopLoop = () => {
+      if (raf) {
         cancelAnimationFrame(raf);
         raf = 0;
       }
+    };
+    const onIntroDone = () => {
+      introHeld = false;
+      startLoop();
+    };
+    if (introHeld) {
+      window.addEventListener("recursive-intro-done", onIntroDone, { once: true });
+    }
+
+    const onVisibility = () => {
+      pageVisible = !document.hidden;
+      if (pageVisible) startLoop();
+      else stopLoop();
     };
 
     const mediaQuery = window.matchMedia?.("(prefers-reduced-motion: reduce)");
@@ -774,12 +827,9 @@ export const WarpText: React.FC<WarpTextProps> = ({
         visible = entry.isIntersecting;
         if (visible) {
           resize();
-          if (pageVisible && !raf) raf = requestAnimationFrame(loop);
+          startLoop();
         } else {
-          if (raf) {
-            cancelAnimationFrame(raf);
-            raf = 0;
-          }
+          stopLoop();
         }
       },
       { threshold: 0 }
@@ -795,12 +845,16 @@ export const WarpText: React.FC<WarpTextProps> = ({
     syncUniforms(program, propsRef.current);
     contextRef.current = { program, rasterize };
     resize();
-    raf = requestAnimationFrame(loop);
+    // One frame now, so the wordmark is already rendered when the curtain
+    // lifts; the loop itself waits for the intro (see startLoop).
+    renderOnce();
+    startLoop();
 
     return () => {
       disposed = true;
       contextRef.current = null;
       if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("recursive-intro-done", onIntroDone);
       resizeObserver?.disconnect();
       intersectionObserver?.disconnect();
       canvas.removeEventListener("pointermove", onPointerMove);
@@ -820,6 +874,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
 
       if (canvas.parentNode === container) container.removeChild(canvas);
     };
+    }
   }, []);
 
   return (

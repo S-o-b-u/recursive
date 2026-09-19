@@ -199,7 +199,10 @@ export default function IntroSequence() {
 
   useEffect(() => {
     if (phase !== "playing") return;
-    const t = window.setTimeout(() => setShowChrome(true), 900);
+    // 1.4s, not 0.9s: the hero's WarpText compiles its shader at ~0.8s (see
+    // that file), and stacking a second compile 100ms later put both on the
+    // artifact's awakening. The button's own fade-in is at 1.6s, after this.
+    const t = window.setTimeout(() => setShowChrome(true), 1400);
     return () => window.clearTimeout(t);
   }, [phase]);
 
@@ -295,6 +298,15 @@ export default function IntroSequence() {
     let cleanupVidListeners: (() => void) | null = null;
     /** Set once the hand-off intentionally stops the intro's plate. */
     let plateReleased = false;
+    /**
+     * Set once the timeline deliberately starts the plate. Until then every
+     * keep-alive listener below stands down, because a paused plate is the
+     * intended state: the video used to autoplay from mount, decoding 1080p
+     * for three seconds behind a veil that is fully opaque until 3.25s -- pure
+     * contention with the artifact stage, which runs in exactly that window.
+     * It now starts at 2.9s, in time to have frames up before the veil lifts.
+     */
+    let plateStarted = false;
     if (introVid) {
       introVid.muted = true;
       introVid.defaultMuted = true;
@@ -312,7 +324,7 @@ export default function IntroSequence() {
       // two 4K streams competing at precisely the moment the hero arrives.
       // Once the plate is deliberately released, these stand down.
       const ensurePlaying = () => {
-        if (plateReleased || doneRef.current) return;
+        if (!plateStarted || plateReleased || doneRef.current) return;
         if (introVid.paused) {
           introVid.play().catch(() => {});
         }
@@ -363,7 +375,7 @@ export default function IntroSequence() {
     }
 
     const onTouchKick = () => {
-      if (plateReleased) return;
+      if (!plateStarted || plateReleased) return;
       if (videoRef.current && videoRef.current.paused && !doneRef.current) {
         videoRef.current.play().catch(() => {});
       }
@@ -431,7 +443,28 @@ export default function IntroSequence() {
 
     const isMobileDevice = isTouch || liteMedia || prefersLiteMedia();
 
-    // Coarse warm-up: start the hero's plate playing and roughly aligned on desktop.
+    /**
+     * Seek the hero's plate to the intro's current frame.
+     *
+     * Both plates are the same file, and the dissolve crossfades one into the
+     * other over 0.65-0.85s. The hero used to start from currentTime 0 while
+     * the intro was ~12s in, so the crossfade blended two different moments
+     * of the same grass: a ghosted double image for the whole hand-off, which
+     * is precisely what a "not smooth" transition looks like. Aligned, the two
+     * plates are pixel-identical and the dissolve has nothing to show.
+     */
+    const alignHeroPlate = () => {
+      const heroVid = heroVideo();
+      if (!heroVid || !introVid || introVid.readyState < 2) return;
+      try {
+        const dur = heroVid.duration || introVid.duration;
+        const t =
+          dur && Number.isFinite(dur) ? introVid.currentTime % dur : introVid.currentTime;
+        if (Math.abs(heroVid.currentTime - t) > 0.04) heroVid.currentTime = t;
+      } catch {}
+    };
+
+    // Coarse warm-up: start the hero's plate playing and aligned on desktop.
     // On mobile / touch devices, do not spin up the second video early —
     // iOS WebKit will pause the active intro video if a second video starts playing!
     const warmHeroPlate = () => {
@@ -439,6 +472,7 @@ export default function IntroSequence() {
       const heroVid = heroVideo();
       if (!heroVid) return;
       try {
+        alignHeroPlate();
         const p = heroVid.play();
         if (p && typeof p.catch === "function") p.catch(() => {});
       } catch {}
@@ -535,11 +569,28 @@ export default function IntroSequence() {
         );
         const welcomeSub = welcomeBlock.querySelector<HTMLElement>(".intro-welcome-sub");
 
+        // Every tween in this stage is opacity or transform -- nothing else.
+        //
+        // This stage used to animate `filter` (a 32px drop-shadow, i.e. a
+        // gaussian blur, on the artifact; blur() on every welcome word, in and
+        // out; blur() on the whole mark on exit), `clip-path`, and
+        // `letter-spacing`. Each of those is re-rasterised or re-laid-out on
+        // every frame it changes, and they all ran together in the first four
+        // seconds -- on top of hydration, the first video decode and the hero's
+        // WebGL init. A single letter-spacing tween measured ~0.94ms of layout
+        // per frame on a desktop, 31x the transform that replaces it; phones
+        // are several times slower again. This is what "the artifact stutters
+        // on load" was.
+        //
+        // The look survives: the wings unfurl on scaleX, the glow is the aura
+        // (a static blur, rasterised once, moved on the compositor), the
+        // tracking expansion is a scaleX, and the blur-to-focus reads the same
+        // as a short opacity + lift at this duration.
         if (welcomeWordInners.length > 0) {
-          tl.set(welcomeWordInners, { opacity: 0, y: 18, filter: "blur(8px)" }, 0);
+          tl.set(welcomeWordInners, { opacity: 0, y: 18 }, 0);
         }
         if (welcomeSub) {
-          tl.set(welcomeSub, { opacity: 0, y: 10, letterSpacing: "0.12em" }, 0);
+          tl.set(welcomeSub, { opacity: 0, y: 10, scaleX: 0.9 }, 0);
         }
 
         const artifactImg = artifactMark.querySelector<HTMLElement>(".intro-artifact-img");
@@ -548,18 +599,20 @@ export default function IntroSequence() {
         // Pin starting states synchronously BEFORE paint — eliminates any 1-frame jitter or pop
         gsap.set(artifactMark, { y: 0, opacity: 1, force3D: true });
         if (welcomeWordInners.length > 0) {
-          gsap.set(welcomeWordInners, { opacity: 0, y: 18, filter: "blur(8px)" });
+          gsap.set(welcomeWordInners, { opacity: 0, y: 18 });
         }
         if (welcomeSub) {
-          gsap.set(welcomeSub, { opacity: 0, y: 10, letterSpacing: "0.12em" });
+          gsap.set(welcomeSub, { opacity: 0, y: 10, scaleX: 0.9, transformOrigin: "center center" });
         }
         if (artifactImg) {
+          // Continue exactly from the held state on the two plates before
+          // this one. The pending plate's copy sat at opacity 1 / scale 1 and
+          // this one must paint identically on its first frame, or the swap
+          // shows as a flicker.
           gsap.set(artifactImg, {
-            opacity: 0,
-            scaleX: 0.28,
-            scaleY: 0.72,
-            clipPath: "inset(0% 42% 0% 42%)",
-            filter: "brightness(2.2) saturate(1.4) drop-shadow(0 0 32px rgba(162, 235, 98, 0.95))",
+            opacity: 1,
+            scaleX: 1,
+            scaleY: 1,
             transformOrigin: "center center",
             force3D: true,
           });
@@ -573,21 +626,24 @@ export default function IntroSequence() {
           });
         }
 
-        // Stage 1: Relic Awakening (Center-Out Wings Unfurl)
-        // Emerges smoothly from bright luminous center core and expands outward
+        // Stage 1: Relic Awakening.
+        //
+        // This was a center-out unfurl from scaleX 0.28 / opacity 0. But the
+        // mark has already been on screen for the whole load -- breathing on
+        // the loading veil, held on the pending plate -- so entering it again
+        // from nothing was the pop the visitor saw. It now wakes in place: one
+        // slow breath as the aura blooms behind it, which is the emergence
+        // beat the unfurl was carrying. Opacity and transform only.
         if (artifactImg) {
           tl.to(
             artifactImg,
-            {
-              opacity: 1,
-              scaleX: 1,
-              scaleY: 1,
-              clipPath: "inset(0% 0% 0% 0%)",
-              filter: "brightness(1.2) saturate(1.15) drop-shadow(0 4px 24px rgba(0, 0, 0, 0.65))",
-              duration: 1.05,
-              ease: "power3.out",
-            },
+            { scale: 1.035, duration: 0.55, ease: "sine.out" },
             0.05,
+          );
+          tl.to(
+            artifactImg,
+            { scale: 1, duration: 0.6, ease: "sine.inOut" },
+            0.6,
           );
         } else {
           tl.fromTo(
@@ -636,7 +692,6 @@ export default function IntroSequence() {
             {
               opacity: 1,
               y: 0,
-              filter: "blur(0px)",
               duration: 0.68,
               ease: "power3.out",
               stagger: 0.09,
@@ -645,14 +700,16 @@ export default function IntroSequence() {
           );
         }
 
-        // "RECURSIVE 2026" slides in with letter-spacing tracking expansion
+        // "RECURSIVE 2026" slides in; the tracking expansion is a scaleX from
+        // 0.9, which reads identically and stays on the compositor. The final
+        // letter-spacing lives in the stylesheet.
         if (welcomeSub) {
           tl.to(
             welcomeSub,
             {
               opacity: 1,
               y: 0,
-              letterSpacing: isWideScreen ? "0.34em" : "0.26em",
+              scaleX: 1,
               duration: 0.65,
               ease: "power2.out",
             },
@@ -678,7 +735,6 @@ export default function IntroSequence() {
             {
               opacity: 0,
               y: -14,
-              filter: "blur(6px)",
               duration: 0.45,
               ease: "power2.in",
               stagger: 0.03,
@@ -693,12 +749,17 @@ export default function IntroSequence() {
             3.08,
           );
         }
+        // The mark's exit was a blur(8px) tween on a container holding a
+        // blur(28px) aura and a drop-shadowed image: nested filters, all
+        // re-rasterised together every frame. It was the most expensive half
+        // second of the whole intro. A slight shrink under the fade gives the
+        // same softening.
         tl.to(
           artifactMark,
           {
             opacity: 0,
             y: "-=12",
-            filter: "blur(8px)",
+            scale: 0.96,
             duration: 0.5,
             ease: "power2.in",
           },
@@ -712,6 +773,24 @@ export default function IntroSequence() {
           3.25,
         );
       }
+
+      // Start the plate 0.35s before the veil begins to lift (3.25s) and 1.2s
+      // before it is gone. Enough lead for a preloaded, muted, inline video to
+      // have real frames up on a phone; short enough that it is not decoding
+      // under the artifact.
+      tl.call(
+        () => {
+          if (!introVid || doneRef.current) return;
+          plateStarted = true;
+          try {
+            if (introVid.currentTime > 0.05) introVid.currentTime = 0;
+          } catch {}
+          const p = introVid.play();
+          if (p && typeof p.catch === "function") p.catch(() => {});
+        },
+        undefined,
+        2.9,
+      );
 
       // ── Stage 3: Slowly the intro story animation starts ──
       tl.to(
@@ -756,12 +835,12 @@ export default function IntroSequence() {
       });
 
       if (skipWrap) {
-        // Smoothly fade in at 1.0s
+        // Fades in at 1.6s, after the button has mounted at 1.4s.
         tl.fromTo(
           skipWrap,
           { opacity: 0, y: 10, pointerEvents: "none" },
           { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", pointerEvents: "auto" },
-          1.0,
+          1.6,
         );
         // Cleanly dismiss BEFORE hero page transition so it never lingers after transition
         tl.to(
@@ -803,6 +882,11 @@ export default function IntroSequence() {
       const handoffTime = isMobileDevice ? 12.15 : 12.0;
       tl.call(() => {
         gsap.set(root, { background: "transparent" });
+        // Before the event: <Hero> plays its plate in response to it, and the
+        // seek has to land first so it starts on the intro's frame. On desktop
+        // this is a re-sync after the 11.3s warm-up; on mobile it is the only
+        // alignment, taken the instant before the hero's first play().
+        alignHeroPlate();
         if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
         if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("recursive-intro-done"));
       }, undefined, handoffTime);
@@ -830,21 +914,14 @@ export default function IntroSequence() {
 
     const tl = tlRef.current!;
 
-    // ── Synchronous start: video and timeline start in exact lockstep from frame 0 ──
+    // ── Synchronous start ──
+    // The timeline starts now; the plate starts from inside it at 2.9s (see
+    // the tl.call above) rather than here, because nothing can see it for the
+    // first three seconds.
     let started = false;
-    const vid = videoRef.current;
     const startNow = () => {
       if (started || doneRef.current) return;
       started = true;
-      if (vid) {
-        if (vid.currentTime > 0.05) {
-          try {
-            vid.currentTime = 0;
-          } catch {}
-        }
-        const p = vid.play();
-        if (p && typeof p.catch === "function") p.catch(() => {});
-      }
       tl.play(0);
     };
 
@@ -939,6 +1016,8 @@ export default function IntroSequence() {
       q.call(
         () => {
           gsap.set(root, { background: "transparent" });
+          // Same seam as the full hand-off: land the seek before <Hero> plays.
+          alignHeroPlate();
           if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
           if (typeof window !== "undefined")
             window.dispatchEvent(new CustomEvent("recursive-intro-done"));
@@ -1012,8 +1091,43 @@ export default function IntroSequence() {
           pointerEvents: "auto",
         }}
       >
-        <div className="intro-pending-mark">
-          <div className="intro-artifact-aura" aria-hidden="true" style={{ opacity: 0 }} />
+        {/* The same artifact the loading veil was just showing, held still at
+            the exact state the intro's Stage 1 starts from. This plate is on
+            screen for the whole hydration stall; it used to be empty, so the
+            mark vanished here and reappeared later. */}
+        {/* Inline on purpose: the component's stylesheet lives in the
+            "playing" branch and is not on the page yet. These values must
+            equal .track-loading-mark / .track-artifact in app/loading.tsx and
+            .intro-artifact-mark / .intro-artifact-img below, or the mark
+            shifts at one of the two swaps. */}
+        <div
+          className="intro-pending-mark"
+          style={{
+            position: "relative",
+            width: "clamp(210px, 30vw, 360px)",
+            aspectRatio: "744 / 220",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        >
+          <img
+            src="/images/ui/artifact.png"
+            alt=""
+            aria-hidden="true"
+            draggable={false}
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              filter: "brightness(1.2) saturate(1.15) drop-shadow(0 4px 24px rgba(0, 0, 0, 0.65))",
+              pointerEvents: "none",
+            }}
+          />
         </div>
       </div>
     );
@@ -1025,11 +1139,13 @@ export default function IntroSequence() {
         <div className="intro-media-clip">
           <div ref={mediaRef} className="intro-media">
             <div ref={focusRef} className="intro-focus">
+              {/* No autoPlay: the timeline starts this at 2.9s, once there is
+                  something to see. preload="auto" still buffers it from mount,
+                  so the start is instant when it comes. */}
               <video
                 ref={videoRef}
                 src="/bg/hero_bg.mp4"
                 poster="/images/hero/hero_poster.jpg"
-                autoPlay
                 loop
                 muted
                 playsInline
@@ -1187,7 +1303,7 @@ export default function IntroSequence() {
           justify-content: center;
           pointer-events: none;
           user-select: none;
-          will-change: transform, opacity, filter;
+          will-change: transform, opacity;
         }
 
         .intro-artifact-aura {
@@ -1208,15 +1324,22 @@ export default function IntroSequence() {
           width: 100%;
           height: 100%;
           object-fit: contain;
-          opacity: 0;
-          transform: scale(0.28, 0.72);
-          clip-path: inset(0% 42% 0% 42%);
-          -webkit-clip-path: inset(0% 42% 0% 42%);
-          filter: brightness(2.2) saturate(1.4) drop-shadow(0 0 32px rgba(162, 235, 98, 0.95));
+          /* Held: visible, at rest. This is the state the loading veil ends
+             on and the pending plate holds, so the intro can take it over
+             without a seam. Stage 1 brightens it from here rather than
+             re-entering it from nothing. */
+          opacity: 1;
+          transform: none;
+          /* Static, and already the *final* grade. It used to start at a 32px
+             emerald drop-shadow and tween to this; a drop-shadow is a gaussian
+             blur, and a changing radius re-rasterises the image every frame.
+             Held still, it is rasterised once and composited from then on. The
+             emerald bloom at the start is the aura's job. */
+          filter: brightness(1.2) saturate(1.15) drop-shadow(0 4px 24px rgba(0, 0, 0, 0.65));
           pointer-events: none;
           user-select: none;
           -webkit-user-drag: none;
-          will-change: transform, opacity, filter, clip-path;
+          will-change: transform, opacity;
         }
 
         .intro-welcome-block {
@@ -1242,7 +1365,10 @@ export default function IntroSequence() {
           text-transform: none;
           color: #ffffff;
           text-shadow: 0 4px 28px rgba(0, 0, 0, 0.7);
-          filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.5));
+          /* No filter here. A filter on this container is an effect node that
+             has to be re-composited every time any child layer changes -- and
+             the children are the animating words. The text-shadow alone carries
+             the depth. */
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1265,7 +1391,7 @@ export default function IntroSequence() {
 
         .intro-welcome-word-i {
           display: inline-block;
-          will-change: transform, opacity, filter;
+          will-change: transform, opacity;
         }
 
         .intro-welcome-sub {
@@ -1278,7 +1404,10 @@ export default function IntroSequence() {
           text-shadow: 0 0 16px rgba(120, 185, 75, 0.4);
           margin-top: 10px;
           display: inline-block;
-          will-change: transform, opacity, letter-spacing;
+          transform-origin: center center;
+          /* letter-spacing is fixed above; it is not animated any more. It is
+             a layout property, and will-change cannot promote it anyway. */
+          will-change: transform, opacity;
         }
 
         .intro-media-clip { position: absolute; inset: 0; overflow: hidden; }
