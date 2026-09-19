@@ -70,14 +70,55 @@ export default function Navigation() {
     };
   }, [menuOpen]);
 
+  const [introFinished, setIntroFinished] = useState(() => {
+    if (typeof document !== "undefined") {
+      return document.documentElement.dataset.intro === "done" || !document.querySelector(".intro-root");
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    if (introFinished) return;
+    const onIntroDone = () => setIntroFinished(true);
+    window.addEventListener("recursive-intro-done", onIntroDone);
+
+    const observer = new MutationObserver(() => {
+      if (
+        document.documentElement.dataset.intro === "done" ||
+        !document.querySelector(".intro-root")
+      ) {
+        setIntroFinished(true);
+      }
+    });
+
+    if (typeof document !== "undefined") {
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-intro"],
+      });
+    }
+
+    const fallbackTimer = setTimeout(() => setIntroFinished(true), 16000);
+
+    return () => {
+      window.removeEventListener("recursive-intro-done", onIntroDone);
+      observer.disconnect();
+      clearTimeout(fallbackTimer);
+    };
+  }, [introFinished]);
+
   return (
     <>
       <nav className="nav-root">
         <motion.div
           className="nav-glass-container"
           initial={reduced ? false : { y: -22, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: reduced ? 0 : 0.7, ease: EASE_OUT, delay: reduced ? 0 : 0.2 }}
+          animate={
+            introFinished
+              ? { y: 0, opacity: 1 }
+              : { y: -22, opacity: 0 }
+          }
+          transition={{ duration: reduced ? 0 : 0.75, ease: EASE_OUT, delay: reduced ? 0 : 0.05 }}
         >
           <LiquidGlassCard
             glowIntensity="sm"

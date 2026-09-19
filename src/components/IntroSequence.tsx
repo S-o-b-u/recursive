@@ -648,12 +648,23 @@ export default function IntroSequence() {
       // ── Stage 3: Slowly the intro story animation starts ──
       tl.to(
         heroMediaTargets(),
-        { scale: 1, yPercent: 0, duration: 8.5, ease: "power1.inOut" },
+        {
+          scale: 1,
+          yPercent: 0,
+          duration: 8.5,
+          ease: "sine.inOut",
+          onComplete: () => {
+            const hm = heroMediaTargets();
+            if (hm.length > 0) {
+              gsap.set(hm, { clearProps: "transform" });
+            }
+          },
+        },
         3.7,
       );
       tl.to(
         media,
-        { scale: 1, yPercent: 0, duration: 8.5, ease: "power1.inOut" },
+        { scale: 1, yPercent: 0, duration: 8.5, ease: "sine.inOut" },
         3.7,
       );
 
@@ -742,18 +753,11 @@ export default function IntroSequence() {
 
       tl.to(scene, { autoAlpha: 0, duration: dissolveDuration, ease: "power1.inOut" }, dissolveStart);
 
-      tl.call(() => {
-        const hm = heroMediaTargets();
-        if (hm.length > 0) {
-          gsap.set(hm, { clearProps: "transform" });
-        }
-      }, undefined, 12.25);
-
       tl.set(root, { pointerEvents: "none" }, dissolveStart + 0.15);
       tl.call(releaseScroll, undefined, dissolveStart + dissolveDuration + 0.05);
 
-      // 5. Glow recedes over the settled landing page.
-      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 0.85, ease: "power1.inOut" }, dissolveStart + dissolveDuration);
+      // 5. Glow recedes over the settled landing page with buttery smooth sine ease
+      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 0.85, ease: "sine.inOut" }, dissolveStart + dissolveDuration);
     }, root);
 
     const tl = tlRef.current!;
@@ -869,7 +873,7 @@ export default function IntroSequence() {
       q.fromTo(
         bloom,
         { opacity: 0, scale: 1.1 },
-        { opacity: 0.9, scale: 1, duration: 0.5, ease: "sine.out" },
+        { opacity: isMobileDevice ? 0.35 : 0.45, scale: 1, duration: 0.5, ease: "sine.out" },
         0.3,
       );
       q.call(
@@ -885,7 +889,7 @@ export default function IntroSequence() {
       q.to(scene, { autoAlpha: 0, duration: 0.6, ease: "sine.inOut" }, 0.66);
       q.set(root, { pointerEvents: "none" }, 1.0);
       q.call(releaseScroll, undefined, 1.26);
-      q.to(bloom, { opacity: 0, scale: 1.04, duration: 0.65, ease: "power1.inOut" }, 1.05);
+      q.to(bloom, { opacity: 0, scale: 1.04, duration: 0.65, ease: "sine.inOut" }, 1.05);
     };
 
     return () => {
