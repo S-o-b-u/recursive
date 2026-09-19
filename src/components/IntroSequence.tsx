@@ -71,13 +71,6 @@ const CUES: [number, number][] = [
 const WARP_RADIUS = 250;
 
 /**
- * Playback rate of the intro's plate. The clip is 8.1s and starts at 2.9s;
- * desktop pauses it at 13.25s, so it must last >10.35s. At 0.76x it lasts
- * 10.66s and ends at 13.56s -- 0.3s of margin -- and never loops on screen.
- */
-const PLATE_RATE = 0.76;
-
-/**
  * `overflow: hidden` on <html> removes the classic scrollbar, which widens the
  * layout viewport and re-crops every `object-fit: cover` plate — a visible zoom
  * + sideways slide when the lock is taken and again when it is released.
@@ -296,13 +289,15 @@ export default function IntroSequence() {
     // Belt-and-suspenders lock for the frame before Lenis is reachable. Only
     // safe when the scrollbar gutter is reserved — see GUTTER_STABLE.
     //
-    // Not on touch devices. There is no Lenis there to be late; the root's
-    // non-passive touchmove block is what holds the page. And toggling
-    // overflow on <html> at the hand-off is a relayout on a phone -- the one
-    // window in which nothing on screen should move.
-    const touchDevice =
-      "ontouchstart" in window || navigator.maxTouchPoints > 0;
-    const lockOverflow = GUTTER_STABLE && !touchDevice;
+    // On touch devices this lock does a second, more important job: a page
+    // that cannot scroll is a page whose browser toolbar stays put. The intro
+    // root and scene are sized in dvh, so a toolbar that shows and hides on a
+    // touch gesture resizes every full-bleed layer and re-crops the plate --
+    // which on a phone reads as the whole intro shaking. (I removed the lock
+    // on touch once as "insurance" against a relayout at the hand-off; that
+    // relayout never happens -- overlay scrollbars have no width -- and the
+    // shaking it let in was worse than the thing it guarded against.)
+    const lockOverflow = GUTTER_STABLE;
     if (lockOverflow) {
       document.documentElement.style.overflow = "hidden";
       document.body.style.overflow = "hidden";
@@ -354,15 +349,41 @@ export default function IntroSequence() {
       };
       introVid.addEventListener("pause", onPause);
 
-      // No manual loop. There used to be a timeupdate handler that hard-seeked
-      // to 0 at duration-0.35s. The clip is 8.1s and the plate is on screen
-      // from ~3.25s to ~13.05s -- longer than the clip -- so that seek landed
-      // at ~10.65s, in the last line of the story, and on a phone a JS seek on
-      // a playing video is a freeze followed by a jump in the grass. The plate
-      // now runs at PLATE_RATE (see the start call), which stretches the clip
-      // over the whole visible window with a margin, so it never reaches its
-      // end while anyone can see it. The native `loop` attribute stays as the
-      // fallback if it ever does.
+      // The element carries autoPlay purely so iOS starts fetching at load
+      // (see the JSX). Any playback the browser starts on its own before the
+      // timeline asks for it is stopped on the spot: the bytes keep arriving,
+      // the decoder does not run. onPause stands down because plateStarted is
+      // still false.
+      const holdUntilStarted = () => {
+        if (!plateStarted && !introVid.paused) {
+          try {
+            introVid.pause();
+          } catch {}
+        }
+      };
+      introVid.addEventListener("play", holdUntilStarted);
+      holdUntilStarted();
+
+      // No manual loop, and no fear of the native one.
+      //
+      // hero_loop_pp.mp4 is a palindrome: the source played forward, then in
+      // reverse. Both the turnaround and the loop point are ordinary one-frame
+      // steps, so the native `loop` attribute has no seam to show, and the
+      // sway's *phase* is continuous by construction -- it just changes
+      // direction, which is what wind does. (A crossfade loop was tried first
+      // and rejected: blending two sway states smeared the blades for a full
+      // second, every 7s, on every device.) The original hard loop cut from
+      // one sway pose straight to another and read as a snap. This also
+      // removes two workarounds this file
+      // used to carry: a timeupdate handler that hard-seeked to 0 before the
+      // end (a freeze-then-jump on phones), and a 0.76x playback rate that
+      // stretched the clip so it could not reach its end while visible. Both
+      // plates now run at natural speed and loop whenever they like.
+      //
+      // This is also what fixed the hand-off. The hero's plate is seeked to the
+      // intro's frame at the cut; with a non-seamless clip that put it a second
+      // from the end, so it looped to frame 0 under the tail of the dissolve --
+      // a lateral snap in the grass on desktop, a shake on phones.
       introVid.addEventListener("seeked", ensurePlaying);
 
       ensurePlaying();
@@ -371,6 +392,7 @@ export default function IntroSequence() {
         introVid.removeEventListener("waiting", ensurePlaying);
         introVid.removeEventListener("stalled", ensurePlaying);
         introVid.removeEventListener("pause", onPause);
+        introVid.removeEventListener("play", holdUntilStarted);
         introVid.removeEventListener("seeked", ensurePlaying);
       };
     }
@@ -785,13 +807,6 @@ export default function IntroSequence() {
           plateStarted = true;
           try {
             if (introVid.currentTime > 0.05) introVid.currentTime = 0;
-            // 8.1s of clip has to cover 2.9s -> ~13.05s without looping.
-            // 8.1 / 0.76 = 10.66s, which reaches 13.56s: past the point the
-            // plate is paused on any device, with margin. The footage is slow grass; at
-            // 0.78x it still reads as wind. The hero's plate runs at 1x and
-            // the two are frame-aligned at hand-off, so over a 0.65-0.85s
-            // dissolve they drift by ~0.15s of sway -- not visible.
-            introVid.playbackRate = PLATE_RATE;
           } catch {}
           const p = introVid.play();
           if (p && typeof p.catch === "function") p.catch(() => {});
@@ -1188,13 +1203,21 @@ export default function IntroSequence() {
         <div className="intro-media-clip">
           <div ref={mediaRef} className="intro-media">
             <div ref={focusRef} className="intro-focus">
-              {/* No autoPlay: the timeline starts this at 2.9s, once there is
-                  something to see. preload="auto" still buffers it from mount,
-                  so the start is instant when it comes. */}
+              {/* autoPlay is kept, but only as a FETCH trigger. iOS Safari will
+                  not download a byte of a video until playback is requested,
+                  preload="auto" or not -- so without autoPlay the 7MB plate
+                  starts downloading at 2.9s and on cellular the grass arrives
+                  late and abruptly. The effect below pauses it on its very
+                  first "play" so the decoder does not run under the artifact;
+                  the timeline starts it for real at 2.9s.
+                  /bg/ is served Cache-Control: immutable (next.config.ts), so a
+                  replacement clip MUST get a new filename -- this is already the
+                  third name for exactly that reason. Update <Hero> too. */}
               <video
                 ref={videoRef}
-                src="/bg/hero_bg.mp4"
-                poster="/images/hero/hero_poster.jpg"
+                src="/bg/hero_loop_pp.mp4"
+                poster="/images/hero/hero_poster_v3.jpg"
+                autoPlay
                 loop
                 muted
                 playsInline

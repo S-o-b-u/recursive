@@ -119,7 +119,7 @@ export default function Hero() {
             else — so the hero is never a flat empty plate. */}
         <img
           className="hero-video hero-poster"
-          src="/images/hero/hero_poster.jpg"
+          src="/images/hero/hero_poster_v3.jpg"
           alt=""
           aria-hidden="true"
           draggable={false}
@@ -128,8 +128,8 @@ export default function Hero() {
           <video
             ref={videoRef}
             className="hero-video"
-            src="/bg/hero_bg.mp4"
-            poster="/images/hero/hero_poster.jpg"
+            src="/bg/hero_loop_pp.mp4"
+            poster="/images/hero/hero_poster_v3.jpg"
             autoPlay={false}
             loop
             muted

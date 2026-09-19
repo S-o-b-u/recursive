@@ -57,7 +57,7 @@ export default function JsonLd() {
       hasMap: `https://www.google.com/maps/search/?api=1&query=${VENUE.lat},${VENUE.lng}`,
     },
     image: [
-      `${siteUrl}/images/hero/hero_poster.jpg`,
+      `${siteUrl}/images/hero/hero_poster_v3.jpg`,
       `${siteUrl}/college_logo/gnitacm.png`,
       `${siteUrl}/images/brand/logo.png`,
     ],

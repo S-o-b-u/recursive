@@ -135,7 +135,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <link
           rel="preload"
           as="image"
-          href="/images/hero/hero_poster.jpg"
+          href="/images/hero/hero_poster_v3.jpg"
           fetchPriority="high"
         />
         <link
