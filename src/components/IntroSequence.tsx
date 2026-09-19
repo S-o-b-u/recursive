@@ -71,6 +71,13 @@ const CUES: [number, number][] = [
 const WARP_RADIUS = 250;
 
 /**
+ * Playback rate of the intro's plate. The clip is 8.1s and starts at 2.9s;
+ * desktop pauses it at 13.25s, so it must last >10.35s. At 0.76x it lasts
+ * 10.66s and ends at 13.56s -- 0.3s of margin -- and never loops on screen.
+ */
+const PLATE_RATE = 0.76;
+
+/**
  * `overflow: hidden` on <html> removes the classic scrollbar, which widens the
  * layout viewport and re-crops every `object-fit: cover` plate — a visible zoom
  * + sideways slide when the lock is taken and again when it is released.
@@ -288,7 +295,15 @@ export default function IntroSequence() {
     } catch {}
     // Belt-and-suspenders lock for the frame before Lenis is reachable. Only
     // safe when the scrollbar gutter is reserved — see GUTTER_STABLE.
-    if (GUTTER_STABLE) {
+    //
+    // Not on touch devices. There is no Lenis there to be late; the root's
+    // non-passive touchmove block is what holds the page. And toggling
+    // overflow on <html> at the hand-off is a relayout on a phone -- the one
+    // window in which nothing on screen should move.
+    const touchDevice =
+      "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    const lockOverflow = GUTTER_STABLE && !touchDevice;
+    if (lockOverflow) {
       document.documentElement.style.overflow = "hidden";
       document.body.style.overflow = "hidden";
     }
@@ -339,28 +354,16 @@ export default function IntroSequence() {
       };
       introVid.addEventListener("pause", onPause);
 
-      // Handle seamless video loop without freeze on mobile
-      let looping = false;
-      const onTimeUpdate = () => {
-        if (looping) return;
-        if (introVid.duration && Number.isFinite(introVid.duration)) {
-          if (introVid.currentTime >= introVid.duration - 0.35) {
-            looping = true;
-            introVid.currentTime = 0;
-            ensurePlaying();
-            window.setTimeout(() => {
-              looping = false;
-            }, 300);
-          }
-        }
-      };
-      introVid.addEventListener("timeupdate", onTimeUpdate);
+      // No manual loop. There used to be a timeupdate handler that hard-seeked
+      // to 0 at duration-0.35s. The clip is 8.1s and the plate is on screen
+      // from ~3.25s to ~13.05s -- longer than the clip -- so that seek landed
+      // at ~10.65s, in the last line of the story, and on a phone a JS seek on
+      // a playing video is a freeze followed by a jump in the grass. The plate
+      // now runs at PLATE_RATE (see the start call), which stretches the clip
+      // over the whole visible window with a margin, so it never reaches its
+      // end while anyone can see it. The native `loop` attribute stays as the
+      // fallback if it ever does.
       introVid.addEventListener("seeked", ensurePlaying);
-      const onEnded = () => {
-        introVid.currentTime = 0;
-        ensurePlaying();
-      };
-      introVid.addEventListener("ended", onEnded);
 
       ensurePlaying();
 
@@ -368,9 +371,7 @@ export default function IntroSequence() {
         introVid.removeEventListener("waiting", ensurePlaying);
         introVid.removeEventListener("stalled", ensurePlaying);
         introVid.removeEventListener("pause", onPause);
-        introVid.removeEventListener("timeupdate", onTimeUpdate);
         introVid.removeEventListener("seeked", ensurePlaying);
-        introVid.removeEventListener("ended", onEnded);
       };
     }
 
@@ -498,7 +499,7 @@ export default function IntroSequence() {
     const releaseScroll = () => {
       if (released || doneRef.current) return;
       released = true;
-      if (GUTTER_STABLE) {
+      if (lockOverflow) {
         document.documentElement.style.overflow = "";
         document.body.style.overflow = "";
       }
@@ -784,6 +785,13 @@ export default function IntroSequence() {
           plateStarted = true;
           try {
             if (introVid.currentTime > 0.05) introVid.currentTime = 0;
+            // 8.1s of clip has to cover 2.9s -> ~13.05s without looping.
+            // 8.1 / 0.76 = 10.66s, which reaches 13.56s: past the point the
+            // plate is paused on any device, with margin. The footage is slow grass; at
+            // 0.78x it still reads as wind. The hero's plate runs at 1x and
+            // the two are frame-aligned at hand-off, so over a 0.65-0.85s
+            // dissolve they drift by ~0.15s of sway -- not visible.
+            introVid.playbackRate = PLATE_RATE;
           } catch {}
           const p = introVid.play();
           if (p && typeof p.catch === "function") p.catch(() => {});
@@ -876,10 +884,37 @@ export default function IntroSequence() {
       );
 
       // Pin the plate to exact identity at the dissolve start without micro-snap
+
+      // Hand off to Hero.
+      //
+      // On touch devices the plate swap and the dissolve happen at the same
+      // instant, and the intro's plate is frozen *deliberately* the moment the
+      // hero's starts. This is the fix for the hand-off shaking on phones.
+      //
+      // iOS runs one inline video at a time: starting the hero's plate pauses
+      // the intro's. That fired "pause", the keep-alive answered with play(),
+      // which paused the hero, whose keep-alive played it back, which paused
+      // the intro again... and plateReleased -- the flag that makes the intro
+      // stand down -- was not set until 0.75s later. So for the entire
+      // crossfade the two plates took turns freezing and jumping each other.
+      // Since both are the same clip and are frame-aligned first, freezing the
+      // intro's copy on the frame the hero's starts from costs nothing
+      // visible: the dissolve crosses from a held frame to the same frame in
+      // motion. Only one decoder ever runs.
+      //
+      // Desktop keeps both plates playing (aligned) through the dissolve, as
+      // it can, and pauses the intro's once it is fully transparent.
+      const handoffTime = isMobileDevice ? 12.15 : 12.0;
+      const dissolveStart = isMobileDevice ? handoffTime : 12.3;
+      const dissolveDuration = isMobileDevice ? 0.75 : 0.85;
+
+      // Pin the plate to exact identity once its climb has finished. The climb
+      // tween ends at 12.2s (3.7 + 8.5); this must not land before that, or it
+      // snaps the plate 50ms early and the still-running tween flicks it back
+      // for a frame. 12.3s is after the tween on every device and, on mobile,
+      // 150ms into a dissolve the plate is already at ~identity for anyway.
       tl.set(media, { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0 }, 12.3);
 
-      // Hand off to Hero: signal at 12.15s so Hero starts playing smoothly right before the dissolve
-      const handoffTime = isMobileDevice ? 12.15 : 12.0;
       tl.call(() => {
         gsap.set(root, { background: "transparent" });
         // Before the event: <Hero> plays its plate in response to it, and the
@@ -887,29 +922,35 @@ export default function IntroSequence() {
         // this is a re-sync after the 11.3s warm-up; on mobile it is the only
         // alignment, taken the instant before the hero's first play().
         alignHeroPlate();
+        if (isMobileDevice && introVid) {
+          plateReleased = true;
+          try {
+            introVid.pause();
+          } catch {}
+        }
         if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
         if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("recursive-intro-done"));
       }, undefined, handoffTime);
 
-      const dissolveDuration = isMobileDevice ? 0.65 : 0.85;
-      tl.to(scene, { autoAlpha: 0, duration: dissolveDuration, ease: "power1.inOut" }, 12.3);
+      tl.to(scene, { autoAlpha: 0, duration: dissolveDuration, ease: "power1.inOut" }, dissolveStart);
 
-      // Once scene is fully transparent, ensure hero is playing and release introVid
+      // Once the scene is fully transparent: desktop releases its plate here
+      // (mobile already did, above); both make sure the hero's is running.
       tl.call(() => {
-        if (isMobileDevice && introVid) {
+        if (introVid) {
+          plateReleased = true;
           try {
-            plateReleased = true;
             introVid.pause();
           } catch {}
         }
         resumeHeroPlate();
-      }, undefined, 12.3 + dissolveDuration + 0.1);
+      }, undefined, dissolveStart + dissolveDuration + 0.1);
 
-      tl.set(root, { pointerEvents: "none" }, 12.55);
-      tl.call(releaseScroll, undefined, 13.0);
+      tl.set(root, { pointerEvents: "none" }, dissolveStart + 0.25);
+      tl.call(releaseScroll, undefined, dissolveStart + dissolveDuration + 0.05);
 
       // 5. Glow recedes over the settled landing page.
-      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 0.9, ease: "power1.inOut" }, 12.3 + dissolveDuration);
+      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 0.9, ease: "power1.inOut" }, dissolveStart + dissolveDuration);
     }, root);
 
     const tl = tlRef.current!;
@@ -1016,8 +1057,16 @@ export default function IntroSequence() {
       q.call(
         () => {
           gsap.set(root, { background: "transparent" });
-          // Same seam as the full hand-off: land the seek before <Hero> plays.
+          // Same seam as the full hand-off: land the seek before <Hero> plays,
+          // and on touch devices freeze this plate so the two never fight for
+          // the single decoder.
           alignHeroPlate();
+          if (isMobileDevice && introVid) {
+            plateReleased = true;
+            try {
+              introVid.pause();
+            } catch {}
+          }
           if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
           if (typeof window !== "undefined")
             window.dispatchEvent(new CustomEvent("recursive-intro-done"));
