@@ -576,7 +576,8 @@ export const WarpText: React.FC<WarpTextProps> = ({
       active: 0,
       activeTarget: 0,
     };
-    const startTime = performance.now();
+    // Mutable: reset when the loop starts late (see onIntroDone).
+    let startTime = performance.now();
 
     try {
       renderer = new Renderer({
@@ -774,6 +775,17 @@ export const WarpText: React.FC<WarpTextProps> = ({
     };
     const onIntroDone = () => {
       introHeld = false;
+      // Restart the idle clock. The lens drifts on a sine of `elapsed`, and
+      // the pointer state lerps toward it from (0.5, 0.5). With the loop held
+      // for the ~12s intro, elapsed was ~12s on the first visible frame, the
+      // idle target was ~0.41, and the lens swept from centre to the left over
+      // the next second and a half -- a right-to-left sweep across the
+      // wordmark at the exact moment the hero appears. At elapsed = 0 the
+      // idle target *is* (0.5, 0.5): the same rest state the held frame was
+      // rendered in, so the first moving frame continues it with no jump and
+      // the drift starts from stillness, as it did when the loop ran from
+      // mount.
+      startTime = performance.now();
       startLoop();
     };
     if (introHeld) {
