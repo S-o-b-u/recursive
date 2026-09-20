@@ -395,15 +395,15 @@ export default function IntroSequence() {
 
       const isWideScreen = typeof window !== "undefined" && window.innerWidth >= 768;
       // Intimate initial camera framing centered on the plastic chair and hill crest.
-      // 1.08x scale on desktop / 1.10x on mobile centers dead on the chair (which sits
-      // at 50% X, 48% Y in the video plate) without diagonal subpixel drift.
-      const initialScale = isWideScreen ? 1.08 : 1.10;
+      // Slightly deeper zoom for drama, but mobile capped at 1.15 to prevent shake on small screens.
+      // Chair sits at 50% X, 48% Y — chair-relative origin eliminates diagonal subpixel drift.
+      const initialScale = isWideScreen ? 1.15 : 1.15;
       const hvs = heroVideoScale();
       if (hvs) {
         gsap.set(hvs, {
           scale: initialScale,
-          transformOrigin: "50% 50%",
-          force3D: true,
+          transformOrigin: "50% 48%",
+          force3D: false,
         });
       }
 
@@ -639,17 +639,18 @@ export default function IntroSequence() {
       );
 
       // ── Stage 3: Cinematic Zoom Out / Revealing Animation ──
-      // Camera smoothly and majestically pulls back as morning light breaks and the story unfolds.
-      // The deeper zoom (1.22x) paired with a layered grade peel creates a dramatic reveal:
-      // the scene starts dark and close, then the darkness lifts from the center outward
-      // as the camera steadily pulls back — like dawn breaking over the hill.
+      // Camera slowly pulls back as morning light gradually breaks — slower, more cinematic reveal.
+      // Zoom: 3.4s → 13.4s (10.0s, power2.out) — extended for gradual reveal.
+      // Grade: starts fading WITH zoom at 3.4s, ends at 13.4s (10.0s fade, sine.inOut),
+      // so darkness lifts gradually from the very beginning — text becomes readable as scene reveals.
+      // Clean zoom tail: 0s (grade ends exactly when zoom ends).
       if (hvs) {
         tl.to(
           hvs,
           {
             scale: 1,
-            duration: 8.4,
-            ease: "sine.inOut",
+            duration: 10.0,
+            ease: "power2.out",
             onComplete: () => {
               gsap.set(hvs, { clearProps: "transform" });
             },
@@ -658,14 +659,13 @@ export default function IntroSequence() {
         );
       }
 
-      // Grade reveal — synced with the zoom-out so darkness tracks distance:
-      // Zoom runs 3.4s → 11.8s (8.4s, sine.inOut).
-      // Grade holds full dark until the first text beat (4.1s), then fades
-      // 1 → 0 using the same sine.inOut curve, ending at 11.8s — the exact
-      // frame the zoom reaches scale 1. Deeper zoom = darker, fully out = clear.
-      tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 7.7, ease: "sine.inOut" }, 4.1);
+      // Grade reveal — starts WITH zoom, full 10s duration, sine.inOut for slow start/end:
+      // Fades 3.4s → 13.4s (10.0s, sine.inOut) — perfectly synced with zoom.
+      // sine.inOut = imperceptible start, accelerates middle, decelerates end = natural dawn.
+      tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 10.0, ease: "sine.inOut" }, 3.4);
 
-      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 8.2, ease: "none" }, 3.9);
+      // Progress bar matches extended zoom
+      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 10.0, ease: "none" }, 3.4);
 
       lines.forEach((el, i) => {
         const [tin, tout] = CUES[i];
@@ -733,12 +733,13 @@ export default function IntroSequence() {
         bloom,
         { opacity: 0 },
         { opacity: isMobileDevice ? 0.35 : 0.45, duration: 0.75, ease: "sine.out" },
-        12.0,
+        13.4,
       );
 
       // Hand off to Hero: single unified video plate continues uninterrupted at 60fps
-      const handoffTime = 12.15;
-      const dissolveStart = 12.2;
+      // Zoom ends at 13.4s, bloom starts at 13.4s, handoff at 13.55s
+      const handoffTime = 13.55;
+      const dissolveStart = 13.6;
       const dissolveDuration = 0.75;
 
       tl.call(() => {
@@ -840,7 +841,7 @@ export default function IntroSequence() {
         gsap.killTweensOf(hvsTarget);
         gsap.to(hvsTarget, {
           scale: 1,
-          transformOrigin: "50% 50%",
+          transformOrigin: "50% 48%",
           duration: 0.4,
           ease: "power2.out",
           onComplete: () => {
@@ -1237,7 +1238,7 @@ export default function IntroSequence() {
           will-change: transform, opacity;
         }
 
-        .intro-media-clip { position: absolute; inset: 0; overflow: hidden; }
+        .intro-media-clip { position: absolute; inset: 0; overflow: hidden; will-change: transform; contain: paint; }
 
         /* No CSS transform/filter seed here. The intro is not in the SSR paint
            (it mounts only once phase is "playing"), and GSAP's fromTo applies
@@ -1248,16 +1249,19 @@ export default function IntroSequence() {
         .intro-media {
           position: absolute;
           inset: 0;
-          will-change: transform;
-          transform: translateZ(0);
-          -webkit-transform: translateZ(0);
-          backface-visibility: hidden;
+          contain: paint;
+          isolation: isolate;
         }
         /* Separate layer so the focus rack never fights the climb's transform +
            colour-grade tween on .intro-media. */
         .intro-focus {
           position: absolute;
           inset: 0;
+          will-change: transform, filter;
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
         }
 
 
@@ -1270,20 +1274,21 @@ export default function IntroSequence() {
           object-fit: cover;
           /* Must match Hero's .hero-video so the frame-synced hand-off aligns. */
           object-position: center center;
+          will-change: transform;
           transform: translateZ(0);
           -webkit-transform: translateZ(0);
-          backface-visibility: hidden;
-          -webkit-backface-visibility: hidden;
         }
 
-        /* Dark cinematic vignette — the scene starts buried in darkness,
-           and light breaks through the center first as the grade fades.
+/* Dark cinematic vignette — the scene starts buried in darkness,
+           light breaks through the center first as the grade fades.
            Three layers: center-clear radial, bottom-heavy vignette, overall haze. */
         .intro-grade {
           position: absolute;
           inset: 0;
           pointer-events: none;
           will-change: opacity;
+          contain: paint;
+          isolation: isolate;
           background:
             radial-gradient(65% 55% at 50% 52%, rgba(6,14,9,0) 0%, rgba(6,14,9,0.55) 50%, rgba(4,10,7,0.92) 100%),
             radial-gradient(120% 90% at 50% 116%, rgba(6,14,9,0) 32%, rgba(6,14,9,0.85) 70%, rgba(4,10,7,0.98) 100%),
