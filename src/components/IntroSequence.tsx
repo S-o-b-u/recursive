@@ -875,7 +875,7 @@ export default function IntroSequence() {
       }
     }, 500);
 
-    // ── Smooth & Fast Gradient Reveal on Skip ──────────────────────────────
+    // ── Cinematic Sunrise Aperture & Light Bloom Reveal on Skip ────────────
     let bailing = false;
     bailRef.current = () => {
       if (bailing || doneRef.current) return;
@@ -883,30 +883,11 @@ export default function IntroSequence() {
       started = true;
       tl.pause();
 
-      const veil = veilRef.current;
       const bloom = bloomRef.current;
       const isReduced = reducedMotion();
 
-      // Immediately fade out the skip button and progress bar
-      if (skipWrap) gsap.to(skipWrap, { opacity: 0, duration: 0.15, ease: "power1.out" });
-      if (bar) gsap.to(bar, { opacity: 0, duration: 0.15, ease: "power1.out" });
-
-      const allTargets = [
-        scene, media, focus, grade, bar,
-        loaderOverlay, artifactMark, welcomeBlock,
-        root.querySelector<HTMLElement>(".intro-artifact-img"),
-        root.querySelector<HTMLElement>(".intro-artifact-aura"),
-        ...root.querySelectorAll<HTMLElement>(".intro-welcome-word-i"),
-        root.querySelector<HTMLElement>(".intro-welcome-sub"),
-        skipWrap,
-        ...root.querySelectorAll<HTMLElement>(".intro-word"),
-        ...root.querySelectorAll<HTMLElement>(".intro-word-i"),
-      ].filter(Boolean);
-
       const commitHandoff = () => {
         tl.kill();
-        gsap.killTweensOf(allTargets);
-        gsap.set(allTargets, { clearProps: "transform,opacity,filter" });
 
         const hvsTarget = heroVideoScale();
         if (hvsTarget) {
@@ -917,10 +898,6 @@ export default function IntroSequence() {
         if (heroVid && heroVid.paused) {
           heroVid.play().catch(() => {});
         }
-
-        // Hide intro scene behind the veil and prepare page
-        gsap.set(scene, { autoAlpha: 0 });
-        gsap.set(root, { background: "transparent", pointerEvents: "none" });
 
         delete document.documentElement.dataset.scrollLock;
         document.documentElement.style.overflow = "";
@@ -943,67 +920,93 @@ export default function IntroSequence() {
         releaseScroll();
       };
 
-      if (!veil || isReduced) {
+      if (isReduced) {
         commitHandoff();
         finish();
         return;
       }
 
-      // Fast, ultra-smooth gradient dissolve & wipe reveal
-      gsap.killTweensOf([veil, bloom].filter(Boolean));
-      gsap.set(veil, {
-        yPercent: 0,
+      // Gather all UI elements to dissolve
+      const uiTargets = [
+        skipWrap, bar, welcomeBlock, artifactMark,
+        ...root.querySelectorAll<HTMLElement>(".intro-word"),
+        ...root.querySelectorAll<HTMLElement>(".intro-line"),
+      ].filter(Boolean);
+
+      gsap.killTweensOf([
+        bloom, grade, loaderOverlay, scene, root, ...uiTargets
+      ].filter(Boolean));
+
+      const cineTl = gsap.timeline();
+
+      // 1. UI Elements dissolve gracefully with a subtle upward ease
+      cineTl.to(uiTargets, {
         opacity: 0,
-        scale: 1,
-        visibility: "visible",
-        pointerEvents: "auto",
-        force3D: true,
-      });
-
-      const wipeTl = gsap.timeline();
-
-      // Phase 1: Emerald gradient mist washes in smoothly over the intro
-      wipeTl.to(veil, {
-        opacity: 1,
-        duration: 0.22,
-        ease: "power2.inOut",
-        onComplete: commitHandoff,
+        y: -10,
+        scale: 0.97,
+        duration: 0.2,
+        ease: "power2.out",
+        stagger: 0.008,
       }, 0);
 
-      // Phase 2: Dawn bloom gradient swells over the horizon
+      // 2. Cinematic Dawn Bloom: Golden morning sunrise light floods the frame
       if (bloom) {
-        wipeTl.fromTo(bloom,
-          { opacity: 0 },
-          { opacity: 0.5, duration: 0.32, ease: "sine.out" },
-          0.18
+        cineTl.fromTo(bloom,
+          { opacity: 0, scale: 0.95 },
+          { opacity: 0.85, scale: 1.05, duration: 0.32, ease: "power2.out", force3D: true },
+          0
         );
       }
 
-      // Phase 3: The emerald gradient veil smoothly lifts and completely dissolves to 0
-      wipeTl.to(veil, {
-        yPercent: -130,
-        opacity: 0,
-        scale: 1.02,
-        duration: 0.52,
-        ease: "power2.inOut",
-        force3D: true,
-      }, 0.22);
-
-      // Phase 4: Golden dawn bloom recedes over the daylight hero page
-      if (bloom) {
-        wipeTl.to(bloom, {
+      // 3. Aperture Iris Expansion: Darkness expands outward from the chair into full daylight
+      if (grade) {
+        cineTl.to(grade, {
+          scale: 2.8,
           opacity: 0,
-          duration: 0.45,
-          ease: "sine.inOut",
-        }, 0.42);
+          duration: 0.44,
+          ease: "power2.inOut",
+          transformOrigin: "50% 52.8%",
+          force3D: true,
+        }, 0.04);
       }
 
-      // Phase 5: Clean finish — veil is already at opacity 0 and off-screen
-      wipeTl.call(() => {
-        gsap.set([veil, bloom].filter(Boolean), { visibility: "hidden", pointerEvents: "none" });
+      // If welcome overlay is active, dissolve it smoothly into the light
+      if (loaderOverlay) {
+        cineTl.to(loaderOverlay, {
+          opacity: 0,
+          scale: 1.06,
+          duration: 0.32,
+          ease: "power2.inOut",
+          force3D: true,
+        }, 0.02);
+      }
+
+      // 4. Commit Hero hand-off at peak dawn luminance
+      cineTl.call(commitHandoff, undefined, 0.24);
+
+      // 5. Golden dawn bloom gently recedes over the daylight hero page
+      if (bloom) {
+        cineTl.to(bloom, {
+          opacity: 0,
+          scale: 1.0,
+          duration: 0.48,
+          ease: "sine.inOut",
+          force3D: true,
+        }, 0.32);
+      }
+
+      // 6. Smoothly clear scene layer
+      cineTl.to(scene, {
+        autoAlpha: 0,
+        duration: 0.22,
+        ease: "power1.out",
+      }, 0.36);
+
+      // 7. Complete transition cleanly
+      cineTl.call(() => {
         gsap.set(root, { autoAlpha: 0, pointerEvents: "none" });
         finish();
-      }, undefined, 0.74);
+      }, undefined, 0.76);
     };
 
     return () => {
@@ -1445,22 +1448,27 @@ export default function IntroSequence() {
           opacity: 0;
           pointer-events: none;
           z-index: 100001;
-          will-change: opacity;
+          will-change: opacity, transform;
+          transform-origin: 50% 70%;
           background:
-            radial-gradient(72% 46% at 50% 74%,
-              rgba(255, 244, 214, 0.55) 0%,
-              rgba(252, 236, 198, 0.30) 30%,
-              rgba(214, 230, 196, 0.08) 58%,
-              rgba(214, 230, 196, 0) 78%),
-            linear-gradient(0deg, rgba(255, 240, 208, 0.14) 0%, rgba(255, 240, 208, 0) 42%);
+            radial-gradient(85% 55% at 50% 70%,
+              rgba(255, 248, 225, 0.85) 0%,
+              rgba(255, 238, 190, 0.55) 25%,
+              rgba(214, 238, 185, 0.22) 50%,
+              rgba(180, 225, 160, 0.06) 72%,
+              transparent 85%),
+            linear-gradient(0deg, rgba(255, 242, 210, 0.22) 0%, rgba(255, 242, 210, 0) 50%);
         }
 
         @media (max-width: 860px), (pointer: coarse) {
           .intro-bloom {
-            background: radial-gradient(72% 46% at 50% 74%,
-              rgba(255, 244, 214, 0.35) 0%,
-              rgba(252, 236, 198, 0.18) 30%,
-              rgba(214, 230, 196, 0) 65%) !important;
+            background:
+              radial-gradient(85% 55% at 50% 70%,
+                rgba(255, 248, 225, 0.7) 0%,
+                rgba(255, 238, 190, 0.4) 25%,
+                rgba(214, 238, 185, 0.15) 50%,
+                transparent 75%),
+              linear-gradient(0deg, rgba(255, 242, 210, 0.18) 0%, rgba(255, 242, 210, 0) 45%) !important;
           }
         }
 
@@ -1604,40 +1612,9 @@ export default function IntroSequence() {
           }
         }
 
-        /* Skip transition curtain — Purely Blur & Gradient-Based (No Sharp Edges) */
+        /* Unused legacy veil element — hidden */
         .intro-veil {
-          position: fixed;
-          top: -10vh;
-          left: 0;
-          right: 0;
-          height: 145vh;
-          z-index: 100000;
-          pointer-events: none;
-          visibility: hidden;
-          will-change: transform, opacity;
-          background:
-            radial-gradient(130% 90% at 50% 35%, rgba(60, 110, 45, 0.45) 0%, rgba(18, 40, 18, 0.85) 45%, #050d05 90%),
-            linear-gradient(180deg, #081408 0%, #030803 40%, #010301 65%, transparent 100%);
-          -webkit-mask-image: linear-gradient(
-            to bottom,
-            black 0%,
-            black 42%,
-            rgba(0, 0, 0, 0.9) 56%,
-            rgba(0, 0, 0, 0.6) 70%,
-            rgba(0, 0, 0, 0.25) 84%,
-            transparent 100%
-          );
-          mask-image: linear-gradient(
-            to bottom,
-            black 0%,
-            black 42%,
-            rgba(0, 0, 0, 0.9) 56%,
-            rgba(0, 0, 0, 0.6) 70%,
-            rgba(0, 0, 0, 0.25) 84%,
-            transparent 100%
-          );
-          backdrop-filter: blur(24px);
-          -webkit-backdrop-filter: blur(24px);
+          display: none;
         }
 
         @media (prefers-reduced-motion: reduce) {
