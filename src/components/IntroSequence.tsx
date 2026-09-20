@@ -128,10 +128,8 @@ export default function IntroSequence() {
     try {
       sessionStorage.setItem(SEEN_KEY, "1");
     } catch {}
-    if (GUTTER_STABLE) {
-      document.documentElement.style.overflow = "";
-      document.body.style.overflow = "";
-    }
+    document.documentElement.style.overflow = "";
+    document.body.style.overflow = "";
 
     // Resume the hero's plate — it was frozen for the crossfade so the two
     // videos could not drift. It picks up from the exact frame it held.
@@ -297,7 +295,14 @@ export default function IntroSequence() {
     // on touch once as "insurance" against a relayout at the hand-off; that
     // relayout never happens -- overlay scrollbars have no width -- and the
     // shaking it let in was worse than the thing it guarded against.)
-    const lockOverflow = GUTTER_STABLE;
+    const isTouch =
+      typeof window !== "undefined" &&
+      ("ontouchstart" in window || navigator.maxTouchPoints > 0 || window.innerWidth < 860);
+
+    // On touch devices lock overflow so mobile browser toolbar stays put.
+    // On desktop, Lenis + wheel/keyboard event blockers hold scroll completely
+    // without touching overflow or causing scrollbar gutter gaps.
+    const lockOverflow = isTouch;
     if (lockOverflow) {
       document.documentElement.style.overflow = "hidden";
       document.body.style.overflow = "hidden";
@@ -307,7 +312,8 @@ export default function IntroSequence() {
     const heroVideo = () =>
       document.querySelector<HTMLVideoElement>("video.hero-video");
     const heroVideoScale = () =>
-      document.querySelector<HTMLElement>("#hero .hero-video-scale, #hero .hero-video-wrap");
+      document.querySelector<HTMLElement>("#hero .hero-video-scale") ||
+      document.querySelector<HTMLElement>("#hero .hero-video-wrap");
 
     const onTouchKick = () => {
       const hv = heroVideo();
@@ -323,10 +329,6 @@ export default function IntroSequence() {
 
     // Hold the scroll through Lenis. <SmoothScroll> mounts after this layout
     // effect, so the instance can be a frame or two late — retry briefly.
-    const isTouch =
-      typeof window !== "undefined" &&
-      ("ontouchstart" in window || navigator.maxTouchPoints > 0 || window.innerWidth < 860);
-
     let lenisHooked = false;
     let lenisRaf = 0;
     const grabLenis = () => {
@@ -392,13 +394,31 @@ export default function IntroSequence() {
       tl.set(scene, { opacity: 1 }, 0);
 
       const isWideScreen = typeof window !== "undefined" && window.innerWidth >= 768;
-      // Intimate initial camera framing centered around the hill crest and plastic chair
-      const initialScale = isWideScreen ? 1.08 : 1.10;
+      // Intimate initial camera framing centered around the hill crest and plastic chair.
+      // Higher values = more dramatic zoom-out reveal (was 1.08/1.10, now 1.22/1.28).
+      const initialScale = isWideScreen ? 1.22 : 1.28;
       const hvs = heroVideoScale();
+      // Compute the framing offset as an explicit translation instead of an
+      // off-center transform-origin. Scaling around a non-center origin
+      // implicitly translates the element by (origin - 50%) * (scale - 1) each
+      // frame, and at the tail of a long ease the sub-pixel rounding of those
+      // tiny shifts causes visible jitter/shaking. A center origin with an
+      // explicit x/y tween keeps every frame in clean GPU-compositor territory.
+      //
+      // The math: an origin of (ox%, oy%) with scale S is equivalent to
+      //   origin 50% 50%  +  translate( (ox-50)/100 * w * (S-1), (oy-50)/100 * h * (S-1) )
+      const vw = typeof window !== "undefined" ? window.innerWidth : 1920;
+      const vh = typeof window !== "undefined" ? window.innerHeight : 1080;
+      const oxPct = isWideScreen ? 52 : 50; // original origin-x %
+      const oyPct = isWideScreen ? 56 : 60; // original origin-y %
+      const initialX = ((oxPct - 50) / 100) * vw * (initialScale - 1);
+      const initialY = ((oyPct - 50) / 100) * vh * (initialScale - 1);
       if (hvs) {
         gsap.set(hvs, {
           scale: initialScale,
-          transformOrigin: isWideScreen ? "52% 58%" : "50% 62%",
+          x: -initialX,
+          y: -initialY,
+          transformOrigin: "50% 50%",
           force3D: true,
         });
       }
@@ -635,12 +655,17 @@ export default function IntroSequence() {
       );
 
       // ── Stage 3: Cinematic Zoom Out / Revealing Animation ──
-      // Camera smoothly and majestically pulls back as morning light breaks and the story unfolds
+      // Camera smoothly and majestically pulls back as morning light breaks and the story unfolds.
+      // The deeper zoom (1.22x) paired with a layered grade peel creates a dramatic reveal:
+      // the scene starts dark and close, then the darkness lifts from the center outward
+      // as the camera steadily pulls back — like dawn breaking over the hill.
       if (hvs) {
         tl.to(
           hvs,
           {
             scale: 1,
+            x: 0,
+            y: 0,
             duration: 8.4,
             ease: "sine.inOut",
           },
@@ -648,7 +673,13 @@ export default function IntroSequence() {
         );
       }
 
-      tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 7.6, ease: "sine.inOut" }, 3.8);
+      // Grade reveal — synced with the zoom-out so darkness tracks distance:
+      // Zoom runs 3.4s → 11.8s (8.4s, sine.inOut).
+      // Grade holds full dark until the first text beat (4.1s), then fades
+      // 1 → 0 using the same sine.inOut curve, ending at 11.8s — the exact
+      // frame the zoom reaches scale 1. Deeper zoom = darker, fully out = clear.
+      tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 7.7, ease: "sine.inOut" }, 4.1);
+
       tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 8.2, ease: "none" }, 3.9);
 
       lines.forEach((el, i) => {
@@ -822,7 +853,7 @@ export default function IntroSequence() {
       const hvsTarget = heroVideoScale();
       if (hvsTarget) {
         gsap.killTweensOf(hvsTarget);
-        gsap.to(hvsTarget, { scale: 1, duration: 0.4, ease: "power2.out" });
+        gsap.to(hvsTarget, { scale: 1, x: 0, y: 0, transformOrigin: "50% 50%", duration: 0.4, ease: "power2.out" });
       }
 
       const heroVid = heroVideo();
@@ -1055,10 +1086,7 @@ export default function IntroSequence() {
            the glow (a sibling, not a child) lingers over the landing page. */
         .intro-scene {
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
+          inset: 0;
           width: 100%;
           height: 100%;
           min-height: 100vh;
@@ -1255,14 +1283,18 @@ export default function IntroSequence() {
           -webkit-backface-visibility: hidden;
         }
 
-        /* Dark from above — you're at the bottom, looking up the hill. */
+        /* Dark cinematic vignette — the scene starts buried in darkness,
+           and light breaks through the center first as the grade fades.
+           Three layers: center-clear radial, bottom-heavy vignette, overall haze. */
         .intro-grade {
           position: absolute;
           inset: 0;
           pointer-events: none;
+          will-change: opacity;
           background:
-            radial-gradient(120% 90% at 50% 116%, rgba(6,14,9,0) 32%, rgba(6,14,9,0.8) 76%, rgba(4,10,7,0.96) 100%),
-            linear-gradient(180deg, rgba(6,13,9,0.7) 0%, rgba(6,13,9,0.24) 46%, rgba(6,13,9,0.48) 100%);
+            radial-gradient(65% 55% at 50% 52%, rgba(6,14,9,0) 0%, rgba(6,14,9,0.55) 50%, rgba(4,10,7,0.92) 100%),
+            radial-gradient(120% 90% at 50% 116%, rgba(6,14,9,0) 32%, rgba(6,14,9,0.85) 70%, rgba(4,10,7,0.98) 100%),
+            linear-gradient(180deg, rgba(6,13,9,0.8) 0%, rgba(6,13,9,0.3) 42%, rgba(6,13,9,0.6) 100%);
         }
 
         /* Dawn cresting the hill — low, wide, warm. Masks the cut, then recedes. */

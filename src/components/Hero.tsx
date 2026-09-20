@@ -302,7 +302,7 @@ export default function Hero() {
           width: 100%;
           height: 100%;
           pointer-events: none;
-          transform-origin: 52% 58%;
+          transform-origin: 50% 50%;
           will-change: transform;
           transform: translate3d(0, 0, 0);
           backface-visibility: hidden;
@@ -311,7 +311,7 @@ export default function Hero() {
 
         @media (max-width: 860px) {
           .hero-video-scale {
-            transform-origin: 50% 62%;
+            transform-origin: 50% 50%;
           }
         }
 
