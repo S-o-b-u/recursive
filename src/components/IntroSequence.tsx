@@ -884,14 +884,15 @@ export default function IntroSequence() {
       tl.pause();
 
       const veil = veilRef.current;
+      const bloom = bloomRef.current;
       const isReduced = reducedMotion();
 
       // Immediately fade out the skip button and progress bar
-      if (skipWrap) gsap.to(skipWrap, { opacity: 0, duration: 0.12, ease: "power1.out" });
-      if (bar) gsap.to(bar, { opacity: 0, duration: 0.12, ease: "power1.out" });
+      if (skipWrap) gsap.to(skipWrap, { opacity: 0, duration: 0.15, ease: "power1.out" });
+      if (bar) gsap.to(bar, { opacity: 0, duration: 0.15, ease: "power1.out" });
 
       const allTargets = [
-        scene, bloom, media, focus, grade, bar,
+        scene, media, focus, grade, bar,
         loaderOverlay, artifactMark, welcomeBlock,
         root.querySelector<HTMLElement>(".intro-artifact-img"),
         root.querySelector<HTMLElement>(".intro-artifact-aura"),
@@ -948,10 +949,12 @@ export default function IntroSequence() {
         return;
       }
 
-      // Fast, ultra-smooth gradient wipe reveal
-      gsap.killTweensOf(veil);
+      // Fast, ultra-smooth gradient dissolve & wipe reveal
+      gsap.killTweensOf([veil, bloom].filter(Boolean));
       gsap.set(veil, {
-        yPercent: 120,
+        yPercent: 0,
+        opacity: 0,
+        scale: 1,
         visibility: "visible",
         pointerEvents: "auto",
         force3D: true,
@@ -959,26 +962,47 @@ export default function IntroSequence() {
 
       const wipeTl = gsap.timeline();
 
-      // Phase 1: Gradient sweeps up smoothly and fastly to cover the scene
+      // Phase 1: Emerald gradient mist washes in smoothly over the intro
       wipeTl.to(veil, {
-        yPercent: 0,
-        duration: 0.24,
-        ease: "power2.in",
-        force3D: true,
+        opacity: 1,
+        duration: 0.22,
+        ease: "power2.inOut",
         onComplete: commitHandoff,
       }, 0);
 
-      // Phase 2: Immediately sweeps up to reveal the hero page
+      // Phase 2: Dawn bloom gradient swells over the horizon
+      if (bloom) {
+        wipeTl.fromTo(bloom,
+          { opacity: 0 },
+          { opacity: 0.5, duration: 0.3, ease: "sine.out" },
+          0.18
+        );
+      }
+
+      // Phase 3: The emerald gradient veil smoothly lifts and dissolves up
       wipeTl.to(veil, {
-        yPercent: -120,
-        duration: 0.28,
-        ease: "power2.out",
+        yPercent: -105,
+        opacity: 0.15,
+        scale: 1.03,
+        duration: 0.44,
+        ease: "power2.inOut",
         force3D: true,
-        onComplete: () => {
-          gsap.set(veil, { yPercent: 120, visibility: "hidden", pointerEvents: "none" });
-          finish();
-        },
-      });
+      }, 0.22);
+
+      // Phase 4: Golden dawn bloom recedes over the daylight hero page
+      if (bloom) {
+        wipeTl.to(bloom, {
+          opacity: 0,
+          duration: 0.4,
+          ease: "sine.inOut",
+        }, 0.42);
+      }
+
+      // Complete transition
+      wipeTl.call(() => {
+        gsap.set(veil, { visibility: "hidden", pointerEvents: "none" });
+        finish();
+      }, undefined, 0.66);
     };
 
     return () => {
@@ -1419,6 +1443,8 @@ export default function IntroSequence() {
           inset: 0;
           opacity: 0;
           pointer-events: none;
+          z-index: 100001;
+          will-change: opacity;
           background:
             radial-gradient(72% 46% at 50% 74%,
               rgba(255, 244, 214, 0.55) 0%,
@@ -1584,44 +1610,27 @@ export default function IntroSequence() {
           z-index: 100000;
           pointer-events: none;
           visibility: hidden;
-          will-change: transform;
+          will-change: transform, opacity;
           background:
-            radial-gradient(120% 80% at 50% 35%, rgba(56, 96, 42, 0.45) 0%, rgba(20, 42, 18, 0.8) 45%, #050d05 100%),
-            linear-gradient(180deg, #081408 0%, #020502 60%, #000200 100%);
-          box-shadow: 0 0 100px 40px rgba(1, 4, 1, 0.95);
-        }
-
-        .intro-veil::before {
-          content: "";
-          position: absolute;
-          top: -140px;
-          left: 0;
-          right: 0;
-          height: 140px;
-          background: linear-gradient(
-            to top,
-            #081408 0%,
-            rgba(8, 20, 8, 0.85) 30%,
-            rgba(30, 60, 25, 0.5) 60%,
-            rgba(60, 110, 45, 0.2) 80%,
-            transparent 100%
-          );
-          pointer-events: none;
+            radial-gradient(130% 90% at 50% 35%, rgba(60, 110, 45, 0.45) 0%, rgba(18, 40, 18, 0.85) 45%, #050d05 90%),
+            linear-gradient(180deg, #081408 0%, #030803 55%, #010301 100%);
+          box-shadow: 0 0 120px 50px rgba(1, 4, 1, 0.95);
         }
 
         .intro-veil::after {
           content: "";
           position: absolute;
-          bottom: -140px;
+          bottom: -280px;
           left: 0;
           right: 0;
-          height: 140px;
+          height: 280px;
           background: linear-gradient(
             to bottom,
-            #000200 0%,
-            rgba(2, 5, 2, 0.85) 30%,
-            rgba(30, 60, 25, 0.5) 60%,
-            rgba(60, 110, 45, 0.2) 80%,
+            #010301 0%,
+            rgba(3, 8, 3, 0.95) 20%,
+            rgba(10, 25, 12, 0.8) 45%,
+            rgba(35, 75, 30, 0.5) 68%,
+            rgba(75, 140, 55, 0.22) 85%,
             transparent 100%
           );
           pointer-events: none;
