@@ -407,18 +407,10 @@ export default function IntroSequence() {
       tl.set(root, { autoAlpha: 1 });
       tl.set(scene, { opacity: 1 }, 0);
 
-      const isWideScreen = typeof window !== "undefined" && window.innerWidth >= 768;
-      // Camera starts at 1.12x zoom on the chair (50% X, 52% Y) — holds through all intro text,
-      // then smoothly scales down to 1.0 when gradient lifts.
-      const initialScale = 1.12;
+      // Ensure the hero video plate remains rock-solid at native 1:1 scale (0 video transforms = 0 grass shaking)
       const hvs = heroVideoScale();
       if (hvs) {
-        gsap.set(hvs, {
-          scale: initialScale,
-          transformOrigin: "50% 52%",
-          force3D: true,
-        });
-        tl.set(hvs, { scale: initialScale, transformOrigin: "50% 52%" }, 0);
+        gsap.set(hvs, { clearProps: "transform" });
       }
 
       // ── Stage 1 & 2: Artifact & Welcome Cascade ──
@@ -655,64 +647,49 @@ export default function IntroSequence() {
         2.9,
       );
 
-      // ── Stage 3: the grade lifts and the camera pulls back together, across the story ──
+      // ── Stage 3: Cinematic Aperture Gradient Reveal (Rock-solid native 1:1 video) ──
       //
-      // One slow motion under the text, from the first line to the last
-      // (4.1s -> 11.95s): the dark grade fades to a low floor while the camera
-      // eases from its 1.12x framing on the chair back to 1:1. The chair is
-      // revealed and the frame opens at the same pace, so by "Let's find out."
-      // the scene is already at its resting composition. Only the last of the
-      // grade -- the floor -- goes at the end, with its aperture widening, as
-      // the beat that hands to the hero.
-      //
-      // Spreading the 12% pull-back over ~8s also all but removes the grass
-      // crawl the old 1.8s version had on DPR-1 desktops: the clip is being
-      // downscaled there, and bilinear re-samples grass at a new phase every
-      // frame the scale changes; at this speed the per-frame scale delta is
-      // ~4x smaller than the previous 2.4s version and ~9x the 1.8s one.
+      // The video plate stays 100% stable at native 1:1 scale with zero transforms,
+      // which completely eliminates grass shaking, shimmering, and crawl across
+      // desktop, tablet, and mobile phone.
+      // The cinematic reveal is carried smoothly by the dark aperture gradient (grade),
+      // which starts focused on the solitary chair and gently expands outward,
+      // easing down to a comfortable floor under the story text, then opening fully
+      // into bright morning daylight.
       const textStartTime = 4.1;
       const textEndTime = 11.95;
       const gradeFloor = 0.3;
       const revealDuration = textEndTime - textStartTime;
       const gradientLiftStart = textEndTime + 0.1;
-      // the final beat: the grade floor lifts and its aperture widens
+      // the final beat: the grade floor lifts and its aperture widens completely
       const scaleDownDuration = 1.2;
       const scaleDownEase = "sine.inOut";
 
-      // Grade: 1 -> floor, and camera: 1.12 -> 1, on the same clock and curve.
+      // Dark grade eases from full atmospheric vignette to gradeFloor while aperture opens gently
       tl.fromTo(
         grade,
         { scale: 1.0, opacity: 1 },
-        { opacity: gradeFloor, duration: revealDuration, ease: "sine.inOut" },
+        {
+          scale: 1.15,
+          opacity: gradeFloor,
+          duration: revealDuration,
+          ease: "sine.inOut",
+          force3D: true,
+          transformOrigin: "50% 52.8%",
+        },
         textStartTime,
       );
-      if (hvs) {
-        tl.to(
-          hvs,
-          {
-            scale: 1,
-            duration: revealDuration,
-            ease: "sine.inOut",
-            force3D: true,
-            transformOrigin: "50% 52%",
-            // No clearProps at the end: scale(1) is identity, and stripping
-            // the inline transform is a style change on a composited video
-            // layer for no visible difference.
-          },
-          textStartTime,
-        );
-      }
 
-      // The last of the grade, widening as it goes.
+      // The last of the grade: aperture expands wide and lifts completely into daylight
       tl.to(
         grade,
         {
-          scale: 1.4,
+          scale: 1.5,
           opacity: 0,
           duration: scaleDownDuration,
           ease: scaleDownEase,
           force3D: true,
-          transformOrigin: "50% 52%",
+          transformOrigin: "50% 52.8%",
         },
         gradientLiftStart,
       );
@@ -923,10 +900,10 @@ export default function IntroSequence() {
       gsap.killTweensOf(allTargets);
       gsap.set(allTargets, { clearProps: "transform,opacity,filter" });
 
-      // Reset video scale immediately
+      // Ensure video plate transform is clean
       const hvsTarget = heroVideoScale();
       if (hvsTarget) {
-        gsap.set(hvsTarget, { scale: 1, transformOrigin: "50% 52%", clearProps: "transform" });
+        gsap.set(hvsTarget, { clearProps: "transform" });
       }
 
       // Play hero video
