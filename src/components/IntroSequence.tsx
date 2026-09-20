@@ -194,38 +194,7 @@ export default function IntroSequence() {
       else window.setTimeout(unmount, 500);
     };
 
-    if (!veil || isReduced) {
-      doTransition();
-      return;
-    }
-
-    // Fast gradient wipe - reveal hero page smoothly
-    gsap.killTweensOf(veil);
-    gsap.set(veil, { 
-      yPercent: 100, 
-      visibility: "visible", 
-      pointerEvents: "auto" 
-    });
-
-    const tl = gsap.timeline({
-      onComplete: doTransition,
-    });
-
-    // Quick sweep up to cover, then immediately sweep down to reveal
-    tl.to(veil, { 
-      yPercent: 0, 
-      duration: 0.2, 
-      ease: "power4.inOut" 
-    }, 0);
-    
-    tl.to(veil, { 
-      yPercent: -100, 
-      duration: 0.25, 
-      ease: "power3.out",
-      onComplete: () => {
-        gsap.set(veil, { yPercent: 100, visibility: "hidden", pointerEvents: "none" });
-      }
-    }, 0.15);
+    doTransition();
   }, []);
 
   const skip = useCallback(() => {
@@ -906,17 +875,21 @@ export default function IntroSequence() {
       }
     }, 500);
 
-    // ── Instant Skip ───────────────────────────────────────────────────────
-    // Immediately kills all tweens and jumps straight to hero page — no animation.
+    // ── Smooth & Fast Gradient Reveal on Skip ──────────────────────────────
     let bailing = false;
     bailRef.current = () => {
       if (bailing || doneRef.current) return;
       bailing = true;
       started = true;
       tl.pause();
-      tl.kill();
 
-      // Kill all tweens instantly
+      const veil = veilRef.current;
+      const isReduced = reducedMotion();
+
+      // Immediately fade out the skip button and progress bar
+      if (skipWrap) gsap.to(skipWrap, { opacity: 0, duration: 0.12, ease: "power1.out" });
+      if (bar) gsap.to(bar, { opacity: 0, duration: 0.12, ease: "power1.out" });
+
       const allTargets = [
         scene, bloom, media, focus, grade, bar,
         loaderOverlay, artifactMark, welcomeBlock,
@@ -927,32 +900,85 @@ export default function IntroSequence() {
         skipWrap,
         ...root.querySelectorAll<HTMLElement>(".intro-word"),
         ...root.querySelectorAll<HTMLElement>(".intro-word-i"),
-        heroVideoScale(),
       ].filter(Boolean);
-      gsap.killTweensOf(allTargets);
-      gsap.set(allTargets, { clearProps: "transform,opacity,filter" });
 
-      // Ensure video plate transform is clean
-      const hvsTarget = heroVideoScale();
-      if (hvsTarget) {
-        gsap.set(hvsTarget, { clearProps: "transform" });
+      const commitHandoff = () => {
+        tl.kill();
+        gsap.killTweensOf(allTargets);
+        gsap.set(allTargets, { clearProps: "transform,opacity,filter" });
+
+        const hvsTarget = heroVideoScale();
+        if (hvsTarget) {
+          gsap.set(hvsTarget, { clearProps: "transform" });
+        }
+
+        const heroVid = heroVideo();
+        if (heroVid && heroVid.paused) {
+          heroVid.play().catch(() => {});
+        }
+
+        // Hide intro scene behind the veil and prepare page
+        gsap.set(scene, { autoAlpha: 0 });
+        gsap.set(root, { background: "transparent", pointerEvents: "none" });
+
+        delete document.documentElement.dataset.scrollLock;
+        document.documentElement.style.overflow = "";
+        document.body.style.overflow = "";
+
+        const lenis = getLenis();
+        if (lenis) {
+          lenis.scrollTo(0, { immediate: true, force: true });
+          lenis.start();
+        } else {
+          window.scrollTo(0, 0);
+        }
+
+        if (typeof document !== "undefined") {
+          document.documentElement.dataset.intro = "done";
+        }
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("recursive-intro-done"));
+        }
+        releaseScroll();
+      };
+
+      if (!veil || isReduced) {
+        commitHandoff();
+        finish();
+        return;
       }
 
-      // Play hero video
-      const heroVid = heroVideo();
-      if (heroVid && heroVid.paused) {
-        heroVid.play().catch(() => {});
-      }
+      // Fast, ultra-smooth gradient wipe reveal
+      gsap.killTweensOf(veil);
+      gsap.set(veil, {
+        yPercent: 120,
+        visibility: "visible",
+        pointerEvents: "auto",
+        force3D: true,
+      });
 
-      // Instant handoff
-      gsap.set(root, { background: "transparent" });
-      if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
-      if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("recursive-intro-done"));
-      
-      gsap.set(scene, { autoAlpha: 0 });
-      gsap.set(root, { pointerEvents: "none" });
-      releaseScroll();
-      finish();
+      const wipeTl = gsap.timeline();
+
+      // Phase 1: Gradient sweeps up smoothly and fastly to cover the scene
+      wipeTl.to(veil, {
+        yPercent: 0,
+        duration: 0.24,
+        ease: "power2.in",
+        force3D: true,
+        onComplete: commitHandoff,
+      }, 0);
+
+      // Phase 2: Immediately sweeps up to reveal the hero page
+      wipeTl.to(veil, {
+        yPercent: -120,
+        duration: 0.28,
+        ease: "power2.out",
+        force3D: true,
+        onComplete: () => {
+          gsap.set(veil, { yPercent: 120, visibility: "hidden", pointerEvents: "none" });
+          finish();
+        },
+      });
     };
 
     return () => {
@@ -1560,14 +1586,50 @@ export default function IntroSequence() {
           visibility: hidden;
           will-change: transform;
           background:
-            radial-gradient(120% 70% at 50% 0%, rgba(52, 88, 38, 0.42) 0%, rgba(52, 88, 38, 0) 62%),
-            linear-gradient(180deg, #0A160A 0%, #010301 62%);
-          box-shadow: 0 0 100px 30px rgba(1, 3, 1, 0.95);
+            radial-gradient(120% 80% at 50% 35%, rgba(56, 96, 42, 0.45) 0%, rgba(20, 42, 18, 0.8) 45%, #050d05 100%),
+            linear-gradient(180deg, #081408 0%, #020502 60%, #000200 100%);
+          box-shadow: 0 0 100px 40px rgba(1, 4, 1, 0.95);
+        }
+
+        .intro-veil::before {
+          content: "";
+          position: absolute;
+          top: -140px;
+          left: 0;
+          right: 0;
+          height: 140px;
+          background: linear-gradient(
+            to top,
+            #081408 0%,
+            rgba(8, 20, 8, 0.85) 30%,
+            rgba(30, 60, 25, 0.5) 60%,
+            rgba(60, 110, 45, 0.2) 80%,
+            transparent 100%
+          );
+          pointer-events: none;
+        }
+
+        .intro-veil::after {
+          content: "";
+          position: absolute;
+          bottom: -140px;
+          left: 0;
+          right: 0;
+          height: 140px;
+          background: linear-gradient(
+            to bottom,
+            #000200 0%,
+            rgba(2, 5, 2, 0.85) 30%,
+            rgba(30, 60, 25, 0.5) 60%,
+            rgba(60, 110, 45, 0.2) 80%,
+            transparent 100%
+          );
+          pointer-events: none;
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .intro-root { display: none; }
-          .intro-veil { display: none; }
+          .intro-root { display: none !important; }
+          .intro-veil { display: none !important; }
         }
       `}</style>
     </div>
