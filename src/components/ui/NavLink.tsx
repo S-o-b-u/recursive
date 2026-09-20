@@ -7,6 +7,7 @@ import {
   type ReactNode,
   useRef,
   useState,
+  useEffect,
 } from "react";
 
 /**
@@ -26,6 +27,7 @@ import {
  */
 
 import { triggerScrollExpand } from "@/lib/scroll-expand";
+import { acquireNavWave, releaseNavWave } from "@/lib/nav-wave";
 
 type Ripple = { x: number; y: number; id: number };
 
@@ -47,6 +49,15 @@ export default function NavLink({
   const [hovered, setHovered] = useState(false);
   const [tapped, setTapped] = useState(false);
   const [ripples, setRipples] = useState<Ripple[]>([]);
+
+  // The ripple filters are SMIL-driven; run their animations only while this
+  // item needs them. See src/lib/nav-wave.ts.
+  const active = hovered || tapped;
+  useEffect(() => {
+    if (!active) return;
+    acquireNavWave();
+    return () => releaseNavWave();
+  }, [active]);
   const idRef = useRef(0);
   const elRef = useRef<HTMLAnchorElement>(null);
 

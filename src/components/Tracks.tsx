@@ -77,11 +77,18 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
                 {track.media.src && (
                   <div className="tr-card-media-link">
                     <div className="tr-card-media">
+                      {/* Intrinsic size declared so the browser reserves the
+                          box before the lazy load lands; without it a
+                          lazy image starts as 0x0 and shifts the layout
+                          when it arrives. CSS still sizes it to the card. */}
                       <img
                         src={track.media.src}
                         alt={track.title}
                         className="tr-card-img"
+                        width={1514}
+                        height={1039}
                         loading="lazy"
+                        decoding="async"
                       />
                       <span className="tr-card-media-gloss" aria-hidden="true" />
                     </div>

@@ -191,6 +191,7 @@ export default function Navigation() {
               dur="7s"
               values="0.022 0.05; 0.04 0.022; 0.022 0.05"
               repeatCount="indefinite"
+              begin="indefinite"
             />
           </feTurbulence>
           <feDisplacementMap
@@ -216,6 +217,7 @@ export default function Navigation() {
               dur="5.5s"
               values="0.014 0.03; 0.028 0.016; 0.014 0.03"
               repeatCount="indefinite"
+              begin="indefinite"
             />
           </feTurbulence>
           <feDisplacementMap
