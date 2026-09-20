@@ -311,6 +311,7 @@ export default function Hero() {
           width: 100%;
           height: 100%;
           pointer-events: none;
+          transform-origin: 50% 52%;
         }
 
         /* ── 100% Clean Video Plate — Direct GPU Composition ── */

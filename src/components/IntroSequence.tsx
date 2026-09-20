@@ -137,6 +137,9 @@ export default function IntroSequence() {
       const hv = document.querySelector<HTMLVideoElement>("video.hero-video");
       const p = hv?.play();
       if (p && typeof p.catch === "function") p.catch(() => {});
+      const hvs = document.querySelector<HTMLElement>("#hero .hero-video-scale") ||
+                  document.querySelector<HTMLElement>("#hero .hero-video-wrap");
+      if (hvs) gsap.set(hvs, { clearProps: "transform" });
     } catch {}
 
     // Release the scroll through Lenis so the hero arrives already smoothed,
@@ -393,10 +396,19 @@ export default function IntroSequence() {
       tl.set(root, { autoAlpha: 1 });
       tl.set(scene, { opacity: 1 }, 0);
 
-      // Ensure the hero video plate remains rock-solid at native 1:1 scale (0 video transforms = 0 grass shaking)
+      const isWideScreen = typeof window !== "undefined" && window.innerWidth >= 768;
+      // Intimate initial camera framing zoomed in on the plastic chair (which sits at 50% X, 52% Y).
+      // 1.09x on desktop / 1.11x on mobile centers directly on the chair, making it prominent
+      // without excessive scaling that could cause pixelation or grass shimmer.
+      const initialScale = isWideScreen ? 1.09 : 1.11;
       const hvs = heroVideoScale();
       if (hvs) {
-        gsap.set(hvs, { clearProps: "transform" });
+        gsap.set(hvs, {
+          scale: initialScale,
+          transformOrigin: "50% 52%",
+          force3D: true,
+        });
+        tl.set(hvs, { scale: initialScale, transformOrigin: "50% 52%" }, 0);
       }
 
       // ── Stage 1 & 2: Artifact & Welcome Cascade ──
@@ -630,28 +642,47 @@ export default function IntroSequence() {
         2.9,
       );
 
-      // ── Stage 3: Cinematic Gradient Ease Zoom-In Reveal ──
-      // The scene begins in deep, atmospheric morning darkness with a rich, heavy vignette.
-      // As the captions narrate the ascent ("Welcome to the bottom..."),
-      // the dark aperture vignette smoothly eases and zooms in / expands outward (center-out iris reveal),
-      // gradually revealing the sunlit hill crest, plastic chair, and swaying grass into full morning daylight.
-      // The video itself remains 100% stable at native 1:1 scale with zero subpixel aliasing or shaking.
+      // ── Stage 3: Cinematic Zoomed Chair to Normal & Deep Gradient Reveal ──
+      // The scene starts in deep, rich morning darkness with an intimate camera framing zoomed on the chair.
+      // The dark gradient and zoomed framing are held firmly through Line 1 ("Welcome to the bottom") and into Line 2.
+      // From 5.2s, the aperture expands and fades outward while the camera smoothly zooms out to normal 1:1 framing,
+      // bringing the sunlit hill crest, plastic chair, and swaying grass into full morning daylight.
+      const revealStart = 5.2;
+      const revealDuration = 7.8; // 5.2s -> 13.0s
+
+      if (hvs) {
+        tl.to(
+          hvs,
+          {
+            scale: 1,
+            duration: revealDuration,
+            ease: "sine.inOut",
+            force3D: true,
+            transformOrigin: "50% 52%",
+            onComplete: () => {
+              gsap.set(hvs, { clearProps: "transform" });
+            },
+          },
+          revealStart,
+        );
+      }
+
       tl.fromTo(
         grade,
         { scale: 1.0, opacity: 1 },
         {
-          scale: 1.55,
+          scale: 1.65,
           opacity: 0,
-          duration: 9.0,
+          duration: revealDuration,
           ease: "sine.inOut",
           force3D: true,
           transformOrigin: "50% 52%",
         },
-        4.0,
+        revealStart,
       );
 
-      // Progress bar matches the reveal window (4.0s to 13.0s)
-      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 9.0, ease: "none" }, 4.0);
+      // Progress bar matches the story reveal window (4.1s to 13.0s)
+      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 8.9, ease: "none" }, 4.1);
 
       lines.forEach((el, i) => {
         const [tin, tout] = CUES[i];
@@ -825,7 +856,16 @@ export default function IntroSequence() {
       const hvsTarget = heroVideoScale();
       if (hvsTarget) {
         gsap.killTweensOf(hvsTarget);
-        gsap.set(hvsTarget, { clearProps: "transform" });
+        gsap.to(hvsTarget, {
+          scale: 1,
+          transformOrigin: "50% 52%",
+          duration: 0.4,
+          ease: "power2.out",
+          force3D: true,
+          onComplete: () => {
+            gsap.set(hvsTarget, { clearProps: "transform" });
+          },
+        });
       }
 
       const heroVid = heroVideo();
@@ -881,6 +921,10 @@ export default function IntroSequence() {
         history.scrollRestoration = prevRestoration;
       } catch {}
       ctx.revert();
+      try {
+        const hvsClean = heroVideoScale();
+        if (hvsClean) gsap.set(hvsClean, { clearProps: "transform" });
+      } catch {}
       tlRef.current = null;
     };
   }, [phase, finish]);
@@ -1257,8 +1301,8 @@ export default function IntroSequence() {
           -webkit-transform: translateZ(0);
         }
 
-        /* Dark cinematic dawn grade — starts with the solitary chair gently revealed through
-           the center-clear aperture while surrounding slopes and grass lie in rich darkness,
+        /* Deep atmospheric cinematic dawn grade — starts with the solitary chair gently revealed through
+           the center-clear aperture while surrounding slopes and grass lie in rich, dense darkness,
            slowly lifting with an ease zoom-in reveal to bathe the hill and chair in morning daylight. */
         .intro-grade {
           position: absolute;
@@ -1272,9 +1316,9 @@ export default function IntroSequence() {
           transform-origin: 50% 52%;
           will-change: transform, opacity;
           background:
-            radial-gradient(65% 55% at 50% 52%, rgba(6, 14, 9, 0) 0%, rgba(6, 14, 9, 0.55) 45%, rgba(4, 10, 7, 0.94) 76%, rgba(1, 4, 2, 1) 100%),
-            radial-gradient(120% 90% at 50% 116%, rgba(6, 14, 9, 0) 30%, rgba(4, 10, 7, 0.86) 68%, rgba(1, 4, 2, 1) 100%),
-            linear-gradient(180deg, rgba(3, 8, 5, 0.84) 0%, rgba(6, 14, 9, 0.28) 42%, rgba(3, 8, 5, 0.72) 100%);
+            radial-gradient(60% 50% at 50% 52%, rgba(4, 10, 6, 0) 0%, rgba(4, 10, 6, 0.22) 20%, rgba(2, 7, 4, 0.72) 42%, rgba(1, 4, 2, 0.96) 72%, rgba(1, 2, 1, 1) 100%),
+            radial-gradient(120% 95% at 50% 118%, rgba(2, 6, 3, 0) 22%, rgba(1, 4, 2, 0.90) 60%, rgba(1, 2, 1, 1) 100%),
+            linear-gradient(180deg, rgba(1, 4, 2, 0.94) 0%, rgba(3, 8, 5, 0.40) 38%, rgba(2, 6, 4, 0.52) 64%, rgba(1, 2, 1, 0.96) 100%);
         }
 
         /* Dawn cresting the hill — low, wide, warm. Masks the cut, then recedes. */
