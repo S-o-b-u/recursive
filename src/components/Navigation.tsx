@@ -118,7 +118,12 @@ export default function Navigation() {
               ? { y: 0, opacity: 1 }
               : { y: -22, opacity: 0 }
           }
-          transition={{ duration: reduced ? 0 : 0.75, ease: EASE_OUT, delay: reduced ? 0 : 0.05 }}
+          // Enters after the intro's dissolve (0.65s from hand-off), not during
+          // it. This pill carries a 36px backdrop blur and a glass card: fading
+          // it in over a backdrop that is itself cross-fading meant re-blurring
+          // its region on every frame of the costliest window in the sequence.
+          // As a final beat after the hero has settled it costs nothing visible.
+          transition={{ duration: reduced ? 0 : 0.7, ease: EASE_OUT, delay: reduced ? 0 : 0.85 }}
         >
           <LiquidGlassCard
             glowIntensity="sm"
@@ -870,12 +875,19 @@ export default function Navigation() {
             transform: translateY(-4.4px) rotate(-45deg);
           }
 
-          /* Ultra-translucent crystal frosted glass on mobile phone navbar pill */
+          /* Frosted pill on phones -- as a fill, not a backdrop blur.
+             This pill sits over the hero's video, and a backdrop-filter has to
+             re-blur everything behind it on every frame the backdrop changes,
+             which with moving grass is every frame, for the life of the page.
+             At DPR 3 that is a ~1000x170px 28px blur per frame: the single
+             most expensive thing on the hero for a phone GPU. The backdrop is
+             a soft sky; a translucent warm-white fill reads the same at rest
+             and costs nothing per frame. */
           .nav-glass-container > div,
           .nav-glass-container :global(.relative.isolate) {
-            background: rgba(255, 255, 255, 0.08) !important;
-            backdrop-filter: blur(28px) saturate(200%) !important;
-            -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
+            background: rgba(238, 234, 226, 0.80) !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
             box-shadow:
               0 8px 32px rgba(0, 0, 0, 0.06),
               inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;

@@ -39,11 +39,26 @@ export default function Hero() {
       video.play().catch(() => {});
     };
 
-    const isIntroPlaying =
+    const introPlaying = () =>
       typeof document !== "undefined" &&
       document.documentElement.dataset.intro !== "done";
+    // The intro sets this the moment it wants the plate moving (2.9s in, just
+    // before its veil lifts). Until then the plate is held.
+    const plateArmed = () => video.dataset.plate === "on";
 
-    if (isIntroPlaying) {
+    // While the intro is up and has not armed the plate, decoding is wasted:
+    // the plate is under an opaque veil for the first 3.25s. But the first
+    // play() must still happen, because iOS Safari fetches nothing until
+    // playback is requested, preload or not -- and a cold fetch starting at
+    // 2.9s puts the grass on screen late on cellular. So: let the observer's
+    // initial play() start the download, then stop the decoder on the first
+    // frame. The poster and frame 0 are the same picture.
+    const hold = () => {
+      if (introPlaying() && !plateArmed() && !video.paused) video.pause();
+    };
+    video.addEventListener("playing", hold);
+
+    if (introPlaying()) {
       window.addEventListener("recursive-intro-done", playHero, { once: true });
     } else {
       playHero();
@@ -53,6 +68,8 @@ export default function Hero() {
       const io = new IntersectionObserver((entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
+            // Under the intro this is the fetch trigger (see hold above); once
+            // the intro is done it is the normal scroll-back-into-view resume.
             video.play().catch(() => {});
           } else {
             video.pause();
@@ -62,15 +79,23 @@ export default function Hero() {
       io.observe(video);
       return () => {
         window.removeEventListener("recursive-intro-done", playHero);
+        video.removeEventListener("playing", hold);
         io.disconnect();
       };
     }
 
     return () => {
       window.removeEventListener("recursive-intro-done", playHero);
+      video.removeEventListener("playing", hold);
     };
   }, []);
 
+  // Hidden UI sits at opacity 0.01, not 0. At exactly 0 the compositor
+  // treats a layer as invisible and does not rasterise it, so the wordmark
+  // texture, buttons and annotation were all painted for the first time in
+  // the opening frames of the hand-off dissolve -- a 150ms stall right on the
+  // cut, with the main thread idle. At 0.01 nothing is visible to the eye but
+  // every tile is ready before the reveal.
   const [introFinished, setIntroFinished] = useState(false);
 
   // Sync intro state on mount
@@ -157,11 +182,11 @@ export default function Hero() {
             id="headingrow"
             className="hero-center-content"
             ref={centerRef}
-            initial={reduced ? false : { opacity: 0, y: 14 }}
+            initial={reduced ? false : { opacity: 0.01, y: 14 }}
             animate={
               introFinished
                 ? { opacity: 1, y: 0 }
-                : { opacity: 0, y: 14 }
+                : { opacity: 0.01, y: 14 }
             }
             transition={{ duration: 0.7, ease: EASE_OUT, delay: 0.02 }}
           >
@@ -197,11 +222,11 @@ export default function Hero() {
           <motion.div
             className="hero-bottom-area"
             ref={dockRef}
-            initial={reduced ? false : { opacity: 0, y: 14 }}
+            initial={reduced ? false : { opacity: 0.01, y: 14 }}
             animate={
               introFinished
                 ? { opacity: 1, y: 0 }
-                : { opacity: 0, y: 14 }
+                : { opacity: 0.01, y: 14 }
             }
             transition={{ duration: 0.7, delay: 0.1, ease: EASE_OUT }}
           >
@@ -244,8 +269,8 @@ export default function Hero() {
       {/* ── Simple Clean Chair Annotation (No Box, No Glow) ── */}
       <motion.div
         className="hero-chair-annotation"
-        initial={reduced ? false : { opacity: 0 }}
-        animate={introFinished ? { opacity: 1 } : { opacity: 0 }}
+        initial={reduced ? false : { opacity: 0.01 }}
+        animate={introFinished ? { opacity: 1 } : { opacity: 0.01 }}
         transition={{ duration: 0.6, delay: 0.12, ease: EASE_OUT }}
       >
         <svg
@@ -312,6 +337,10 @@ export default function Hero() {
           height: 100%;
           pointer-events: none;
           transform-origin: 50% 52%;
+          transform: translate3d(0, 0, 0);
+          -webkit-transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
         }
 
         /* ── 100% Clean Video Plate — Direct GPU Composition ── */
@@ -323,6 +352,10 @@ export default function Hero() {
           object-fit: cover;
           object-position: center center;
           pointer-events: none;
+          transform: translate3d(0, 0, 0);
+          -webkit-transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
         }
 
         /* ── Fluid Flex Column Container for Foreground ── */

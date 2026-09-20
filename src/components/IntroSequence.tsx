@@ -56,16 +56,15 @@ const LINES: Line[] = [
   { words: ["Let's", "find", "out."] },
 ];
 
-// [enter, exit] in seconds. Short lines read fast; line 4 (the long one) gets
-// extra room. Exits are quick and accelerate away, so the outgoing line is
-// essentially gone by the time the next one starts — no smear between beats.
+// [enter, exit] in seconds. Each line fully exits before next enters — no overlap.
+// Camera stays still during all text. Gradient lifts after last line exits.
 const CUES: [number, number][] = [
-  [4.1, 5.05],
-  [5.25, 6.2],
-  [6.4, 7.5],
-  [7.75, 9.45],
-  [9.7, 10.75],
-  [10.95, 11.95],
+  [4.1, 5.0],    // Line 1: "Welcome to the bottom."
+  [5.2, 6.1],    // Line 2: "Do you know what's at the top?"
+  [6.3, 7.3],    // Line 3: "Yep. A single plastic chair."
+  [7.5, 9.2],    // Line 4: "Hundreds of hackers… but only ONE team gets to sit."
+  [9.4, 10.5],   // Line 5: "So here's the dare: can you conquer it?"
+  [10.7, 11.8],  // Line 6: "Let's find out."
 ];
 
 const WARP_RADIUS = 250;
@@ -175,6 +174,12 @@ export default function IntroSequence() {
 
     const refreshTriggers = () => {
       scrollHome();
+      // Exactly one refresh, here, after the hand-off, in an idle slot. It is
+      // needed on every device: globals.css puts overflow:hidden on <html>
+      // while data-intro="playing", which changes scrollHeight, so every
+      // trigger measured during the intro is wrong until re-measured. This
+      // is the ONLY post-intro refresh on the page now -- reveal.tsx used to
+      // fire its own from each of ~40 instances on the same event.
       ScrollTrigger.refresh();
     };
 
@@ -200,11 +205,11 @@ export default function IntroSequence() {
 
   useEffect(() => {
     if (phase !== "playing") return;
-    // 1.4s, not 0.9s: the hero's WarpText compiles its shader at ~0.8s (see
-    // that file), and stacking a second compile 100ms later put both on the
-    // artifact's awakening. The button's own fade-in is at 1.6s, after this.
-    const t = window.setTimeout(() => setShowChrome(true), 1400);
-    return () => window.clearTimeout(t);
+    // Mount the shader button now, while the timeline is still waiting for an
+    // idle period (see startNow). Its compile then lands in the same window
+    // as hydration, before a single frame of the artifact animates -- rather
+    // than 1.4s into it, which is where a timer put it before.
+    setShowChrome(true);
   }, [phase]);
 
   // ── Pass 1: decide ──────────────────────────────────────────────────────
@@ -397,10 +402,9 @@ export default function IntroSequence() {
       tl.set(scene, { opacity: 1 }, 0);
 
       const isWideScreen = typeof window !== "undefined" && window.innerWidth >= 768;
-      // Intimate initial camera framing zoomed in on the plastic chair (which sits at 50% X, 52% Y).
-      // 1.09x on desktop / 1.11x on mobile centers directly on the chair, making it prominent
-      // without excessive scaling that could cause pixelation or grass shimmer.
-      const initialScale = isWideScreen ? 1.09 : 1.11;
+      // Camera starts at 1.12x zoom on the chair (50% X, 52% Y) — holds through all intro text,
+      // then smoothly scales down to 1.0 when gradient lifts.
+      const initialScale = 1.12;
       const hvs = heroVideoScale();
       if (hvs) {
         gsap.set(hvs, {
@@ -633,6 +637,9 @@ export default function IntroSequence() {
         () => {
           const heroVid = heroVideo();
           if (!heroVid || doneRef.current) return;
+          // Arm before play: <Hero> holds the plate paused (its decoder idle
+          // under the opaque veil) until this flag is set. See Hero.tsx.
+          heroVid.dataset.plate = "on";
           if (heroVid.paused) {
             const p = heroVid.play();
             if (p && typeof p.catch === "function") p.catch(() => {});
@@ -642,47 +649,70 @@ export default function IntroSequence() {
         2.9,
       );
 
-      // ── Stage 3: Cinematic Zoomed Chair to Normal & Deep Gradient Reveal ──
-      // The scene starts in deep, rich morning darkness with an intimate camera framing zoomed on the chair.
-      // The dark gradient and zoomed framing are held firmly through Line 1 ("Welcome to the bottom") and into Line 2.
-      // From 5.2s, the aperture expands and fades outward while the camera smoothly zooms out to normal 1:1 framing,
-      // bringing the sunlit hill crest, plastic chair, and swaying grass into full morning daylight.
-      const revealStart = 5.2;
-      const revealDuration = 7.8; // 5.2s -> 13.0s
+      // ── Stage 3: the grade lifts slowly across the story; the camera pulls back at the end ──
+      //
+      // Two separate motions, on purpose:
+      //   a) The dark grade fades gradually from the first line to the last
+      //      (4.1s -> 11.95s), so the chair emerges from the dark *while* the
+      //      story plays rather than staying buried until the end. It settles at
+      //      a low floor, not zero, so the last lines still have a vignette to
+      //      sit on.
+      //   b) The camera holds its 1.12x framing on the chair through all six
+      //      lines. Only once the last line has left does it pull back to 1:1,
+      //      and the remaining grade goes with it, its aperture widening.
+      const textStartTime = 4.1;
+      const textEndTime = 11.95;
+      const gradeFloor = 0.3;
+      const gradientLiftStart = textEndTime + 0.1;
+      const scaleDownDuration = 1.8;
+      const scaleDownEase = "cubic-bezier(0.25, 1, 0.5, 1)";
 
+      // a) slow reveal under the text. Opacity only: a single compositor
+      //    property on one promoted layer for the whole stretch.
+      tl.fromTo(
+        grade,
+        { scale: 1.0, opacity: 1 },
+        {
+          opacity: gradeFloor,
+          duration: textEndTime - textStartTime,
+          ease: "sine.inOut",
+        },
+        textStartTime,
+      );
+
+      // b) the pull-back, and the last of the grade with it.
       if (hvs) {
         tl.to(
           hvs,
           {
             scale: 1,
-            duration: revealDuration,
-            ease: "sine.inOut",
+            duration: scaleDownDuration,
+            ease: scaleDownEase,
             force3D: true,
             transformOrigin: "50% 52%",
             onComplete: () => {
               gsap.set(hvs, { clearProps: "transform" });
             },
           },
-          revealStart,
+          gradientLiftStart,
         );
       }
 
-      tl.fromTo(
+      tl.to(
         grade,
-        { scale: 1.0, opacity: 1 },
         {
-          scale: 1.65,
+          scale: 1.4,
           opacity: 0,
-          duration: revealDuration,
-          ease: "sine.inOut",
+          duration: scaleDownDuration,
+          ease: scaleDownEase,
           force3D: true,
           transformOrigin: "50% 52%",
         },
-        revealStart,
+        gradientLiftStart,
       );
 
-      // Progress bar matches the story reveal window (4.1s to 13.0s)
-      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 8.9, ease: "none" }, 4.1);
+      // Progress bar matches the story reveal window (4.1s to gradientLiftStart + scaleDownDuration)
+      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: gradientLiftStart + scaleDownDuration - 4.1, ease: "none" }, 4.1);
 
       lines.forEach((el, i) => {
         const [tin, tout] = CUES[i];
@@ -733,6 +763,16 @@ export default function IntroSequence() {
       }
 
       // ── Hand-off ──────────────────────────────────────────────────────────
+      // Last line exits at ~11.8s, then gradient lifts (11.95s), scale down completes (~13.75s),
+      // then bloom rises, then handoff.
+      const lastLineExit = 11.8;
+      const gradientLiftStartHandoff = lastLineExit + 0.15; // 11.95
+      const scaleDownComplete = gradientLiftStartHandoff + scaleDownDuration; // ~13.75
+      const bloomStart = scaleDownComplete + 0.1; // 13.85
+      const handoffTime = scaleDownComplete + 0.3; // 14.05
+      const dissolveStart = handoffTime + 0.05; // 14.1
+      const dissolveDuration = 0.6;
+
       // 2. Last line eases out on its own with soft deceleration
       if (lines.length > 0) {
         const lastWords = Array.from(lines[lines.length - 1].querySelectorAll<HTMLElement>(".intro-word"));
@@ -740,32 +780,37 @@ export default function IntroSequence() {
           tl.to(
             lastWords,
             { opacity: 0, y: -12, scale: 0.98, duration: 0.58, ease: "power2.inOut", stagger: 0.024 },
-            11.9,
+            lastLineExit,
           );
         }
       }
 
-      // 3. A soft dawn glow rises from the hill line, then recedes.
+      // 3. A soft dawn glow rises from the hill line after scale down completes, then recedes.
       tl.fromTo(
         bloom,
         { opacity: 0 },
         { opacity: isMobileDevice ? 0.35 : 0.45, duration: 0.75, ease: "sine.out" },
-        13.0,
+        bloomStart,
       );
 
       // Hand off to Hero: single unified video plate continues uninterrupted at 60fps
-      // Zoom ends at 13.0s, bloom rises at 13.0s, handoff at 13.25s
-      const handoffTime = 13.25;
-      const dissolveStart = 13.3;
-      const dissolveDuration = 0.75;
-
+      // Scale down completes at ~13.75s, bloom rises at 13.85s, handoff at 14.05s
       tl.call(() => {
         gsap.set(root, { background: "transparent" });
         if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
         if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("recursive-intro-done"));
       }, undefined, handoffTime);
 
-      tl.to(scene, { autoAlpha: 0, duration: dissolveDuration, ease: "power1.inOut" }, dissolveStart);
+      // The "dissolve" fades only what is still visible in the scene, which by
+      // now is the progress bar: the grade finished lifting at 13.75, every
+      // line has left, the veil and the skip button are gone, and the scene's
+      // own background is transparent. Fading the whole scene container
+      // instead made the compositor allocate a full-viewport offscreen
+      // surface for group opacity and re-composite through it for 0.6s -- the
+      // single most expensive stretch of the sequence, spent on a hairline.
+      // The bar fades on its own layer; the scene is simply hidden after.
+      tl.to(bar, { opacity: 0, duration: dissolveDuration * 0.6, ease: "power1.inOut" }, dissolveStart);
+      tl.set(scene, { autoAlpha: 0 }, dissolveStart + dissolveDuration);
 
       tl.set(root, { pointerEvents: "none" }, dissolveStart + 0.15);
       tl.call(releaseScroll, undefined, dissolveStart + dissolveDuration + 0.05);
@@ -776,10 +821,19 @@ export default function IntroSequence() {
 
     const tl = tlRef.current!;
 
-    // ── Synchronous start ──
-    // The timeline starts now; the plate starts from inside it at 2.9s (see
-    // the tl.call above) rather than here, because nothing can see it for the
-    // first three seconds.
+    // ── Start when the main thread is quiet ──
+    //
+    // Not synchronously. This effect runs in the middle of hydration, and the
+    // artifact used to start animating right here -- into the teeth of the
+    // heaviest JS the page ever does: hydrating twenty-odd components, the
+    // wordmark's WebGL init, a shader compile, every ScrollTrigger. On a 4x
+    // throttled CPU that froze the artifact for over a second, on every
+    // device class. Waiting for an idle period costs nothing visible: the
+    // playing branch's first frame is identical to the pending plate and the
+    // loading veil before it, so the mark simply holds still a little longer
+    // on a slow machine and not at all on a fast one. The 400ms floor lets
+    // the inits scheduled below (WarpText, the skip button) claim the first
+    // idle slot; the 1500ms ceiling guarantees a start regardless.
     let started = false;
     const startNow = () => {
       if (started || doneRef.current) return;
@@ -787,7 +841,18 @@ export default function IntroSequence() {
       tl.play(0);
     };
 
-    startNow();
+    const ric = (window as unknown as {
+      requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    });
+    let startIdle = 0;
+    const startTimer = window.setTimeout(() => {
+      if (typeof ric.requestIdleCallback === "function") {
+        startIdle = ric.requestIdleCallback(startNow, { timeout: 1500 });
+      } else {
+        startNow();
+      }
+    }, 400);
 
     // ── Watchdog ──────────────────────────────────────────────────────────
     // The intro is a fixed, full-viewport overlay that holds scroll, so a stall
@@ -826,82 +891,53 @@ export default function IntroSequence() {
       }
     }, 500);
 
-    // ── Graceful skip ─────────────────────────────────────────────────────
+    // ── Instant Skip ───────────────────────────────────────────────────────
+    // Immediately kills all tweens and jumps straight to hero page — no animation.
     let bailing = false;
     bailRef.current = () => {
       if (bailing || doneRef.current) return;
       bailing = true;
       started = true;
       tl.pause();
+      tl.kill();
 
-      const words = root.querySelectorAll<HTMLElement>(".intro-word");
-      const wordInners = root.querySelectorAll<HTMLElement>(".intro-word-i");
-      gsap.killTweensOf([scene, bloom, media, focus, grade, bar]);
-      if (loaderOverlay) {
-        gsap.killTweensOf([loaderOverlay, artifactMark, welcomeBlock]);
-        const artImg = root.querySelector<HTMLElement>(".intro-artifact-img");
-        const artAura = root.querySelector<HTMLElement>(".intro-artifact-aura");
-        if (artImg) gsap.killTweensOf(artImg);
-        if (artAura) gsap.killTweensOf(artAura);
-      }
-      const welcomeWordInners = root.querySelectorAll<HTMLElement>(".intro-welcome-word-i");
-      const welcomeSub = root.querySelector<HTMLElement>(".intro-welcome-sub");
-      if (welcomeWordInners.length > 0) gsap.killTweensOf(welcomeWordInners);
-      if (welcomeSub) gsap.killTweensOf(welcomeSub);
-      if (skipWrap) gsap.killTweensOf(skipWrap);
-      gsap.killTweensOf(words);
-      gsap.killTweensOf(wordInners);
-      gsap.set(wordInners, { clearProps: "transform,textShadow" });
+      // Kill all tweens instantly
+      const allTargets = [
+        scene, bloom, media, focus, grade, bar,
+        loaderOverlay, artifactMark, welcomeBlock,
+        root.querySelector<HTMLElement>(".intro-artifact-img"),
+        root.querySelector<HTMLElement>(".intro-artifact-aura"),
+        ...root.querySelectorAll<HTMLElement>(".intro-welcome-word-i"),
+        root.querySelector<HTMLElement>(".intro-welcome-sub"),
+        skipWrap,
+        ...root.querySelectorAll<HTMLElement>(".intro-word"),
+        ...root.querySelectorAll<HTMLElement>(".intro-word-i"),
+        heroVideoScale(),
+      ].filter(Boolean);
+      gsap.killTweensOf(allTargets);
+      gsap.set(allTargets, { clearProps: "transform,opacity,filter" });
 
+      // Reset video scale immediately
       const hvsTarget = heroVideoScale();
       if (hvsTarget) {
-        gsap.killTweensOf(hvsTarget);
-        gsap.to(hvsTarget, {
-          scale: 1,
-          transformOrigin: "50% 52%",
-          duration: 0.4,
-          ease: "power2.out",
-          force3D: true,
-          onComplete: () => {
-            gsap.set(hvsTarget, { clearProps: "transform" });
-          },
-        });
+        gsap.set(hvsTarget, { scale: 1, transformOrigin: "50% 52%", clearProps: "transform" });
       }
 
+      // Play hero video
       const heroVid = heroVideo();
       if (heroVid && heroVid.paused) {
         heroVid.play().catch(() => {});
       }
 
-      const q = gsap.timeline({ onComplete: finish });
-      if (loaderOverlay) {
-        q.to(loaderOverlay, { autoAlpha: 0, duration: 0.2, ease: "power2.in" }, 0);
-      }
-      if (skipWrap) {
-        q.to(skipWrap, { opacity: 0, scale: 0.9, y: 6, duration: 0.22, ease: "power2.in", pointerEvents: "none" }, 0);
-      }
-      q.to(words, { autoAlpha: 0, yPercent: -14, duration: 0.28, ease: "power2.in" }, 0);
-      q.to(grade, { scale: 1.45, opacity: 0, duration: 0.6, ease: "sine.inOut" }, 0.04);
-      q.fromTo(
-        bloom,
-        { opacity: 0 },
-        { opacity: isMobileDevice ? 0.35 : 0.45, duration: 0.5, ease: "sine.out" },
-        0.3,
-      );
-      q.call(
-        () => {
-          gsap.set(root, { background: "transparent" });
-          if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
-          if (typeof window !== "undefined")
-            window.dispatchEvent(new CustomEvent("recursive-intro-done"));
-        },
-        undefined,
-        0.4,
-      );
-      q.to(scene, { autoAlpha: 0, duration: 0.6, ease: "sine.inOut" }, 0.66);
-      q.set(root, { pointerEvents: "none" }, 1.0);
-      q.call(releaseScroll, undefined, 1.26);
-      q.to(bloom, { opacity: 0, duration: 0.65, ease: "sine.inOut" }, 1.05);
+      // Instant handoff
+      gsap.set(root, { background: "transparent" });
+      if (typeof document !== "undefined") document.documentElement.dataset.intro = "done";
+      if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("recursive-intro-done"));
+      
+      gsap.set(scene, { autoAlpha: 0 });
+      gsap.set(root, { pointerEvents: "none" });
+      releaseScroll();
+      finish();
     };
 
     return () => {
@@ -909,6 +945,8 @@ export default function IntroSequence() {
       root.removeEventListener("wheel", block);
       root.removeEventListener("touchmove", block);
       window.clearInterval(watchdog);
+      window.clearTimeout(startTimer);
+      if (startIdle && typeof ric.cancelIdleCallback === "function") ric.cancelIdleCallback(startIdle);
       window.removeEventListener("keydown", blockKeys);
       cleanupVidListeners?.();
       window.removeEventListener("lenis:ready", onLenisReady);
@@ -1098,24 +1136,33 @@ export default function IntroSequence() {
           -webkit-tap-highlight-color: transparent;
         }
 
-        /* Everything that belongs to the story — fades out at the hand-off while
+/* Everything that belongs to the story — fades out at the hand-off while
            the glow (a sibling, not a child) lingers over the landing page. */
-        .intro-scene {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          min-height: 100vh;
-          min-height: 100dvh;
-          overflow: hidden;
-          background: transparent;
-          opacity: 1;
-          pointer-events: none;
-          contain: layout paint style;
-        }
+         /* A stacking context, not a layer: each animating child is its own layer already, so promoting the scene was one more full-viewport surface per frame. GSAP gives it one for the 0.6s dissolve, the only time it needs it. */
+         .intro-scene {
+           position: absolute;
+           inset: 0;
+           width: 100%;
+           height: 100%;
+           min-height: 100vh;
+           min-height: 100dvh;
+           overflow: hidden;
+           background: transparent;
+           opacity: 1;
+           pointer-events: none;
+           contain: layout paint style;
+         }
 
-        /* ── Initial Artifact Loader & Welcome Veil ── */
-        .intro-loader-veil {
+         /* Empty now (the plate is the hero's video), as are .intro-media and .intro-focus below. They stay only because the effect guards on their refs; with will-change + translate3d they were three nested full-viewport GPU surfaces holding nothing. */
+         .intro-media-clip { 
+           position: absolute; 
+           inset: 0; 
+           overflow: hidden; 
+           contain: paint; 
+         }
+
+         /* ── Initial Artifact Loader & Welcome Veil ── */
+         .intro-loader-veil {
           position: absolute;
           inset: 0;
           z-index: 50;
@@ -1153,7 +1200,6 @@ export default function IntroSequence() {
           justify-content: center;
           pointer-events: none;
           user-select: none;
-          will-change: transform, opacity;
         }
 
         .intro-artifact-aura {
@@ -1164,7 +1210,8 @@ export default function IntroSequence() {
           filter: blur(28px);
           pointer-events: none;
           opacity: 0;
-          transform: scale(0.35);
+          transform: scale(0.35) translate3d(0, 0, 0);
+          -webkit-transform: scale(0.35) translate3d(0, 0, 0);
           will-change: transform, opacity;
         }
 
@@ -1179,7 +1226,8 @@ export default function IntroSequence() {
              without a seam. Stage 1 brightens it from here rather than
              re-entering it from nothing. */
           opacity: 1;
-          transform: none;
+          transform: translate3d(0, 0, 0);
+          -webkit-transform: translate3d(0, 0, 0);
           /* Static, and already the *final* grade. It used to start at a 32px
              emerald drop-shadow and tween to this; a drop-shadow is a gaussian
              blur, and a changing radius re-rasterises the image every frame.
@@ -1242,6 +1290,8 @@ export default function IntroSequence() {
         .intro-welcome-word-i {
           display: inline-block;
           will-change: transform, opacity;
+          transform: translate3d(0, 0, 0);
+          -webkit-transform: translate3d(0, 0, 0);
         }
 
         .intro-welcome-sub {
@@ -1258,6 +1308,8 @@ export default function IntroSequence() {
           /* letter-spacing is fixed above; it is not animated any more. It is
              a layout property, and will-change cannot promote it anyway. */
           will-change: transform, opacity;
+          transform: translate3d(0, 0, 0);
+          -webkit-transform: translate3d(0, 0, 0);
         }
 
         .intro-media-clip { position: absolute; inset: 0; overflow: hidden; will-change: transform; contain: paint; }
@@ -1279,11 +1331,6 @@ export default function IntroSequence() {
         .intro-focus {
           position: absolute;
           inset: 0;
-          will-change: transform, filter;
-          transform: translateZ(0);
-          -webkit-transform: translateZ(0);
-          backface-visibility: hidden;
-          -webkit-backface-visibility: hidden;
         }
 
 
@@ -1296,41 +1343,38 @@ export default function IntroSequence() {
           object-fit: cover;
           /* Must match Hero's .hero-video so the frame-synced hand-off aligns. */
           object-position: center center;
-          will-change: transform;
-          transform: translateZ(0);
-          -webkit-transform: translateZ(0);
         }
 
         /* Deep atmospheric cinematic dawn grade — starts with the solitary chair gently revealed through
            the center-clear aperture while surrounding slopes and grass lie in rich, dense darkness,
            slowly lifting with an ease zoom-in reveal to bathe the hill and chair in morning daylight. */
+        /* Viewport-sized, not 140%. The box only ever scales UP (to 1.4 at the
+           end), so 100% already covers the viewport at every moment; the
+           oversized box doubled the layer's pixels for nothing. The gradient
+           geometry below is the old one re-expressed for the smaller box, so
+           it paints identically. No isolation:isolate either: it forced
+           an offscreen surface for a leaf layer whose only effect is opacity. */
         .intro-grade {
           position: absolute;
-          inset: -20%;
-          width: 140%;
-          height: 140%;
+          inset: 0;
           pointer-events: none;
           z-index: 2;
           contain: paint;
-          isolation: isolate;
-          transform-origin: 50% 52%;
+          transform-origin: 50% 52.8%;
           will-change: transform, opacity;
           background:
-            radial-gradient(60% 50% at 50% 52%, rgba(4, 10, 6, 0) 0%, rgba(4, 10, 6, 0.22) 20%, rgba(2, 7, 4, 0.72) 42%, rgba(1, 4, 2, 0.96) 72%, rgba(1, 2, 1, 1) 100%),
-            radial-gradient(120% 95% at 50% 118%, rgba(2, 6, 3, 0) 22%, rgba(1, 4, 2, 0.90) 60%, rgba(1, 2, 1, 1) 100%),
-            linear-gradient(180deg, rgba(1, 4, 2, 0.94) 0%, rgba(3, 8, 5, 0.40) 38%, rgba(2, 6, 4, 0.52) 64%, rgba(1, 2, 1, 0.96) 100%);
+            radial-gradient(84% 70% at 50% 52.8%, rgba(4, 10, 6, 0) 0%, rgba(4, 10, 6, 0.22) 20%, rgba(2, 7, 4, 0.72) 42%, rgba(1, 4, 2, 0.96) 72%, rgba(1, 2, 1, 1) 100%),
+            radial-gradient(168% 133% at 50% 145.2%, rgba(2, 6, 3, 0) 22%, rgba(1, 4, 2, 0.90) 60%, rgba(1, 2, 1, 1) 100%),
+            linear-gradient(180deg, rgba(1, 4, 2, 0.94) -20%, rgba(3, 8, 5, 0.40) 33.2%, rgba(2, 6, 4, 0.52) 69.6%, rgba(1, 2, 1, 0.96) 120%);
         }
 
         /* Dawn cresting the hill — low, wide, warm. Masks the cut, then recedes. */
+        /* No layer until its own tween promotes it (it is idle for ~14s), and no blend mode: screen on a full-viewport layer renders everything beneath it to an offscreen surface every frame it is visible -- during the dissolve, the costliest frames of the sequence. */
         .intro-bloom {
           position: absolute;
           inset: 0;
           opacity: 0;
           pointer-events: none;
-          mix-blend-mode: screen;
-          will-change: opacity, transform;
-          transform: translateZ(0);
-          -webkit-transform: translateZ(0);
           background:
             radial-gradient(72% 46% at 50% 74%,
               rgba(255, 244, 214, 0.55) 0%,
@@ -1342,7 +1386,6 @@ export default function IntroSequence() {
 
         @media (max-width: 860px), (pointer: coarse) {
           .intro-bloom {
-            mix-blend-mode: screen !important;
             background: radial-gradient(72% 46% at 50% 74%,
               rgba(255, 244, 214, 0.35) 0%,
               rgba(252, 236, 198, 0.18) 30%,
@@ -1386,13 +1429,14 @@ export default function IntroSequence() {
           margin: 0 0.24em 0.12em 0;
           opacity: 0;
           will-change: transform, opacity;
-          transform: translateZ(0);
-          -webkit-transform: translateZ(0);
+          transform: translate3d(0, 0, 0);
+          -webkit-transform: translate3d(0, 0, 0);
           backface-visibility: hidden;
         }
         .intro-word-i {
           display: inline-block;
-          transform: translateZ(0);
+          transform: translate3d(0, 0, 0);
+          -webkit-transform: translate3d(0, 0, 0);
         }
         .intro-word.is-accent .intro-word-i {
           color: #a6e06a;

@@ -247,6 +247,20 @@ html[data-intro="playing"] body::before {
   visibility: hidden !important;
 }
 
+/* When the intro ends these two full-screen cover-image layers come back --
+   and both are promoted, so un-hiding them rasterises two viewport-sized
+   JPEG draws in the same frame as the hand-off. They sit behind the hero,
+   which covers the viewport, so nobody can see them until the first scroll.
+   Let them return a beat later, once the hand-off's frames are spent. */
+.fixed-cloud-plate,
+body::before {
+  transition: visibility 0s linear 1.6s, opacity 0s linear 1.6s;
+}
+html[data-intro="playing"] .fixed-cloud-plate,
+html[data-intro="playing"] body::before {
+  transition: none;
+}
+
 html[data-intro="playing"] .nav-root {
   opacity: 0 !important;
   visibility: hidden !important;
@@ -271,14 +285,26 @@ html[data-intro="playing"] footer.footer-shell {
   pointer-events: none !important;
 }
 
-/* Smooth reveal transitions when data-intro transitions from "playing" to "done" */
+/* Smooth reveal transitions when data-intro transitions from "playing" to "done".
+   The nav waits 0.9s: the intro's dissolve runs for 0.65s after the hand-off,
+   and this pill carries a backdrop blur and a glass filter. Fading it in over
+   a backdrop that is itself cross-fading meant re-blurring its region on every
+   frame of the costliest window in the whole sequence -- the compositor froze
+   in 200ms chunks there. As a last beat after the hero has settled it is free. */
 .nav-root {
-  transition: opacity 0.6s ease;
+  /* visibility is delayed too. Without it the nav became "visible" the
+     instant data-intro flipped -- at opacity 0, so nothing showed, but the
+     pill's backdrop-filter is a compositor effect that runs regardless of
+     the element's own opacity: a 36px blur of the region behind it on every
+     frame of the hand-off. Kept hidden until the fade actually begins. */
+  transition: opacity 0.6s ease 0.9s, visibility 0s linear 0.9s;
 }
 
-main > *:not(.intro-root):not(.intro-pending-plate):not(#hero) {
-  transition: opacity 0.5s ease;
-}
+/* No transition on the gated sections. They are all below the fold when the
+   intro ends, so nobody sees them fade -- but the flip of data-intro started
+   eight simultaneous opacity transitions, each promoting a huge section to
+   its own layer in the same frame as the hand-off. That was a 300ms+ style
+   and layer-tree stall on a throttled CPU, for an invisible effect. */
 
 /* ─── Typography ─── */
 

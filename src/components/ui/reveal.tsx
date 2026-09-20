@@ -14,12 +14,47 @@ const reduced = () =>
 
 /** Late-loading webfonts change text height, which moves every trigger below.
  *  One refresh once the fonts settle keeps start/end anchors honest. */
+/**
+ * One refresh for everyone.
+ *
+ * ScrollTrigger.refresh() is global: it re-measures every trigger on the
+ * page (~12,000px, dozens of triggers). This file used to call it from
+ * *each* instance -- and there are around forty of them on the home page --
+ * on intro-done, on every resize, twice on mount, and on fonts-ready. That
+ * is forty full re-measurements fired back to back, synchronously, inside
+ * whatever dispatched the event. Measured: a 380ms main-thread task at the
+ * hand-off on a throttled CPU, the same again at finish(), the same during
+ * the artifact animation at load, and -- since a phone's toolbar showing or
+ * hiding is a resize -- the same on every toolbar move, which is what a
+ * shaking intro on a phone looks like.
+ *
+ * All requests now collapse into a single refresh on the next idle slot.
+ * intro-done and resize are no longer handled here at all: the intro
+ * schedules exactly one refresh when it finishes, and ScrollTrigger already
+ * listens to resize itself, honouring ignoreMobileResize -- which the
+ * per-instance listener silently bypassed.
+ */
+let refreshPending = 0;
+export function scheduleRefresh() {
+  if (refreshPending || typeof window === "undefined") return;
+  const run = () => {
+    refreshPending = 0;
+    ScrollTrigger.refresh();
+  };
+  const w = window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+  refreshPending = typeof w.requestIdleCallback === "function"
+    ? w.requestIdleCallback(run, { timeout: 400 })
+    : window.setTimeout(run, 50);
+}
+
 function refreshOnFonts() {
-  let raf = 0;
+  let cancelled = false;
   document.fonts?.ready.then(() => {
-    raf = requestAnimationFrame(() => ScrollTrigger.refresh());
+    if (!cancelled) scheduleRefresh();
   });
-  return () => cancelAnimationFrame(raf);
+  return () => {
+    cancelled = true;
+  };
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -104,30 +139,17 @@ export function RevealWords({
       );
     }, root);
 
-    const handleRefresh = () => {
-      if (typeof window !== "undefined" && window.location.hash && typeof ScrollTrigger.clearScrollMemory === "function") {
-        ScrollTrigger.clearScrollMemory();
-      }
-      ScrollTrigger.refresh();
-    };
-
-    if (typeof window !== "undefined") {
-      window.addEventListener("recursive-intro-done", handleRefresh);
-      window.addEventListener("resize", handleRefresh);
-    }
-
-    const timer1 = setTimeout(handleRefresh, 150);
-    const timer2 = setTimeout(handleRefresh, 600);
+    // Two coalesced refreshes after mount (layout settles, images land), and
+    // one on fonts-ready. See scheduleRefresh for why nothing here listens
+    // to intro-done or resize any more.
+    const timer1 = setTimeout(scheduleRefresh, 150);
+    const timer2 = setTimeout(scheduleRefresh, 600);
     const cancelFonts = refreshOnFonts();
 
     return () => {
       cancelFonts();
       clearTimeout(timer1);
       clearTimeout(timer2);
-      if (typeof window !== "undefined") {
-        window.removeEventListener("recursive-intro-done", handleRefresh);
-        window.removeEventListener("resize", handleRefresh);
-      }
       ctx.revert();
     };
   }, [paragraphs, start, end, dim]);

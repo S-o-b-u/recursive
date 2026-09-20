@@ -536,14 +536,23 @@ export const WarpText: React.FC<WarpTextProps> = ({
       document.documentElement.dataset.intro === "playing";
     if (!introPlaying) return mountWarp();
 
+    // First idle period, not a fixed 800ms. The intro holds its timeline
+    // until the main thread is quiet (with a 400ms floor), so an idle
+    // callback here lands in the slot *before* the artifact starts moving --
+    // on a slow machine that is the difference between the compile happening
+    // under a static mark and happening under an animating one.
     let dispose: (() => void) | undefined;
     let cancelled = false;
-    const timer = window.setTimeout(() => {
-      if (!cancelled) dispose = mountWarp();
-    }, 800);
+    const w = window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
+    let idle = 0;
+    let timer = 0;
+    const go = () => { if (!cancelled) dispose = mountWarp(); };
+    if (typeof w.requestIdleCallback === "function") idle = w.requestIdleCallback(go, { timeout: 600 });
+    else timer = window.setTimeout(go, 300);
     return () => {
       cancelled = true;
-      window.clearTimeout(timer);
+      if (idle && typeof w.cancelIdleCallback === "function") w.cancelIdleCallback(idle);
+      if (timer) window.clearTimeout(timer);
       dispose?.();
     };
 
@@ -773,20 +782,17 @@ export const WarpText: React.FC<WarpTextProps> = ({
         raf = 0;
       }
     };
+    let introDoneTimer = 0;
     const onIntroDone = () => {
-      introHeld = false;
-      // Restart the idle clock. The lens drifts on a sine of `elapsed`, and
-      // the pointer state lerps toward it from (0.5, 0.5). With the loop held
-      // for the ~12s intro, elapsed was ~12s on the first visible frame, the
-      // idle target was ~0.41, and the lens swept from centre to the left over
-      // the next second and a half -- a right-to-left sweep across the
-      // wordmark at the exact moment the hero appears. At elapsed = 0 the
-      // idle target *is* (0.5, 0.5): the same rest state the held frame was
-      // rendered in, so the first moving frame continues it with no jump and
-      // the drift starts from stillness, as it did when the loop ran from
-      // mount.
-      startTime = performance.now();
-      startLoop();
+      // The held frame is already on screen; the idle warp starting a second
+      // later is invisible as a delay, and it keeps the per-frame WebGL draw
+      // out of the hand-off dissolve, where every frame is already paying for
+      // a full-viewport cross-fade. On a weak GPU that overlap was the jank.
+      introDoneTimer = window.setTimeout(() => {
+        introHeld = false;
+        startTime = performance.now();
+        startLoop();
+      }, 1000);
     };
     if (introHeld) {
       window.addEventListener("recursive-intro-done", onIntroDone, { once: true });
@@ -867,6 +873,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
       contextRef.current = null;
       if (raf) cancelAnimationFrame(raf);
       window.removeEventListener("recursive-intro-done", onIntroDone);
+      if (introDoneTimer) window.clearTimeout(introDoneTimer);
       resizeObserver?.disconnect();
       intersectionObserver?.disconnect();
       canvas.removeEventListener("pointermove", onPointerMove);
