@@ -109,33 +109,35 @@ export default function Hero() {
 
   return (
     <section id="hero" className="hero" ref={sectionRef}>
-      {/* ── 100% Crisp, Pure Video Background (Zero filters, no blur/jitter transforms) ── */}
+      {/* ── 100% Crisp, Pure Video Background with Smooth GPU Scale Container ── */}
       <div className="hero-video-wrap">
-        {/* The still poster is always painted first: it is the hero background
-            on phones / data-saver / reduced-motion (where the 4K loop never
-            loads), and the instant, crisp paint under the video everywhere
-            else — so the hero is never a flat empty plate. */}
-        <img
-          className="hero-video hero-poster"
-          src="/images/hero/hero_poster_v3.jpg"
-          alt=""
-          aria-hidden="true"
-          draggable={false}
-        />
-        {useVideo && (
-          <video
-            ref={videoRef}
-            className="hero-video"
-            src="/bg/hero_loop_pp.mp4"
-            poster="/images/hero/hero_poster_v3.jpg"
-            autoPlay={false}
-            loop
-            muted
-            playsInline
-            preload="auto"
+        <div className="hero-video-scale">
+          {/* The still poster is always painted first: it is the hero background
+              on phones / data-saver / reduced-motion (where the 4K loop never
+              loads), and the instant, crisp paint under the video everywhere
+              else — so the hero is never a flat empty plate. */}
+          <img
+            className="hero-video hero-poster"
+            src="/images/hero/hero_poster_v3.jpg"
+            alt=""
             aria-hidden="true"
+            draggable={false}
           />
-        )}
+          {useVideo && (
+            <video
+              ref={videoRef}
+              className="hero-video"
+              src="/bg/hero_loop_pp.mp4"
+              poster="/images/hero/hero_poster_v3.jpg"
+              autoPlay={false}
+              loop
+              muted
+              playsInline
+              preload="auto"
+              aria-hidden="true"
+            />
+          )}
+        </div>
       </div>
 
       {/* ── Foreground Content in Responsive Flex Column Layout ── */}
@@ -293,7 +295,27 @@ export default function Hero() {
           z-index: 1;
         }
 
-        /* ── 100% Clean Video Plate — Unscaled & Hardware Accelerated for Pure Clarity ── */
+        /* ── Hardware-Accelerated Container for Smooth Cinematic Camera Zoom ── */
+        .hero-video-scale {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          transform-origin: 52% 58%;
+          will-change: transform;
+          transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+        }
+
+        @media (max-width: 860px) {
+          .hero-video-scale {
+            transform-origin: 50% 62%;
+          }
+        }
+
+        /* ── 100% Clean Video Plate — Direct GPU Composition ── */
         .hero-video {
           position: absolute;
           inset: 0;
@@ -302,8 +324,6 @@ export default function Hero() {
           object-fit: cover;
           object-position: center center;
           pointer-events: none;
-          transform: translate3d(0, 0, 0);
-          will-change: transform;
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
         }

@@ -306,8 +306,8 @@ export default function IntroSequence() {
 
     const heroVideo = () =>
       document.querySelector<HTMLVideoElement>("video.hero-video");
-    const heroMediaTargets = () =>
-      document.querySelectorAll<HTMLElement>("#hero .hero-video");
+    const heroVideoScale = () =>
+      document.querySelector<HTMLElement>("#hero .hero-video-scale, #hero .hero-video-wrap");
 
     const onTouchKick = () => {
       const hv = heroVideo();
@@ -391,10 +391,16 @@ export default function IntroSequence() {
       tl.set(root, { autoAlpha: 1 });
       tl.set(scene, { opacity: 1 }, 0);
 
-      // Ensure the unified hero video plate is rock-solid at native 1:1 scale (0 transforms = 0 subpixel jitter)
-      const hm = heroMediaTargets();
-      if (hm.length > 0) {
-        gsap.set(hm, { clearProps: "transform" });
+      const isWideScreen = typeof window !== "undefined" && window.innerWidth >= 768;
+      // Intimate initial camera framing centered around the hill crest and plastic chair
+      const initialScale = isWideScreen ? 1.08 : 1.10;
+      const hvs = heroVideoScale();
+      if (hvs) {
+        gsap.set(hvs, {
+          scale: initialScale,
+          transformOrigin: isWideScreen ? "52% 58%" : "50% 62%",
+          force3D: true,
+        });
       }
 
       // ── Stage 1 & 2: Artifact & Welcome Cascade ──
@@ -628,7 +634,20 @@ export default function IntroSequence() {
         2.9,
       );
 
-      // ── Stage 3: The cinematic vignette dissolves, revealing the sunlit hill ──
+      // ── Stage 3: Cinematic Zoom Out / Revealing Animation ──
+      // Camera smoothly and majestically pulls back as morning light breaks and the story unfolds
+      if (hvs) {
+        tl.to(
+          hvs,
+          {
+            scale: 1,
+            duration: 8.4,
+            ease: "sine.inOut",
+          },
+          3.4,
+        );
+      }
+
       tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 7.6, ease: "sine.inOut" }, 3.8);
       tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 8.2, ease: "none" }, 3.9);
 
@@ -800,9 +819,11 @@ export default function IntroSequence() {
       gsap.killTweensOf(wordInners);
       gsap.set(wordInners, { clearProps: "transform,textShadow" });
 
-      const hm = heroMediaTargets();
-      gsap.killTweensOf(hm);
-      gsap.set(hm, { clearProps: "transform" });
+      const hvsTarget = heroVideoScale();
+      if (hvsTarget) {
+        gsap.killTweensOf(hvsTarget);
+        gsap.to(hvsTarget, { scale: 1, duration: 0.4, ease: "power2.out" });
+      }
 
       const heroVid = heroVideo();
       if (heroVid && heroVid.paused) {
