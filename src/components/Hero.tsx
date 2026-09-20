@@ -304,25 +304,13 @@ export default function Hero() {
           z-index: 1;
         }
 
-        /* ── Hardware-Accelerated Container for Smooth Cinematic Camera Zoom ── */
+        /* ── Clean Video Plate Container — Direct Hardware Composition ── */
         .hero-video-scale {
           position: absolute;
           inset: 0;
           width: 100%;
           height: 100%;
           pointer-events: none;
-          transform-origin: 50% 50%;
-          will-change: transform;
-          transform: translate3d(0, 0, 0);
-          backface-visibility: hidden;
-          -webkit-backface-visibility: hidden;
-          contain: paint;
-        }
-
-        @media (max-width: 860px) {
-          .hero-video-scale {
-            transform-origin: 50% 50%;
-          }
         }
 
         /* ── 100% Clean Video Plate — Direct GPU Composition ── */
