@@ -90,12 +90,14 @@ export default function Hero() {
     };
   }, []);
 
-  // Hidden UI sits at opacity 0.01, not 0. At exactly 0 the compositor
+  // Hidden UI sits at opacity 0.002, not 0. At exactly 0 the compositor
   // treats a layer as invisible and does not rasterise it, so the wordmark
   // texture, buttons and annotation were all painted for the first time in
-  // the opening frames of the hand-off dissolve -- a 150ms stall right on the
-  // cut, with the main thread idle. At 0.01 nothing is visible to the eye but
-  // every tile is ready before the reveal.
+  // the opening frames of the hand-off -- a stall right on the cut with the
+  // main thread idle. Any non-zero opacity keeps them rasterised. It was 0.01
+  // for a while, and 1% of a black wordmark on the bright sky the grade now
+  // reveals is ~2.5 grey levels: a faint ghost of the logo during the last
+  // lines. 0.002 is half a level, below what 8-bit output can show.
   const [introFinished, setIntroFinished] = useState(false);
 
   // Sync intro state on mount
@@ -182,11 +184,11 @@ export default function Hero() {
             id="headingrow"
             className="hero-center-content"
             ref={centerRef}
-            initial={reduced ? false : { opacity: 0.01, y: 14 }}
+            initial={reduced ? false : { opacity: 0.002, y: 14 }}
             animate={
               introFinished
                 ? { opacity: 1, y: 0 }
-                : { opacity: 0.01, y: 14 }
+                : { opacity: 0.002, y: 14 }
             }
             transition={{ duration: 0.7, ease: EASE_OUT, delay: 0.02 }}
           >
@@ -222,11 +224,11 @@ export default function Hero() {
           <motion.div
             className="hero-bottom-area"
             ref={dockRef}
-            initial={reduced ? false : { opacity: 0.01, y: 14 }}
+            initial={reduced ? false : { opacity: 0.002, y: 14 }}
             animate={
               introFinished
                 ? { opacity: 1, y: 0 }
-                : { opacity: 0.01, y: 14 }
+                : { opacity: 0.002, y: 14 }
             }
             transition={{ duration: 0.7, delay: 0.1, ease: EASE_OUT }}
           >
@@ -269,8 +271,8 @@ export default function Hero() {
       {/* ── Simple Clean Chair Annotation (No Box, No Glow) ── */}
       <motion.div
         className="hero-chair-annotation"
-        initial={reduced ? false : { opacity: 0.01 }}
-        animate={introFinished ? { opacity: 1 } : { opacity: 0.01 }}
+        initial={reduced ? false : { opacity: 0.002 }}
+        animate={introFinished ? { opacity: 1 } : { opacity: 0.002 }}
         transition={{ duration: 0.6, delay: 0.12, ease: EASE_OUT }}
       >
         <svg

@@ -237,7 +237,16 @@ body::before {
    While the intro loader animation is playing, the underlying website content
    (background clouds, navigation dock, page content sections, and footer)
    must remain completely hidden to eliminate any flash, flicker, or peeking. */
-html[data-intro="playing"] {
+/* The scroll lock is its own attribute, not data-intro. Changing overflow on
+   <html> swaps the document's root scroller, and Chrome rebuilds the
+   compositor's scroll and property trees for it -- re-attaching every layer
+   on screen. Tied to data-intro, that rebuild landed in the first frames of
+   the hand-off reveal (a ~230ms freeze with the main thread idle, seen as
+   the grass hitching). The intro now drops this attribute only once the
+   hero is fully revealed and static, and only ever sets it on touch devices,
+   where it keeps the browser toolbar still; on desktop Lenis and the input
+   blockers hold scroll and the root scroller never changes at all. */
+html[data-scroll-lock="1"] {
   overflow: hidden !important;
 }
 

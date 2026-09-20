@@ -127,6 +127,7 @@ export default function IntroSequence() {
     try {
       sessionStorage.setItem(SEEN_KEY, "1");
     } catch {}
+    delete document.documentElement.dataset.scrollLock;
     document.documentElement.style.overflow = "";
     document.body.style.overflow = "";
 
@@ -312,6 +313,10 @@ export default function IntroSequence() {
     // without touching overflow or causing scrollbar gutter gaps.
     const lockOverflow = isTouch;
     if (lockOverflow) {
+      // See html[data-scroll-lock] in globals.css: this, not data-intro, is
+      // what holds overflow, so it can be released after the reveal instead
+      // of during it.
+      document.documentElement.dataset.scrollLock = "1";
       document.documentElement.style.overflow = "hidden";
       document.body.style.overflow = "hidden";
     }
@@ -375,6 +380,7 @@ export default function IntroSequence() {
       if (released || doneRef.current) return;
       released = true;
       if (lockOverflow) {
+        delete document.documentElement.dataset.scrollLock;
         document.documentElement.style.overflow = "";
         document.body.style.overflow = "";
       }
@@ -649,55 +655,55 @@ export default function IntroSequence() {
         2.9,
       );
 
-      // ── Stage 3: the grade lifts slowly across the story; the camera pulls back at the end ──
+      // ── Stage 3: the grade lifts and the camera pulls back together, across the story ──
       //
-      // Two separate motions, on purpose:
-      //   a) The dark grade fades gradually from the first line to the last
-      //      (4.1s -> 11.95s), so the chair emerges from the dark *while* the
-      //      story plays rather than staying buried until the end. It settles at
-      //      a low floor, not zero, so the last lines still have a vignette to
-      //      sit on.
-      //   b) The camera holds its 1.12x framing on the chair through all six
-      //      lines. Only once the last line has left does it pull back to 1:1,
-      //      and the remaining grade goes with it, its aperture widening.
+      // One slow motion under the text, from the first line to the last
+      // (4.1s -> 11.95s): the dark grade fades to a low floor while the camera
+      // eases from its 1.12x framing on the chair back to 1:1. The chair is
+      // revealed and the frame opens at the same pace, so by "Let's find out."
+      // the scene is already at its resting composition. Only the last of the
+      // grade -- the floor -- goes at the end, with its aperture widening, as
+      // the beat that hands to the hero.
+      //
+      // Spreading the 12% pull-back over ~8s also all but removes the grass
+      // crawl the old 1.8s version had on DPR-1 desktops: the clip is being
+      // downscaled there, and bilinear re-samples grass at a new phase every
+      // frame the scale changes; at this speed the per-frame scale delta is
+      // ~4x smaller than the previous 2.4s version and ~9x the 1.8s one.
       const textStartTime = 4.1;
       const textEndTime = 11.95;
       const gradeFloor = 0.3;
+      const revealDuration = textEndTime - textStartTime;
       const gradientLiftStart = textEndTime + 0.1;
-      const scaleDownDuration = 1.8;
-      const scaleDownEase = "cubic-bezier(0.25, 1, 0.5, 1)";
+      // the final beat: the grade floor lifts and its aperture widens
+      const scaleDownDuration = 1.2;
+      const scaleDownEase = "sine.inOut";
 
-      // a) slow reveal under the text. Opacity only: a single compositor
-      //    property on one promoted layer for the whole stretch.
+      // Grade: 1 -> floor, and camera: 1.12 -> 1, on the same clock and curve.
       tl.fromTo(
         grade,
         { scale: 1.0, opacity: 1 },
-        {
-          opacity: gradeFloor,
-          duration: textEndTime - textStartTime,
-          ease: "sine.inOut",
-        },
+        { opacity: gradeFloor, duration: revealDuration, ease: "sine.inOut" },
         textStartTime,
       );
-
-      // b) the pull-back, and the last of the grade with it.
       if (hvs) {
         tl.to(
           hvs,
           {
             scale: 1,
-            duration: scaleDownDuration,
-            ease: scaleDownEase,
+            duration: revealDuration,
+            ease: "sine.inOut",
             force3D: true,
             transformOrigin: "50% 52%",
-            onComplete: () => {
-              gsap.set(hvs, { clearProps: "transform" });
-            },
+            // No clearProps at the end: scale(1) is identity, and stripping
+            // the inline transform is a style change on a composited video
+            // layer for no visible difference.
           },
-          gradientLiftStart,
+          textStartTime,
         );
       }
 
+      // The last of the grade, widening as it goes.
       tl.to(
         grade,
         {
@@ -767,10 +773,10 @@ export default function IntroSequence() {
       // then bloom rises, then handoff.
       const lastLineExit = 11.8;
       const gradientLiftStartHandoff = lastLineExit + 0.15; // 11.95
-      const scaleDownComplete = gradientLiftStartHandoff + scaleDownDuration; // ~13.75
-      const bloomStart = scaleDownComplete + 0.1; // 13.85
-      const handoffTime = scaleDownComplete + 0.3; // 14.05
-      const dissolveStart = handoffTime + 0.05; // 14.1
+      const scaleDownComplete = gradientLiftStartHandoff + scaleDownDuration; // 13.15 (final grade lift done)
+      const bloomStart = scaleDownComplete + 0.1; // 13.25
+      const handoffTime = scaleDownComplete + 0.3; // 13.45
+      const dissolveStart = handoffTime + 0.05; // 13.5
       const dissolveDuration = 0.6;
 
       // 2. Last line eases out on its own with soft deceleration
