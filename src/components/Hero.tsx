@@ -18,6 +18,7 @@ export default function Hero() {
 
   // Background video plate showing the hill and moving grass on all devices
   const [useVideo, setUseVideo] = useState(true);
+  const [videoPlaying, setVideoPlaying] = useState(false);
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -122,6 +123,10 @@ export default function Hero() {
             alt=""
             aria-hidden="true"
             draggable={false}
+            style={{
+              opacity: videoPlaying ? 0 : 1,
+              transition: "opacity 0.4s ease",
+            }}
           />
           {useVideo && (
             <video
@@ -135,6 +140,7 @@ export default function Hero() {
               playsInline
               preload="auto"
               aria-hidden="true"
+              onPlaying={() => setVideoPlaying(true)}
             />
           )}
         </div>

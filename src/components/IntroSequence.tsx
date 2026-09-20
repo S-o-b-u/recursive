@@ -394,30 +394,14 @@ export default function IntroSequence() {
       tl.set(scene, { opacity: 1 }, 0);
 
       const isWideScreen = typeof window !== "undefined" && window.innerWidth >= 768;
-      // Intimate initial camera framing centered around the hill crest and plastic chair.
-      // Higher values = more dramatic zoom-out reveal (was 1.08/1.10, now 1.22/1.28).
-      const initialScale = isWideScreen ? 1.22 : 1.28;
+      // Intimate initial camera framing centered on the plastic chair and hill crest.
+      // 1.08x scale on desktop / 1.10x on mobile centers dead on the chair (which sits
+      // at 50% X, 48% Y in the video plate) without diagonal subpixel drift.
+      const initialScale = isWideScreen ? 1.08 : 1.10;
       const hvs = heroVideoScale();
-      // Compute the framing offset as an explicit translation instead of an
-      // off-center transform-origin. Scaling around a non-center origin
-      // implicitly translates the element by (origin - 50%) * (scale - 1) each
-      // frame, and at the tail of a long ease the sub-pixel rounding of those
-      // tiny shifts causes visible jitter/shaking. A center origin with an
-      // explicit x/y tween keeps every frame in clean GPU-compositor territory.
-      //
-      // The math: an origin of (ox%, oy%) with scale S is equivalent to
-      //   origin 50% 50%  +  translate( (ox-50)/100 * w * (S-1), (oy-50)/100 * h * (S-1) )
-      const vw = typeof window !== "undefined" ? window.innerWidth : 1920;
-      const vh = typeof window !== "undefined" ? window.innerHeight : 1080;
-      const oxPct = isWideScreen ? 52 : 50; // original origin-x %
-      const oyPct = isWideScreen ? 56 : 60; // original origin-y %
-      const initialX = ((oxPct - 50) / 100) * vw * (initialScale - 1);
-      const initialY = ((oyPct - 50) / 100) * vh * (initialScale - 1);
       if (hvs) {
         gsap.set(hvs, {
           scale: initialScale,
-          x: -initialX,
-          y: -initialY,
           transformOrigin: "50% 50%",
           force3D: true,
         });
@@ -664,10 +648,11 @@ export default function IntroSequence() {
           hvs,
           {
             scale: 1,
-            x: 0,
-            y: 0,
             duration: 8.4,
             ease: "sine.inOut",
+            onComplete: () => {
+              gsap.set(hvs, { clearProps: "transform" });
+            },
           },
           3.4,
         );
@@ -853,7 +838,15 @@ export default function IntroSequence() {
       const hvsTarget = heroVideoScale();
       if (hvsTarget) {
         gsap.killTweensOf(hvsTarget);
-        gsap.to(hvsTarget, { scale: 1, x: 0, y: 0, transformOrigin: "50% 50%", duration: 0.4, ease: "power2.out" });
+        gsap.to(hvsTarget, {
+          scale: 1,
+          transformOrigin: "50% 50%",
+          duration: 0.4,
+          ease: "power2.out",
+          onComplete: () => {
+            gsap.set(hvsTarget, { clearProps: "transform" });
+          },
+        });
       }
 
       const heroVid = heroVideo();
