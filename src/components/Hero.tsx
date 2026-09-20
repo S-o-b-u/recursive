@@ -110,20 +110,6 @@ export default function Hero() {
     };
   }, [introFinished]);
 
-  // Subtle ease-out zoom on hero video when page becomes visible
-  useEffect(() => {
-    if (!introFinished || reduced) return;
-    const scaleEl = videoScaleRef.current;
-    if (!scaleEl) return;
-
-    // Intro already ends at scale 1; this is a micro-settle (1.003 → 1)
-    // immediateRender:false prevents a jump from the intro's clearProps
-    gsap.fromTo(
-      scaleEl,
-      { scale: 1.003, transformOrigin: "50% 48%" },
-      { scale: 1, duration: 0.8, ease: "power2.out", clearProps: "transform", immediateRender: false }
-    );
-  }, [introFinished, reduced]);
 
   return (
     <section id="hero" className="hero" ref={sectionRef}>
@@ -325,9 +311,9 @@ export default function Hero() {
           width: 100%;
           height: 100%;
           pointer-events: none;
-          transform-origin: 50% 48%;
+          transform-origin: 50% 50%;
           will-change: transform;
-          transform: translateZ(0);
+          transform: translate3d(0, 0, 0);
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
           contain: paint;
@@ -335,7 +321,7 @@ export default function Hero() {
 
         @media (max-width: 860px) {
           .hero-video-scale {
-            transform-origin: 50% 48%;
+            transform-origin: 50% 50%;
           }
         }
 
@@ -348,9 +334,6 @@ export default function Hero() {
           object-fit: cover;
           object-position: center center;
           pointer-events: none;
-          will-change: transform;
-          transform: translateZ(0);
-          -webkit-transform: translateZ(0);
         }
 
         /* ── Fluid Flex Column Container for Foreground ── */

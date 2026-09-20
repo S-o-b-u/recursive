@@ -395,15 +395,14 @@ export default function IntroSequence() {
 
       const isWideScreen = typeof window !== "undefined" && window.innerWidth >= 768;
       // Intimate initial camera framing centered on the plastic chair and hill crest.
-      // Slightly deeper zoom for drama, but mobile capped at 1.15 to prevent shake on small screens.
-      // Chair sits at 50% X, 48% Y — chair-relative origin eliminates diagonal subpixel drift.
-      const initialScale = isWideScreen ? 1.15 : 1.15;
+      // Pure 50% 50% transform origin ensures perfectly symmetric radial scale with zero X/Y subpixel drift.
+      const initialScale = isWideScreen ? 1.15 : 1.14;
       const hvs = heroVideoScale();
       if (hvs) {
         gsap.set(hvs, {
           scale: initialScale,
-          transformOrigin: "50% 48%",
-          force3D: false,
+          transformOrigin: "50% 50%",
+          force3D: true,
         });
       }
 
@@ -639,33 +638,33 @@ export default function IntroSequence() {
       );
 
       // ── Stage 3: Cinematic Zoom Out / Revealing Animation ──
-      // Camera slowly pulls back as morning light gradually breaks — slower, more cinematic reveal.
-      // Zoom: 3.4s → 13.4s (10.0s, power2.out) — extended for gradual reveal.
-      // Grade: starts fading WITH zoom at 3.4s, ends at 13.4s (10.0s fade, sine.inOut),
-      // so darkness lifts gradually from the very beginning — text becomes readable as scene reveals.
-      // Clean zoom tail: 0s (grade ends exactly when zoom ends).
+      // Camera smoothly and gracefully pulls back as morning light gradually breaks.
+      // Starts gently at 3.8s as the veil finishes lifting and Line 1 begins,
+      // maintaining steady, smooth 60fps cinematic movement without micro-jitter,
+      // softly settling into scale 1 by 13.0s right as the final caption concludes.
       if (hvs) {
         tl.to(
           hvs,
           {
             scale: 1,
-            duration: 10.0,
-            ease: "power2.out",
+            duration: 9.2,
+            ease: "sine.inOut",
+            force3D: true,
             onComplete: () => {
               gsap.set(hvs, { clearProps: "transform" });
             },
           },
-          3.4,
+          3.8,
         );
       }
 
-      // Grade reveal — starts WITH zoom, full 10s duration, sine.inOut for slow start/end:
-      // Fades 3.4s → 13.4s (10.0s, sine.inOut) — perfectly synced with zoom.
-      // sine.inOut = imperceptible start, accelerates middle, decelerates end = natural dawn.
-      tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 10.0, ease: "sine.inOut" }, 3.4);
+      // Grade reveal — slowly and smoothly reveals the hill and scene from deep darkness into bright daylight.
+      // Starts at 4.1s as Line 1 ("Welcome to the bottom") appears, gradually lifting the deep gradient
+      // with a buttery sine.inOut ease, reaching full daylight at 13.0s as the final lines conclude.
+      tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 8.9, ease: "sine.inOut" }, 4.1);
 
-      // Progress bar matches extended zoom
-      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 10.0, ease: "none" }, 3.4);
+      // Progress bar matches the reveal window (3.8s to 13.0s)
+      tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 9.2, ease: "none" }, 3.8);
 
       lines.forEach((el, i) => {
         const [tin, tout] = CUES[i];
@@ -733,13 +732,13 @@ export default function IntroSequence() {
         bloom,
         { opacity: 0 },
         { opacity: isMobileDevice ? 0.35 : 0.45, duration: 0.75, ease: "sine.out" },
-        13.4,
+        13.0,
       );
 
       // Hand off to Hero: single unified video plate continues uninterrupted at 60fps
-      // Zoom ends at 13.4s, bloom starts at 13.4s, handoff at 13.55s
-      const handoffTime = 13.55;
-      const dissolveStart = 13.6;
+      // Zoom ends at 13.0s, bloom rises at 13.0s, handoff at 13.25s
+      const handoffTime = 13.25;
+      const dissolveStart = 13.3;
       const dissolveDuration = 0.75;
 
       tl.call(() => {
@@ -841,9 +840,10 @@ export default function IntroSequence() {
         gsap.killTweensOf(hvsTarget);
         gsap.to(hvsTarget, {
           scale: 1,
-          transformOrigin: "50% 48%",
+          transformOrigin: "50% 50%",
           duration: 0.4,
           ease: "power2.out",
+          force3D: true,
           onComplete: () => {
             gsap.set(hvsTarget, { clearProps: "transform" });
           },
@@ -1279,9 +1279,9 @@ export default function IntroSequence() {
           -webkit-transform: translateZ(0);
         }
 
-/* Dark cinematic vignette — the scene starts buried in darkness,
-           light breaks through the center first as the grade fades.
-           Three layers: center-clear radial, bottom-heavy vignette, overall haze. */
+        /* Deep cinematic dawn grade — starts buried in rich darkness and dense shadows,
+           slowly lifting to reveal the sunlit hill crest, plastic chair, and swaying grass.
+           Features a rich emerald-black base, a focused center vignette, and heavy grass shading. */
         .intro-grade {
           position: absolute;
           inset: 0;
@@ -1290,9 +1290,8 @@ export default function IntroSequence() {
           contain: paint;
           isolation: isolate;
           background:
-            radial-gradient(65% 55% at 50% 52%, rgba(6,14,9,0) 0%, rgba(6,14,9,0.55) 50%, rgba(4,10,7,0.92) 100%),
-            radial-gradient(120% 90% at 50% 116%, rgba(6,14,9,0) 32%, rgba(6,14,9,0.85) 70%, rgba(4,10,7,0.98) 100%),
-            linear-gradient(180deg, rgba(6,13,9,0.8) 0%, rgba(6,13,9,0.3) 42%, rgba(6,13,9,0.6) 100%);
+            radial-gradient(ellipse 85% 72% at 50% 50%, rgba(4, 10, 6, 0.65) 0%, rgba(2, 7, 4, 0.88) 50%, rgba(1, 3, 2, 0.98) 100%),
+            linear-gradient(180deg, rgba(3, 8, 5, 0.92) 0%, rgba(2, 6, 3, 0.60) 30%, rgba(2, 6, 3, 0.82) 65%, rgba(1, 4, 2, 1) 100%);
         }
 
         /* Dawn cresting the hill — low, wide, warm. Masks the cut, then recedes. */
