@@ -645,7 +645,7 @@ export default function IntroSequence() {
           duration: 9.0,
           ease: "sine.inOut",
           force3D: true,
-          transformOrigin: "50% 50%",
+          transformOrigin: "50% 52%",
         },
         4.0,
       );
@@ -1257,23 +1257,24 @@ export default function IntroSequence() {
           -webkit-transform: translateZ(0);
         }
 
-        /* Deep cinematic dawn grade — starts buried in rich darkness and dense shadows,
-           slowly lifting with an ease zoom-in aperture reveal to show the sunlit hill crest, plastic chair, and swaying grass.
-           Features a rich emerald-black base, a focused center vignette, and heavy grass shading. */
+        /* Dark cinematic dawn grade — starts with the solitary chair gently revealed through
+           the center-clear aperture while surrounding slopes and grass lie in rich darkness,
+           slowly lifting with an ease zoom-in reveal to bathe the hill and chair in morning daylight. */
         .intro-grade {
           position: absolute;
-          inset: -30%;
-          width: 160%;
-          height: 160%;
+          inset: -20%;
+          width: 140%;
+          height: 140%;
           pointer-events: none;
           z-index: 2;
           contain: paint;
           isolation: isolate;
-          transform-origin: 50% 50%;
+          transform-origin: 50% 52%;
           will-change: transform, opacity;
           background:
-            radial-gradient(ellipse 65% 55% at 50% 50%, rgba(2, 6, 3, 0.90) 0%, rgba(2, 6, 3, 0.97) 48%, rgba(1, 3, 2, 0.99) 78%, rgba(0, 2, 1, 1) 100%),
-            linear-gradient(180deg, rgba(1, 4, 2, 0.98) 0%, rgba(2, 6, 3, 0.88) 35%, rgba(1, 3, 2, 0.96) 70%, rgba(0, 2, 1, 1) 100%);
+            radial-gradient(65% 55% at 50% 52%, rgba(6, 14, 9, 0) 0%, rgba(6, 14, 9, 0.55) 45%, rgba(4, 10, 7, 0.94) 76%, rgba(1, 4, 2, 1) 100%),
+            radial-gradient(120% 90% at 50% 116%, rgba(6, 14, 9, 0) 30%, rgba(4, 10, 7, 0.86) 68%, rgba(1, 4, 2, 1) 100%),
+            linear-gradient(180deg, rgba(3, 8, 5, 0.84) 0%, rgba(6, 14, 9, 0.28) 42%, rgba(3, 8, 5, 0.72) 100%);
         }
 
         /* Dawn cresting the hill — low, wide, warm. Masks the cut, then recedes. */
