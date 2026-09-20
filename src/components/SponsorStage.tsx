@@ -592,10 +592,12 @@ export default function SponsorStage() {
                           height={52}
                         />
                       </a>
-                      <div
+                      <a
+                        href="https://eventopia.in/"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="sxp-partner-card sxp-float-card-alt sxp-eventopia-card"
                         title="Eventopia"
-                        role="img"
                         aria-label="Eventopia"
                       >
                         <img
@@ -605,7 +607,7 @@ export default function SponsorStage() {
                           width={170}
                           height={44}
                         />
-                      </div>
+                      </a>
                     </div>
                   </div>
 

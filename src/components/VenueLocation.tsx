@@ -168,9 +168,9 @@ export default function VenueLocation() {
                     <Car className="w-5 h-5 text-[#1b4324]" />
                   </div>
                   <div className="transit-text-wrap">
-                    <span className="transit-label">Cabs / Parking</span>
+                    <span className="transit-label">By Cabs</span>
                     <p className="transit-desc">
-                      Drop-off right at GNIT Main Gate with designated event parking on campus.
+                      Drop-off right at GNIT Main Gate.
                     </p>
                   </div>
                 </div>
