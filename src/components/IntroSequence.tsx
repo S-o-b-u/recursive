@@ -121,7 +121,6 @@ export default function IntroSequence() {
   const bailRef = useRef<(() => void) | null>(null);
   const doneRef = useRef(false);
   const veilRef = useRef<HTMLDivElement>(null);
-  const markRef = useRef<HTMLDivElement>(null);
 
   const reducedMotion = () =>
     typeof window !== "undefined" &&
@@ -135,7 +134,6 @@ export default function IntroSequence() {
     } catch {}
 
     const veil = veilRef.current;
-    const mark = markRef.current;
     const isReduced = reducedMotion();
 
     const doTransition = () => {
@@ -196,46 +194,38 @@ export default function IntroSequence() {
       else window.setTimeout(unmount, 500);
     };
 
-    if (!veil || !mark || isReduced) {
+    if (!veil || isReduced) {
       doTransition();
       return;
     }
 
-    // Curtain animation: sweep up, then clear down (forward navigation style)
-    gsap.killTweensOf([veil, mark]);
-    gsap.set(veil, { yPercent: 100, visibility: "visible", pointerEvents: "auto" });
-    gsap.set(mark, { opacity: 0, scale: 0.96 });
-
-    // Activate mark animation
-    mark.classList.remove("is-active");
-    void mark.offsetWidth; // trigger reflow
-    mark.classList.add("is-active");
-
-    const tl = gsap.timeline({
-      onComplete: () => {
-        doTransition();
-        // After transition, animate curtain out
-        gsap.to(mark, {
-          opacity: 0,
-          scale: 0.96,
-          duration: 0.22,
-          ease: "power2.inOut",
-        });
-        const outTl = gsap.timeline();
-        outTl.to(veil, {
-          yPercent: -100,
-          duration: 0.44,
-          ease: "expo.out",
-          onComplete: () => {
-            gsap.set(veil, { yPercent: 100, visibility: "hidden", pointerEvents: "none" });
-            if (mark) mark.classList.remove("is-active");
-          },
-        }, 0.03);
-      },
+    // Fast gradient wipe - reveal hero page smoothly
+    gsap.killTweensOf(veil);
+    gsap.set(veil, { 
+      yPercent: 100, 
+      visibility: "visible", 
+      pointerEvents: "auto" 
     });
 
-    tl.to(veil, { yPercent: 0, duration: 0.35, ease: "power3.inOut" }, 0);
-    tl.to(mark, { opacity: 1, scale: 1, duration: 0.24, ease: "power2.out" }, 0.06);
+    const tl = gsap.timeline({
+      onComplete: doTransition,
+    });
+
+    // Quick sweep up to cover, then immediately sweep down to reveal
+    tl.to(veil, { 
+      yPercent: 0, 
+      duration: 0.2, 
+      ease: "power4.inOut" 
+    }, 0);
+    
+    tl.to(veil, { 
+      yPercent: -100, 
+      duration: 0.25, 
+      ease: "power3.out",
+      onComplete: () => {
+        gsap.set(veil, { yPercent: 100, visibility: "hidden", pointerEvents: "none" });
+      }
+    }, 0.15);
   }, []);
 
   const skip = useCallback(() => {
@@ -1146,28 +1136,7 @@ export default function IntroSequence() {
       <div ref={bloomRef} className="intro-bloom" aria-hidden="true" />
 
       {/* Skip transition curtain */}
-      <div ref={veilRef} className="intro-veil" aria-hidden="true">
-        <div ref={markRef} className="intro-mark">
-          <img
-            src="/images/ui/artifact.png"
-            alt=""
-            className="intro-artifact-base intro-artifact-center"
-            draggable={false}
-          />
-          <img
-            src="/images/ui/artifact.png"
-            alt=""
-            className="intro-artifact-base intro-artifact-left"
-            draggable={false}
-          />
-          <img
-            src="/images/ui/artifact.png"
-            alt=""
-            className="intro-artifact-base intro-artifact-right"
-            draggable={false}
-          />
-        </div>
-      </div>
+      <div ref={veilRef} className="intro-veil" aria-hidden="true" />
 
       <style href="intro-sequence" precedence="default" suppressHydrationWarning>{`
         .intro-root {
@@ -1587,8 +1556,6 @@ export default function IntroSequence() {
           position: fixed;
           inset: 0;
           z-index: 100000;
-          display: grid;
-          place-items: center;
           pointer-events: none;
           visibility: hidden;
           will-change: transform;
@@ -1596,79 +1563,6 @@ export default function IntroSequence() {
             radial-gradient(120% 70% at 50% 0%, rgba(52, 88, 38, 0.42) 0%, rgba(52, 88, 38, 0) 62%),
             linear-gradient(180deg, #0A160A 0%, #010301 62%);
           box-shadow: 0 0 100px 30px rgba(1, 3, 1, 0.95);
-        }
-
-        .intro-mark {
-          position: relative;
-          width: clamp(150px, 22vw, 240px);
-          aspect-ratio: 744 / 220;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          opacity: 0;
-          pointer-events: none;
-          user-select: none;
-          will-change: transform, opacity;
-        }
-
-        .intro-artifact-base {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-          filter: brightness(1.16) saturate(1.1);
-          pointer-events: none;
-          user-select: none;
-          -webkit-user-drag: none;
-        }
-
-        .intro-artifact-center {
-          -webkit-mask-image: radial-gradient(ellipse 24% 65% at 50% 50%, black 30%, transparent 100%);
-          mask-image: radial-gradient(ellipse 24% 65% at 50% 50%, black 30%, transparent 100%);
-          opacity: 0.72;
-        }
-
-        .intro-artifact-left {
-          -webkit-mask-image: linear-gradient(to right, black 0%, black 38%, transparent 58%);
-          mask-image: linear-gradient(to right, black 0%, black 38%, transparent 58%);
-          opacity: 1;
-        }
-
-        .intro-artifact-right {
-          -webkit-mask-image: linear-gradient(to right, transparent 42%, black 62%, black 100%);
-          mask-image: linear-gradient(to right, transparent 42%, black 62%, black 100%);
-          opacity: 0;
-        }
-
-        .intro-mark.is-active .intro-artifact-left {
-          animation: intro-split-left 1.05s ease-in-out infinite alternate;
-        }
-
-        .intro-mark.is-active .intro-artifact-right {
-          animation: intro-split-right 1.05s ease-in-out infinite alternate;
-        }
-
-        @keyframes intro-split-left {
-          0% {
-            opacity: 1;
-            transform: scale(1.02);
-          }
-          100% {
-            opacity: 0;
-            transform: scale(0.98);
-          }
-        }
-
-        @keyframes intro-split-right {
-          0% {
-            opacity: 0;
-            transform: scale(0.98);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1.02);
-          }
         }
 
         @media (prefers-reduced-motion: reduce) {
