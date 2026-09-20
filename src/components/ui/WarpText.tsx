@@ -602,8 +602,6 @@ export const WarpText: React.FC<WarpTextProps> = ({
     canvas.style.width = "100%";
     canvas.style.height = "100%";
     canvas.style.display = "block";
-    canvas.style.transform = "translate3d(0, 0, 0)";
-    canvas.style.willChange = "transform";
     canvas.setAttribute("aria-hidden", "true");
     container.appendChild(canvas);
 
@@ -807,19 +805,8 @@ export const WarpText: React.FC<WarpTextProps> = ({
       renderOnce();
     };
 
-    let lastFrameTime = performance.now();
-    const FRAME_BUDGET = 1000 / 60; // 16.667ms stable 60 FPS cap
-
     const loop = (now: number) => {
       if (disposed || contextLost) return;
-      raf = requestAnimationFrame(loop);
-
-      // Capped render loop: Skip frame if less than ~15.2ms has elapsed (prevents 120Hz/144Hz thrash)
-      const delta = now - lastFrameTime;
-      if (delta < FRAME_BUDGET - 1.5) {
-        return;
-      }
-      lastFrameTime = now - (delta % FRAME_BUDGET);
 
       const elapsed = (now - startTime) * 0.001;
       const idleX = 0.5 + Math.sin(elapsed * 0.33) * 0.12;
@@ -841,6 +828,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
       program.uniforms.uTime.value = reduceMotion ? 0 : elapsed;
 
       renderOnce();
+      raf = requestAnimationFrame(loop);
     };
 
     resizeObserver = new ResizeObserver(resize);

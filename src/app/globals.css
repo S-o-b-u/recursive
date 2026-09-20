@@ -280,10 +280,6 @@ main > *:not(.intro-root):not(.intro-pending-plate):not(#hero) {
   transition: opacity 0.5s ease;
 }
 
-html[data-intro="done"] .hero-video-scale {
-  will-change: auto !important;
-}
-
 /* ─── Typography ─── */
 
 h1, h2, h3, h4, h5, h6 {
