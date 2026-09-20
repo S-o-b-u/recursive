@@ -974,17 +974,17 @@ export default function IntroSequence() {
       if (bloom) {
         wipeTl.fromTo(bloom,
           { opacity: 0 },
-          { opacity: 0.5, duration: 0.3, ease: "sine.out" },
+          { opacity: 0.5, duration: 0.32, ease: "sine.out" },
           0.18
         );
       }
 
-      // Phase 3: The emerald gradient veil smoothly lifts and dissolves up
+      // Phase 3: The emerald gradient veil smoothly lifts and completely dissolves to 0
       wipeTl.to(veil, {
-        yPercent: -105,
-        opacity: 0.15,
-        scale: 1.03,
-        duration: 0.44,
+        yPercent: -130,
+        opacity: 0,
+        scale: 1.02,
+        duration: 0.52,
         ease: "power2.inOut",
         force3D: true,
       }, 0.22);
@@ -993,16 +993,17 @@ export default function IntroSequence() {
       if (bloom) {
         wipeTl.to(bloom, {
           opacity: 0,
-          duration: 0.4,
+          duration: 0.45,
           ease: "sine.inOut",
         }, 0.42);
       }
 
-      // Complete transition
+      // Phase 5: Clean finish — veil is already at opacity 0 and off-screen
       wipeTl.call(() => {
-        gsap.set(veil, { visibility: "hidden", pointerEvents: "none" });
+        gsap.set([veil, bloom].filter(Boolean), { visibility: "hidden", pointerEvents: "none" });
+        gsap.set(root, { autoAlpha: 0, pointerEvents: "none" });
         finish();
-      }, undefined, 0.66);
+      }, undefined, 0.74);
     };
 
     return () => {
@@ -1603,37 +1604,40 @@ export default function IntroSequence() {
           }
         }
 
-        /* Skip transition curtain */
+        /* Skip transition curtain — Purely Blur & Gradient-Based (No Sharp Edges) */
         .intro-veil {
           position: fixed;
-          inset: 0;
+          top: -10vh;
+          left: 0;
+          right: 0;
+          height: 145vh;
           z-index: 100000;
           pointer-events: none;
           visibility: hidden;
           will-change: transform, opacity;
           background:
             radial-gradient(130% 90% at 50% 35%, rgba(60, 110, 45, 0.45) 0%, rgba(18, 40, 18, 0.85) 45%, #050d05 90%),
-            linear-gradient(180deg, #081408 0%, #030803 55%, #010301 100%);
-          box-shadow: 0 0 120px 50px rgba(1, 4, 1, 0.95);
-        }
-
-        .intro-veil::after {
-          content: "";
-          position: absolute;
-          bottom: -280px;
-          left: 0;
-          right: 0;
-          height: 280px;
-          background: linear-gradient(
+            linear-gradient(180deg, #081408 0%, #030803 40%, #010301 65%, transparent 100%);
+          -webkit-mask-image: linear-gradient(
             to bottom,
-            #010301 0%,
-            rgba(3, 8, 3, 0.95) 20%,
-            rgba(10, 25, 12, 0.8) 45%,
-            rgba(35, 75, 30, 0.5) 68%,
-            rgba(75, 140, 55, 0.22) 85%,
+            black 0%,
+            black 42%,
+            rgba(0, 0, 0, 0.9) 56%,
+            rgba(0, 0, 0, 0.6) 70%,
+            rgba(0, 0, 0, 0.25) 84%,
             transparent 100%
           );
-          pointer-events: none;
+          mask-image: linear-gradient(
+            to bottom,
+            black 0%,
+            black 42%,
+            rgba(0, 0, 0, 0.9) 56%,
+            rgba(0, 0, 0, 0.6) 70%,
+            rgba(0, 0, 0, 0.25) 84%,
+            transparent 100%
+          );
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
         }
 
         @media (prefers-reduced-motion: reduce) {
