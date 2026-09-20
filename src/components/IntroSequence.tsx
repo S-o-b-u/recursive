@@ -391,28 +391,11 @@ export default function IntroSequence() {
       tl.set(root, { autoAlpha: 1 });
       tl.set(scene, { opacity: 1 }, 0);
 
-      const isWideScreen = typeof window !== "undefined" && window.innerWidth >= 768;
-      // On desktop, tablet, and widescreen devices, scale at 1.07 and yPercent at -3.2%
-      // so the hill crest and plastic chair fit naturally in frame without aggressive cropping.
-      const initialScale = isWideScreen ? 1.07 : 1.12;
-      const initialYPercent = isWideScreen ? -3.2 : -5;
-
-      // Pin media to starting transform immediately before paint
+      // Ensure the unified hero video plate is rock-solid at native 1:1 scale (0 transforms = 0 subpixel jitter)
       const hm = heroMediaTargets();
       if (hm.length > 0) {
-        gsap.set(hm, {
-          scale: initialScale,
-          yPercent: initialYPercent,
-          transformOrigin: "center center",
-          force3D: true,
-        });
+        gsap.set(hm, { clearProps: "transform" });
       }
-      gsap.set(media, {
-        scale: initialScale,
-        yPercent: initialYPercent,
-        transformOrigin: "center center",
-        force3D: true,
-      });
 
       // ── Stage 1 & 2: Artifact & Welcome Cascade ──
       if (loaderOverlay && artifactMark && welcomeBlock) {
@@ -645,29 +628,7 @@ export default function IntroSequence() {
         2.9,
       );
 
-      // ── Stage 3: Slowly the intro story animation starts ──
-      tl.to(
-        heroMediaTargets(),
-        {
-          scale: 1,
-          yPercent: 0,
-          duration: 8.5,
-          ease: "sine.inOut",
-          onComplete: () => {
-            const hm = heroMediaTargets();
-            if (hm.length > 0) {
-              gsap.set(hm, { clearProps: "transform" });
-            }
-          },
-        },
-        3.7,
-      );
-      tl.to(
-        media,
-        { scale: 1, yPercent: 0, duration: 8.5, ease: "sine.inOut" },
-        3.7,
-      );
-
+      // ── Stage 3: The cinematic vignette dissolves, revealing the sunlit hill ──
       tl.fromTo(grade, { opacity: 1 }, { opacity: 0, duration: 7.6, ease: "sine.inOut" }, 3.8);
       tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 8.2, ease: "none" }, 3.9);
 
@@ -735,8 +696,8 @@ export default function IntroSequence() {
       // 3. A soft dawn glow rises from the hill line, then recedes.
       tl.fromTo(
         bloom,
-        { opacity: 0, scale: 1.05 },
-        { opacity: isMobileDevice ? 0.35 : 0.45, scale: 1, duration: 0.75, ease: "sine.out" },
+        { opacity: 0 },
+        { opacity: isMobileDevice ? 0.35 : 0.45, duration: 0.75, ease: "sine.out" },
         12.0,
       );
 
@@ -757,7 +718,7 @@ export default function IntroSequence() {
       tl.call(releaseScroll, undefined, dissolveStart + dissolveDuration + 0.05);
 
       // 5. Glow recedes over the settled landing page with buttery smooth sine ease
-      tl.to(bloom, { opacity: 0, scale: 1.04, duration: 0.85, ease: "sine.inOut" }, dissolveStart + dissolveDuration);
+      tl.to(bloom, { opacity: 0, duration: 0.85, ease: "sine.inOut" }, dissolveStart + dissolveDuration);
     }, root);
 
     const tl = tlRef.current!;
@@ -841,15 +802,7 @@ export default function IntroSequence() {
 
       const hm = heroMediaTargets();
       gsap.killTweensOf(hm);
-      gsap.to(hm, {
-        scale: 1,
-        yPercent: 0,
-        duration: 0.5,
-        ease: "power2.out",
-        onComplete: () => {
-          gsap.set(hm, { clearProps: "transform" });
-        },
-      });
+      gsap.set(hm, { clearProps: "transform" });
 
       const heroVid = heroVideo();
       if (heroVid && heroVid.paused) {
@@ -864,16 +817,11 @@ export default function IntroSequence() {
         q.to(skipWrap, { opacity: 0, scale: 0.9, y: 6, duration: 0.22, ease: "power2.in", pointerEvents: "none" }, 0);
       }
       q.to(words, { autoAlpha: 0, yPercent: -14, duration: 0.28, ease: "power2.in" }, 0);
-      q.to(
-        media,
-        { xPercent: 0, yPercent: 0, x: 0, y: 0, scale: 1, rotation: 0, duration: 0.6, ease: "sine.inOut" },
-        0,
-      );
       q.to(grade, { opacity: 0, duration: 0.6, ease: "sine.inOut" }, 0.04);
       q.fromTo(
         bloom,
-        { opacity: 0, scale: 1.1 },
-        { opacity: isMobileDevice ? 0.35 : 0.45, scale: 1, duration: 0.5, ease: "sine.out" },
+        { opacity: 0 },
+        { opacity: isMobileDevice ? 0.35 : 0.45, duration: 0.5, ease: "sine.out" },
         0.3,
       );
       q.call(
@@ -889,7 +837,7 @@ export default function IntroSequence() {
       q.to(scene, { autoAlpha: 0, duration: 0.6, ease: "sine.inOut" }, 0.66);
       q.set(root, { pointerEvents: "none" }, 1.0);
       q.call(releaseScroll, undefined, 1.26);
-      q.to(bloom, { opacity: 0, scale: 1.04, duration: 0.65, ease: "sine.inOut" }, 1.05);
+      q.to(bloom, { opacity: 0, duration: 0.65, ease: "sine.inOut" }, 1.05);
     };
 
     return () => {
@@ -1069,11 +1017,8 @@ export default function IntroSequence() {
       <style href="intro-sequence" precedence="default" suppressHydrationWarning>{`
         .intro-root {
           position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          width: 100vw;
+          inset: 0;
+          width: 100%;
           height: 100%;
           min-height: 100vh;
           min-height: 100dvh;
