@@ -312,6 +312,11 @@ export default function Hero() {
           height: 100%;
           pointer-events: none;
           transform-origin: 50% 52%;
+          will-change: transform;
+          transform: translate3d(0, 0, 0);
+          -webkit-transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
         }
 
         /* ── 100% Clean Video Plate — Direct GPU Composition ── */
@@ -323,6 +328,10 @@ export default function Hero() {
           object-fit: cover;
           object-position: center center;
           pointer-events: none;
+          transform: translate3d(0, 0, 0);
+          -webkit-transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
         }
 
         /* ── Fluid Flex Column Container for Foreground ── */
