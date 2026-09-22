@@ -184,17 +184,6 @@ export default function VenueLocation() {
                   referrerPolicy="no-referrer"
                 />
 
-                {/* Floating Location Card Overlay */}
-                <div className="map-pin-callout">
-                  <div className="pin-icon-wrap">
-                    <MapPin className="w-5 h-5 text-[#1b4324] fill-[#1b4324]" />
-                  </div>
-                  <div className="pin-text-wrap">
-                    <div className="pin-name">Guru Nanak Institute of Technology</div>
-                    <div className="pin-sub">GNIT Sodepur, Kolkata</div>
-                  </div>
-                </div>
-
                 {/* Floating Bottom Info Bar */}
                 <div className="map-floating-bottom">
                   <div className="map-bottom-left">
@@ -637,55 +626,6 @@ export default function VenueLocation() {
           color: #111c14;
         }
 
-        /* Floating Pin Callout Tooltip */
-        .map-pin-callout {
-          position: absolute;
-          top: 42%;
-          left: 54%;
-          transform: translate(-50%, -50%);
-          z-index: 9;
-          display: flex;
-          align-items: center;
-          gap: 0.6rem;
-          background: rgba(255, 255, 255, 0.36);
-          backdrop-filter: blur(14px) saturate(160%);
-          -webkit-backdrop-filter: blur(14px) saturate(160%);
-          border: 1px solid rgba(255, 255, 255, 0.55);
-          box-shadow:
-            inset 0 1px 1.5px rgba(255, 255, 255, 0.75),
-            0 4px 14px rgba(0, 0, 0, 0.04);
-          border-radius: 0.85rem;
-          padding: 0.48rem 0.9rem;
-          pointer-events: none;
-        }
-
-        .pin-icon-wrap {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .pin-text-wrap {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .pin-name {
-          font-family: var(--font-display), var(--font-dm-sans), sans-serif;
-          font-size: 0.825rem;
-          font-weight: 700;
-          letter-spacing: -0.01em;
-          color: #111c14;
-          line-height: 1.25;
-        }
-
-        .pin-sub {
-          font-family: var(--font-dm-sans), sans-serif;
-          font-size: 0.72rem;
-          color: #526356;
-          margin-top: 1px;
-        }
-
         /* Floating Controls */
         .map-floating-controls {
           position: absolute;
@@ -882,21 +822,6 @@ export default function VenueLocation() {
           .map-float-pill svg {
             width: 13px;
             height: 13px;
-          }
-
-          .map-pin-callout {
-            padding: 0.35rem 0.6rem;
-            top: 38%;
-            left: 50%;
-            border-radius: 0.65rem;
-          }
-
-          .pin-name {
-            font-size: 0.72rem;
-          }
-
-          .pin-sub {
-            font-size: 0.62rem;
           }
 
           .map-floating-controls {
