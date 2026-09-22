@@ -176,10 +176,12 @@ export default function VenueLocation() {
                   </div>
                 </div>
 
-                <div
-                  className="google-maps-frame map-static-canvas"
-                  role="img"
-                  aria-label="Map showing Guru Nanak Institute of Technology in Sodepur, Kolkata"
+                <iframe
+                  title="Interactive map of Guru Nanak Institute of Technology"
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=88.3687%2C22.6851%2C88.3888%2C22.7051&layer=mapnik&marker=${VENUE.lat}%2C${VENUE.lng}`}
+                  className="google-maps-frame"
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
                 />
 
                 {/* Floating Location Card Overlay */}
