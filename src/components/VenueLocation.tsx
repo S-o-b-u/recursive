@@ -862,8 +862,8 @@ export default function VenueLocation() {
 
         @media (max-width: 640px) {
           .google-maps-frame {
-            top: -68px;
-            height: calc(100% + 180px);
+            top: 0;
+            height: 100%;
           }
 
           .map-floating-top {
