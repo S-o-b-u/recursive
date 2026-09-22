@@ -152,18 +152,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
         <PageTransition />
 
-        {/*
-          Devfolio SDK — injected as a literal <script> via dangerouslySetInnerHTML
-          so the tag appears in the server-rendered HTML body and is visible to
-          Devfolio's verification crawler, which fetches raw HTML without executing
-          JS. Positioned after children so DOM elements are parsed before initial execution.
-        */}
-        <div
-          dangerouslySetInnerHTML={{
-            __html:
-              '<script defer src="https://apply.devfolio.co/v2/sdk.js"></script>',
-          }}
-        />
       </body>
     </html>
   );

@@ -8,6 +8,20 @@ import type { NextConfig } from "next";
  * the files are replaced wholesale when they change, so a long max-age is safe.
  */
 const IMMUTABLE = "public, max-age=31536000, immutable";
+const CONTENT_SECURITY_POLICY = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'self'",
+  "form-action 'self' https://*.devfolio.co",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data:",
+  "connect-src 'self'",
+  "frame-src https://maps.google.com https://www.google.com",
+  "upgrade-insecure-requests",
+].join("; ");
 
 const nextConfig: NextConfig = {
   // Dev-only: stops `next dev` from generating AGENTS.md / CLAUDE.md at the root.
@@ -26,13 +40,11 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Baseline hardening. Deliberately no Content-Security-Policy: the page
-        // carries inline <style> blocks, a WebGL/shader layer, the Devfolio SDK
-        // and a Google Maps embed, so a policy written blind would break the
-        // register button rather than protect anyone. Worth adding later, but
-        // only alongside a pass that actually exercises those flows.
         source: "/:path*",
         headers: [
+          ...(process.env.NODE_ENV === "production"
+            ? [{ key: "Content-Security-Policy", value: CONTENT_SECURITY_POLICY }]
+            : []),
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },

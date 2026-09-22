@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { EVENT } from "@/data/hackathon";
 
 export interface DevfolioButtonProps {
@@ -10,24 +9,12 @@ export interface DevfolioButtonProps {
   style?: React.CSSProperties;
 }
 
-/** Minimal escape for a value interpolated into a double-quoted HTML attribute. */
-function attr(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
 export default function DevfolioButton({
   slug = EVENT.devfolioSlug || "recursiveacm",
   theme = EVENT.devfolioTheme || "light",
   className = "",
   style,
 }: DevfolioButtonProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const slotRef = useRef<HTMLDivElement>(null);
-
   const directDevfolioUrl =
     EVENT.devfolioUrl || `https://${slug}.devfolio.co`;
 
@@ -35,48 +22,12 @@ export default function DevfolioButton({
    * Keep the official <div class="apply-button"> rendered in the DOM so that
    * Devfolio's crawler verification successfully detects the required markup and slug.
    *
-   * We do NOT allow Devfolio's SDK iframe to visually overlay our button, because
-   * when v2 applications are not yet live or during API initialization, the SDK
-   * injects a disabled iframe button with background #b3ceff (a pale washed-out blue),
-   * causing the button to visually fade out from brand blue to pale grayish blue!
-   *
-   * Keeping the native button permanently rendered on top guarantees rock-solid
-   * Devfolio brand blue (#3770FF) at all times, instant interactivity, zero flicker,
-   * and 100% reliable navigation to the verified Devfolio hackathon page.
+   * The native button uses a direct link, avoiding the SDK iframe's cross-origin
+   * API request while preserving reliable Devfolio navigation.
    */
-  useEffect(() => {
-    const slot = slotRef.current;
-    if (!slot) return;
-
-    // Ensure the placeholder exists inside the slot if React re-render removed it
-    if (!slot.querySelector(".apply-button") && !slot.querySelector("iframe")) {
-      const placeholder = document.createElement("div");
-      placeholder.className = "apply-button";
-      placeholder.setAttribute("data-hackathon-slug", slug);
-      placeholder.setAttribute("data-button-theme", theme);
-      placeholder.style.height = "44px";
-      placeholder.style.width = "255px";
-      slot.appendChild(placeholder);
-    }
-
-    // Ensure Devfolio SDK script is injected if not already present
-    if (
-      typeof document !== "undefined" &&
-      !document.querySelector('script[src="https://apply.devfolio.co/v2/sdk.js"]')
-    ) {
-      const script = document.createElement("script");
-      script.src = "https://apply.devfolio.co/v2/sdk.js";
-      script.async = true;
-      script.defer = true;
-      document.body.appendChild(script);
-    }
-  }, [slug, theme]);
-
   return (
     <div
-      ref={containerRef}
       className={`devfolio-button-wrapper ${className}`.trim()}
-      suppressHydrationWarning
       style={{
         position: "relative",
         display: "inline-flex",
@@ -145,13 +96,11 @@ export default function DevfolioButton({
         <span>Apply with Devfolio</span>
       </a>
 
-      {/* ── Devfolio Crawler & SDK Target Slot: Houses official markup for verification ── */}
+      {/* Keep the crawler marker without loading the SDK iframe. */}
       <div
-        ref={slotRef}
         className="devfolio-sdk-slot"
         aria-hidden="true"
         tabIndex={-1}
-        suppressHydrationWarning
         style={{
           position: "absolute",
           inset: 0,
@@ -162,10 +111,14 @@ export default function DevfolioButton({
           zIndex: 0,
           overflow: "hidden",
         }}
-        dangerouslySetInnerHTML={{
-          __html: `<div class="apply-button" data-hackathon-slug="${attr(slug)}" data-button-theme="${attr(theme)}" style="height:44px;width:255px"></div>`,
-        }}
-      />
+      >
+        <div
+          className="apply-button"
+          data-hackathon-slug={slug}
+          data-button-theme={theme}
+          style={{ height: "44px", width: "255px" }}
+        />
+      </div>
 
       <style jsx global>{`
         .devfolio-button-wrapper:hover .devfolio-native-button {

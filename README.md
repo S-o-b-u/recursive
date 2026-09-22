@@ -57,6 +57,8 @@ answers, sponsor tiers. Edit content there rather than in components.
   `HeadingNowTrial-45Medium.ttf` (`--font-heading`) are a personal-use font and a
   trial font. Both need proper licences, or replacing, before this is treated as
   a settled public site.
-- No Content-Security-Policy. The page mixes inline styles, a WebGL layer, the
-  Devfolio SDK and a Google Maps embed, so a policy needs to be written against
-  those flows rather than guessed at.
+- Content Security Policy is configured in `next.config.ts`. It allows the
+  inline bootstrap and styles required by the App Router, plus the Devfolio SDK
+  and Google Maps embed. The policy is intentionally applied only to production:
+  Next.js development mode uses eval-based source-map debugging, while production
+  never permits `unsafe-eval`.

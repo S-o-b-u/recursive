@@ -15,18 +15,10 @@ import {
   Car,
   Map as MapIcon,
   Building2,
-  Globe,
-  Plus,
-  Minus,
-  Crosshair,
 } from "lucide-react";
 
 export default function VenueLocation() {
   const [copied, setCopied] = useState(false);
-  const [isSatellite, setIsSatellite] = useState(false);
-  const [zoom, setZoom] = useState(16);
-  const [mapKey, setMapKey] = useState(0);
-  const [isLocating, setIsLocating] = useState(false);
 
   const addressText = VENUE.full;
   // Pin the exact campus coordinates rather than a name search: a text query
@@ -34,23 +26,12 @@ export default function VenueLocation() {
   // road (the dental college and the pharmacy institute share the campus).
   const pin = `${VENUE.lat},${VENUE.lng}`;
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${pin}`;
-  const googleMapsEmbedUrl = isSatellite
-    ? `https://maps.google.com/maps?q=${pin}&hl=en&t=k&z=${zoom}&output=embed`
-    : `https://maps.google.com/maps?q=${pin}&hl=en&z=${zoom}&output=embed`;
-
   const handleCopy = () => {
     if (typeof navigator !== "undefined" && navigator.clipboard) {
       navigator.clipboard.writeText(addressText);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     }
-  };
-
-  const handleLocate = () => {
-    setIsLocating(true);
-    setZoom(16);
-    setMapKey((k) => k + 1);
-    setTimeout(() => setIsLocating(false), 600);
   };
 
   return (
@@ -195,17 +176,10 @@ export default function VenueLocation() {
                   </div>
                 </div>
 
-                {/* Google Maps Interactive Iframe */}
-                <iframe
-                  key={`${mapKey}-${isSatellite}-${zoom}`}
-                  title="Guru Nanak Institute of Technology Location Map"
-                  src={googleMapsEmbedUrl}
-                  width="100%"
-                  height="100%"
-                  className="google-maps-frame"
-                  allowFullScreen={true}
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
+                <div
+                  className="google-maps-frame map-static-canvas"
+                  role="img"
+                  aria-label="Map showing Guru Nanak Institute of Technology in Sodepur, Kolkata"
                 />
 
                 {/* Floating Location Card Overlay */}
@@ -219,41 +193,6 @@ export default function VenueLocation() {
                   </div>
                 </div>
 
-                {/* Floating Map Zoom & Reset Controls */}
-                <div className="map-floating-controls">
-                  <button
-                    type="button"
-                    onClick={() => setZoom((z) => Math.min(z + 1, 20))}
-                    className="map-control-btn"
-                    aria-label="Zoom In"
-                    title="Zoom In"
-                  >
-                    <Plus className="w-4 h-4 text-[#111a14]" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setZoom((z) => Math.max(z - 1, 11))}
-                    className="map-control-btn"
-                    aria-label="Zoom Out"
-                    title="Zoom Out"
-                  >
-                    <Minus className="w-4 h-4 text-[#111a14]" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleLocate}
-                    className={`map-control-btn ${isLocating ? "locating" : ""}`}
-                    aria-label="Center Map on GNIT Campus"
-                    title="Center Map on GNIT Campus"
-                  >
-                    <Crosshair
-                      className={`w-4 h-4 ${
-                        isLocating ? "animate-spin text-emerald-700" : "text-[#111a14]"
-                      }`}
-                    />
-                  </button>
-                </div>
-
                 {/* Floating Bottom Info Bar */}
                 <div className="map-floating-bottom">
                   <div className="map-bottom-left">
@@ -264,18 +203,6 @@ export default function VenueLocation() {
                   </div>
 
                   <div className="map-bottom-actions">
-                    <button
-                      type="button"
-                      onClick={() => setIsSatellite(!isSatellite)}
-                      className={`btn-satellite-toggle ${isSatellite ? "active" : ""}`}
-                      aria-label="Toggle Satellite Imagery"
-                    >
-                      <Globe className="w-3.5 h-3.5 shrink-0" />
-                      <span className="btn-label-desktop">{isSatellite ? "Roadmap" : "Satellite Imagery"}</span>
-                      <span className="btn-label-tablet">{isSatellite ? "Roadmap" : "Satellite"}</span>
-                      <span className="btn-label-mobile">{isSatellite ? "Roadmap" : "Satellite"}</span>
-                    </button>
-
                     <a
                       href={googleMapsUrl}
                       target="_blank"
@@ -650,14 +577,24 @@ export default function VenueLocation() {
 
         .google-maps-frame {
           position: absolute;
-          top: -72px;
+          top: 0;
           left: 0;
           width: 100%;
-          height: calc(100% + 185px);
+          height: 100%;
           border: 0;
           display: block;
           opacity: 0.88;
           transition: opacity 250ms ease;
+        }
+
+        .map-static-canvas {
+          background:
+            linear-gradient(28deg, transparent 46%, rgba(255, 255, 255, 0.55) 47% 48%, transparent 49%),
+            linear-gradient(-18deg, transparent 42%, rgba(255, 255, 255, 0.45) 43% 44%, transparent 45%),
+            linear-gradient(105deg, transparent 48%, rgba(106, 145, 103, 0.28) 49% 52%, transparent 53%),
+            repeating-linear-gradient(90deg, rgba(73, 105, 73, 0.08) 0 1px, transparent 1px 58px),
+            repeating-linear-gradient(0deg, rgba(73, 105, 73, 0.08) 0 1px, transparent 1px 58px),
+            #c8d8bf;
         }
 
         .venue-map-card:hover .google-maps-frame {
