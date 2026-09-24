@@ -454,23 +454,23 @@ export default function Hero() {
           flex-shrink: 0;
         }
 
-        /* ── Powered By Card (Translucent Liquid Frosted Glass) ── */
+        /* ── Powered By Card (Styled matching Campus Address in VenueLocation) ── */
         .hero-partner-card {
           position: relative;
           display: inline-flex;
           align-items: center;
           gap: clamp(0.55rem, 0.9vw, 0.8rem);
-          padding: clamp(0.38rem, 0.6svh, 0.5rem) clamp(0.68rem, 1.05vw, 0.95rem);
+          padding: clamp(0.42rem, 0.65svh, 0.55rem) clamp(0.7rem, 1.1vw, 1.0rem);
           border-radius: clamp(0.95rem, 1.2vw, 1.25rem);
-          background: linear-gradient(145deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.015) 50%, rgba(220, 245, 215, 0.03) 100%);
-          backdrop-filter: blur(8px) saturate(135%);
-          -webkit-backdrop-filter: blur(8px) saturate(135%);
-          border: 1px solid rgba(255, 255, 255, 0.24);
-          border-bottom: 1px solid rgba(22, 45, 26, 0.04);
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.04) 48%, rgba(220, 245, 215, 0.08) 100%);
+          backdrop-filter: blur(12px) saturate(160%);
+          -webkit-backdrop-filter: blur(12px) saturate(160%);
+          border: 1px solid rgba(255, 255, 255, 0.42);
+          border-bottom: 1px solid rgba(22, 45, 26, 0.08);
           box-shadow:
-            inset 0 1px 1px 0 rgba(255, 255, 255, 0.35),
-            inset 0 -1px 1px 0 rgba(22, 45, 26, 0.02),
-            0 6px 18px -6px rgba(18, 38, 22, 0.04);
+            inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.65),
+            inset 0 -1px 1.5px 0 rgba(22, 45, 26, 0.03),
+            0 8px 24px -8px rgba(18, 38, 22, 0.07);
           text-decoration: none;
           cursor: pointer;
           pointer-events: auto;
@@ -482,12 +482,12 @@ export default function Hero() {
         }
 
         .hero-partner-card:hover {
-          background: linear-gradient(145deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(220, 245, 215, 0.06) 100%);
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.08) 48%, rgba(220, 245, 215, 0.14) 100%);
           transform: translateY(-2px);
-          border-color: rgba(255, 255, 255, 0.40);
+          border-color: rgba(255, 255, 255, 0.65);
           box-shadow:
-            inset 0 1.2px 1.5px 0 rgba(255, 255, 255, 0.50),
-            0 10px 28px -8px rgba(18, 38, 22, 0.07);
+            inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.85),
+            0 14px 36px -10px rgba(18, 38, 22, 0.12);
         }
 
         .hero-partner-card:active {
@@ -496,13 +496,16 @@ export default function Hero() {
 
         /* Frosted Icon Box matching .venue-address-icon-box */
         .hero-partner-icon-box {
-          width: clamp(32px, 3.8vw, 40px);
-          height: clamp(32px, 3.8vw, 40px);
-          border-radius: clamp(0.7rem, 0.85vw, 0.9rem);
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.22);
+          width: clamp(34px, 4.0vw, 42px);
+          height: clamp(34px, 4.0vw, 42px);
+          border-radius: clamp(0.75rem, 0.9vw, 0.95rem);
+          background: rgba(255, 255, 255, 0.20);
+          backdrop-filter: blur(10px) saturate(160%);
+          -webkit-backdrop-filter: blur(10px) saturate(160%);
+          border: 1px solid rgba(255, 255, 255, 0.52);
           box-shadow:
-            inset 0 1px 1px rgba(255, 255, 255, 0.30);
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.75),
+            0 2px 6px rgba(0, 0, 0, 0.02);
           display: flex;
           align-items: center;
           justify-content: center;
