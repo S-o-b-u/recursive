@@ -375,11 +375,11 @@ export default function SponsorStage() {
                   <span className="sxp-eyebrow">Supporters &amp; partners</span>
                   <h2 className="sxp-heading">Our Sponsors</h2>
 
-                  {/* ── Top Tier: Platform Partner (Devfolio) + Sponsor (OSEN) + Domain Sponsor (.xyz) ── */}
+                  {/* ── Top Tier: Partner (Aqyron Labs) + Platform Partner (Devfolio) + Sponsor (OSEN & 2i Educare) + Domain Sponsor (.xyz) ── */}
                   <div className="sxp-top-tier-row">
                     <div className="sxp-top-card-col">
-                      <span className="sxp-tier-badge">PLATFORM PARTNER</span>
-                      <div className="sxp-devfolio-card-wrap">
+                      <span className="sxp-tier-badge">PARTNER</span>
+                      <div className="sxp-aqyron-card-wrap">
                         <img
                           src="/images/ui/devfolio_rays.png"
                           alt=""
@@ -388,6 +388,27 @@ export default function SponsorStage() {
                           width={48}
                           height={48}
                         />
+                        <a
+                          href="https://aqyronlabs.com"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="sxp-partner-card sxp-float-card sxp-aqyron-card"
+                          title="Aqyron Labs"
+                          aria-label="Aqyron Labs"
+                        >
+                          <img
+                            src="/images/sponsors/aqyron-labs.png"
+                            alt="Aqyron Labs"
+                            className="sxp-partner-logo sxp-aqyron-logo"
+                            width={785}
+                            height={568}
+                          />
+                        </a>
+                      </div>
+                    </div>
+                    <div className="sxp-top-card-col">
+                      <span className="sxp-tier-badge">PLATFORM PARTNER</span>
+                      <div className="sxp-devfolio-card-wrap">
                         <a
                           href="https://devfolio.co"
                           target="_blank"
@@ -415,7 +436,7 @@ export default function SponsorStage() {
                     </div>
                     <div className="sxp-top-card-col">
                       <span className="sxp-tier-badge">SPONSOR</span>
-                      <div className="sxp-osen-card-wrap">
+                      <div className="sxp-sponsor-cards-wrap">
                         <div
                           className="sxp-partner-card sxp-float-card-alt sxp-osen-card"
                           title="OSEN"
@@ -430,6 +451,22 @@ export default function SponsorStage() {
                             height={54}
                           />
                         </div>
+                        <a
+                          href="https://2ieducare.in"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="sxp-partner-card sxp-float-card sxp-educare-card"
+                          title="2i Educare - Wing of 2nd Inning"
+                          aria-label="2i Educare"
+                        >
+                          <img
+                            src="/images/sponsors/2i-educare.png"
+                            alt="2i Educare"
+                            className="sxp-partner-logo sxp-educare-logo"
+                            width={928}
+                            height={326}
+                          />
+                        </a>
                       </div>
                     </div>
                     <div className="sxp-top-card-col">
@@ -960,18 +997,18 @@ export default function SponsorStage() {
         }
 
         .sxp-wing-left {
-          left: max(0.5rem, calc(50% - 33.5rem));
+          left: max(0.5rem, calc(50% - 37rem));
         }
 
         .sxp-wing-right {
-          right: max(0.5rem, calc(50% - 33.5rem));
+          right: max(0.5rem, calc(50% - 37rem));
         }
 
-        /* ── Left wing: doodle on top (alongside Devfolio), Victoria polaroid lower (matching tablet) ── */
+        /* ── Left wing: doodle on top, Victoria polaroid lower (matching tablet) ── */
         .sxp-art-doodle-left {
           position: absolute;
           top: clamp(21%, 23.5vh, 26%);
-          left: clamp(1.2rem, 2.5vw, 3.6rem);
+          left: clamp(-1.5rem, -0.6vw, 1.2rem);
           z-index: 3;
         }
 
@@ -988,7 +1025,7 @@ export default function SponsorStage() {
           position: absolute;
           top: clamp(25%, 28vh, 31%);
           left: auto;
-          right: clamp(-3.6rem, -3.8vw, -2.4rem);
+          right: clamp(-4.6rem, -4.4vw, -2.8rem);
           z-index: 1;
         }
 
@@ -1211,6 +1248,7 @@ export default function SponsorStage() {
           color: #2d4c29;
           margin-bottom: 0.15rem;
           opacity: 0.92;
+          white-space: nowrap;
         }
 
         /* ── iOS Liquid Frosted Glass Cards (Transparent Cloud View - matching Campus Address) ── */
@@ -1254,14 +1292,20 @@ export default function SponsorStage() {
           display: block;
         }
 
-        /* ── Top Tier: Devfolio, OSEN & XYZ Card Wraps with Radiant Rays ── */
+        /* ── Top Tier: Aqyron Labs, Devfolio, Sponsor Cards & XYZ Wraps with Radiant Rays ── */
+        .sxp-aqyron-card-wrap,
         .sxp-devfolio-card-wrap,
+        .sxp-sponsor-cards-wrap,
         .sxp-osen-card-wrap,
         .sxp-xyz-card-wrap {
           position: relative;
           display: inline-flex;
           align-items: center;
           justify-content: center;
+        }
+
+        .sxp-sponsor-cards-wrap {
+          gap: clamp(10px, 1.2vw, 16px);
         }
 
         .sxp-rays {
@@ -1428,6 +1472,42 @@ export default function SponsorStage() {
           display: block;
         }
 
+        .sxp-aqyron-card {
+          flex: 0 0 auto !important;
+          width: clamp(140px, 11vw, 175px) !important;
+          height: clamp(68px, 7.5vh, 80px) !important;
+          border-radius: 20px !important;
+          padding: 0 0.8rem !important;
+          text-decoration: none;
+        }
+
+        .sxp-aqyron-logo {
+          width: auto;
+          height: clamp(40px, 4.6vh, 50px);
+          max-height: 50px;
+          max-width: 90%;
+          object-fit: contain;
+          display: block;
+        }
+
+        .sxp-educare-card {
+          flex: 0 0 auto !important;
+          width: clamp(150px, 12vw, 185px) !important;
+          height: clamp(68px, 7.5vh, 80px) !important;
+          border-radius: 20px !important;
+          padding: 0 0.8rem !important;
+          text-decoration: none;
+        }
+
+        .sxp-educare-logo {
+          width: auto;
+          height: clamp(30px, 3.6vh, 38px);
+          max-height: 38px;
+          max-width: 92%;
+          object-fit: contain;
+          display: block;
+        }
+
         .sxp-osen-card {
           width: clamp(135px, 11vw, 165px) !important;
           height: clamp(68px, 7.5vh, 80px) !important;
@@ -1495,25 +1575,34 @@ export default function SponsorStage() {
         /* ── Narrower viewports responsive adjustments for wings ── */
         @media (max-width: 1440px) {
           .sxp-wing-left {
-            left: max(0.5rem, calc(50% - clamp(30.5rem, 37vw, 34rem)));
-            transform: scale(0.92);
+            left: max(0.3rem, calc(50% - clamp(33rem, 38vw, 36.5rem)));
+            transform: scale(0.90);
           }
           .sxp-wing-right {
-            right: max(0.5rem, calc(50% - clamp(30.5rem, 37vw, 34rem)));
-            transform: scale(0.92);
+            right: max(0.3rem, calc(50% - clamp(33rem, 38vw, 36.5rem)));
+            transform: scale(0.90);
+          }
+          .sxp-art-doodle-left {
+            left: clamp(-1.8rem, -0.8vw, 0.4rem);
+          }
+          .sxp-polaroid-group.sxp-polaroid-group-right {
+            right: clamp(-4.8rem, -4.4vw, -2.8rem);
           }
         }
 
         @media (max-width: 1260px) {
           .sxp-wing-left {
-            left: max(0.2rem, calc(50% - clamp(27rem, 35vw, 30.5rem)));
-            transform: scale(0.85);
-            opacity: 0.92;
+            left: max(0.2rem, calc(50% - clamp(30rem, 36vw, 33.5rem)));
+            transform: scale(0.82);
+            opacity: 0.90;
           }
           .sxp-wing-right {
-            right: max(0.2rem, calc(50% - clamp(27rem, 35vw, 30.5rem)));
-            transform: scale(0.85);
-            opacity: 0.92;
+            right: max(0.2rem, calc(50% - clamp(30rem, 36vw, 33.5rem)));
+            transform: scale(0.82);
+            opacity: 0.90;
+          }
+          .sxp-art-doodle-left {
+            left: clamp(-1.4rem, -0.6vw, 0.2rem);
           }
         }
 
@@ -1537,11 +1626,11 @@ export default function SponsorStage() {
             opacity: 0.92;
           }
 
-          /* Left Doodle: shifted nicely outside Devfolio card */
+          /* Left Doodle: shifted nicely outside Aqyron / Devfolio */
           .sxp-art-doodle-left {
             top: clamp(21%, 23.5vh, 26%);
-            left: clamp(0.2rem, 0.8vw, 1.2rem);
-            transform: scale(0.86);
+            left: clamp(-0.8rem, -0.2vw, 0.4rem);
+            transform: scale(0.82);
           }
 
           /* Victoria Memorial: positioned lower alongside partners with clean spacing */
@@ -1694,8 +1783,34 @@ export default function SponsorStage() {
             gap: clamp(10px, 1.4vw, 16px) !important;
           }
 
+          .sxp-aqyron-card {
+            width: clamp(120px, 12vw, 150px) !important;
+            height: 64px !important;
+            border-radius: 18px !important;
+            padding: 0 0.6rem !important;
+          }
+
+          .sxp-aqyron-logo {
+            max-height: 40px !important;
+          }
+
+          .sxp-sponsor-cards-wrap {
+            gap: 10px !important;
+          }
+
+          .sxp-educare-card {
+            width: clamp(130px, 13vw, 160px) !important;
+            height: 64px !important;
+            border-radius: 18px !important;
+            padding: 0 0.6rem !important;
+          }
+
+          .sxp-educare-logo {
+            max-height: 28px !important;
+          }
+
           .sxp-osen-card {
-            width: clamp(120px, 14vw, 145px) !important;
+            width: clamp(110px, 12vw, 135px) !important;
             height: 64px !important;
             border-radius: 18px !important;
             padding: 0 0.5rem !important;
@@ -1781,11 +1896,11 @@ export default function SponsorStage() {
             opacity: 0.90;
           }
 
-          /* Shift ideas doodle cleanly away from Devfolio */
+          /* Shift ideas doodle cleanly away from Aqyron / Devfolio */
           .sxp-art-doodle-left {
             top: clamp(21%, 23.5vh, 26%);
-            left: clamp(0rem, 0.4vw, 0.6rem);
-            transform: scale(0.82);
+            left: clamp(-1.0rem, -0.2vw, 0.3rem);
+            transform: scale(0.80);
           }
 
           /* Brighter & larger tomorrow doodle on tablet */
@@ -1888,38 +2003,75 @@ export default function SponsorStage() {
             word-spacing: 0.05em !important;
           }
 
+          .sxp-aqyron-card {
+            width: clamp(105px, 13vw, 125px) !important;
+            height: 58px !important;
+            border-radius: 16px !important;
+            padding: 0 0.45rem !important;
+          }
+
+          .sxp-aqyron-logo {
+            max-height: 36px !important;
+          }
+
           .sxp-devfolio-card {
             flex: 0 0 auto !important;
-            width: clamp(230px, 31vw, 260px) !important;
+            width: clamp(180px, 24vw, 215px) !important;
             height: 58px !important;
             border-radius: 16px !important;
           }
 
           .sxp-devfolio-content {
-            padding-inline: clamp(0.85rem, 1.3vw, 1.15rem) !important;
+            padding-inline: clamp(0.75rem, 1.1vw, 1.0rem) !important;
           }
 
           .sxp-devfolio-divider {
-            margin-inline: clamp(0.45rem, 0.7vw, 0.65rem) !important;
+            margin-inline: clamp(0.4rem, 0.6vw, 0.55rem) !important;
+          }
+
+          .sxp-devfolio-tagline {
+            font-size: 0.46rem !important;
+            letter-spacing: 0.12em !important;
+          }
+
+          .sxp-tier-badge {
+            font-size: 0.60rem !important;
+            letter-spacing: 0.12em !important;
+            white-space: nowrap !important;
           }
 
           .sxp-top-tier-row {
             flex-wrap: nowrap !important;
-            gap: clamp(8px, 1.2vw, 12px) !important;
+            gap: clamp(6px, 1.0vw, 10px) !important;
+          }
+
+          .sxp-sponsor-cards-wrap {
+            gap: 8px !important;
           }
 
           .sxp-osen-card {
-            width: clamp(102px, 13vw, 125px) !important;
-            height: 58px !important;
-            border-radius: 16px !important;
-            padding: 0 0.4rem !important;
-          }
-
-          .sxp-xyz-card {
-            width: clamp(80px, 10vw, 98px) !important;
+            width: clamp(90px, 11vw, 105px) !important;
             height: 58px !important;
             border-radius: 16px !important;
             padding: 0 0.35rem !important;
+          }
+
+          .sxp-educare-card {
+            width: clamp(105px, 13.5vw, 125px) !important;
+            height: 58px !important;
+            border-radius: 16px !important;
+            padding: 0 0.45rem !important;
+          }
+
+          .sxp-educare-logo {
+            max-height: 24px !important;
+          }
+
+          .sxp-xyz-card {
+            width: clamp(72px, 9vw, 85px) !important;
+            height: 58px !important;
+            border-radius: 16px !important;
+            padding: 0 0.3rem !important;
           }
 
           .sxp-osen-logo {
@@ -2017,7 +2169,7 @@ export default function SponsorStage() {
             margin-bottom: 0 !important;
           }
 
-          /* Top tier: Devfolio on top, OSEN + XYZ side-by-side row on mobile */
+          /* Top tier: Aqyron + Devfolio on row 1, OSEN + Educare + XYZ on row 2 on mobile */
           .sxp-top-tier-row {
             display: flex !important;
             flex-direction: row !important;
@@ -2025,28 +2177,48 @@ export default function SponsorStage() {
             align-items: flex-end !important;
             justify-content: center !important;
             gap: 6px 8px !important;
-            width: min(94vw, 350px) !important;
-          }
-          .sxp-top-tier-row > .sxp-top-card-col:first-child {
             width: 100% !important;
+            max-width: 350px !important;
+            margin-inline: auto !important;
           }
           .sxp-top-card-col {
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
           }
+          .sxp-aqyron-card-wrap,
           .sxp-devfolio-card-wrap,
+          .sxp-sponsor-cards-wrap,
           .sxp-osen-card-wrap,
           .sxp-xyz-card-wrap {
             margin-top: 0 !important;
+          }
+          .sxp-sponsor-cards-wrap {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 5px !important;
           }
           .sxp-devfolio-rays,
           .sxp-rays {
             display: none !important;
           }
+          .sxp-aqyron-card {
+            flex: 0 0 auto !important;
+            width: clamp(100px, 29vw, 118px) !important;
+            height: 46px !important;
+            border-radius: 14px !important;
+            padding: 0 0.45rem !important;
+          }
+          .sxp-aqyron-logo {
+            max-height: 30px !important;
+            width: auto !important;
+            max-width: 88% !important;
+          }
           .sxp-devfolio-card {
             flex: 0 0 auto !important;
-            width: clamp(190px, 55vw, 225px) !important;
+            width: clamp(165px, 48vw, 195px) !important;
             height: 46px !important;
             border-radius: 14px !important;
           }
@@ -2067,25 +2239,37 @@ export default function SponsorStage() {
           }
           .sxp-osen-card {
             flex: 0 0 auto !important;
-            width: clamp(100px, 30vw, 118px) !important;
+            width: clamp(75px, 22vw, 88px) !important;
+            height: 46px !important;
+            border-radius: 14px !important;
+            padding: 0 0.35rem !important;
+          }
+          .sxp-educare-card {
+            flex: 0 0 auto !important;
+            width: clamp(88px, 25vw, 102px) !important;
             height: 46px !important;
             border-radius: 14px !important;
             padding: 0 0.35rem !important;
           }
           .sxp-xyz-card {
             flex: 0 0 auto !important;
-            width: clamp(80px, 23vw, 95px) !important;
+            width: clamp(68px, 20vw, 80px) !important;
             height: 46px !important;
             border-radius: 14px !important;
             padding: 0 0.25rem !important;
           }
           .sxp-osen-logo {
-            max-height: 25px !important;
+            max-height: 22px !important;
+            width: auto !important;
+            max-width: 88% !important;
+          }
+          .sxp-educare-logo {
+            max-height: 22px !important;
             width: auto !important;
             max-width: 90% !important;
           }
           .sxp-xyz-logo {
-            max-height: 19px !important;
+            max-height: 18px !important;
             width: auto !important;
             max-width: 86% !important;
           }
@@ -2122,6 +2306,9 @@ export default function SponsorStage() {
           .sxp-mahakash-card,
           .sxp-gdg-card,
           .sxp-stuamb-card,
+          .sxp-aqyron-card,
+          .sxp-devfolio-card,
+          .sxp-educare-card,
           .sxp-osen-card,
           .sxp-xyz-card {
             transform: none !important;
@@ -2131,6 +2318,9 @@ export default function SponsorStage() {
           .sxp-mahakash-card:hover,
           .sxp-gdg-card:hover,
           .sxp-stuamb-card:hover,
+          .sxp-aqyron-card:hover,
+          .sxp-devfolio-card:hover,
+          .sxp-educare-card:hover,
           .sxp-osen-card:hover,
           .sxp-xyz-card:hover {
             transform: translateY(-2px) scale(1.015) !important;

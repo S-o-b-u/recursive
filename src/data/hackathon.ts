@@ -245,13 +245,15 @@ export const JUDGES: Judge[] = [
 
 /** Sponsor logo wall. Add a slot per signed sponsor, drop the logo in, set `src`. */
 export const SPONSOR_SLOTS: Slot[] = [
+  { label: "AQYRON LABS LOGO", expect: "/images/sponsors/aqyron-labs.png", src: "/images/sponsors/aqyron-labs.png" },
   { label: "DEVFOLIO LOGO", expect: "/images/sponsors/devfolio.png", src: "/images/sponsors/devfolio.png" },
+  { label: "OSEN LOGO", expect: "/images/sponsors/OSEN.png", src: "/images/sponsors/OSEN.png" },
+  { label: "2I EDUCARE LOGO", expect: "/images/sponsors/2i-educare.png", src: "/images/sponsors/2i-educare.png" },
   { label: "INNOFUSION LOGO", expect: "/images/sponsors/INNOFUSION 3.0 logo.png", src: "/images/sponsors/INNOFUSION 3.0 logo.png" },
   { label: "REACT KOLKATA LOGO", expect: "/images/sponsors/react-kolkata-logo-full-light.png", src: "/images/sponsors/react-kolkata-logo-full-light.png" },
   { label: "CODERUSH X LOGO", expect: "/images/sponsors/CodeRush X Logo.png", src: "/images/sponsors/CodeRush X Logo.png" },
   { label: "LNC LOGO", expect: "/images/sponsors/LNC.png", src: "/images/sponsors/LNC.png" },
   { label: "MICROSOFT STUDENT AMBASSADOR LOGO", expect: "/images/sponsors/Stu amb.png", src: "/images/sponsors/Stu amb.png" },
-  { label: "OSEN LOGO", expect: "/images/sponsors/OSEN.png", src: "/images/sponsors/OSEN.png" },
   { label: "XYZ DOMAIN SPONSOR LOGO", expect: "/images/sponsors/xyz-logo-color.png", src: "/images/sponsors/xyz-logo-color.png" },
   { label: "EVENTOPIA LOGO", expect: "/images/sponsors/Eventopia-Logo-04.png", src: "/images/sponsors/Eventopia-Logo-04.png" },
   { label: "GNIT MAHAKASH LOGO", expect: "/images/sponsors/FinalBlack.png", src: "/images/sponsors/FinalBlack.png" },
