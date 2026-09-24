@@ -195,16 +195,16 @@ export default function Hero() {
             <h1 className="sr-only">
               RECURSIVE 2026 — ACM Hackathon by GNIT Kolkata ACM Student Chapter
             </h1>
-            {/* ── Official Partner Eyebrow Badge: Aqyron Labs ── */}
+            {/* ── Powered By Eyebrow Badge: Aqyron Labs ── */}
             <a
               href="https://aqyronlabs.com"
               target="_blank"
               rel="noopener noreferrer"
               className="hero-partner-badge"
-              title="Aqyron Labs — Official Partner (aqyronlabs.com)"
-              aria-label="Aqyron Labs — Official Partner (aqyronlabs.com)"
+              title="Powered by Aqyron Labs (aqyronlabs.com)"
+              aria-label="Powered by Aqyron Labs (aqyronlabs.com)"
             >
-              <span className="hero-partner-tag">PARTNER</span>
+              <span className="hero-partner-tag">POWERED BY</span>
               <span className="hero-partner-divider" aria-hidden="true" />
               <img
                 src="/images/sponsors/aqyron-labs.png"
