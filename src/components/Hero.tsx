@@ -456,14 +456,14 @@ export default function Hero() {
           height: clamp(30px, 3.8svh, 36px);
           padding: 0 clamp(0.65rem, 1.2vw, 1.0rem);
           border-radius: 9999px;
-          background: rgba(255, 255, 255, 0.78);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
-          border: 1px solid rgba(18, 36, 21, 0.13);
+          background: rgba(255, 255, 255, 0.48);
+          backdrop-filter: blur(14px) saturate(140%);
+          -webkit-backdrop-filter: blur(14px) saturate(140%);
+          border: 1px solid rgba(18, 36, 21, 0.12);
           box-shadow:
-            0 2px 8px rgba(18, 36, 21, 0.05),
-            0 1px 2px rgba(18, 36, 21, 0.04),
-            inset 0 1px 0 rgba(255, 255, 255, 0.85);
+            0 2px 8px rgba(18, 36, 21, 0.04),
+            0 1px 2px rgba(18, 36, 21, 0.03),
+            inset 0 1px 0 rgba(255, 255, 255, 0.65);
           text-decoration: none;
           cursor: pointer;
           pointer-events: auto;
@@ -479,13 +479,13 @@ export default function Hero() {
         }
 
         .hero-partner-badge:hover {
-          background: rgba(255, 255, 255, 0.94);
-          border-color: rgba(18, 36, 21, 0.24);
+          background: rgba(255, 255, 255, 0.72);
+          border-color: rgba(18, 36, 21, 0.20);
           transform: translateY(-1.5px);
           box-shadow:
-            0 6px 18px rgba(18, 36, 21, 0.10),
-            0 2px 4px rgba(18, 36, 21, 0.05),
-            inset 0 1px 0 rgba(255, 255, 255, 0.95);
+            0 6px 18px rgba(18, 36, 21, 0.08),
+            0 2px 4px rgba(18, 36, 21, 0.04),
+            inset 0 1px 0 rgba(255, 255, 255, 0.85);
         }
 
         .hero-partner-badge:active {
