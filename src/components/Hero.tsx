@@ -195,9 +195,44 @@ export default function Hero() {
             <h1 className="sr-only">
               RECURSIVE 2026 — ACM Hackathon by GNIT Kolkata ACM Student Chapter
             </h1>
-            <p className="sr-only">
-              Official website for RECURSIVE Hackathon 2026 at Guru Nanak Institute of Technology (GNIT), Kolkata. An 8-hour sprint in AI, Web3, FinTech, HealthTech, CyberSecurity, and Open Innovation. Register on Devfolio.
-            </p>
+            {/* ── Official Partner Eyebrow Badge: Aqyron Labs ── */}
+            <a
+              href="https://aqyronlabs.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hero-partner-badge"
+              title="Aqyron Labs — Official Partner (aqyronlabs.com)"
+              aria-label="Aqyron Labs — Official Partner (aqyronlabs.com)"
+            >
+              <span className="hero-partner-tag">PARTNER</span>
+              <span className="hero-partner-divider" aria-hidden="true" />
+              <img
+                src="/images/sponsors/aqyron-labs.png"
+                alt="Aqyron Labs"
+                className="hero-partner-logo"
+                width={785}
+                height={568}
+              />
+              <span className="hero-partner-name">Aqyron Labs</span>
+              <span className="hero-partner-dot" aria-hidden="true" />
+              <span className="hero-partner-domain">aqyronlabs.com</span>
+              <svg
+                className="hero-partner-arrow"
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3.5 2.5H9.5V8.5M9.5 2.5L2.5 9.5"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
+
             <div className="hero-warp-wrap">
               <WarpText
                 src="/images/brand/logo.png"
@@ -410,6 +445,117 @@ export default function Hero() {
           will-change: transform, opacity;
           padding-inline: clamp(0.5rem, 1.5vw, 1.2rem);
           flex-shrink: 0;
+        }
+
+        /* ── Official Partner Eyebrow Badge (Aqyron Labs) ── */
+        .hero-partner-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: clamp(0.35rem, 0.7vw, 0.55rem);
+          height: clamp(30px, 3.8svh, 36px);
+          padding: 0 clamp(0.65rem, 1.2vw, 1.0rem);
+          border-radius: 9999px;
+          background: rgba(255, 255, 255, 0.78);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          border: 1px solid rgba(18, 36, 21, 0.13);
+          box-shadow:
+            0 2px 8px rgba(18, 36, 21, 0.05),
+            0 1px 2px rgba(18, 36, 21, 0.04),
+            inset 0 1px 0 rgba(255, 255, 255, 0.85);
+          text-decoration: none;
+          cursor: pointer;
+          pointer-events: auto;
+          margin-bottom: clamp(0.4rem, 1.0svh, 0.8rem);
+          transition:
+            transform 220ms cubic-bezier(0.23, 1, 0.32, 1),
+            background 220ms ease,
+            border-color 220ms ease,
+            box-shadow 220ms ease;
+          user-select: none;
+          -webkit-user-select: none;
+          z-index: 25;
+        }
+
+        .hero-partner-badge:hover {
+          background: rgba(255, 255, 255, 0.94);
+          border-color: rgba(18, 36, 21, 0.24);
+          transform: translateY(-1.5px);
+          box-shadow:
+            0 6px 18px rgba(18, 36, 21, 0.10),
+            0 2px 4px rgba(18, 36, 21, 0.05),
+            inset 0 1px 0 rgba(255, 255, 255, 0.95);
+        }
+
+        .hero-partner-badge:active {
+          transform: translateY(0) scale(0.98);
+        }
+
+        .hero-partner-tag {
+          font-family: var(--font-geist-mono), monospace;
+          font-size: clamp(0.56rem, 0.68vw, 0.64rem);
+          font-weight: 700;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #234320;
+          opacity: 0.88;
+        }
+
+        .hero-partner-divider {
+          width: 1px;
+          height: clamp(12px, 1.4svh, 15px);
+          background: rgba(18, 36, 21, 0.16);
+          flex-shrink: 0;
+        }
+
+        .hero-partner-logo {
+          height: clamp(17px, 2.1svh, 22px);
+          width: auto;
+          max-width: clamp(24px, 3.0vw, 32px);
+          object-fit: contain;
+          display: block;
+          flex-shrink: 0;
+        }
+
+        .hero-partner-name {
+          font-family: var(--font-dm-sans), system-ui, sans-serif;
+          font-size: clamp(0.74rem, 0.9vw, 0.86rem);
+          font-weight: 700;
+          letter-spacing: -0.01em;
+          color: #0e1e10;
+          white-space: nowrap;
+        }
+
+        .hero-partner-dot {
+          width: 3px;
+          height: 3px;
+          border-radius: 50%;
+          background: rgba(18, 36, 21, 0.35);
+          flex-shrink: 0;
+        }
+
+        .hero-partner-domain {
+          font-family: var(--font-geist-mono), monospace;
+          font-size: clamp(0.64rem, 0.78vw, 0.72rem);
+          font-weight: 500;
+          color: #3b5839;
+          letter-spacing: 0.02em;
+          white-space: nowrap;
+        }
+
+        .hero-partner-arrow {
+          width: clamp(9px, 1.1vw, 11px);
+          height: clamp(9px, 1.1vw, 11px);
+          color: #234320;
+          opacity: 0.55;
+          flex-shrink: 0;
+          transition: transform 220ms ease, opacity 220ms ease;
+        }
+
+        .hero-partner-badge:hover .hero-partner-arrow {
+          opacity: 0.9;
+          transform: translate(1px, -1px);
         }
 
         .hero-warp-wrap {
@@ -668,6 +814,15 @@ export default function Hero() {
         }
 
         @media (max-width: 860px) {
+          .hero-partner-badge {
+            height: clamp(28px, 3.4svh, 32px) !important;
+            padding: 0 clamp(0.55rem, 1.5vw, 0.85rem) !important;
+            margin-bottom: clamp(0.3rem, 0.8svh, 0.55rem) !important;
+          }
+          .hero-partner-domain,
+          .hero-partner-dot {
+            display: none !important;
+          }
           .hero-warp-wrap {
             width: 100% !important;
             max-width: min(90vw, 720px) !important;
@@ -742,6 +897,29 @@ export default function Hero() {
           .hero-ground-zone {
             padding-bottom: clamp(2.2rem, 4.5svh, 3.4rem);
             padding-inline: clamp(0.5rem, 2.5vw, 1rem);
+          }
+          .hero-partner-badge {
+            height: 27px !important;
+            padding: 0 0.65rem !important;
+            gap: 0.35rem !important;
+            margin-bottom: 0.3rem !important;
+          }
+          .hero-partner-tag {
+            font-size: 0.52rem !important;
+            letter-spacing: 0.12em !important;
+          }
+          .hero-partner-divider {
+            height: 11px !important;
+          }
+          .hero-partner-logo {
+            height: 15px !important;
+          }
+          .hero-partner-name {
+            font-size: 0.72rem !important;
+          }
+          .hero-partner-arrow {
+            width: 8px !important;
+            height: 8px !important;
           }
           .hero-warp-wrap {
             width: min(90vw, 420px) !important;
@@ -880,6 +1058,24 @@ export default function Hero() {
 
         /* Specifically tailored for 6.0" and 6.1" phones (iPhone 12/13/14/15/16 at 390px/393px, Pixel, Galaxy) */
         @media (max-width: 420px) {
+          .hero-partner-badge {
+            height: 25px !important;
+            padding: 0 0.55rem !important;
+            gap: 0.3rem !important;
+            margin-bottom: 0.25rem !important;
+          }
+          .hero-partner-tag {
+            font-size: 0.48rem !important;
+          }
+          .hero-partner-divider {
+            height: 10px !important;
+          }
+          .hero-partner-logo {
+            height: 14px !important;
+          }
+          .hero-partner-name {
+            font-size: 0.68rem !important;
+          }
           .hero-sky-zone {
             padding-bottom: clamp(2.4rem, 6.6svh, 4.0rem);
           }
@@ -919,6 +1115,14 @@ export default function Hero() {
 
         /* Short / Landscape Viewports: scale down smoothly without colliding */
         @media (max-height: 560px) {
+          .hero-partner-badge {
+            height: 24px !important;
+            margin-bottom: 0.2rem !important;
+          }
+          .hero-partner-domain,
+          .hero-partner-dot {
+            display: none !important;
+          }
           .hero-sky-zone {
             height: 52svh !important;
             flex: 0 0 52svh !important;
