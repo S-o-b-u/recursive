@@ -7,11 +7,25 @@ interface SeamlessBackgroundVideoProps {
   poster?: string;
 }
 
+/** How early (in seconds) before the video ends to begin the crossfade. */
+const CROSSFADE_LEAD_S = 1.8;
+
+/** CSS transition duration (ms) for the opacity crossfade. */
+const CROSSFADE_CSS_MS = 700;
+
 /**
  * True zero-blink dual-buffer seamless looping video player.
- * The outgoing video stays 100% opaque underneath while the incoming
- * video fades in on top, guaranteeing 0% black background bleed-through
- * and complete continuity without any visual hitch or blink.
+ *
+ * Key design decisions for maximum seamlessness:
+ * 1. Crossfade starts CROSSFADE_LEAD_S seconds before the active video ends,
+ *    giving 1.1 s of overlap after the CSS transition completes.
+ * 2. The opacity transition begins IMMEDIATELY — we do NOT await the play()
+ *    promise, which can take 50-200 ms and cut into the lead window.
+ * 3. At the halfway point of the active video we seek the standby video to t=0
+ *    so it is fully pre-buffered by the time the crossfade fires.
+ * 4. The outgoing video is not paused/reset until CROSSFADE_CSS_MS + 200 ms
+ *    after the crossfade begins, ensuring it stays solid underneath even if
+ *    the network is slow.
  */
 export default function SeamlessBackgroundVideo({
   src = "/videos/hackathon-chair-seamless.mp4",
@@ -29,94 +43,104 @@ export default function SeamlessBackgroundVideo({
   const activeRef = useRef<"A" | "B">("A");
   const transitioningRef = useRef(false);
 
-  // Initial playback on mount
+  // ── Initial playback ─────────────────────────────────────────────────────
   useEffect(() => {
     const vA = videoA.current;
+    const vB = videoB.current;
     if (!vA) return;
 
-    const onInitialPlay = () => {
-      setPosterVisible(false);
-    };
-
-    vA.addEventListener("playing", onInitialPlay, { once: true });
+    const onPlaying = () => setPosterVisible(false);
+    vA.addEventListener("playing", onPlaying, { once: true });
     vA.play().catch(() => {});
 
-    if (videoB.current) {
-      videoB.current.load();
+    // Aggressively pre-buffer video B from the start
+    if (vB) {
+      vB.load();
+      vB.currentTime = 0;
     }
   }, []);
 
-  // Frame monitor for zero-dip seamless crossfade
+  // ── Frame-accurate crossfade loop ─────────────────────────────────────────
   useEffect(() => {
     let animFrame: number;
+    let midpointReached = false; // whether we've pre-seeked standby this cycle
 
-    const checkTime = () => {
+    const tick = () => {
       const active = activeRef.current;
       const current = active === "A" ? videoA.current : videoB.current;
-      const next = active === "A" ? videoB.current : videoA.current;
+      const next    = active === "A" ? videoB.current : videoA.current;
 
       if (current && next && current.duration > 0 && !transitioningRef.current) {
-        const remaining = current.duration - current.currentTime;
+        const elapsed   = current.currentTime;
+        const duration  = current.duration;
+        const remaining = duration - elapsed;
 
-        // Trigger transition 1.0s before current video ends
-        if (remaining <= 1.0) {
+        // At 50% through the active clip, ensure the standby is seeked to 0
+        // and has entered at least the HAVE_FUTURE_DATA readyState (≥3).
+        if (!midpointReached && elapsed >= duration * 0.5) {
+          midpointReached = true;
+          if (next.readyState < 3) {
+            next.currentTime = 0;
+          }
+        }
+
+        // ── Begin crossfade ──────────────────────────────────────────────
+        if (remaining <= CROSSFADE_LEAD_S) {
           transitioningRef.current = true;
+          midpointReached = false; // reset for next cycle
 
+          // Seek standby to 0 and fire play() — fire-and-forget intentionally;
+          // we must NOT await it before touching opacity or we burn the lead window.
           next.currentTime = 0;
-          next.play().then(() => {
-            if (active === "A") {
-              // B fades in on top of A; A remains solid 100% opacity underneath
-              setZIndexB(2);
-              setZIndexA(1);
-              setOpacityB(1);
-            } else {
-              // A fades in on top of B; B remains solid 100% opacity underneath
-              setZIndexA(2);
-              setZIndexB(1);
-              setOpacityA(1);
-            }
+          next.play().catch(() => {});
 
-            // Once crossfade finishes, incoming video is 100% solid. Safe to reset outgoing video.
-            setTimeout(() => {
-              if (active === "A") {
-                setOpacityA(0);
-                activeRef.current = "B";
-                if (current) {
-                  current.pause();
-                  current.currentTime = 0;
-                }
-              } else {
-                setOpacityB(0);
-                activeRef.current = "A";
-                if (current) {
-                  current.pause();
-                  current.currentTime = 0;
-                }
-              }
-              transitioningRef.current = false;
-            }, 850);
-          }).catch(() => {
+          // Immediately kick off the CSS opacity transition
+          if (active === "A") {
+            setZIndexB(2);
+            setZIndexA(1);
+            setOpacityB(1);
+          } else {
+            setZIndexA(2);
+            setZIndexB(1);
+            setOpacityA(1);
+          }
+
+          // After the CSS fade finishes (+200 ms buffer), retire the outgoing video.
+          // By this point it has been invisible for ≥200 ms so resetting it is safe.
+          setTimeout(() => {
+            if (active === "A") {
+              setOpacityA(0);
+              activeRef.current = "B";
+              current.pause();
+              current.currentTime = 0;
+            } else {
+              setOpacityB(0);
+              activeRef.current = "A";
+              current.pause();
+              current.currentTime = 0;
+            }
             transitioningRef.current = false;
-          });
+          }, CROSSFADE_CSS_MS + 200);
         }
       }
 
-      animFrame = requestAnimationFrame(checkTime);
+      animFrame = requestAnimationFrame(tick);
     };
 
-    animFrame = requestAnimationFrame(checkTime);
+    animFrame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(animFrame);
   }, []);
 
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0 bg-black">
-      {/* Initial poster layer that dissolves once video starts */}
+      {/* Poster layer — dissolves once video begins playing */}
       {poster && (
         <div
-          className="absolute inset-0 w-full h-full bg-cover bg-center transition-opacity duration-700"
+          className="absolute inset-0 w-full h-full bg-cover bg-center"
           style={{
             backgroundImage: `url(${poster})`,
             opacity: posterVisible ? 1 : 0,
+            transition: "opacity 0.9s ease-in-out",
             zIndex: 0,
           }}
         />
@@ -129,11 +153,11 @@ export default function SeamlessBackgroundVideo({
         muted
         playsInline
         preload="auto"
-        className="absolute inset-0 w-full h-full object-cover object-center will-change-opacity"
+        className="absolute inset-0 w-full h-full object-cover object-center will-change-[opacity]"
         style={{
           opacity: opacityA,
           zIndex: zIndexA,
-          transition: "opacity 0.8s linear",
+          transition: `opacity ${CROSSFADE_CSS_MS}ms ease-in-out`,
         }}
       />
 
@@ -144,11 +168,11 @@ export default function SeamlessBackgroundVideo({
         muted
         playsInline
         preload="auto"
-        className="absolute inset-0 w-full h-full object-cover object-center will-change-opacity"
+        className="absolute inset-0 w-full h-full object-cover object-center will-change-[opacity]"
         style={{
           opacity: opacityB,
           zIndex: zIndexB,
-          transition: "opacity 0.8s linear",
+          transition: `opacity ${CROSSFADE_CSS_MS}ms ease-in-out`,
         }}
       />
     </div>

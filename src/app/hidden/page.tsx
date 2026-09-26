@@ -62,6 +62,7 @@ export default function HiddenChairPage() {
   // Timer State (Server-Authoritative Synchronization across all devices)
   const serverStateRef = useRef<CountdownSyncState>(DEFAULT_COUNTDOWN_STATE);
   const serverOffsetRef = useRef<number>(0);
+  const firstSyncRef = useRef<boolean>(true);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [speed, setSpeed] = useState(1);
@@ -70,16 +71,46 @@ export default function HiddenChairPage() {
   const [showControls, setShowControls] = useState(true);
 
   // Sync state from server response
-  const applyServerSync = useCallback((state: CountdownSyncState, serverTime: number) => {
-    serverOffsetRef.current = serverTime - Date.now();
-    serverStateRef.current = state;
-    setIsRunning(state.isRunning);
-    setSpeed(state.speed);
-    setForcedLunch(state.forcedLunch);
-    if (!state.isRunning) {
-      setElapsedSeconds(state.accumulatedSeconds);
-    }
-  }, []);
+  const applyServerSync = useCallback(
+    (state: CountdownSyncState, serverTime: number, serverElapsed: number) => {
+      // ── Version guard ────────────────────────────────────────────────────
+      // Reject stale/out-of-order responses. An older version can arrive when
+      // two rapid actions (e.g. reset then start) race through the network.
+      if (state.version < serverStateRef.current.version) return;
+
+      // ── Server-clock offset (EMA smoothed) ───────────────────────────────
+      // Raw offset = how far server time is from local time (network latency included).
+      // We use an exponential moving average (α = 0.15) so that latency spikes
+      // don't cause visible time jumps in the 50ms tick loop.
+      const rawOffset = serverTime - Date.now();
+      if (firstSyncRef.current) {
+        serverOffsetRef.current = rawOffset; // first sample: use raw directly
+        firstSyncRef.current = false;
+      } else {
+        serverOffsetRef.current = serverOffsetRef.current * 0.85 + rawOffset * 0.15;
+      }
+
+      serverStateRef.current = state;
+      setIsRunning(state.isRunning);
+      setSpeed(state.speed);
+      setForcedLunch(state.forcedLunch);
+
+      if (!state.isRunning) {
+        // Paused/reset: snap elapsed to the exact server value immediately.
+        setElapsedSeconds(state.accumulatedSeconds);
+      } else {
+        // Running: only correct the display if drift vs. server is significant
+        // (> 2 s). Small differences are absorbed by the 50 ms local tick so
+        // the display stays smooth without constant polling-induced jumps.
+        const localElapsed = computeElapsedSeconds(state, Date.now() + serverOffsetRef.current);
+        if (Math.abs(serverElapsed - localElapsed) > 2.0) {
+          setElapsedSeconds(serverElapsed);
+        }
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   // Poll server state
   const fetchSyncState = useCallback(async () => {
@@ -87,8 +118,8 @@ export default function HiddenChairPage() {
       const res = await fetch("/api/countdown", { cache: "no-store" });
       if (!res.ok) return;
       const data = await res.json();
-      if (data && data.state) {
-        applyServerSync(data.state, data.serverTime);
+      if (data?.state) {
+        applyServerSync(data.state, data.serverTime, data.elapsedSeconds ?? 0);
       }
     } catch {
       // Ignore network errors during polling
@@ -127,6 +158,7 @@ export default function HiddenChairPage() {
   const dispatchAction = useCallback(async (action: CountdownAction) => {
     const serverNow = Date.now() + serverOffsetRef.current;
     const optimistic = applyCountdownAction(serverStateRef.current, action, serverNow);
+    // Apply optimistic update immediately so the UI feels instant
     serverStateRef.current = optimistic;
     setIsRunning(optimistic.isRunning);
     setSpeed(optimistic.speed);
@@ -143,8 +175,9 @@ export default function HiddenChairPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        if (data && data.state) {
-          applyServerSync(data.state, data.serverTime);
+        if (data?.state) {
+          // Reconcile with authoritative server response
+          applyServerSync(data.state, data.serverTime, data.elapsedSeconds ?? 0);
         }
       }
     } catch (err) {

@@ -24,7 +24,7 @@ export function getServerCountdownState(): CountdownSyncState {
       if (fs.existsSync(STATE_FILE_PATH)) {
         const fileData = fs.readFileSync(STATE_FILE_PATH, "utf-8");
         const parsed = JSON.parse(fileData) as Partial<CountdownSyncState>;
-        globalThis.__countdown_state__ = {
+        const loaded: CountdownSyncState = {
           isRunning: Boolean(parsed.isRunning),
           startTime: Number(parsed.startTime) || 0,
           accumulatedSeconds: Number(parsed.accumulatedSeconds) || 0,
@@ -33,6 +33,24 @@ export function getServerCountdownState(): CountdownSyncState {
           updatedAt: Number(parsed.updatedAt) || now,
           version: Number(parsed.version) || 1,
         };
+
+        // If the timer was running when the state was saved, re-anchor it:
+        // compute elapsed using the persisted startTime and snapshot it into
+        // accumulatedSeconds, then update startTime to now. This prevents a
+        // cold-start (server restart / HMR) from skipping time while the
+        // process was down — real elapsed is preserved, but we avoid the case
+        // where a very old startTime causes an immediate overflow to 28800 s.
+        if (loaded.isRunning) {
+          const restoredElapsed = computeElapsedSeconds(loaded, now);
+          const capped = Math.min(TOTAL_HACKATHON_SECONDS, Math.max(0, restoredElapsed));
+          loaded.accumulatedSeconds = capped;
+          loaded.startTime = now;
+          if (capped >= TOTAL_HACKATHON_SECONDS) {
+            loaded.isRunning = false;
+          }
+        }
+
+        globalThis.__countdown_state__ = loaded;
       }
     } catch (err) {
       console.error("[countdown-server] Failed to load persisted state:", err);
