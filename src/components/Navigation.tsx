@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { NAV_LINKS, EVENT } from "@/data/hackathon";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
@@ -12,9 +13,44 @@ import { getLenis } from "@/lib/lenis";
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export default function Navigation() {
+  const pathname = usePathname();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const reduced = useReducedMotion();
+
+  // Easter Egg: 5 clicks on "RECURSIVE" on navbar unlocks hidden stage (desktop only)
+  const clickCountRef = useRef(0);
+  const clickTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleBrandClick = (e: React.MouseEvent) => {
+    // Only work in desktop, not in phone or tablet
+    if (typeof window !== "undefined") {
+      const isSmallScreen = window.innerWidth < 1024;
+      const ua = navigator.userAgent || "";
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+      const isIPad = /Macintosh/i.test(ua) && (navigator.maxTouchPoints ?? 0) > 1;
+      if (isSmallScreen || isMobileUA || isIPad) {
+        return;
+      }
+    }
+
+    clickCountRef.current += 1;
+    const clicks = clickCountRef.current;
+
+    if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+    clickTimerRef.current = setTimeout(() => {
+      clickCountRef.current = 0;
+    }, 2500);
+
+    if (clicks >= 5) {
+      e.preventDefault();
+      e.stopPropagation();
+      clickCountRef.current = 0;
+      setMenuOpen(false);
+      router.push("/hidden");
+    }
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -107,6 +143,8 @@ export default function Navigation() {
     };
   }, [introFinished]);
 
+  if (pathname === "/hidden") return null;
+
   return (
     <>
       <nav className="nav-root">
@@ -134,7 +172,12 @@ export default function Navigation() {
           >
             <div className="nav-glass-pill-layout">
               {/* Brand mark */}
-              <NavLink href="/" className="nav-brand" ariaLabel={`${EVENT.name} — home`}>
+              <NavLink
+                href="/"
+                className="nav-brand"
+                ariaLabel={`${EVENT.name} — home`}
+                onClick={handleBrandClick}
+              >
                 <span className="nav-wordmark">{EVENT.name}</span>
               </NavLink>
 
@@ -247,7 +290,13 @@ export default function Navigation() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.28, delay: 0.04, ease: [0.22, 1, 0.36, 1] }}
             >
-              <Link href="/" onClick={() => setMenuOpen(false)} className="limelq-brand">
+              <Link
+                href="/"
+                onClick={(e) => {
+                  handleBrandClick(e);
+                }}
+                className="limelq-brand"
+              >
                 {EVENT.name}
               </Link>
 

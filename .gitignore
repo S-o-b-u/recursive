@@ -49,3 +49,4 @@ skills-lock.json
 /Screenshot *.png
 /ChatGPT *.png
 scratch/
+.countdown-state.json

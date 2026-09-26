@@ -38,6 +38,7 @@ export default function NavLink({
   className = "nav-link",
   ariaLabel,
   isActive,
+  onClick,
 }: {
   href: string;
   label?: string;
@@ -45,6 +46,7 @@ export default function NavLink({
   className?: string;
   ariaLabel?: string;
   isActive?: boolean;
+  onClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
 }) {
   const [hovered, setHovered] = useState(false);
   const [tapped, setTapped] = useState(false);
@@ -62,6 +64,9 @@ export default function NavLink({
   const elRef = useRef<HTMLAnchorElement>(null);
 
   const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    onClick?.(e);
+    if (e.defaultPrevented) return;
+
     setTapped(true);
     window.setTimeout(() => setTapped(false), 520);
 

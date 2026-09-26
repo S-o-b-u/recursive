@@ -2,6 +2,7 @@
 
 import { gsap } from "gsap";
 import React, { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { EVENT } from "@/data/hackathon";
 import WarpText from "@/components/ui/WarpText";
 
@@ -372,6 +373,9 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
 };
 
 export default function Footer() {
+  const pathname = usePathname();
+  if (pathname === "/hidden") return null;
+
   const scrollToTop = () => {
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });

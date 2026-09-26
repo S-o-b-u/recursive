@@ -9,14 +9,17 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
+        disallow: ["/hidden"],
       },
       {
         userAgent: "Googlebot",
         allow: "/",
+        disallow: ["/hidden"],
       },
       {
         userAgent: "Bingbot",
         allow: "/",
+        disallow: ["/hidden"],
       },
     ],
     sitemap: `${siteUrl}/sitemap.xml`,
