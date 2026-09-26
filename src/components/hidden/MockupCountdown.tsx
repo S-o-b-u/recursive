@@ -63,12 +63,12 @@ export default function MockupCountdown({
           fontWeight: 700,
           letterSpacing: isAllZero ? "0.06em" : "0.145em",
           textTransform: isAllZero ? "none" : "uppercase",
-          color: isAllZero ? "#000000" : isAmber ? "#FDE68A" : "#0A0D0A",
+          color: isAllZero ? "#000000" : isAmber ? "#16a34a" : "#0A0D0A",
           minHeight: "20px",
           lineHeight: "20px",
           marginBottom: "16px",
           textShadow: isAmber
-            ? "0 2px 8px rgba(0,0,0,0.8)"
+            ? "0 2px 8px rgba(0,0,0,0.8), 0 0 10px rgba(22, 163, 74, 0.4)"
             : "0 1px 2px rgba(0, 0, 0, 0.45)",
           whiteSpace: "nowrap",
           transition: "color 0.5s ease",

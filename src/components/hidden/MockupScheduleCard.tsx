@@ -99,6 +99,23 @@ export default function MockupScheduleCard({
     >
       {MOCKUP_SCHEDULE.map((item) => {
         const isItemLunchActive = item.isLunch && isLunchActive;
+        const isLunchItem = Boolean(item.isLunch);
+
+        const timeColor = isLunchItem
+          ? isItemLunchActive
+            ? "#22c55e"
+            : "#16a34a"
+          : isItemLunchActive
+          ? "#FDE68A"
+          : "rgba(255, 255, 255, 0.88)";
+
+        const titleColor = isLunchItem
+          ? isItemLunchActive
+            ? "#22c55e"
+            : "#16a34a"
+          : isItemLunchActive
+          ? "#FDE68A"
+          : "rgba(255, 255, 255, 0.95)";
 
         return (
           <div
@@ -119,9 +136,11 @@ export default function MockupScheduleCard({
               style={{
                 width: "98px",
                 flexShrink: 0,
-                color: isItemLunchActive ? "#FDE68A" : "rgba(255, 255, 255, 0.88)",
-                fontWeight: 400,
+                color: timeColor,
+                fontWeight: isLunchItem ? 600 : 400,
                 whiteSpace: "nowrap",
+                textShadow: isLunchItem ? "0 1px 3px rgba(0, 0, 0, 0.7)" : undefined,
+                transition: "color 0.3s ease",
               }}
             >
               {item.time}
@@ -131,8 +150,10 @@ export default function MockupScheduleCard({
             <div
               style={{
                 flex: 1,
-                color: isItemLunchActive ? "#FDE68A" : "rgba(255, 255, 255, 0.95)",
-                fontWeight: 400,
+                color: titleColor,
+                fontWeight: isLunchItem ? 600 : 400,
+                textShadow: isLunchItem ? "0 1px 3px rgba(0, 0, 0, 0.7)" : undefined,
+                transition: "color 0.3s ease",
               }}
             >
               <div style={{ whiteSpace: "nowrap" }}>{item.title}</div>
