@@ -99,8 +99,8 @@ export default function MockupScheduleCard({
       {MOCKUP_SCHEDULE.map((item) => {
         const isLunchItem = Boolean(item.isLunch);
 
-        // Lunch & Networking → deep green; everything else → white
-        const textColor = isLunchItem ? "#16a34a" : "rgba(255, 255, 255, 0.90)";
+        // Lunch & Networking → warm lime; everything else → white
+        const textColor = isLunchItem ? "#84cc16" : "rgba(255, 255, 255, 0.90)";
 
         return (
           <div
