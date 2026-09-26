@@ -19,9 +19,9 @@ export default function SvgNeonDigit({
   width = 52,
   height = 79,
 }: SvgNeonDigitProps) {
-  const strokeColor = isAmber ? "#FDE68A" : "#000000";
+  const strokeColor = isAmber ? "#4ade80" : "#000000";
   const glowShadow = isAmber
-    ? "drop-shadow(0 0 10px rgba(251, 191, 36, 0.85)) drop-shadow(0 0 22px rgba(245, 158, 11, 0.45))"
+    ? "drop-shadow(0 0 8px rgba(74, 222, 128, 1.0)) drop-shadow(0 0 22px rgba(34, 197, 94, 0.7)) drop-shadow(0 0 44px rgba(22, 163, 74, 0.35))"
     : "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4)) drop-shadow(0 6px 14px rgba(0, 0, 0, 0.3))";
 
   const renderDigit = () => {
@@ -225,9 +225,9 @@ export function SvgNeonColon({
   width?: number;
   height?: number;
 }) {
-  const color = isAmber ? "#FDE68A" : "#000000";
+  const color = isAmber ? "#4ade80" : "#000000";
   const glowShadow = isAmber
-    ? "drop-shadow(0 0 10px rgba(251, 191, 36, 0.85)) drop-shadow(0 0 22px rgba(245, 158, 11, 0.45))"
+    ? "drop-shadow(0 0 8px rgba(74, 222, 128, 1.0)) drop-shadow(0 0 22px rgba(34, 197, 94, 0.7)) drop-shadow(0 0 44px rgba(22, 163, 74, 0.35))"
     : "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4)) drop-shadow(0 6px 14px rgba(0, 0, 0, 0.3))";
 
   return (
