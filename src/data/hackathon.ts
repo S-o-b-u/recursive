@@ -249,6 +249,7 @@ export const SPONSOR_SLOTS: Slot[] = [
   { label: "DEVFOLIO LOGO", expect: "/images/sponsors/devfolio.png", src: "/images/sponsors/devfolio.png" },
   { label: "OSEN LOGO", expect: "/images/sponsors/OSEN.png", src: "/images/sponsors/OSEN.png" },
   { label: "2I EDUCARE LOGO", expect: "/images/sponsors/2i-educare.png", src: "/images/sponsors/2i-educare.png" },
+  { label: "INSTITUTE OF ACADEMIC EXCELLENCE LOGO", expect: "/images/sponsors/ShortIAE1x111.png", src: "/images/sponsors/ShortIAE1x111.png" },
   { label: "INNOFUSION LOGO", expect: "/images/sponsors/INNOFUSION 3.0 logo.png", src: "/images/sponsors/INNOFUSION 3.0 logo.png" },
   { label: "REACT KOLKATA LOGO", expect: "/images/sponsors/react-kolkata-logo-full-light.png", src: "/images/sponsors/react-kolkata-logo-full-light.png" },
   { label: "CODERUSH X LOGO", expect: "/images/sponsors/CodeRush X Logo.png", src: "/images/sponsors/CodeRush X Logo.png" },
