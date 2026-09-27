@@ -63,12 +63,12 @@ export default function MockupCountdown({
           fontWeight: 700,
           letterSpacing: isAllZero ? "0.06em" : "0.145em",
           textTransform: isAllZero ? "none" : "uppercase",
-          color: isAllZero ? "#000000" : isAmber ? "#84cc16" : "#0A0D0A",
+          color: isAllZero ? "#000000" : isAmber ? "#30401C" : "#0A0D0A",
           minHeight: "20px",
           lineHeight: "20px",
           marginBottom: "16px",
           textShadow: isAmber
-            ? "0 2px 8px rgba(0,0,0,0.7), 0 0 10px rgba(132, 204, 22, 0.35)"
+            ? "0 2px 8px rgba(0,0,0,0.6), 0 0 10px rgba(96, 130, 48, 0.35)"
             : "0 1px 2px rgba(0, 0, 0, 0.45)",
           whiteSpace: "nowrap",
           transition: "color 0.5s ease",
@@ -119,11 +119,11 @@ export default function MockupCountdown({
               fontWeight: 600,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: isAmber ? "#84cc16" : "#0A0D0A",
+              color: isAmber ? "#30401C" : "#0A0D0A",
               height: "16px",
               lineHeight: "16px",
               textShadow: isAmber
-                ? "0 1px 6px rgba(0,0,0,0.5), 0 0 12px rgba(132, 204, 22, 0.3)"
+                ? "0 1px 5px rgba(0,0,0,0.5), 0 0 10px rgba(96, 130, 48, 0.3)"
                 : "0 1px 2px rgba(0, 0, 0, 0.45)",
               whiteSpace: "nowrap",
               transition: "color 0.5s ease",
@@ -162,11 +162,11 @@ export default function MockupCountdown({
               fontWeight: 600,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: isAmber ? "#84cc16" : "#0A0D0A",
+              color: isAmber ? "#30401C" : "#0A0D0A",
               height: "16px",
               lineHeight: "16px",
               textShadow: isAmber
-                ? "0 1px 6px rgba(0,0,0,0.5), 0 0 12px rgba(132, 204, 22, 0.3)"
+                ? "0 1px 5px rgba(0,0,0,0.5), 0 0 10px rgba(96, 130, 48, 0.3)"
                 : "0 1px 2px rgba(0, 0, 0, 0.45)",
               whiteSpace: "nowrap",
               transition: "color 0.5s ease",
@@ -205,11 +205,11 @@ export default function MockupCountdown({
               fontWeight: 600,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: isAmber ? "#84cc16" : "#0A0D0A",
+              color: isAmber ? "#30401C" : "#0A0D0A",
               height: "16px",
               lineHeight: "16px",
               textShadow: isAmber
-                ? "0 1px 6px rgba(0,0,0,0.5), 0 0 12px rgba(132, 204, 22, 0.3)"
+                ? "0 1px 5px rgba(0,0,0,0.5), 0 0 10px rgba(96, 130, 48, 0.3)"
                 : "0 1px 2px rgba(0, 0, 0, 0.45)",
               whiteSpace: "nowrap",
               transition: "color 0.5s ease",

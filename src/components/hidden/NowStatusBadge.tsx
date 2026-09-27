@@ -28,7 +28,7 @@ export default function NowStatusBadge({
         whiteSpace: "nowrap",
         transition: "all 0.3s ease",
         textShadow: isLunch
-          ? "0 1px 3px rgba(0, 0, 0, 0.9), 0 2px 10px rgba(132, 204, 22, 0.4)"
+          ? "0 1px 3px rgba(0, 0, 0, 0.85), 0 2px 8px rgba(96, 130, 48, 0.35)"
           : "0 1px 2px rgba(0, 0, 0, 0.35)",
       }}
     >
@@ -39,7 +39,7 @@ export default function NowStatusBadge({
         transition={{ duration: 0.3 }}
         style={{
           display: "inline-block",
-          color: isLunch ? "#84cc16" : "#000000",
+          color: isLunch ? "#30401C" : "#000000",
           fontWeight: 900,
           fontSize: "19px",
           lineHeight: 1,
@@ -49,7 +49,7 @@ export default function NowStatusBadge({
       </motion.span>
       <span
         style={{
-          color: isLunch ? "#84cc16" : "#000000",
+          color: isLunch ? "#30401C" : "#000000",
           fontWeight: 800,
           fontSize: "14px",
           letterSpacing: "0.12em",
@@ -76,7 +76,7 @@ export default function NowStatusBadge({
             transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
             style={{
               display: "inline-block",
-              color: isLunch ? "#84cc16" : "#000000",
+              color: isLunch ? "#30401C" : "#000000",
               fontWeight: 700,
               fontSize: "16px",
               letterSpacing: "0.02em",
