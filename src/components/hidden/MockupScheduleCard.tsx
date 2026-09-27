@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import s from "./stage.module.css";
 
 export interface ScheduleItem {
   id: string;
@@ -8,6 +9,8 @@ export interface ScheduleItem {
   title: string;
   subtitle?: string;
   secondsOffset: number;
+  /** When the slot ends, for the progress line on the current row. */
+  endOffset: number;
   isLunch?: boolean;
 }
 
@@ -17,18 +20,21 @@ export const MOCKUP_SCHEDULE: ScheduleItem[] = [
     time: "10:00",
     title: "Shift-8 Starts",
     secondsOffset: 0,
+    endOffset: 3600,
   },
   {
     id: "checkpoint-1",
     time: "11:00 – 01:00",
     title: "Sprint Checkpoint 1",
     secondsOffset: 3600,
+    endOffset: 10800,
   },
   {
     id: "lunch-networking",
     time: "01:30 – 02:15",
     title: "Lunch & Networking",
     secondsOffset: 12600,
+    endOffset: 15300,
     isLunch: true,
   },
   {
@@ -37,12 +43,14 @@ export const MOCKUP_SCHEDULE: ScheduleItem[] = [
     title: "Sprint Checkpoint 2 & Devfolio",
     subtitle: "Submission Deadline",
     secondsOffset: 15300,
+    endOffset: 23400,
   },
   {
     id: "code-freeze",
     time: "05:00",
     title: "Code Freeze",
     secondsOffset: 25200,
+    endOffset: 28800,
   },
 ];
 
@@ -68,96 +76,46 @@ export function getActiveMockupMilestone(
 interface MockupScheduleCardProps {
   elapsedSeconds: number;
   isLunchActive: boolean;
+  /** The row the NOW caption shows (lunch when it is forced). */
+  activeId?: string;
   onSelectMilestone?: (seconds: number, isLunch?: boolean) => void;
 }
 
 export default function MockupScheduleCard({
   elapsedSeconds,
   isLunchActive,
+  activeId,
   onSelectMilestone,
 }: MockupScheduleCardProps) {
+  const currentId = activeId ?? getActiveMockupMilestone(elapsedSeconds).id;
   return (
-    <div
-      style={{
-        position: "relative",
-        width: "380px",
-        background: "rgba(4, 10, 4, 0.18)",
-        backdropFilter: "blur(10px)",
-        WebkitBackdropFilter: "blur(10px)",
-        border: "1px solid rgba(255, 255, 255, 0.07)",
-        borderRadius: "18px",
-        color: "#fff",
-        userSelect: "none",
-        fontFamily: "var(--font-dm-sans), sans-serif",
-        overflow: "hidden",
-        padding: "18px 22px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "13px",
-      }}
-    >
+    <div className={s.card}>
       {MOCKUP_SCHEDULE.map((item) => {
-        const isLunchItem = Boolean(item.isLunch);
-
-        // Lunch & Networking: white until lunch time is active, then #30401C (Ceylanite)
-        // All other items: always white
-        const textColor =
-          isLunchItem && isLunchActive
-            ? "#30401C"
-            : "rgba(255, 255, 255, 0.90)";
-
+        const isNow = item.id === currentId;
+        const state = isNow ? "now" : elapsedSeconds >= item.endOffset ? "past" : "next";
+        const progress = Math.min(
+          1,
+          Math.max(0, (elapsedSeconds - item.secondsOffset) / (item.endOffset - item.secondsOffset))
+        );
         return (
           <div
             key={item.id}
             data-milestone-id={item.id}
+            data-state={state}
+            data-lunch={item.isLunch && isLunchActive ? "1" : "0"}
+            className={s.item}
             onClick={() => onSelectMilestone?.(item.secondsOffset, item.isLunch)}
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              fontSize: "13px",
-              lineHeight: 1.4,
-              letterSpacing: "0.01em",
-              cursor: "pointer",
-            }}
           >
-            {/* Time column */}
-            <div
-              style={{
-                width: "112px",
-                flexShrink: 0,
-                color: textColor,
-                fontWeight: isLunchItem ? 600 : 400,
-                whiteSpace: "nowrap",
-                transition: "color 0.3s ease",
-              }}
-            >
-              {item.time}
-            </div>
-
-            {/* Title + subtitle column */}
-            <div
-              style={{
-                flex: 1,
-                color: textColor,
-                fontWeight: isLunchItem ? 600 : 400,
-                transition: "color 0.3s ease",
-              }}
-            >
-              <div style={{ whiteSpace: "nowrap" }}>{item.title}</div>
-              {item.subtitle && (
-                <div
-                  style={{
-                    fontSize: "10.5px",
-                    color: "rgba(255, 255, 255, 0.60)",
-                    lineHeight: 1.15,
-                    whiteSpace: "nowrap",
-                    marginTop: "2px",
-                  }}
-                >
-                  {item.subtitle}
-                </div>
-              )}
-            </div>
+            <span className={s.time}>{item.time}</span>
+            <span className={s.title}>
+              {item.title}
+              {item.subtitle && <span className={s.sub}>{item.subtitle}</span>}
+            </span>
+            {isNow && (
+              <span className={s.progress} aria-hidden="true">
+                <i style={{ transform: `scaleX(${progress})` }} />
+              </span>
+            )}
           </div>
         );
       })}

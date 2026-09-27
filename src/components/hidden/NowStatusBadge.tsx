@@ -1,93 +1,29 @@
 "use client";
 
 import React from "react";
-import { motion, AnimatePresence } from "motion/react";
 import { ScheduleItem } from "./MockupScheduleCard";
+import s from "./stage.module.css";
 
 interface NowStatusBadgeProps {
   item: ScheduleItem;
   isLunchActive: boolean;
 }
 
-export default function NowStatusBadge({
-  item,
-  isLunchActive,
-}: NowStatusBadgeProps) {
+/** The caption beside the chair: what is happening right now. */
+export default function NowStatusBadge({ item, isLunchActive }: NowStatusBadgeProps) {
   const isLunch = Boolean(item.isLunch || isLunchActive);
-
   return (
-    <div
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "9px",
-        padding: "2px 0",
-        background: "transparent",
-        userSelect: "none",
-        fontFamily: "var(--font-dm-sans), sans-serif",
-        whiteSpace: "nowrap",
-        transition: "all 0.3s ease",
-        textShadow: isLunch
-          ? "0 1px 3px rgba(0, 0, 0, 0.85), 0 2px 8px rgba(96, 130, 48, 0.35)"
-          : "0 1px 2px rgba(0, 0, 0, 0.35)",
-      }}
-    >
-      <motion.span
-        key={item.id + "-pipe"}
-        initial={{ scaleY: 0.6, opacity: 0.6 }}
-        animate={{ scaleY: 1, opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        style={{
-          display: "inline-block",
-          color: isLunch ? "#30401C" : "#000000",
-          fontWeight: 900,
-          fontSize: "19px",
-          lineHeight: 1,
-        }}
-      >
-        |
-      </motion.span>
-      <span
-        style={{
-          color: isLunch ? "#30401C" : "#000000",
-          fontWeight: 800,
-          fontSize: "14px",
-          letterSpacing: "0.12em",
-          lineHeight: 1,
-          textTransform: "uppercase",
-        }}
-      >
-        NOW:
+    <div className={s.now} data-lunch={isLunch ? "1" : "0"} aria-live="polite">
+      <span className={s.nowRule} aria-hidden="true" />
+      <span className={s.nowBody}>
+        <span className={s.nowLabel}>
+          <span className={s.nowDot} aria-hidden="true" />
+          Now
+        </span>
+        <span key={item.id} className={s.nowTitle}>
+          {item.title}
+        </span>
       </span>
-      <div
-        style={{
-          position: "relative",
-          display: "inline-block",
-          overflow: "hidden",
-          verticalAlign: "middle",
-        }}
-      >
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={item.id}
-            initial={{ opacity: 0, y: 14, filter: "blur(3px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            exit={{ opacity: 0, y: -14, filter: "blur(3px)" }}
-            transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-            style={{
-              display: "inline-block",
-              color: isLunch ? "#30401C" : "#000000",
-              fontWeight: 700,
-              fontSize: "16px",
-              letterSpacing: "0.02em",
-              lineHeight: 1,
-              whiteSpace: "nowrap",
-            }}
-          >
-            {item.title}
-          </motion.span>
-        </AnimatePresence>
-      </div>
     </div>
   );
 }

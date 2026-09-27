@@ -9,7 +9,9 @@ import MockupScheduleCard, {
   getActiveMockupMilestone,
 } from "@/components/hidden/MockupScheduleCard";
 import NowStatusBadge from "@/components/hidden/NowStatusBadge";
-import SeamlessBackgroundVideo from "@/components/hidden/SeamlessBackgroundVideo";
+import StageScene from "@/components/hidden/StageScene";
+import { stageSans } from "@/components/hidden/stage-font";
+import stage from "@/components/hidden/stage.module.css";
 import { TOTAL_HACKATHON_SECONDS, getActiveMilestone } from "@/data/shift8";
 import {
   CountdownSyncState,
@@ -19,6 +21,8 @@ import {
   applyCountdownAction,
 } from "@/lib/countdown-sync";
 import { EVENT } from "@/data/hackathon";
+
+const UI_FONT = "var(--font-stage), var(--font-dm-sans), sans-serif";
 import {
   ArrowLeft,
   Play,
@@ -291,14 +295,14 @@ export default function HiddenChairPage() {
   // Password Gate
   if (!isAuthenticated) {
     return (
-      <div className="relative w-screen h-screen overflow-hidden bg-[#0A0D0A] flex flex-col items-center justify-center text-white select-none">
+      <div className={`${stageSans.variable} relative w-screen h-screen overflow-hidden bg-[#0A0D0A] flex flex-col items-center justify-center text-white select-none`}>
         {/* Back Link */}
         <Link
           href="/?intro=0#hero"
           onClick={() => {
             try { sessionStorage.setItem("recursive:skip-intro-for-anchor", "1"); } catch {}
           }}
-          className="absolute top-4 left-5 flex items-center gap-2 text-xs font-mono text-zinc-500 hover:text-white transition-colors cursor-pointer"
+          className="absolute top-4 left-5 flex items-center gap-2 text-xs font-semibold text-zinc-500 hover:text-white transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to {EVENT.name}</span>
@@ -308,12 +312,12 @@ export default function HiddenChairPage() {
         <form
           onSubmit={handlePassSubmit}
           className="flex flex-col items-center gap-3 p-6"
-          style={{ fontFamily: "var(--font-dm-sans), sans-serif" }}
+          style={{ fontFamily: UI_FONT }}
         >
           <div className="flex items-center gap-3">
             <label
               htmlFor="pass-input"
-              className="text-sm font-mono tracking-wider text-zinc-300 font-semibold whitespace-nowrap"
+              className="text-sm tracking-wider text-zinc-300 font-bold whitespace-nowrap"
             >
               Enter Pass:
             </label>
@@ -346,14 +350,14 @@ export default function HiddenChairPage() {
             </div>
             <button
               type="submit"
-              className="px-2 py-1.5 bg-transparent hover:bg-transparent border-0 text-sm font-mono font-medium text-zinc-300 hover:text-white transition-colors cursor-pointer active:scale-95"
+              className="px-2 py-1.5 bg-transparent hover:bg-transparent border-0 text-sm font-bold text-zinc-300 hover:text-white transition-colors cursor-pointer active:scale-95"
             >
               Enter
             </button>
           </div>
 
           {passError && (
-            <p className="text-xs font-mono text-red-400 tracking-wide mt-1">
+            <p className="text-xs font-semibold text-red-400 tracking-wide mt-1">
               Incorrect password. Try again.
             </p>
           )}
@@ -363,12 +367,9 @@ export default function HiddenChairPage() {
   }
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-black text-white select-none">
-      {/* ── Seamless Dual-Buffer Background Video with the Chair on the Hill ── */}
-      <SeamlessBackgroundVideo
-        src="/videos/hackathon-chair-seamless.mp4"
-        poster="/videos/chair-poster.jpg"
-      />
+    <div className={`${stageSans.variable} relative w-screen h-screen overflow-hidden bg-black text-white select-none`}>
+      {/* ── The chair on the hill, lit for the hackathon's hour: 10:00 morning -> 18:00 dusk ── */}
+      <StageScene hour={10 + elapsedSeconds / 3600} />
 
       {/* ── Subtle Floating Controls Bar ── */}
       <AnimatePresence>
@@ -387,7 +388,7 @@ export default function HiddenChairPage() {
               }}
               className="pointer-events-auto group flex items-center gap-2 px-2 py-1.5 rounded-full bg-transparent hover:bg-black/20 text-xs sm:text-sm font-medium text-white/90 hover:text-white transition-all cursor-pointer active:scale-95"
               style={{
-                fontFamily: "var(--font-dm-sans), sans-serif",
+                fontFamily: UI_FONT,
                 textShadow: "0 1px 4px rgba(0, 0, 0, 0.7)",
               }}
             >
@@ -409,7 +410,7 @@ export default function HiddenChairPage() {
                     : "text-white/90 hover:text-white"
                 }`}
                 style={{
-                  fontFamily: "var(--font-dm-sans), sans-serif",
+                  fontFamily: UI_FONT,
                   textShadow: "0 1px 4px rgba(0, 0, 0, 0.7)",
                 }}
               >
@@ -487,32 +488,10 @@ export default function HiddenChairPage() {
         </button>
       )}
 
-      {/* ── EXACT POSITIONING 16:9 STAGE MATCHING MOCKUP (media_1790452367835.jpg) ── */}
-      {/* 
-        This stage scales and anchors in exact lockstep with the background video,
-        preserving pixel-perfect placement relative to the solitary chair across
-        any screen size, resolution, and aspect ratio.
-      */}
-      <div
-        className="pointer-events-none"
-        style={{
-          position: "absolute",
-          left: "50%",
-          top: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "max(100vw, calc(100vh * (1024 / 571)))",
-          height: "max(100vh, calc(100vw / (1024 / 571)))",
-        }}
-      >
-        {/* 1. Countdown Section (Title + Digits + Labels) at Top = 28.5%, Center X = 50.39% */}
-        <div
-          className="absolute pointer-events-auto"
-          style={{
-            top: "28.5%",
-            left: "50.39%",
-            transform: "translateX(-50%)",
-          }}
-        >
+      {/* ── Overlay locked to the cover-fit plate, so it tracks the chair at any size ── */}
+      <div className={stage.stage}>
+        {/* Countdown in the sky above the chair */}
+        <div className={`${stage.anchor} ${stage.atCount}`}>
           <MockupCountdown
             remainingSeconds={remainingSeconds}
             isLunchTime={Boolean(isLunchTime)}
@@ -522,38 +501,20 @@ export default function HiddenChairPage() {
           />
         </div>
 
-        {/* 2. Schedule Card at Top = 70%, Center X = 49.90% resting lower on the grassy hill */}
-        <div
-          className="absolute pointer-events-auto"
-          style={{
-            top: "70%",
-            left: "49.90%",
-            transform: "translateX(-50%)",
-          }}
-        >
+        {/* Schedule resting on the hill */}
+        <div className={`${stage.anchor} ${stage.atCard}`}>
           <MockupScheduleCard
             elapsedSeconds={elapsedSeconds}
             isLunchActive={Boolean(isLunchTime)}
+            activeId={activeMockupMilestone.id}
             onSelectMilestone={handleSelectMilestone}
           />
         </div>
 
-        {/* 3. Now Status Badge on the right side of the chair */}
-        <div
-          className="absolute pointer-events-auto"
-          style={{
-            top: "51.8%",
-            left: "55.2%",
-            transform: "translateY(-50%)",
-          }}
-        >
-          <NowStatusBadge
-            item={activeMockupMilestone}
-            isLunchActive={Boolean(isLunchTime)}
-          />
+        {/* NOW caption beside the chair */}
+        <div className={`${stage.anchor} ${stage.atNow}`}>
+          <NowStatusBadge item={activeMockupMilestone} isLunchActive={Boolean(isLunchTime)} />
         </div>
-
-
       </div>
     </div>
   );
