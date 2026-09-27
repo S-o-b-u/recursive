@@ -80,20 +80,20 @@ export default function MockupScheduleCard({
     <div
       style={{
         position: "relative",
-        width: "324px",
+        width: "380px",
         background: "rgba(4, 10, 4, 0.18)",
         backdropFilter: "blur(10px)",
         WebkitBackdropFilter: "blur(10px)",
         border: "1px solid rgba(255, 255, 255, 0.07)",
-        borderRadius: "16px",
+        borderRadius: "18px",
         color: "#fff",
         userSelect: "none",
         fontFamily: "var(--font-dm-sans), sans-serif",
         overflow: "hidden",
-        padding: "14px 18px",
+        padding: "18px 22px",
         display: "flex",
         flexDirection: "column",
-        gap: "10px",
+        gap: "13px",
       }}
     >
       {MOCKUP_SCHEDULE.map((item) => {
@@ -114,8 +114,8 @@ export default function MockupScheduleCard({
             style={{
               display: "flex",
               alignItems: "flex-start",
-              fontSize: "11.5px",
-              lineHeight: 1.35,
+              fontSize: "13px",
+              lineHeight: 1.4,
               letterSpacing: "0.01em",
               cursor: "pointer",
             }}
@@ -123,7 +123,7 @@ export default function MockupScheduleCard({
             {/* Time column */}
             <div
               style={{
-                width: "98px",
+                width: "112px",
                 flexShrink: 0,
                 color: textColor,
                 fontWeight: isLunchItem ? 600 : 400,
