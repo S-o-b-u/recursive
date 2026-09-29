@@ -1051,42 +1051,42 @@ export default function SponsorStage() {
         }
 
         .sxp-wing-left {
-          left: max(0.5rem, calc(50% - 46rem));
+          left: max(0.5rem, calc(50% - 37.5rem));
         }
 
         .sxp-wing-right {
-          right: max(0.5rem, calc(50% - 46rem));
+          right: max(0.5rem, calc(50% - 37.5rem));
         }
 
         /* ── Left wing: doodle on top, Victoria polaroid lower ── */
         .sxp-art-doodle-left {
           position: absolute;
-          top: clamp(18%, 21vh, 24%);
-          left: clamp(0.2rem, 1.0vw, 1.6rem);
+          top: clamp(21%, 23.5vh, 26%);
+          left: clamp(-1.2rem, -0.6vw, 0.8rem);
           z-index: 3;
         }
 
         /* Victoria Memorial: positioned lower alongside community partners with clean spacing */
         .sxp-polaroid-group.sxp-polaroid-group-left {
           position: absolute;
-          top: clamp(48%, 52vh, 58%);
-          left: clamp(-0.5rem, 0.4vw, 1.0rem);
+          top: clamp(48%, 51vh, 56%);
+          left: clamp(-3.8rem, -3.6vw, -2.2rem);
           z-index: 1;
         }
 
-        /* ── Right wing: Howrah bridge comfortably outside domain sponsor without overlapping ── */
+        /* ── Right wing: Howrah bridge alongside domain sponsor & coderush without overlapping ── */
         .sxp-polaroid-group.sxp-polaroid-group-right {
           position: absolute;
-          top: clamp(24%, 28vh, 32%);
+          top: clamp(26%, 29vh, 32%);
           left: auto;
-          right: clamp(0.2rem, 1.0vw, 1.6rem);
+          right: clamp(-3.2rem, -3.0vw, -1.8rem);
           z-index: 1;
         }
 
         .sxp-art-doodle-right {
           position: absolute;
-          top: clamp(62%, 66vh, 72%);
-          right: clamp(0.5rem, 1.5vw, 2.2rem);
+          top: clamp(60%, 64vh, 68%);
+          right: clamp(-0.8rem, -0.4vw, 1.0rem);
           z-index: 3;
         }
 
@@ -1098,10 +1098,10 @@ export default function SponsorStage() {
         .sxp-polaroid-victoria-img {
           position: relative;
           z-index: 2;
-          width: clamp(165px, 14vw, 215px);
+          width: clamp(195px, 17vw, 250px);
           height: auto;
           transform: rotate(-10deg);
-          filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.35)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.20));
+          filter: drop-shadow(0 20px 38px rgba(0, 0, 0, 0.40)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.25));
           transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
         }
 
@@ -1112,10 +1112,10 @@ export default function SponsorStage() {
         .sxp-polaroid-howrah-img {
           position: relative;
           z-index: 2;
-          width: clamp(165px, 14vw, 215px);
+          width: clamp(200px, 17.5vw, 255px);
           height: auto;
           transform: rotate(8.5deg);
-          filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.35)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.20));
+          filter: drop-shadow(0 20px 38px rgba(0, 0, 0, 0.40)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.25));
           transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
         }
 
@@ -1124,7 +1124,7 @@ export default function SponsorStage() {
         }
 
         .sxp-doodle-ideas-img {
-          width: clamp(95px, 8.5vw, 125px);
+          width: clamp(110px, 10vw, 150px);
           height: auto;
           display: block;
           transform: rotate(-9deg);
@@ -1137,7 +1137,7 @@ export default function SponsorStage() {
         }
 
         .sxp-doodle-tomorrow-img {
-          width: clamp(100px, 9vw, 130px);
+          width: clamp(115px, 10.5vw, 155px);
           height: auto;
           display: block;
           transform: rotate(9deg);
@@ -1177,7 +1177,7 @@ export default function SponsorStage() {
         }
 
         .sxp-crown {
-          width: clamp(80px, 8vw, 130px) !important;
+          width: clamp(114px, 56.87px + 15.87vw, 260px) !important;
           height: auto !important;
           opacity: 0.88;
           display: block;
@@ -1703,37 +1703,37 @@ export default function SponsorStage() {
         /* ── Narrower viewports responsive adjustments for wings ── */
         @media (max-width: 1440px) {
           .sxp-wing-left {
-            left: clamp(0.4rem, 1.2vw, 1.6rem);
-            transform: scale(0.88);
+            left: max(0.3rem, calc(50% - clamp(33rem, 38vw, 36.5rem)));
+            transform: scale(0.92);
           }
           .sxp-wing-right {
-            right: clamp(0.4rem, 1.2vw, 1.6rem);
-            transform: scale(0.88);
+            right: max(0.3rem, calc(50% - clamp(33rem, 38vw, 36.5rem)));
+            transform: scale(0.92);
           }
           .sxp-art-doodle-left {
-            left: clamp(0.2rem, 0.8vw, 1.2rem);
+            left: clamp(-1.0rem, -0.4vw, 0.6rem);
           }
           .sxp-polaroid-group.sxp-polaroid-group-right {
-            right: clamp(0.2rem, 0.8vw, 1.2rem);
+            right: clamp(-3.0rem, -2.8vw, -1.6rem);
           }
         }
 
         @media (max-width: 1260px) {
           .sxp-wing-left {
-            left: clamp(0.2rem, 0.8vw, 1.2rem);
-            transform: scale(0.78);
+            left: max(0.2rem, calc(50% - clamp(30rem, 36vw, 33.5rem)));
+            transform: scale(0.84);
             opacity: 0.90;
           }
           .sxp-wing-right {
-            right: clamp(0.2rem, 0.8vw, 1.2rem);
-            transform: scale(0.78);
+            right: max(0.2rem, calc(50% - clamp(30rem, 36vw, 33.5rem)));
+            transform: scale(0.84);
             opacity: 0.90;
           }
           .sxp-art-doodle-left {
-            left: clamp(0.1rem, 0.4vw, 0.8rem);
+            left: clamp(-0.8rem, -0.2vw, 0.4rem);
           }
           .sxp-polaroid-group.sxp-polaroid-group-right {
-            right: clamp(0.1rem, 0.4vw, 0.8rem);
+            right: clamp(-2.4rem, -2.2vw, -1.2rem);
           }
         }
 
@@ -2687,34 +2687,34 @@ export default function SponsorStage() {
           }
         }
 
-        /* Short viewports: hide crown ornament and tighten padding so everything fits cleanly */
+        /* Short viewports: ensure everything fits cleanly while preserving crown artifact */
         @media (max-height: 840px) {
-          .sxp-crown {
-            display: none !important;
-          }
           .sxp-ornament-wrap {
-            margin-bottom: 0 !important;
+            margin-bottom: clamp(0.1rem, 0.2vh, 0.2rem) !important;
           }
           .sxp-heading {
-            font-size: clamp(1.75rem, 3.2vw, 2.3rem) !important;
+            font-size: clamp(1.8rem, 3.2vw, 2.4rem) !important;
             margin-bottom: 0.1rem !important;
           }
           .sxp-body {
-            padding-top: clamp(3.6rem, 5.5vh, 4.4rem) !important;
-            padding-bottom: 0.8rem !important;
+            padding-top: clamp(3.2rem, 5.0vh, 4.0rem) !important;
+            padding-bottom: 0.6rem !important;
           }
         }
 
         @media (max-height: 720px) {
           .sxp-eyebrow {
-            display: none !important;
+            margin-bottom: 0.05rem !important;
+          }
+          .sxp-heading {
+            font-size: clamp(1.6rem, 2.8vw, 2.0rem) !important;
           }
           .sxp-unrevealed-note {
-            display: none !important;
+            margin-top: 0.1rem !important;
           }
           .sxp-cta-wrap {
             transform: scale(0.88) !important;
-            margin-top: 0.15rem !important;
+            margin-top: 0.12rem !important;
           }
         }
 
