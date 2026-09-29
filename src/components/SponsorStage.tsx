@@ -1018,8 +1018,8 @@ export default function SponsorStage() {
           align-items: center;
           justify-content: center;
           padding-inline: var(--padding-x);
-          padding-top: clamp(4.5rem, 8vh, 5.8rem);
-          padding-bottom: clamp(1.2rem, 2.5vh, 2.2rem);
+          padding-top: clamp(3.8rem, 6.5vh, 4.8rem);
+          padding-bottom: clamp(0.8rem, 1.8vh, 1.4rem);
           opacity: 0;
           pointer-events: none;
           will-change: transform, opacity;
@@ -1044,49 +1044,49 @@ export default function SponsorStage() {
           position: absolute;
           top: 0;
           bottom: 0;
-          width: clamp(210px, 19vw, 280px);
+          width: clamp(175px, 16vw, 240px);
           pointer-events: none;
           z-index: 1;
           user-select: none;
         }
 
         .sxp-wing-left {
-          left: max(0.5rem, calc(50% - 37rem));
+          left: max(0.5rem, calc(50% - 46rem));
         }
 
         .sxp-wing-right {
-          right: max(0.5rem, calc(50% - 37rem));
+          right: max(0.5rem, calc(50% - 46rem));
         }
 
-        /* ── Left wing: doodle on top, Victoria polaroid lower (matching tablet) ── */
+        /* ── Left wing: doodle on top, Victoria polaroid lower ── */
         .sxp-art-doodle-left {
           position: absolute;
-          top: clamp(21%, 23.5vh, 26%);
-          left: clamp(-1.5rem, -0.6vw, 1.2rem);
+          top: clamp(18%, 21vh, 24%);
+          left: clamp(0.2rem, 1.0vw, 1.6rem);
           z-index: 3;
         }
 
-        /* Victoria Memorial: positioned lower alongside partners with clean spacing (matching tablet) */
+        /* Victoria Memorial: positioned lower alongside community partners with clean spacing */
         .sxp-polaroid-group.sxp-polaroid-group-left {
           position: absolute;
-          top: clamp(48%, 51vh, 56%);
-          left: clamp(-4.6rem, -4.5vw, -3.2rem);
+          top: clamp(48%, 52vh, 58%);
+          left: clamp(-0.5rem, 0.4vw, 1.0rem);
           z-index: 1;
         }
 
-        /* ── Right wing: Howrah bridge alongside domain sponsor without overlapping (matching tablet) ── */
+        /* ── Right wing: Howrah bridge comfortably outside domain sponsor without overlapping ── */
         .sxp-polaroid-group.sxp-polaroid-group-right {
           position: absolute;
-          top: clamp(25%, 28vh, 31%);
+          top: clamp(24%, 28vh, 32%);
           left: auto;
-          right: clamp(-4.6rem, -4.4vw, -2.8rem);
+          right: clamp(0.2rem, 1.0vw, 1.6rem);
           z-index: 1;
         }
 
         .sxp-art-doodle-right {
           position: absolute;
-          top: clamp(60%, 64vh, 68%);
-          right: clamp(0.2rem, 1.2vw, 1.8rem);
+          top: clamp(62%, 66vh, 72%);
+          right: clamp(0.5rem, 1.5vw, 2.2rem);
           z-index: 3;
         }
 
@@ -1098,10 +1098,10 @@ export default function SponsorStage() {
         .sxp-polaroid-victoria-img {
           position: relative;
           z-index: 2;
-          width: clamp(200px, 18vw, 255px);
+          width: clamp(165px, 14vw, 215px);
           height: auto;
           transform: rotate(-10deg);
-          filter: drop-shadow(0 20px 38px rgba(0, 0, 0, 0.40)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.25));
+          filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.35)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.20));
           transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
         }
 
@@ -1112,10 +1112,10 @@ export default function SponsorStage() {
         .sxp-polaroid-howrah-img {
           position: relative;
           z-index: 2;
-          width: clamp(205px, 18.5vw, 265px);
+          width: clamp(165px, 14vw, 215px);
           height: auto;
           transform: rotate(8.5deg);
-          filter: drop-shadow(0 20px 38px rgba(0, 0, 0, 0.40)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.25));
+          filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.35)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.20));
           transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
         }
 
@@ -1124,7 +1124,7 @@ export default function SponsorStage() {
         }
 
         .sxp-doodle-ideas-img {
-          width: clamp(115px, 10.5vw, 155px);
+          width: clamp(95px, 8.5vw, 125px);
           height: auto;
           display: block;
           transform: rotate(-9deg);
@@ -1137,7 +1137,7 @@ export default function SponsorStage() {
         }
 
         .sxp-doodle-tomorrow-img {
-          width: clamp(120px, 11vw, 160px);
+          width: clamp(100px, 9vw, 130px);
           height: auto;
           display: block;
           transform: rotate(9deg);
@@ -1155,7 +1155,7 @@ export default function SponsorStage() {
           position: relative;
           z-index: 2;
           width: 100%;
-          max-width: min(90vw, 64rem);
+          max-width: min(88vw, 58rem);
           margin-inline: auto;
           display: flex;
           flex-direction: column;
@@ -1173,11 +1173,11 @@ export default function SponsorStage() {
           display: flex;
           justify-content: center;
           align-items: center;
-          margin-bottom: clamp(0.35rem, 0.8vh, 0.65rem);
+          margin-bottom: clamp(0.12rem, 0.3vh, 0.3rem);
         }
 
         .sxp-crown {
-          width: clamp(114px, 56.87px + 15.87vw, 260px) !important;
+          width: clamp(80px, 8vw, 130px) !important;
           height: auto !important;
           opacity: 0.88;
           display: block;
@@ -1187,31 +1187,31 @@ export default function SponsorStage() {
 
         .sxp-eyebrow {
           font-family: var(--font-geist-mono), monospace;
-          font-size: 0.72rem;
+          font-size: 0.65rem;
           font-weight: 500;
           letter-spacing: 0.22em;
           text-transform: uppercase;
           color: #2e4b2a;
           opacity: 0.95;
-          margin-bottom: 0.45rem;
+          margin-bottom: 0.15rem;
         }
 
         .sxp-heading {
-          margin: 0 0 clamp(0.35rem, 0.8vh, 0.6rem);
+          margin: 0 0 clamp(0.15rem, 0.4vh, 0.35rem);
           font-family: var(--font-dm-sans), sans-serif;
           font-weight: 700;
-          font-size: clamp(2.4rem, 5.2vw, 3.8rem);
+          font-size: clamp(1.9rem, 3.4vw, 2.7rem);
           line-height: 1.05;
           letter-spacing: -0.035em;
           color: #122415;
         }
 
         .sxp-lede {
-          margin: 0 0 clamp(0.35rem, 0.7vh, 0.6rem);
+          margin: 0 0 clamp(0.15rem, 0.3vh, 0.35rem);
           max-width: 44rem;
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: clamp(0.95rem, 1.35vw, 1.12rem);
-          line-height: 1.48;
+          font-size: clamp(0.85rem, 1.1vw, 0.98rem);
+          line-height: 1.4;
           color: #384f36;
           text-wrap: pretty;
         }
@@ -1220,8 +1220,8 @@ export default function SponsorStage() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 0.25rem;
-          margin-top: clamp(0.1rem, 0.3vh, 0.25rem);
+          gap: 0.15rem;
+          margin-top: clamp(0.08rem, 0.25vh, 0.2rem);
           margin-bottom: 0;
           z-index: 10;
         }
@@ -1230,8 +1230,8 @@ export default function SponsorStage() {
           display: flex;
           align-items: flex-end;
           justify-content: center;
-          gap: clamp(14px, 1.8vw, 24px);
-          margin-top: clamp(0.05rem, 0.2vh, 0.2rem);
+          gap: clamp(10px, 1.3vw, 18px);
+          margin-top: clamp(0.05rem, 0.2vh, 0.15rem);
           z-index: 10;
         }
 
@@ -1239,29 +1239,29 @@ export default function SponsorStage() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 0.25rem;
+          gap: 0.15rem;
         }
 
         .sxp-sponsors-tier {
-          margin-top: clamp(0.2rem, 0.5vh, 0.45rem);
+          margin-top: clamp(0.15rem, 0.35vh, 0.32rem);
           margin-bottom: 0;
           z-index: 10;
         }
 
         .sxp-community-tier {
-          margin-top: clamp(0.25rem, 0.6vh, 0.5rem);
+          margin-top: clamp(0.18rem, 0.4vh, 0.35rem);
           margin-bottom: 0;
         }
 
         .sxp-media-tier {
-          margin-top: clamp(0.25rem, 0.6vh, 0.5rem);
+          margin-top: clamp(0.15rem, 0.35vh, 0.32rem);
         }
 
         .sxp-media-grid {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: clamp(12px, 1.5vw, 20px);
+          gap: clamp(10px, 1.3vw, 18px);
         }
 
         .sxp-tier-badge-placeholder {
@@ -1274,25 +1274,25 @@ export default function SponsorStage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: clamp(12px, 1.5vw, 20px);
+          gap: clamp(10px, 1.3vw, 18px);
           width: 100%;
-          max-width: 1020px;
+          max-width: 960px;
         }
 
         .sxp-community-grid {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: clamp(12px, 1.5vw, 20px);
+          gap: clamp(8px, 1.1vw, 14px);
           width: 100%;
-          max-width: 1020px;
+          max-width: 960px;
         }
 
         .sxp-community-col {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: clamp(8px, 1vw, 14px);
+          gap: clamp(6px, 0.8vw, 10px);
         }
 
         .sxp-community-center {
@@ -1301,12 +1301,12 @@ export default function SponsorStage() {
 
         .sxp-tier-badge {
           font-family: var(--font-geist-mono), monospace;
-          font-size: 0.72rem;
+          font-size: 0.65rem;
           font-weight: 500;
-          letter-spacing: 0.2em;
+          letter-spacing: 0.18em;
           text-transform: uppercase;
           color: #2d4c29;
-          margin-bottom: 0.15rem;
+          margin-bottom: 0.1rem;
           opacity: 0.92;
           white-space: nowrap;
         }
@@ -1320,7 +1320,7 @@ export default function SponsorStage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 0 1.2rem;
+          padding: 0 1rem;
           box-sizing: border-box;
           background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 48%, rgba(220, 245, 215, 0.04) 100%);
           backdrop-filter: blur(10px) saturate(160%);
@@ -1331,7 +1331,7 @@ export default function SponsorStage() {
             inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.55),
             inset 0 -1px 1.5px 0 rgba(22, 45, 26, 0.03),
             0 8px 24px -8px rgba(18, 38, 22, 0.06);
-          border-radius: 20px;
+          border-radius: 16px;
           transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, background 260ms ease, border-color 260ms ease;
           user-select: none;
         }
@@ -1346,7 +1346,7 @@ export default function SponsorStage() {
         }
 
         .sxp-partner-logo {
-          height: clamp(24px, 3vh, 32px);
+          height: clamp(20px, 2.5vh, 26px);
           width: auto;
           object-fit: contain;
           display: block;
@@ -1366,12 +1366,12 @@ export default function SponsorStage() {
         }
 
         .sxp-sponsor-cards-wrap {
-          gap: clamp(10px, 1.2vw, 16px);
+          gap: clamp(8px, 1.0vw, 14px);
         }
 
         .sxp-rays {
           position: absolute;
-          width: clamp(36px, 3.6vw, 46px);
+          width: clamp(28px, 2.8vw, 38px);
           height: auto;
           pointer-events: none;
           z-index: 4;
@@ -1379,22 +1379,22 @@ export default function SponsorStage() {
 
         /* Shifted to left of Devfolio card, mirrored to radiate upwards-left */
         .sxp-rays-left {
-          top: -24px;
-          left: -16px;
+          top: -20px;
+          left: -12px;
           transform: scaleX(-1);
         }
 
         /* Positioned on right side of OSEN card, radiating upwards-right */
         .sxp-rays-right {
-          top: -24px;
-          right: -16px;
+          top: -20px;
+          right: -12px;
         }
 
         .sxp-devfolio-card {
           flex: 0 0 auto !important;
-          width: clamp(225px, 18.5vw, 275px) !important;
-          height: clamp(68px, 7.5vh, 80px) !important;
-          border-radius: 20px !important;
+          width: clamp(190px, 15vw, 225px) !important;
+          height: clamp(54px, 6.0vh, 62px) !important;
+          border-radius: 16px !important;
           padding: 0 !important;
           text-decoration: none;
         }
@@ -1405,31 +1405,31 @@ export default function SponsorStage() {
           justify-content: center;
           width: 100%;
           height: 100%;
-          padding-inline: clamp(0.85rem, 1.4vw, 1.3rem);
+          padding-inline: clamp(0.7rem, 1.1vw, 1.0rem);
         }
 
         .sxp-devfolio-logo {
-          height: clamp(22px, 2.8vh, 30px);
+          height: clamp(18px, 2.3vh, 24px);
           width: auto;
           object-fit: contain;
         }
 
         .sxp-devfolio-divider {
           width: 1px;
-          height: clamp(22px, 2.8vh, 30px);
+          height: clamp(18px, 2.3vh, 24px);
           background: rgba(0, 0, 0, 0.12);
-          margin-inline: clamp(0.55rem, 0.9vw, 0.85rem);
+          margin-inline: clamp(0.45rem, 0.7vw, 0.7rem);
           flex-shrink: 0;
         }
 
         .sxp-devfolio-tagline {
           display: flex;
           flex-direction: column;
-          gap: 2.5px;
+          gap: 2px;
           font-family: var(--font-geist-mono), monospace;
-          font-size: clamp(0.52rem, 0.62vw, 0.58rem);
+          font-size: clamp(0.46rem, 0.54vw, 0.52rem);
           font-weight: 600;
-          letter-spacing: 0.22em;
+          letter-spacing: 0.20em;
           line-height: 1.25;
           color: #172c1a;
           text-align: left;
@@ -1438,9 +1438,9 @@ export default function SponsorStage() {
 
         /* ── Individual Partner Card Branding & Logo Sizes ── */
         .sxp-react-kolkata-logo {
-          width: clamp(120px, 12vw, 155px);
+          width: clamp(105px, 10vw, 135px);
           height: auto;
-          max-height: 38px;
+          max-height: 32px;
           object-fit: contain;
           display: block;
         }
@@ -1449,12 +1449,12 @@ export default function SponsorStage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: clamp(0.45rem, 0.8vw, 0.7rem);
+          gap: clamp(0.4rem, 0.6vw, 0.6rem);
         }
 
         .sxp-innofusion-logo {
-          height: clamp(26px, 3.2vh, 32px);
-          width: clamp(26px, 3.2vh, 32px);
+          height: clamp(22px, 2.6vh, 26px);
+          width: clamp(22px, 2.6vh, 26px);
           object-fit: contain;
           display: block;
           flex-shrink: 0;
@@ -1463,45 +1463,43 @@ export default function SponsorStage() {
         .sxp-innofusion-brand {
           font-family: var(--font-display), var(--font-heading), var(--font-dm-sans), sans-serif;
           font-weight: 800;
-          font-size: clamp(0.95rem, 1.25vw, 1.15rem);
-          letter-spacing: 0.05em;
-          word-spacing: 0.2em;
+          font-size: clamp(0.82rem, 1.05vw, 0.98rem);
+          letter-spacing: 0.04em;
+          word-spacing: 0.15em;
           color: #111a12;
           line-height: 1;
           white-space: nowrap;
         }
 
-
-
         .sxp-coderush-logo {
-          width: clamp(120px, 12vw, 155px);
+          width: clamp(105px, 10vw, 135px);
           height: auto;
-          max-height: 36px;
+          max-height: 30px;
           object-fit: contain;
           display: block;
         }
 
         .sxp-mahakash-logo {
-          width: clamp(140px, 13.5vw, 180px);
+          width: clamp(120px, 11vw, 150px);
           height: auto;
-          max-height: clamp(46px, 5.2vh, 56px);
+          max-height: clamp(38px, 4.2vh, 46px);
           object-fit: contain;
           display: block;
         }
 
         .sxp-stuamb-card {
-          width: clamp(146px, 12.2vw, 175px) !important;
-          height: clamp(146px, 12.2vw, 175px) !important;
+          width: clamp(96px, 8.0vw, 116px) !important;
+          height: clamp(96px, 8.0vw, 116px) !important;
           aspect-ratio: 1 / 1;
-          border-radius: clamp(20px, 1.6vw, 24px) !important;
-          padding: 0.35rem !important;
+          border-radius: clamp(16px, 1.4vw, 20px) !important;
+          padding: 0.3rem !important;
           display: flex !important;
           align-items: center !important;
           justify-content: center !important;
         }
 
         .sxp-stuamb-logo {
-          height: clamp(118px, 13.5vh, 150px);
+          height: clamp(76px, 8.8vh, 94px);
           width: auto;
           max-height: 94%;
           max-width: 92%;
@@ -1510,42 +1508,42 @@ export default function SponsorStage() {
         }
 
         .sxp-gdg-card {
-          width: clamp(185px, 15.5vw, 235px) !important;
-          height: clamp(74px, 8.4vh, 88px) !important;
+          width: clamp(150px, 12vw, 185px) !important;
+          height: clamp(52px, 5.6vh, 62px) !important;
           text-decoration: none;
-          padding: 0.4rem 0.8rem !important;
+          padding: 0.35rem 0.65rem !important;
         }
 
         .sxp-gdg-logo {
-          width: clamp(150px, 13.5vw, 205px);
+          width: clamp(120px, 10.5vw, 155px);
           height: auto;
-          max-height: clamp(58px, 6.8vh, 72px);
+          max-height: clamp(42px, 4.6vh, 50px);
           max-width: 94%;
           object-fit: contain;
           display: block;
         }
 
         .sxp-eventopia-logo {
-          width: clamp(110px, 11vw, 145px);
+          width: clamp(95px, 9vw, 120px);
           height: auto;
-          max-height: 32px;
+          max-height: 28px;
           object-fit: contain;
           display: block;
         }
 
         .sxp-aqyron-card {
           flex: 0 0 auto !important;
-          width: clamp(140px, 11vw, 175px) !important;
-          height: clamp(68px, 7.5vh, 80px) !important;
-          border-radius: 20px !important;
-          padding: 0 0.8rem !important;
+          width: clamp(120px, 9.5vw, 145px) !important;
+          height: clamp(54px, 6.0vh, 62px) !important;
+          border-radius: 16px !important;
+          padding: 0 0.65rem !important;
           text-decoration: none;
         }
 
         .sxp-aqyron-logo {
           width: auto;
-          height: clamp(40px, 4.6vh, 50px);
-          max-height: 50px;
+          height: clamp(32px, 3.8vh, 40px);
+          max-height: 40px;
           max-width: 90%;
           object-fit: contain;
           display: block;
@@ -1553,66 +1551,66 @@ export default function SponsorStage() {
 
         .sxp-educare-card {
           flex: 0 0 auto !important;
-          width: clamp(150px, 12vw, 185px) !important;
-          height: clamp(68px, 7.5vh, 80px) !important;
-          border-radius: 20px !important;
-          padding: 0 0.8rem !important;
+          width: clamp(120px, 9.6vw, 145px) !important;
+          height: clamp(52px, 5.8vh, 60px) !important;
+          border-radius: 16px !important;
+          padding: 0 0.65rem !important;
           text-decoration: none;
         }
 
         .sxp-educare-logo {
           width: auto;
-          height: clamp(30px, 3.6vh, 38px);
-          max-height: 38px;
+          height: clamp(24px, 2.8vh, 30px);
+          max-height: 30px;
           max-width: 92%;
           object-fit: contain;
           display: block;
         }
 
         .sxp-osen-card {
-          width: clamp(135px, 11vw, 165px) !important;
-          height: clamp(68px, 7.5vh, 80px) !important;
-          border-radius: 20px !important;
-          padding: 0 0.65rem !important;
+          width: clamp(110px, 8.8vw, 132px) !important;
+          height: clamp(52px, 5.8vh, 60px) !important;
+          border-radius: 16px !important;
+          padding: 0 0.55rem !important;
         }
 
         .sxp-osen-logo {
-          width: clamp(102px, 8.6vw, 125px);
+          width: clamp(86px, 7.2vw, 108px);
           height: auto;
-          max-height: 40px;
+          max-height: 32px;
           object-fit: contain;
           display: block;
         }
 
         .sxp-iae-card {
           flex: 0 0 auto !important;
-          width: clamp(75px, 6.5vw, 95px) !important;
-          height: clamp(68px, 7.5vh, 80px) !important;
-          border-radius: 20px !important;
-          padding: 0 0.45rem !important;
+          width: clamp(62px, 5.0vw, 75px) !important;
+          height: clamp(52px, 5.8vh, 60px) !important;
+          border-radius: 16px !important;
+          padding: 0 0.35rem !important;
         }
 
         .sxp-iae-logo {
           width: auto;
-          height: clamp(44px, 5vh, 56px);
-          max-height: 56px;
+          height: clamp(36px, 4.2vh, 46px);
+          max-height: 46px;
           max-width: 90%;
           object-fit: contain;
           display: block;
         }
 
         .sxp-xyz-card {
-          width: clamp(105px, 8.2vw, 130px) !important;
-          height: clamp(68px, 7.5vh, 80px) !important;
-          border-radius: 20px !important;
-          padding: 0 0.5rem !important;
+          width: clamp(88px, 7.0vw, 108px) !important;
+          height: clamp(54px, 6.0vh, 62px) !important;
+          border-radius: 16px !important;
+          padding: 0 0.4rem !important;
           text-decoration: none;
         }
 
         .sxp-xyz-logo {
           width: auto;
-          height: clamp(30px, 3.4vh, 38px);
-          max-height: 38px;
+          height: clamp(24px, 2.8vh, 30px);
+          max-height: 30px;
           max-width: 86%;
           object-fit: contain;
           display: block;
@@ -1620,10 +1618,10 @@ export default function SponsorStage() {
 
         .sxp-mlkolkata-card {
           flex: 0 0 auto !important;
-          width: clamp(170px, 14vw, 210px) !important;
-          height: clamp(68px, 7.5vh, 80px) !important;
-          border-radius: 20px !important;
-          padding: 0 0.9rem !important;
+          width: clamp(140px, 11vw, 168px) !important;
+          height: clamp(54px, 6.0vh, 62px) !important;
+          border-radius: 16px !important;
+          padding: 0 0.75rem !important;
           text-decoration: none;
         }
 
@@ -1631,12 +1629,12 @@ export default function SponsorStage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: clamp(0.5rem, 0.7vw, 0.75rem);
+          gap: clamp(0.45rem, 0.6vw, 0.65rem);
           width: 100%;
         }
 
         .sxp-mlkolkata-torch {
-          height: clamp(34px, 4.2vh, 44px);
+          height: clamp(28px, 3.4vh, 34px);
           width: auto;
           object-fit: contain;
           display: block;
@@ -1646,7 +1644,7 @@ export default function SponsorStage() {
         .sxp-mlkolkata-brand {
           font-family: var(--font-display), var(--font-heading), var(--font-dm-sans), sans-serif;
           font-weight: 800;
-          font-size: clamp(0.82rem, 1.0vw, 0.98rem);
+          font-size: clamp(0.74rem, 0.9vw, 0.86rem);
           letter-spacing: -0.01em;
           color: #111a12;
           line-height: 1;
@@ -1655,136 +1653,139 @@ export default function SponsorStage() {
 
         .sxp-tmc-card {
           flex: 0 0 auto !important;
-          width: clamp(96px, 8.2vw, 122px) !important;
-          height: clamp(68px, 7.5vh, 80px) !important;
-          border-radius: 20px !important;
-          padding: 0 0.5rem !important;
+          width: clamp(80px, 6.8vw, 98px) !important;
+          height: clamp(52px, 5.8vh, 60px) !important;
+          border-radius: 16px !important;
+          padding: 0 0.4rem !important;
         }
 
         .sxp-tmc-logo {
           width: auto;
-          height: clamp(40px, 4.8vh, 50px);
-          max-height: 50px;
+          height: clamp(34px, 4.0vh, 42px);
+          max-height: 42px;
           max-width: 90%;
           object-fit: contain;
           display: block;
         }
 
         .sxp-lnc-card {
-          width: clamp(195px, 16.5vw, 245px) !important;
-          height: clamp(66px, 7.2vh, 78px) !important;
-          border-radius: 20px !important;
+          width: clamp(160px, 13vw, 195px) !important;
+          height: clamp(52px, 5.8vh, 60px) !important;
+          border-radius: 16px !important;
           text-decoration: none;
         }
 
         .sxp-lnc-logo {
-          width: clamp(110px, 11vw, 145px);
+          width: clamp(95px, 9vw, 125px);
           height: auto;
-          max-height: 38px;
+          max-height: 32px;
           object-fit: contain;
           display: block;
         }
 
         .sxp-unrevealed-note {
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: clamp(0.74rem, 0.88vw, 0.82rem);
+          font-size: clamp(0.68rem, 0.8vw, 0.76rem);
           color: #3b5039;
           letter-spacing: -0.01em;
-          margin-top: clamp(0.35rem, 0.7vh, 0.6rem);
+          margin-top: clamp(0.2rem, 0.4vh, 0.35rem);
           margin-bottom: 0;
           opacity: 0.88;
         }
 
         .sxp-cta-wrap {
-          margin-top: clamp(0.35rem, 0.8vh, 0.65rem);
+          margin-top: clamp(0.25rem, 0.5vh, 0.45rem);
           display: flex;
           align-items: center;
           justify-content: center;
         }
-        /* ── Narrower viewports responsive adjustments for wings ── */
+
         /* ── Narrower viewports responsive adjustments for wings ── */
         @media (max-width: 1440px) {
           .sxp-wing-left {
-            left: max(0.3rem, calc(50% - clamp(33rem, 38vw, 36.5rem)));
-            transform: scale(0.90);
+            left: clamp(0.4rem, 1.2vw, 1.6rem);
+            transform: scale(0.88);
           }
           .sxp-wing-right {
-            right: max(0.3rem, calc(50% - clamp(33rem, 38vw, 36.5rem)));
-            transform: scale(0.90);
+            right: clamp(0.4rem, 1.2vw, 1.6rem);
+            transform: scale(0.88);
           }
           .sxp-art-doodle-left {
-            left: clamp(-1.8rem, -0.8vw, 0.4rem);
+            left: clamp(0.2rem, 0.8vw, 1.2rem);
           }
           .sxp-polaroid-group.sxp-polaroid-group-right {
-            right: clamp(-4.8rem, -4.4vw, -2.8rem);
+            right: clamp(0.2rem, 0.8vw, 1.2rem);
           }
         }
 
         @media (max-width: 1260px) {
           .sxp-wing-left {
-            left: max(0.2rem, calc(50% - clamp(30rem, 36vw, 33.5rem)));
-            transform: scale(0.82);
+            left: clamp(0.2rem, 0.8vw, 1.2rem);
+            transform: scale(0.78);
             opacity: 0.90;
           }
           .sxp-wing-right {
-            right: max(0.2rem, calc(50% - clamp(30rem, 36vw, 33.5rem)));
-            transform: scale(0.82);
+            right: clamp(0.2rem, 0.8vw, 1.2rem);
+            transform: scale(0.78);
             opacity: 0.90;
           }
           .sxp-art-doodle-left {
-            left: clamp(-1.4rem, -0.6vw, 0.2rem);
+            left: clamp(0.1rem, 0.4vw, 0.8rem);
+          }
+          .sxp-polaroid-group.sxp-polaroid-group-right {
+            right: clamp(0.1rem, 0.4vw, 0.8rem);
           }
         }
 
         @media (max-width: 1080px) {
           /* ── Artifacts side wings positioning matching desktop reference ── */
           .sxp-artifacts-wing {
-            width: clamp(170px, 20vw, 230px);
+            width: clamp(150px, 16vw, 190px);
           }
 
           .sxp-wing-left {
-            left: clamp(0.05rem, 0.6vw, 0.6rem);
+            left: 0.1rem;
             transform-origin: left center;
-            transform: scale(0.72);
-            opacity: 0.92;
+            transform: scale(0.68);
+            opacity: 0.88;
           }
 
           .sxp-wing-right {
-            right: clamp(0.05rem, 0.6vw, 0.6rem);
+            right: 0.1rem;
             transform-origin: right center;
-            transform: scale(0.72);
-            opacity: 0.92;
+            transform: scale(0.68);
+            opacity: 0.88;
           }
 
           /* Left Doodle: shifted nicely outside Aqyron / Devfolio */
           .sxp-art-doodle-left {
-            top: clamp(21%, 23.5vh, 26%);
-            left: clamp(-0.8rem, -0.2vw, 0.4rem);
+            top: clamp(19%, 22vh, 25%);
+            left: clamp(0.1rem, 0.4vw, 0.6rem);
             transform: scale(0.82);
           }
 
           /* Victoria Memorial: positioned lower alongside partners with clean spacing */
           .sxp-polaroid-group.sxp-polaroid-group-left {
-            top: clamp(48%, 51vh, 56%);
-            left: clamp(-3.8rem, -4.0vw, -2.6rem);
+            top: clamp(48%, 52vh, 57%);
+            left: clamp(-0.5rem, 0.2vw, 0.5rem);
           }
 
           /* Howrah Bridge: alongside domain sponsor & coderush without overlapping cards */
           .sxp-polaroid-group.sxp-polaroid-group-right {
-            top: clamp(25%, 28vh, 31%);
+            top: clamp(24%, 27vh, 31%);
             left: auto;
-            right: clamp(-3.4rem, -3.6vw, -2.2rem);
+            right: clamp(0.1rem, 0.4vw, 0.6rem);
           }
 
           /* Right Doodle: brighter and positioned cleanly */
           .sxp-art-doodle-right {
-            top: clamp(60%, 64vh, 68%);
-            right: clamp(0.2rem, 1.0vw, 1.4rem);
+            top: clamp(62%, 65vh, 70%);
+            right: clamp(0.2rem, 0.8vw, 1.2rem);
             transform: scale(0.90);
           }
 
           .sxp-doodle-tomorrow-img {
-            width: clamp(125px, 12vw, 160px) !important;
+            width: clamp(110px, 11vw, 140px) !important;
             filter: brightness(1.35) contrast(1.15) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.18)) !important;
           }
 
@@ -2686,10 +2687,35 @@ export default function SponsorStage() {
           }
         }
 
-        /* Short viewports: the ornament is the first thing to give. */
+        /* Short viewports: hide crown ornament and tighten padding so everything fits cleanly */
+        @media (max-height: 840px) {
+          .sxp-crown {
+            display: none !important;
+          }
+          .sxp-ornament-wrap {
+            margin-bottom: 0 !important;
+          }
+          .sxp-heading {
+            font-size: clamp(1.75rem, 3.2vw, 2.3rem) !important;
+            margin-bottom: 0.1rem !important;
+          }
+          .sxp-body {
+            padding-top: clamp(3.6rem, 5.5vh, 4.4rem) !important;
+            padding-bottom: 0.8rem !important;
+          }
+        }
+
         @media (max-height: 720px) {
-          .sxp-motif { display: none; }
-          .sxp-wall { gap: 0.6rem; }
+          .sxp-eyebrow {
+            display: none !important;
+          }
+          .sxp-unrevealed-note {
+            display: none !important;
+          }
+          .sxp-cta-wrap {
+            transform: scale(0.88) !important;
+            margin-top: 0.15rem !important;
+          }
         }
 
 
