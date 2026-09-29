@@ -103,10 +103,6 @@
   filter: drop-shadow(0 0 calc(var(--u) * 20) rgba(255, 255, 255, 0.32))
     drop-shadow(0 calc(var(--u) * 2) calc(var(--u) * 2.5) rgba(0, 0, 0, 0.16));
 }
-.count[data-lunch="1"] .digits {
-  filter: drop-shadow(0 0 calc(var(--u) * 6) rgba(96, 130, 48, 0.8))
-    drop-shadow(0 0 calc(var(--u) * 18) rgba(48, 64, 28, 0.5));
-}
 .digits[data-clickable="1"] {
   cursor: pointer;
 }
