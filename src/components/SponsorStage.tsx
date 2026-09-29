@@ -1552,7 +1552,7 @@ export default function SponsorStage() {
         .sxp-educare-card {
           flex: 0 0 auto !important;
           width: clamp(120px, 9.6vw, 145px) !important;
-          height: clamp(52px, 5.8vh, 60px) !important;
+          height: clamp(56px, 6.4vh, 64px) !important;
           border-radius: 16px !important;
           padding: 0 0.65rem !important;
           text-decoration: none;
@@ -1560,8 +1560,8 @@ export default function SponsorStage() {
 
         .sxp-educare-logo {
           width: auto;
-          height: clamp(24px, 2.8vh, 30px);
-          max-height: 30px;
+          height: clamp(24px, 2.8vh, 32px);
+          max-height: 32px;
           max-width: 92%;
           object-fit: contain;
           display: block;
@@ -1569,7 +1569,7 @@ export default function SponsorStage() {
 
         .sxp-osen-card {
           width: clamp(110px, 8.8vw, 132px) !important;
-          height: clamp(52px, 5.8vh, 60px) !important;
+          height: clamp(56px, 6.4vh, 64px) !important;
           border-radius: 16px !important;
           padding: 0 0.55rem !important;
         }
@@ -1577,24 +1577,24 @@ export default function SponsorStage() {
         .sxp-osen-logo {
           width: clamp(86px, 7.2vw, 108px);
           height: auto;
-          max-height: 32px;
+          max-height: 34px;
           object-fit: contain;
           display: block;
         }
 
         .sxp-iae-card {
           flex: 0 0 auto !important;
-          width: clamp(62px, 5.0vw, 75px) !important;
-          height: clamp(52px, 5.8vh, 60px) !important;
+          width: clamp(82px, 6.8vw, 100px) !important;
+          height: clamp(56px, 6.4vh, 64px) !important;
           border-radius: 16px !important;
-          padding: 0 0.35rem !important;
+          padding: 0 0.45rem !important;
         }
 
         .sxp-iae-logo {
           width: auto;
-          height: clamp(36px, 4.2vh, 46px);
-          max-height: 46px;
-          max-width: 90%;
+          height: clamp(48px, 5.8vh, 56px);
+          max-height: 56px;
+          max-width: 92%;
           object-fit: contain;
           display: block;
         }
@@ -1653,17 +1653,17 @@ export default function SponsorStage() {
 
         .sxp-tmc-card {
           flex: 0 0 auto !important;
-          width: clamp(80px, 6.8vw, 98px) !important;
-          height: clamp(52px, 5.8vh, 60px) !important;
+          width: clamp(112px, 8.8vw, 135px) !important;
+          height: clamp(56px, 6.4vh, 64px) !important;
           border-radius: 16px !important;
-          padding: 0 0.4rem !important;
+          padding: 0 0.55rem !important;
         }
 
         .sxp-tmc-logo {
           width: auto;
-          height: clamp(34px, 4.0vh, 42px);
-          max-height: 42px;
-          max-width: 90%;
+          height: clamp(46px, 5.5vh, 54px);
+          max-height: 54px;
+          max-width: 92%;
           object-fit: contain;
           display: block;
         }
@@ -1949,10 +1949,10 @@ export default function SponsorStage() {
 
           .sxp-iae-card {
             flex: 0 0 auto !important;
-            width: clamp(66px, 7vw, 82px) !important;
-            height: 64px !important;
+            width: clamp(86px, 9.2vw, 106px) !important;
+            height: 66px !important;
             border-radius: 18px !important;
-            padding: 0 0.4rem !important;
+            padding: 0 0.45rem !important;
           }
 
           .sxp-xyz-card {
@@ -1967,7 +1967,7 @@ export default function SponsorStage() {
           }
 
           .sxp-iae-logo {
-            max-height: 48px !important;
+            max-height: 58px !important;
           }
 
           .sxp-xyz-logo {
@@ -1992,14 +1992,14 @@ export default function SponsorStage() {
 
           .sxp-tmc-card {
             flex: 0 0 auto !important;
-            width: clamp(84px, 9.0vw, 105px) !important;
-            height: 64px !important;
+            width: clamp(116px, 12vw, 140px) !important;
+            height: 66px !important;
             border-radius: 18px !important;
-            padding: 0 0.45rem !important;
+            padding: 0 0.55rem !important;
           }
 
           .sxp-tmc-logo {
-            max-height: 42px !important;
+            max-height: 56px !important;
           }
 
           .sxp-media-grid {
@@ -2239,10 +2239,10 @@ export default function SponsorStage() {
 
           .sxp-iae-card {
             flex: 0 0 auto !important;
-            width: clamp(56px, 7vw, 68px) !important;
-            height: 58px !important;
+            width: clamp(74px, 9.0vw, 90px) !important;
+            height: 60px !important;
             border-radius: 16px !important;
-            padding: 0 0.3rem !important;
+            padding: 0 0.4rem !important;
           }
 
           .sxp-xyz-card {
@@ -2257,7 +2257,7 @@ export default function SponsorStage() {
           }
 
           .sxp-iae-logo {
-            max-height: 42px !important;
+            max-height: 52px !important;
           }
 
           .sxp-xyz-logo {
@@ -2282,14 +2282,14 @@ export default function SponsorStage() {
 
           .sxp-tmc-card {
             flex: 0 0 auto !important;
-            width: clamp(74px, 9vw, 88px) !important;
-            height: 58px !important;
+            width: clamp(100px, 12vw, 120px) !important;
+            height: 60px !important;
             border-radius: 16px !important;
-            padding: 0 0.35rem !important;
+            padding: 0 0.5rem !important;
           }
 
           .sxp-tmc-logo {
-            max-height: 36px !important;
+            max-height: 50px !important;
           }
 
           .sxp-media-grid {
@@ -2463,7 +2463,7 @@ export default function SponsorStage() {
           }
           .sxp-iae-card {
             flex: 0 0 auto !important;
-            width: clamp(46px, 13vw, 56px) !important;
+            width: clamp(54px, 15vw, 64px) !important;
             height: 46px !important;
             border-radius: 14px !important;
             padding: 0 0.25rem !important;
@@ -2486,7 +2486,7 @@ export default function SponsorStage() {
             max-width: 90% !important;
           }
           .sxp-iae-logo {
-            max-height: 36px !important;
+            max-height: 40px !important;
             width: auto !important;
             max-width: 90% !important;
           }
@@ -2514,13 +2514,13 @@ export default function SponsorStage() {
           }
           .sxp-tmc-card {
             flex: 0 0 auto !important;
-            width: clamp(62px, 17vw, 74px) !important;
+            width: clamp(74px, 20vw, 88px) !important;
             height: 46px !important;
             border-radius: 14px !important;
             padding: 0 0.25rem !important;
           }
           .sxp-tmc-logo {
-            max-height: 28px !important;
+            max-height: 36px !important;
             width: auto !important;
             max-width: 88% !important;
           }
@@ -2561,6 +2561,7 @@ export default function SponsorStage() {
           .sxp-devfolio-card,
           .sxp-educare-card,
           .sxp-osen-card,
+          .sxp-tmc-card,
           .sxp-iae-card,
           .sxp-xyz-card {
             transform: none !important;
@@ -2574,6 +2575,7 @@ export default function SponsorStage() {
           .sxp-devfolio-card:hover,
           .sxp-educare-card:hover,
           .sxp-osen-card:hover,
+          .sxp-tmc-card:hover,
           .sxp-iae-card:hover,
           .sxp-xyz-card:hover {
             transform: translateY(-2px) scale(1.015) !important;
