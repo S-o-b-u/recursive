@@ -375,7 +375,7 @@ export default function SponsorStage() {
                   <span className="sxp-eyebrow">Supporters &amp; partners</span>
                   <h2 className="sxp-heading">Our Sponsors</h2>
 
-                  {/* ── Top Tier: Partner (Aqyron Labs) + Platform Partner (Devfolio) + Sponsor (OSEN, 2i Educare & IAE) + Domain Sponsor (.xyz) ── */}
+                  {/* ── Top Tier: Partner (Aqyron Labs) + Platform Partner (Devfolio) + AI/ML Track Partner (ML Kolkata) + Domain Sponsor (.xyz) ── */}
                   <div className="sxp-top-tier-row">
                     <div className="sxp-top-card-col">
                       <span className="sxp-tier-badge">PARTNER</span>
@@ -435,52 +435,27 @@ export default function SponsorStage() {
                       </div>
                     </div>
                     <div className="sxp-top-card-col">
-                      <span className="sxp-tier-badge">SPONSOR</span>
-                      <div className="sxp-sponsor-cards-wrap">
-                        <div
-                          className="sxp-partner-card sxp-float-card-alt sxp-osen-card"
-                          title="OSEN"
-                          role="img"
-                          aria-label="OSEN"
-                        >
-                          <img
-                            src="/images/sponsors/OSEN.png"
-                            alt="OSEN"
-                            className="sxp-partner-logo sxp-osen-logo"
-                            width={200}
-                            height={54}
-                          />
-                        </div>
+                      <span className="sxp-tier-badge">AI/ML TRACK PARTNER</span>
+                      <div className="sxp-mlkolkata-card-wrap">
                         <a
-                          href="https://2ieducare.in"
+                          href="https://www.commudle.com/communities/ml-kolkata"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="sxp-partner-card sxp-float-card sxp-educare-card"
-                          title="2i Educare - Wing of 2nd Inning"
-                          aria-label="2i Educare"
+                          className="sxp-partner-card sxp-float-card sxp-mlkolkata-card"
+                          title="ML Kolkata — AI/ML Track Partner"
+                          aria-label="ML Kolkata"
                         >
-                          <img
-                            src="/images/sponsors/2i-educare.png"
-                            alt="2i Educare"
-                            className="sxp-partner-logo sxp-educare-logo"
-                            width={928}
-                            height={326}
-                          />
+                          <div className="sxp-mlkolkata-content">
+                            <img
+                              src="/images/sponsors/ml-kolkata-torch.png"
+                              alt="ML Kolkata"
+                              className="sxp-mlkolkata-torch"
+                              width={392}
+                              height={738}
+                            />
+                            <span className="sxp-mlkolkata-brand">ML KOLKATA</span>
+                          </div>
                         </a>
-                        <div
-                          className="sxp-partner-card sxp-float-card-alt sxp-iae-card"
-                          title="Institute of Academic Excellence (IAE)"
-                          role="img"
-                          aria-label="Institute of Academic Excellence (IAE)"
-                        >
-                          <img
-                            src="/images/sponsors/ShortIAE1x111.png"
-                            alt="Institute of Academic Excellence"
-                            className="sxp-partner-logo sxp-iae-logo"
-                            width={300}
-                            height={300}
-                          />
-                        </div>
                       </div>
                     </div>
                     <div className="sxp-top-card-col">
@@ -509,6 +484,71 @@ export default function SponsorStage() {
                           aria-hidden="true"
                           width={48}
                           height={48}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ── Sponsors Tier (OSEN, 2i Educare, TMC Institute of Learning, IAE) ── */}
+                  <div className="sxp-partner-tier sxp-sponsors-tier">
+                    <span className="sxp-tier-badge">SPONSORS</span>
+                    <div className="sxp-sponsor-cards-wrap">
+                      <div
+                        className="sxp-partner-card sxp-float-card-alt sxp-osen-card"
+                        title="OSEN"
+                        role="img"
+                        aria-label="OSEN"
+                      >
+                        <img
+                          src="/images/sponsors/OSEN.png"
+                          alt="OSEN"
+                          className="sxp-partner-logo sxp-osen-logo"
+                          width={200}
+                          height={54}
+                        />
+                      </div>
+                      <a
+                        href="https://2ieducare.in"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="sxp-partner-card sxp-float-card sxp-educare-card"
+                        title="2i Educare - Wing of 2nd Inning"
+                        aria-label="2i Educare"
+                      >
+                        <img
+                          src="/images/sponsors/2i-educare.png"
+                          alt="2i Educare"
+                          className="sxp-partner-logo sxp-educare-logo"
+                          width={928}
+                          height={326}
+                        />
+                      </a>
+                      <div
+                        className="sxp-partner-card sxp-float-card sxp-tmc-card"
+                        title="TMC Institute of Learning"
+                        role="img"
+                        aria-label="TMC Institute of Learning"
+                      >
+                        <img
+                          src="/images/sponsors/tmc-institute.png"
+                          alt="TMC Institute of Learning"
+                          className="sxp-partner-logo sxp-tmc-logo"
+                          width={768}
+                          height={590}
+                        />
+                      </div>
+                      <div
+                        className="sxp-partner-card sxp-float-card-alt sxp-iae-card"
+                        title="Institute of Academic Excellence (IAE)"
+                        role="img"
+                        aria-label="Institute of Academic Excellence (IAE)"
+                      >
+                        <img
+                          src="/images/sponsors/ShortIAE1x111.png"
+                          alt="Institute of Academic Excellence"
+                          className="sxp-partner-logo sxp-iae-logo"
+                          width={300}
+                          height={300}
                         />
                       </div>
                     </div>
@@ -1202,6 +1242,12 @@ export default function SponsorStage() {
           gap: 0.25rem;
         }
 
+        .sxp-sponsors-tier {
+          margin-top: clamp(0.2rem, 0.5vh, 0.45rem);
+          margin-bottom: 0;
+          z-index: 10;
+        }
+
         .sxp-community-tier {
           margin-top: clamp(0.25rem, 0.6vh, 0.5rem);
           margin-bottom: 0;
@@ -1309,6 +1355,7 @@ export default function SponsorStage() {
         /* ── Top Tier: Aqyron Labs, Devfolio, Sponsor Cards & XYZ Wraps with Radiant Rays ── */
         .sxp-aqyron-card-wrap,
         .sxp-devfolio-card-wrap,
+        .sxp-mlkolkata-card-wrap,
         .sxp-sponsor-cards-wrap,
         .sxp-osen-card-wrap,
         .sxp-xyz-card-wrap {
@@ -1567,6 +1614,58 @@ export default function SponsorStage() {
           height: clamp(30px, 3.4vh, 38px);
           max-height: 38px;
           max-width: 86%;
+          object-fit: contain;
+          display: block;
+        }
+
+        .sxp-mlkolkata-card {
+          flex: 0 0 auto !important;
+          width: clamp(170px, 14vw, 210px) !important;
+          height: clamp(68px, 7.5vh, 80px) !important;
+          border-radius: 20px !important;
+          padding: 0 0.9rem !important;
+          text-decoration: none;
+        }
+
+        .sxp-mlkolkata-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: clamp(0.5rem, 0.7vw, 0.75rem);
+          width: 100%;
+        }
+
+        .sxp-mlkolkata-torch {
+          height: clamp(34px, 4.2vh, 44px);
+          width: auto;
+          object-fit: contain;
+          display: block;
+          flex-shrink: 0;
+        }
+
+        .sxp-mlkolkata-brand {
+          font-family: var(--font-display), var(--font-heading), var(--font-dm-sans), sans-serif;
+          font-weight: 800;
+          font-size: clamp(0.82rem, 1.0vw, 0.98rem);
+          letter-spacing: -0.01em;
+          color: #111a12;
+          line-height: 1;
+          white-space: nowrap;
+        }
+
+        .sxp-tmc-card {
+          flex: 0 0 auto !important;
+          width: clamp(96px, 8.2vw, 122px) !important;
+          height: clamp(68px, 7.5vh, 80px) !important;
+          border-radius: 20px !important;
+          padding: 0 0.5rem !important;
+        }
+
+        .sxp-tmc-logo {
+          width: auto;
+          height: clamp(40px, 4.8vh, 50px);
+          max-height: 50px;
+          max-width: 90%;
           object-fit: contain;
           display: block;
         }
@@ -1875,6 +1974,33 @@ export default function SponsorStage() {
             max-width: 86% !important;
           }
 
+          .sxp-mlkolkata-card {
+            width: clamp(145px, 16vw, 175px) !important;
+            height: 64px !important;
+            border-radius: 18px !important;
+            padding: 0 0.65rem !important;
+          }
+
+          .sxp-mlkolkata-torch {
+            max-height: 36px !important;
+          }
+
+          .sxp-mlkolkata-brand {
+            font-size: clamp(0.74rem, 0.95vw, 0.88rem) !important;
+          }
+
+          .sxp-tmc-card {
+            flex: 0 0 auto !important;
+            width: clamp(84px, 9.0vw, 105px) !important;
+            height: 64px !important;
+            border-radius: 18px !important;
+            padding: 0 0.45rem !important;
+          }
+
+          .sxp-tmc-logo {
+            max-height: 42px !important;
+          }
+
           .sxp-media-grid {
             gap: clamp(12px, 1.6vw, 18px) !important;
           }
@@ -2138,6 +2264,33 @@ export default function SponsorStage() {
             max-width: 86% !important;
           }
 
+          .sxp-mlkolkata-card {
+            width: clamp(125px, 15vw, 150px) !important;
+            height: 58px !important;
+            border-radius: 16px !important;
+            padding: 0 0.5rem !important;
+          }
+
+          .sxp-mlkolkata-torch {
+            max-height: 32px !important;
+          }
+
+          .sxp-mlkolkata-brand {
+            font-size: 0.70rem !important;
+          }
+
+          .sxp-tmc-card {
+            flex: 0 0 auto !important;
+            width: clamp(74px, 9vw, 88px) !important;
+            height: 58px !important;
+            border-radius: 16px !important;
+            padding: 0 0.35rem !important;
+          }
+
+          .sxp-tmc-logo {
+            max-height: 36px !important;
+          }
+
           .sxp-media-grid {
             gap: 10px !important;
           }
@@ -2233,7 +2386,7 @@ export default function SponsorStage() {
             justify-content: center !important;
             gap: 6px 8px !important;
             width: 100% !important;
-            max-width: 350px !important;
+            max-width: 380px !important;
             margin-inline: auto !important;
           }
           .sxp-top-card-col {
@@ -2243,6 +2396,7 @@ export default function SponsorStage() {
           }
           .sxp-aqyron-card-wrap,
           .sxp-devfolio-card-wrap,
+          .sxp-mlkolkata-card-wrap,
           .sxp-sponsor-cards-wrap,
           .sxp-osen-card-wrap,
           .sxp-xyz-card-wrap {
@@ -2339,6 +2493,35 @@ export default function SponsorStage() {
             max-height: 18px !important;
             width: auto !important;
             max-width: 86% !important;
+          }
+          .sxp-mlkolkata-card {
+            flex: 0 0 auto !important;
+            width: clamp(120px, 35vw, 142px) !important;
+            height: 46px !important;
+            border-radius: 14px !important;
+            padding: 0 0.45rem !important;
+          }
+          .sxp-mlkolkata-content {
+            gap: 0.35rem !important;
+          }
+          .sxp-mlkolkata-torch {
+            max-height: 24px !important;
+            width: auto !important;
+          }
+          .sxp-mlkolkata-brand {
+            font-size: 0.62rem !important;
+          }
+          .sxp-tmc-card {
+            flex: 0 0 auto !important;
+            width: clamp(62px, 17vw, 74px) !important;
+            height: 46px !important;
+            border-radius: 14px !important;
+            padding: 0 0.25rem !important;
+          }
+          .sxp-tmc-logo {
+            max-height: 28px !important;
+            width: auto !important;
+            max-width: 88% !important;
           }
 
           /* Community grid: 3-column balanced composition fitting within viewport */

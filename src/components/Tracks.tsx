@@ -146,6 +146,31 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
                     <span>Track Prize Eligible</span>
                   </div>
 
+                  {track.partner && (
+                    <a
+                      href={track.partner.url || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="tr-partner-badge"
+                      title={`${track.partner.name} — ${track.partner.role}`}
+                      aria-label={`${track.partner.name} — ${track.partner.role}`}
+                    >
+                      <span className="tr-partner-tag">{track.partner.role}</span>
+                      <div className="tr-partner-pill">
+                        <img
+                          src={track.partner.logo}
+                          alt={track.partner.name}
+                          className="tr-partner-logo-img"
+                          width={24}
+                          height={24}
+                        />
+                        <span className="tr-partner-name">{track.partner.name}</span>
+                        <svg className="tr-partner-arrow" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                          <path d="M3.5 2.5H9.5V8.5M9.5 2.5L2.5 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </div>
+                    </a>
+                  )}
                 </div>
               </article>
             );
@@ -469,6 +494,72 @@ export default function Tracks({ detailed = true }: { detailed?: boolean }) {
           width: 1rem;
           height: 1rem;
           color: #5C8C3A;
+        }
+
+        .tr-partner-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          text-decoration: none;
+          cursor: pointer;
+        }
+
+        .tr-partner-tag {
+          font-family: var(--font-geist-mono), monospace;
+          font-size: 0.65rem;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #3d6333;
+        }
+
+        .tr-partner-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+          padding: 0.24rem 0.55rem;
+          border-radius: 9999px;
+          background: rgba(255, 255, 255, 0.72);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(47, 85, 39, 0.18);
+          box-shadow: 0 1px 3px rgba(18, 38, 16, 0.05);
+          transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+        }
+
+        .tr-partner-badge:hover .tr-partner-pill {
+          background: rgba(255, 255, 255, 0.98);
+          border-color: rgba(47, 85, 39, 0.35);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(18, 38, 16, 0.10);
+        }
+
+        .tr-partner-logo-img {
+          width: auto;
+          height: 18px;
+          max-width: 22px;
+          object-fit: contain;
+          display: block;
+        }
+
+        .tr-partner-name {
+          font-family: var(--font-dm-sans), sans-serif;
+          font-size: 0.74rem;
+          font-weight: 700;
+          color: #111a12;
+          white-space: nowrap;
+        }
+
+        .tr-partner-arrow {
+          width: 9px;
+          height: 9px;
+          color: #2F5527;
+          opacity: 0.6;
+          transition: transform 180ms ease, opacity 180ms ease;
+        }
+
+        .tr-partner-badge:hover .tr-partner-arrow {
+          opacity: 1;
+          transform: translate(1px, -1px);
         }
 
         .tr-card-actions {

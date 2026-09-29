@@ -95,6 +95,12 @@ export type Track = {
   media: Slot;
   summary: string;
   prompts: string[];
+  partner?: {
+    name: string;
+    role: string;
+    logo: string;
+    url?: string;
+  };
 };
 
 /**
@@ -107,6 +113,12 @@ export const TRACKS: Track[] = [
     seat: "Seat 01",
     line: "Kill the wrapper. Build intelligence that actually thinks, reasons, and executes.",
     media: { label: "AI & Intelligent Systems", expect: "/images/themes/ai.jpg", src: "/images/themes/ai.jpg" },
+    partner: {
+      name: "ML Kolkata",
+      role: "AI/ML Track Partner",
+      logo: "/images/sponsors/ml-kolkata.png",
+      url: "https://www.commudle.com/communities/ml-kolkata",
+    },
     summary:
       "Stop building glorified prompt wrappers. Engineer multi-agent swarms, local edge models running with zero latency, autonomous execution loops, and neuro-symbolic engines that solve deep real-world chaos.",
     prompts: [
@@ -250,6 +262,8 @@ export const SPONSOR_SLOTS: Slot[] = [
   { label: "OSEN LOGO", expect: "/images/sponsors/OSEN.png", src: "/images/sponsors/OSEN.png" },
   { label: "2I EDUCARE LOGO", expect: "/images/sponsors/2i-educare.png", src: "/images/sponsors/2i-educare.png" },
   { label: "INSTITUTE OF ACADEMIC EXCELLENCE LOGO", expect: "/images/sponsors/ShortIAE1x111.png", src: "/images/sponsors/ShortIAE1x111.png" },
+  { label: "TMC INSTITUTE OF LEARNING LOGO", expect: "/images/sponsors/tmc-institute.png", src: "/images/sponsors/tmc-institute.png" },
+  { label: "ML KOLKATA LOGO", expect: "/images/sponsors/ml-kolkata.png", src: "/images/sponsors/ml-kolkata.png" },
   { label: "INNOFUSION LOGO", expect: "/images/sponsors/INNOFUSION 3.0 logo.png", src: "/images/sponsors/INNOFUSION 3.0 logo.png" },
   { label: "REACT KOLKATA LOGO", expect: "/images/sponsors/react-kolkata-logo-full-light.png", src: "/images/sponsors/react-kolkata-logo-full-light.png" },
   { label: "CODERUSH X LOGO", expect: "/images/sponsors/CodeRush X Logo.png", src: "/images/sponsors/CodeRush X Logo.png" },
