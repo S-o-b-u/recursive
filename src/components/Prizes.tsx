@@ -1,6 +1,7 @@
 import SectionWrapper from "./SectionWrapper";
 import Reveal from "./Reveal";
 import { PRIZES, TRACK_PRIZE, SPECIAL_PRIZES } from "@/data/hackathon";
+import { fluid } from "@/lib/css-math";
 
 export default function Prizes({
   detailed = false,
@@ -65,7 +66,7 @@ export default function Prizes({
           </div>
           <p
             className="font-light leading-none tracking-[var(--tracking-tight)]"
-            style={{ fontSize: "clamp(1.25rem, 16.87px + 0.87vw, 1.75rem)" }}
+            style={{ fontSize: fluid("clamp(1.25rem, 16.87px + 0.87vw, 1.75rem)", "font-size") }}
           >
             {TRACK_PRIZE.amount}
             <span className="ml-2 align-middle text-[length:var(--font-size-sm)] text-[color:var(--color-text-tertiary)]">

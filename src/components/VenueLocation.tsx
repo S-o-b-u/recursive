@@ -184,6 +184,19 @@ export default function VenueLocation() {
                   referrerPolicy="no-referrer"
                 />
 
+                {/* OpenStreetMap's embed page needs a modern browser; older
+                    engines (smartboards) get the same area as a still. */}
+                <img
+                  src="/images/venue/venue-map.jpg"
+                  alt="Map of Guru Nanak Institute of Technology, Sodepur"
+                  className="map-static-fallback"
+                  loading="lazy"
+                  decoding="async"
+                  width={937}
+                  height={1011}
+                />
+                <span className="map-static-attrib">© OpenStreetMap contributors</span>
+
                 {/* Floating Bottom Info Bar */}
                 <div className="map-floating-bottom">
                   <div className="map-bottom-left">
@@ -586,6 +599,38 @@ export default function VenueLocation() {
             repeating-linear-gradient(90deg, rgba(73, 105, 73, 0.08) 0 1px, transparent 1px 58px),
             repeating-linear-gradient(0deg, rgba(73, 105, 73, 0.08) 0 1px, transparent 1px 58px),
             #c8d8bf;
+        }
+
+        .map-static-fallback,
+        .map-static-attrib {
+          display: none;
+        }
+        .legacy-js .google-maps-frame {
+          display: none;
+        }
+        .legacy-js .map-static-fallback {
+          display: block;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          /* keep the pin (370, 503 of 937 x 1011) in view whatever the crop */
+          object-position: 39.5% 49.8%;
+        }
+        .legacy-js .map-static-attrib {
+          display: block;
+          position: absolute;
+          right: 0.6rem;
+          bottom: 4.6rem;
+          z-index: 5;
+          padding: 0.1rem 0.35rem;
+          border-radius: 0.25rem;
+          background: rgba(255, 255, 255, 0.78);
+          color: #3d4a40;
+          font-size: 0.62rem;
+          line-height: 1.3;
         }
 
         .venue-map-card:hover .google-maps-frame {

@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Renderer, Program, Mesh, Triangle, Texture } from "ogl";
 import "./WarpText.css";
+import { fluid } from "@/lib/css-math";
 
 const vertex = `#version 300 es
 in vec2 position;
@@ -289,7 +290,7 @@ const buildTextCanvas = ({
     whiteSpace: "pre",
     inset: "0 auto auto 0",
     fontFamily: props.fontFamily,
-    fontSize: getFontValue(props.fontSize),
+    fontSize: fluid(getFontValue(props.fontSize), "font-size"),
     fontWeight: String(props.fontWeight ?? 800),
     letterSpacing: getFontValue(props.letterSpacing),
     lineHeight:
@@ -935,7 +936,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
               justifyContent: "center",
               fontFamily: fontFamily || "var(--font-hiruko), var(--font-display), sans-serif",
               fontWeight: fontWeight || 900,
-              fontSize: fontSize || "clamp(3.5rem, 18vw, 12rem)",
+              fontSize: fluid(String(fontSize || "clamp(3.5rem, 18vw, 12rem)"), "font-size"),
               letterSpacing: letterSpacing || "-0.035em",
               lineHeight: lineHeight || 0.82,
               background: color?.startsWith("linear-gradient")

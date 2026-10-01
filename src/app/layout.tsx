@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { display, geistMono, hiruko, dmSans, headingNow, bebasNeue } from "./fonts";
+import { LEGACY_BOOTSTRAP } from "@/lib/legacy-bootstrap";
 import SmoothScroll from "@/components/SmoothScroll";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -118,6 +119,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistMono.variable} ${display.variable} ${hiruko.variable} ${dmSans.variable} ${headingNow.variable} ${bebasNeue.variable}`}
     >
       <head>
+        {/* Old browser engines (classroom smartboards): JS polyfills, and the CSS shim when needed */}
+        <script dangerouslySetInnerHTML={{ __html: LEGACY_BOOTSTRAP }} />
         {/* Synchronous bootstrap: locks underlying website content and scroll before initial paint */}
         <script
           dangerouslySetInnerHTML={{

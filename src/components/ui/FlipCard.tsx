@@ -64,6 +64,10 @@ export default function FlipCard({
         .fcd-shell {
           position: absolute;
           inset: 0;
+          /* explicit: older engines size an absolutely positioned <button> to
+             its content instead of stretching it between its insets */
+          width: 100%;
+          height: 100%;
           display: block;
           padding: 0;
           border: none;

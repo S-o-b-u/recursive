@@ -19,20 +19,16 @@ export default function Navigation() {
   const [activeSection, setActiveSection] = useState("");
   const reduced = useReducedMotion();
 
-  // Easter Egg: 5 clicks on "RECURSIVE" on navbar unlocks hidden stage (desktop only)
+  // Easter Egg: 5 clicks on "RECURSIVE" on navbar unlocks hidden stage (large screens only)
   const clickCountRef = useRef(0);
   const clickTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleBrandClick = (e: React.MouseEvent) => {
-    // Only work in desktop, not in phone or tablet
-    if (typeof window !== "undefined") {
-      const isSmallScreen = window.innerWidth < 1024;
-      const ua = navigator.userAgent || "";
-      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-      const isIPad = /Macintosh/i.test(ua) && (navigator.maxTouchPoints ?? 0) > 1;
-      if (isSmallScreen || isMobileUA || isIPad) {
-        return;
-      }
+    // Desktops and big screens, not phones or small tablets. Decided by width
+    // alone: classroom smartboards are Android touch panels, so a user-agent
+    // or touch check would lock the stage out of exactly the screen it is for.
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      return;
     }
 
     clickCountRef.current += 1;

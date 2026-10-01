@@ -691,6 +691,16 @@ export default function Hero() {
           overflow: visible;
         }
 
+        /* Without overflow-x: clip (Chrome < 90, older smartboard browsers)
+           .hero cannot trim the 115vw log, and an Android browser widens the
+           whole page to fit it. The divider is exactly the log's height, so
+           clipping it trims only the sides. */
+        @supports not (overflow-x: clip) {
+          .hero-log-divider {
+            overflow: hidden;
+          }
+        }
+
         .hero-log-img {
           width: 115vw;
           min-width: 100vw;

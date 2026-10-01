@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Themes from "@/components/Themes";
 import Tracks from "@/components/Tracks";
 import { EVENT } from "@/data/hackathon";
+import { fluid } from "@/lib/css-math";
 
 export const metadata: Metadata = {
   title: "Tracks & Themes",
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
 
 export default function TracksPage() {
   return (
-    <main className="night" style={{ minHeight: "100vh", paddingTop: "clamp(3.5rem, 7vh, 5.5rem)" }}>
+    <main className="night" style={{ minHeight: "100vh", paddingTop: fluid("clamp(3.5rem, 7vh, 5.5rem)", "padding-top") }}>
       <Themes />
       {/* The full briefs for all six tracks. <Themes> is a carousel and only
           ever has one brief in the DOM, so before this the page server-rendered

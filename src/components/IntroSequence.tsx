@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import { getLenis } from "@/lib/lenis";
 import { prefersLiteMedia } from "@/lib/device";
+import { fluid } from "@/lib/css-math";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -1080,7 +1081,7 @@ export default function IntroSequence() {
           className="intro-pending-mark"
           style={{
             position: "relative",
-            width: "clamp(210px, 30vw, 360px)",
+            width: fluid("clamp(210px, 30vw, 360px)"),
             aspectRatio: "744 / 220",
             display: "flex",
             alignItems: "center",

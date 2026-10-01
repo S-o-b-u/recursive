@@ -56,8 +56,14 @@ export function LiquidGlassCard({
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   const filterId = `lg-displace-${uid}`;
   const [lite, setLite] = useState(true);
+  // No backdrop-filter (Chrome < 76, the Android browsers on some smartboards):
+  // the light glass is only readable because of the blur behind it, so it
+  // gets a near-opaque fill instead.
+  const [noBlur, setNoBlur] = useState(false);
   useEffect(() => {
     setLite(prefersLiteMedia());
+    const can = (v: string) => typeof CSS !== "undefined" && CSS.supports?.(v, "blur(1px)");
+    setNoBlur(!can("backdrop-filter") && !can("-webkit-backdrop-filter"));
   }, []);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -104,7 +110,7 @@ export function LiquidGlassCard({
     if (isGreen) return "linear-gradient(150deg, rgba(36, 68, 30, 0.82) 0%, rgba(18, 38, 16, 0.94) 100%)";
     // Natural smoked obsidian/botanical deep glass
     if (isDark) return "linear-gradient(150deg, rgba(16, 26, 18, 0.82) 0%, rgba(8, 15, 9, 0.94) 100%)";
-    return "rgba(255,255,255,0.42)";
+    return noBlur ? "rgba(243,241,235,0.94)" : "rgba(255,255,255,0.42)";
   };
 
   const getBorderTop = () => {

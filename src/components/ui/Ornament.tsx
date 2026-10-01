@@ -1,4 +1,5 @@
 import React from "react";
+import { fluid } from "@/lib/css-math";
 
 /**
  * Ornament — botanical section divider rendered above section headings.
@@ -20,7 +21,7 @@ export default function Ornament({
       className={`orn orn-${tone} ${className}`.trim()}
       style={{
         display: "block",
-        width: "clamp(114px, 56.87px + 15.87vw, 260px)",
+        width: fluid("clamp(114px, 56.87px + 15.87vw, 260px)"),
         height: "auto",
         maxWidth: "100%",
         objectFit: "contain",

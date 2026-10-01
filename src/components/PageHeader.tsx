@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import Link from "next/link";
 import Reveal from "./Reveal";
 import WarpText from "./ui/WarpText";
+import { fluid } from "@/lib/css-math";
 
 /**
  * Sub-page header. Opens on the same deep-forest tone the hero pushes into, then
@@ -40,7 +41,7 @@ export default function PageHeader({
               style={{
                 width: "100%",
                 maxWidth: "30ch",
-                height: "clamp(60px, 8vw, 100px)",
+                height: fluid("clamp(60px, 8vw, 100px)", "height"),
                 pointerEvents: "auto",
               }}
             />

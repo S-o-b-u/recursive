@@ -27,6 +27,7 @@ const CRITERIA = [
 ];
 
 import WarpText from "@/components/ui/WarpText";
+import { fluid } from "@/lib/css-math";
 
 export default function PrizesPage() {
   return (
@@ -57,7 +58,7 @@ export default function PrizesPage() {
               style={{
                 width: "100%",
                 maxWidth: "30ch",
-                height: "clamp(35px, 23.65px + 3.152vw, 64px)",
+                height: fluid("clamp(35px, 23.65px + 3.152vw, 64px)", "height"),
                 pointerEvents: "auto",
               }}
             />

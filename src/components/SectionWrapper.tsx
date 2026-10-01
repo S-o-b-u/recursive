@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import Reveal from "./Reveal";
 import WarpText from "./ui/WarpText";
+import { fluid } from "@/lib/css-math";
 
 /**
  * Shared section chrome: id anchor, rhythm, label + heading, optional lede.
@@ -51,7 +52,7 @@ export default function SectionWrapper({
                     style={{
                       width: "100%",
                       maxWidth: "40ch",
-                      height: "clamp(34px, 20.7px + 3.696vw, 68px)",
+                      height: fluid("clamp(34px, 20.7px + 3.696vw, 68px)", "height"),
                       pointerEvents: "auto",
                     }}
                   />
