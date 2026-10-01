@@ -410,7 +410,7 @@ export default function SponsorStage() {
                       <span className="sxp-tier-badge">PARTNER</span>
                       <div className="sxp-composio-card-wrap">
                         <a
-                          href="https://composio.dev"
+                          href="https://coreplatform.in/"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="sxp-partner-card sxp-float-card sxp-composio-card"
