@@ -375,7 +375,7 @@ export default function SponsorStage() {
                   <span className="sxp-eyebrow">Supporters &amp; partners</span>
                   <h2 className="sxp-heading">Our Sponsors</h2>
 
-                  {/* ── Top Tier: Partner (Aqyron Labs) + Platform Partner (Devfolio) + AI/ML Track Partner (ML Kolkata) + Domain Sponsor (.xyz) ── */}
+                  {/* ── Top Tier: Partner (Aqyron Labs) + Core Platform (Composio) + Platform Partner (Devfolio) + AI/ML Track Partner (ML Kolkata) + Domain Sponsor (.xyz) ── */}
                   <div className="sxp-top-tier-row">
                     <div className="sxp-top-card-col">
                       <span className="sxp-tier-badge">PARTNER</span>
@@ -407,14 +407,14 @@ export default function SponsorStage() {
                       </div>
                     </div>
                     <div className="sxp-top-card-col">
-                      <span className="sxp-tier-badge">PARTNER</span>
+                      <span className="sxp-tier-badge">CORE PLATFORM</span>
                       <div className="sxp-composio-card-wrap">
                         <a
                           href="https://composio.dev"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="sxp-partner-card sxp-float-card sxp-composio-card"
-                          title="Composio"
+                          title="Composio — Core Platform"
                           aria-label="Composio"
                         >
                           <div className="sxp-composio-content">
