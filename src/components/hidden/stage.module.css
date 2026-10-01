@@ -248,11 +248,15 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
   color: #fff;
 }
-/* No backdrop blur (older smartboard browsers): a firmer fill keeps the rows readable over the grass */
+/* No backdrop blur (older smartboard browsers, or perf-lite turning it off):
+   a firmer fill keeps the rows readable over the grass */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .card {
     background: rgba(12, 20, 10, 0.58);
   }
+}
+:global(.perf-lite) .card {
+  background: rgba(12, 20, 10, 0.58);
 }
 .item {
   position: relative;

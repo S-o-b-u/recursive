@@ -38,8 +38,20 @@ export function prefersLiteMedia(): boolean {
     const coarse = window.matchMedia("(pointer: coarse)").matches;
     const small = window.matchMedia("(max-width: 860px)").matches;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    return coarse || small || reduce || prefersLessData();
+    return coarse || small || reduce || prefersLessData() || perfLite();
   } catch {
     return false;
   }
+}
+
+/**
+ * True on smartboard-class hardware (set as `perf-lite` on <html> by the inline
+ * bootstrap in src/lib/legacy-bootstrap.ts): old browser engines, Android
+ * panels, 4K touch screens. Continuous effects run once and hold there.
+ */
+export function perfLite(): boolean {
+  return (
+    typeof document !== "undefined" &&
+    document.documentElement.classList.contains("perf-lite")
+  );
 }

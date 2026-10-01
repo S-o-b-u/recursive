@@ -3,7 +3,7 @@
 import { ReactNode, useId, useState, useRef, useCallback, useEffect } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import { cn } from "@/lib/utils";
-import { prefersLiteMedia } from "@/lib/device";
+import { perfLite, prefersLiteMedia } from "@/lib/device";
 
 type Intensity = "none" | "sm" | "md" | "lg";
 
@@ -56,14 +56,14 @@ export function LiquidGlassCard({
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   const filterId = `lg-displace-${uid}`;
   const [lite, setLite] = useState(true);
-  // No backdrop-filter (Chrome < 76, the Android browsers on some smartboards):
+  // No backdrop blur (Chrome < 76, or turned off by perf-lite on smartboards):
   // the light glass is only readable because of the blur behind it, so it
   // gets a near-opaque fill instead.
   const [noBlur, setNoBlur] = useState(false);
   useEffect(() => {
     setLite(prefersLiteMedia());
     const can = (v: string) => typeof CSS !== "undefined" && CSS.supports?.(v, "blur(1px)");
-    setNoBlur(!can("backdrop-filter") && !can("-webkit-backdrop-filter"));
+    setNoBlur(perfLite() || (!can("backdrop-filter") && !can("-webkit-backdrop-filter")));
   }, []);
 
   const containerRef = useRef<HTMLDivElement>(null);

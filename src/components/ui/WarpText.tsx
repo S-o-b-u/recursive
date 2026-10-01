@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Renderer, Program, Mesh, Triangle, Texture } from "ogl";
 import "./WarpText.css";
 import { fluid } from "@/lib/css-math";
+import { perfLite } from "@/lib/device";
 
 const vertex = `#version 300 es
 in vec2 position;
@@ -436,6 +437,29 @@ export const WarpText: React.FC<WarpTextProps> = ({
     preloaded && preloaded.complete && preloaded.naturalWidth > 0 ? preloaded : null
   );
   const [webglFailed, setWebglFailed] = useState(false);
+  const fallbackTextRef = useRef<HTMLSpanElement>(null);
+
+  // The canvas shrinks a line that would not fit (98% of the width, 95% of the
+  // height); the CSS fallback has to do the same or a big wordmark spills out.
+  useLayoutEffect(() => {
+    if (!webglFailed || src || imageSrc) return;
+    const box = containerRef.current;
+    const span = fallbackTextRef.current;
+    if (!box || !span) return;
+    const fit = () => {
+      span.style.fontSize = "";
+      const w = span.scrollWidth;
+      const h = span.offsetHeight;
+      if (!w || !h) return;
+      const f = Math.min(1, (box.clientWidth * 0.98) / w, (box.clientHeight * 0.95) / h);
+      if (f < 1) span.style.fontSize = `${parseFloat(window.getComputedStyle(span).fontSize) * f}px`;
+    };
+    fit();
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(fit) : null;
+    ro?.observe(box);
+    document.fonts?.ready.then(fit).catch(() => {});
+    return () => ro?.disconnect();
+  }, [webglFailed, src, imageSrc, text]);
 
   const propsRef = useRef<WarpTextProps>({
     text,
@@ -589,13 +613,21 @@ export const WarpText: React.FC<WarpTextProps> = ({
     // Mutable: reset when the loop starts late (see onIntroDone).
     let startTime = performance.now();
 
+    // Smartboards: every warp heading is its own WebGL context, and a panel
+    // GPU pays for each one (creation stalls a scroll, memory stays held).
+    // There the heading is drawn by CSS instead.
+    if (perfLite()) {
+      setWebglFailed(true);
+      return undefined;
+    }
+
     try {
       renderer = new Renderer({
         webgl: 2,
         alpha: true,
         premultipliedAlpha: false,
         antialias: true,
-        dpr: Math.min(window.devicePixelRatio || 1, 2),
+        dpr: Math.min(window.devicePixelRatio || 1, perfLite() ? 1 : 2),
       });
       gl = renderer.gl;
       if (!gl) throw new Error("WebGL context creation failed");
@@ -665,7 +697,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
       const rect = container.getBoundingClientRect();
       if (rect.width <= 0 || rect.height <= 0) return;
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, perfLite() ? 1 : 2);
       const textCanvas = buildTextCanvas({
         container,
         width: rect.width,
@@ -734,7 +766,7 @@ export const WarpText: React.FC<WarpTextProps> = ({
       const rect = container.getBoundingClientRect();
       if (rect.width <= 0 || rect.height <= 0) return;
 
-      renderer.dpr = Math.min(window.devicePixelRatio || 1, 2);
+      renderer.dpr = Math.min(window.devicePixelRatio || 1, perfLite() ? 1 : 2);
       renderer.setSize(rect.width, rect.height);
       program.uniforms.uResolution.value[0] = gl.drawingBufferWidth;
       program.uniforms.uResolution.value[1] = gl.drawingBufferHeight;
@@ -773,8 +805,15 @@ export const WarpText: React.FC<WarpTextProps> = ({
       typeof document !== "undefined" &&
       document.documentElement.dataset.intro === "playing";
 
+    // Smartboards: a per-frame full-canvas WebGL draw for an idle drift is
+    // what their GPUs cannot spare; the warped wordmark holds one frame.
+    const holdStill = perfLite();
     const startLoop = () => {
       if (introHeld || !pageVisible || !visible || raf || disposed || contextLost) return;
+      if (holdStill) {
+        renderOnce();
+        return;
+      }
       raf = requestAnimationFrame(loop);
     };
     const stopLoop = () => {
@@ -914,7 +953,8 @@ export const WarpText: React.FC<WarpTextProps> = ({
             className="warp-text-fallback-img"
             style={{
               position: "absolute",
-              inset: 0,
+              top: 0,
+              left: 0,
               width: "100%",
               height: "100%",
               objectFit: "contain",
@@ -929,30 +969,39 @@ export const WarpText: React.FC<WarpTextProps> = ({
           <div
             className="warp-text-fallback-txt"
             style={{
+              // the canvas centres its lines vertically and aligns them by `align`
               position: "absolute",
-              inset: 0,
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 0,
               display: "flex",
-              alignItems: "flex-end",
-              justifyContent: "center",
+              alignItems: "center",
+              justifyContent: align === "left" ? "flex-start" : align === "right" ? "flex-end" : "center",
               fontFamily: fontFamily || "var(--font-hiruko), var(--font-display), sans-serif",
               fontWeight: fontWeight || 900,
               fontSize: fluid(String(fontSize || "clamp(3.5rem, 18vw, 12rem)"), "font-size"),
               letterSpacing: letterSpacing || "-0.035em",
               lineHeight: lineHeight || 0.82,
-              background: color?.startsWith("linear-gradient")
-                ? color
-                : "linear-gradient(180deg, #070e08 0%, #0f1c12 36%, #1a301e 72%, #2c4e30 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              color: "transparent",
-              textAlign: "center",
+              // a gradient is clipped to the glyphs; a plain colour is just the colour
+              ...(color?.startsWith("linear-gradient")
+                ? {
+                    background: color,
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                    color: "transparent",
+                  }
+                : { color: color && color !== "original" ? color : "#0f1c12" }),
+              textAlign: align,
               userSelect: "none",
               pointerEvents: "none",
               whiteSpace: "nowrap",
             }}
           >
-            {text}
+            <span ref={fallbackTextRef} style={{ display: "inline-block" }}>
+              {text}
+            </span>
           </div>
         ))}
     </div>

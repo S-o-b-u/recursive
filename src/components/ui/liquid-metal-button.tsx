@@ -4,7 +4,7 @@ import { liquidMetalFragmentShader, ShaderMount } from "@paper-design/shaders";
 import { Sparkles } from "lucide-react";
 import type React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { prefersLiteMedia } from "@/lib/device";
+import { perfLite, prefersLiteMedia } from "@/lib/device";
 
 /**
  * Two curves, named once.
@@ -35,6 +35,7 @@ const EASE_SIZE = `${EASE}, width 0.4s ease, height 0.4s ease`;
 function preferLiteButton(): boolean {
   if (typeof window === "undefined") return true;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return true;
+  if (perfLite()) return true;
   try {
     const canvas = document.createElement("canvas");
     return !Boolean(window.WebGL2RenderingContext && canvas.getContext("webgl2"));

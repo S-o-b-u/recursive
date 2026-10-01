@@ -5,6 +5,7 @@ import React, { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { EVENT } from "@/data/hackathon";
 import WarpText from "@/components/ui/WarpText";
+import { perfLite } from "@/lib/device";
 
 interface CrowdCanvasProps {
   src: string;
@@ -260,10 +261,15 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     // 1x canvas every frame for a crowd of line-art figures that gains nothing
     // from it. Small screens go lower still.
     const dprOf = () =>
-      Math.min(window.devicePixelRatio || 1, window.innerWidth < 700 ? 1.5 : 2);
+      Math.min(window.devicePixelRatio || 1, perfLite() ? 1 : window.innerWidth < 700 ? 1.5 : 2);
 
+    // Smartboards: draw every other tick (30fps). The walks still advance
+    // every frame; only the full-width redraw is halved.
+    const halfRate = perfLite();
+    let tick = 0;
     const render = () => {
       if (!canvas) return;
+      if (halfRate && tick++ % 2) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
       const dpr = dprOf();
@@ -293,24 +299,34 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       availablePeeps.push(...allPeeps);
 
       initCrowd();
+      if (!running) crowd.forEach((peep) => peep.walk?.pause());
     };
 
+    // The walks are GSAP timelines: left playing off screen they keep the
+    // ticker running every frame for a canvas nobody can see.
     let running = false;
+    let onScreen = false;
     const startRender = () => {
       if (running) return;
       running = true;
+      crowd.forEach((peep) => peep.walk?.resume());
       gsap.ticker.add(render);
     };
     const stopRender = () => {
       if (!running) return;
       running = false;
+      crowd.forEach((peep) => peep.walk?.pause());
       gsap.ticker.remove(render);
     };
 
     const init = () => {
       createPeeps();
       resize();
-      startRender();
+      // The observer may have reported (off screen) before the sprite loaded;
+      // starting unconditionally here left the crowd animating for the
+      // lifetime of the page.
+      if (onScreen || typeof IntersectionObserver === "undefined") startRender();
+      else crowd.forEach((peep) => peep.walk?.pause());
     };
 
     img.onload = init;
@@ -327,7 +343,9 @@ export const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       io = new IntersectionObserver(
         (entries) => {
           for (const e of entries) {
-            if (e.isIntersecting) startRender();
+            onScreen = e.isIntersecting;
+            if (!allPeeps.length) continue; // init() decides once the sprite is in
+            if (onScreen) startRender();
             else stopRender();
           }
         },

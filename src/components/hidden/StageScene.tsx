@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { gradeAt, DAY_START_HOUR, DAY_END_HOUR } from "./day-grade";
+import { perfLite } from "@/lib/device";
 
 interface StageSceneProps {
   /** Clock hour the plate should be lit for (10 = morning ... 18 = dusk). */
@@ -296,7 +297,8 @@ export default function StageScene({
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
       if (!w || !h) return;
-      const r = Math.min(window.devicePixelRatio || 1, MAX_BACKING / Math.max(w, h));
+      // smartboards: 1080p of backing is what the plate holds anyway
+      const r = Math.min(window.devicePixelRatio || 1, (perfLite() ? 1920 : MAX_BACKING) / Math.max(w, h));
       const bw = Math.max(1, Math.round(w * r));
       const bh = Math.max(1, Math.round(h * r));
       if (canvas.width !== bw || canvas.height !== bh) {

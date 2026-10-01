@@ -524,17 +524,46 @@
     }
   }
 
-  var pending = 0;
+  // Work is scoped to what changed. React adds and removes nodes all the time
+  // (the countdown re-renders every second); a full-document pass per change
+  // forced a layout of the whole page once a second, which is the lag an old
+  // smartboard can least afford.
+  var pending = 0, pendingRoots = [], layoutAll = false;
   function schedule() {
     if (!pending) pending = setTimeout(flush, 0);
   }
 
-  var varsKey = "";
   function flush() {
     pending = 0;
-    if (dirtyCss) { dirtyCss = false; rebuildCss(); }
-    inlineStyles(d);
-    scheduleLayout();
+    var roots = pendingRoots;
+    pendingRoots = [];
+    if (dirtyCss) {
+      dirtyCss = false;
+      rebuildCss();
+      inlineStyles(d);
+      layoutAll = true;
+    } else {
+      for (var i = 0; i < roots.length; i++) {
+        if (!d.documentElement.contains(roots[i])) continue;
+        inlineStyles(roots[i]);
+        if (!layoutAll && touchesLayout(roots[i])) layoutAll = true;
+      }
+    }
+    if (layoutAll) scheduleLayout();
+  }
+
+  // a selector for every element the layout pass looks after
+  var trackSel = "";
+  function buildTrackSel() {
+    var list = ["img", '[style*="aspect-ratio"]'], seen = {}, i;
+    function add(s) { if (s && !seen[s]) { seen[s] = 1; list.push(s); } }
+    for (i = 0; i < aspectRules.length; i++) add(aspectRules[i][0]);
+    for (i = 0; i < deferred.length; i++) add(deferred[i].sel);
+    if (F.flexgap) for (var g in gapSelectors) add(g);
+    trackSel = list.join(",");
+  }
+  function touchesLayout(root) {
+    try { return root.matches(trackSel) || !!root.querySelector(trackSel); } catch (e) { return true; }
   }
 
   function rebuildCss() {
@@ -567,7 +596,7 @@
       if (s.aspect) aspectRules = aspectRules.concat(s.aspect);
       if (s.gaps) for (var g in s.gaps) gapSelectors[g] = 1;
     }
-    varsKey = key;
+    buildTrackSel();
     if (!outEl) {
       outEl = d.createElement("style");
       outEl.setAttribute("data-legacy-css", "");
@@ -583,19 +612,23 @@
   // later React/motion update to any other property is never undone.
   var NEEDS = /(clamp|min|max)\(|(^|[;\s])(inset|padding-inline|padding-block|margin-inline|margin-block|translate|scale|rotate)\s*:|[sdl]v[hw]\b/i;
   var inlineDone = typeof WeakMap === "function" ? new WeakMap() : null;
+  var inlineEls = []; // elements with rewritten declarations, for resize
+
+  function inlineOne(el) {
+    if (inlineDone.has(el)) return;
+    var attr = el.getAttribute("style") || "";
+    if (!NEEDS.test(attr)) { inlineDone.set(el, null); return; }
+    var keep = splitTop(attr, ";").filter(function (dcl) { return NEEDS.test(dcl); }).join(";");
+    inlineDone.set(el, keep);
+    inlineEls.push(el);
+    applyInline(el, keep);
+  }
 
   function inlineStyles(root) {
     if (!inlineDone) return;
+    if (root.nodeType === 1 && root.hasAttribute("style")) inlineOne(root);
     var els = root.querySelectorAll("[style]");
-    for (var i = 0; i < els.length; i++) {
-      var el = els[i];
-      if (inlineDone.has(el)) continue;
-      var attr = el.getAttribute("style") || "";
-      if (!NEEDS.test(attr)) { inlineDone.set(el, null); continue; }
-      var keep = splitTop(attr, ";").filter(function (dcl) { return NEEDS.test(dcl); }).join(";");
-      inlineDone.set(el, keep);
-      applyInline(el, keep);
-    }
+    for (var i = 0; i < els.length; i++) inlineOne(els[i]);
   }
 
   function applyInline(el, decls) {
@@ -610,20 +643,22 @@
   }
 
   function reapplyInline() {
-    var els = d.querySelectorAll("[style]");
-    for (var i = 0; i < els.length; i++) {
-      var keep = inlineDone && inlineDone.get(els[i]);
-      if (keep) applyInline(els[i], keep);
+    inlineEls = inlineEls.filter(function (el) { return d.documentElement.contains(el); });
+    for (var i = 0; i < inlineEls.length; i++) {
+      var keep = inlineDone.get(inlineEls[i]);
+      if (keep) applyInline(inlineEls[i], keep);
     }
   }
 
   /* ── aspect-ratio and flex gap by script ──────────────────────────── */
+  // Each pass reads everything before it writes anything, so it costs one
+  // layout instead of one per element.
 
   var layoutTimer = 0;
   function scheduleLayout() {
-    if (!F.aspect && !F.flexgap && !F.math) return;
+    if (!F.aspect && !F.flexgap && !F.math) { layoutAll = false; return; }
     clearTimeout(layoutTimer);
-    layoutTimer = setTimeout(layoutPass, 80);
+    layoutTimer = setTimeout(layoutPass, 120);
   }
 
   var VAXIS = /^(top|bottom|height|min-height|max-height)$/;
@@ -650,74 +685,78 @@
         var basis = cb ? (vert ? cb.clientHeight : cb.clientWidth) : (vert ? vp.h : vp.w);
         var val = evalMath(r.raw, r.prop, r.vars, {}, basis);
         if (!/px$/.test(val)) continue;
-        attr = el.getAttribute("data-legacy-pct");
-        var rec = attr ? JSON.parse(attr) : {};
-        if (!rec[r.prop]) rec[r.prop] = { v: el.style.getPropertyValue(r.prop), p: el.style.getPropertyPriority(r.prop) };
-        el.setAttribute("data-legacy-pct", JSON.stringify(rec));
         touched.push([el, r.prop, val, r.imp]);
       }
     }
-    for (i = 0; i < touched.length; i++) touched[i][0].style.setProperty(touched[i][1], touched[i][2], touched[i][3] ? "important" : "");
+    for (i = 0; i < touched.length; i++) {
+      el = touched[i][0];
+      attr = el.getAttribute("data-legacy-pct");
+      var rec = attr ? JSON.parse(attr) : {};
+      if (!rec[touched[i][1]]) rec[touched[i][1]] = { v: el.style.getPropertyValue(touched[i][1]), p: el.style.getPropertyPriority(touched[i][1]) };
+      el.setAttribute("data-legacy-pct", JSON.stringify(rec));
+      el.style.setProperty(touched[i][1], touched[i][2], touched[i][3] ? "important" : "");
+    }
+  }
+
+  function aspectPass() {
+    var items = [], i, j, els, el;
+    for (i = 0; i < aspectRules.length; i++) {
+      var r = aspectRules[i];
+      if (r[3]) continue; // the rule sets its own height
+      if (r[2] && w.matchMedia && !w.matchMedia(r[2]).matches) continue;
+      try { els = d.querySelectorAll(r[0]); } catch (e) { continue; }
+      for (j = 0; j < els.length; j++) items.push([els[j], r[1]]);
+    }
+    // inline aspect-ratio from React styles (FlipCard, MediaSlot): React's
+    // `style.aspectRatio = ...` is a no-op here, so read the server-rendered attribute
+    els = d.querySelectorAll('[style*="aspect-ratio"]');
+    for (j = 0; j < els.length; j++) {
+      var am = /aspect-ratio\s*:\s*([^;]+)/i.exec(els[j].getAttribute("style") || "");
+      if (am) items.push([els[j], am[1]]);
+    }
+    // writes: back to the element's own height
+    for (i = 0; i < items.length; i++) {
+      el = items[i][0];
+      if (el.getAttribute("data-legacy-ar") === null) el.setAttribute("data-legacy-ar", el.style.height || "");
+      el.style.height = el.getAttribute("data-legacy-ar");
+    }
+    // reads
+    var sets = [];
+    for (i = 0; i < items.length; i++) {
+      el = items[i][0];
+      var ratio = typeof items[i][1] === "number" ? items[i][1] : parseRatio(el, items[i][1]);
+      if (!(ratio > 0)) continue;
+      var box = el.getBoundingClientRect();
+      if (box.width > 0 && box.height < box.width / ratio - 1) sets.push([el, box.width / ratio]);
+    }
+    // writes
+    for (i = 0; i < sets.length; i++) sets[i][0].style.height = sets[i][1] + "px";
+  }
+
+  // Old flexbox stretches an <img> to its natural height whatever its
+  // width: a 260px-wide 744x220 ornament came out 220px tall. Top-align
+  // just the images that are visibly taller than their own ratio.
+  function imagePass(list) {
+    var els = list || d.querySelectorAll("img"), fixes = [], j;
+    for (j = 0; j < els.length; j++) {
+      var im = els[j];
+      if (!im.naturalWidth || im.style.alignSelf) continue;
+      var pcs = im.parentElement && w.getComputedStyle(im.parentElement);
+      if (!pcs || !/flex/.test(pcs.display) || pcs.flexDirection.indexOf("row") !== 0) continue;
+      var ir = im.getBoundingClientRect();
+      if (ir.width > 0 && ir.height > ir.width * im.naturalHeight / im.naturalWidth + 2) {
+        var a = w.getComputedStyle(im).alignSelf;
+        if (a === "stretch" || a === "normal" || a === "auto") fixes.push([im, /center/.test(pcs.alignItems) ? "center" : "flex-start"]);
+      }
+    }
+    for (j = 0; j < fixes.length; j++) fixes[j][0].style.alignSelf = fixes[j][1];
   }
 
   function layoutPass() {
-    var i, j, els;
+    layoutAll = false;
     if (F.math && deferred.length) resolveDeferred();
-    if (F.aspect) {
-      for (i = 0; i < aspectRules.length; i++) {
-        var r = aspectRules[i];
-        if (r[3]) continue; // the rule sets its own height
-        if (r[2] && w.matchMedia && !w.matchMedia(r[2]).matches) continue;
-        try { els = d.querySelectorAll(r[0]); } catch (e) { continue; }
-        for (j = 0; j < els.length; j++) {
-          var el = els[j];
-          if (el.getAttribute("data-legacy-ar") === null) el.setAttribute("data-legacy-ar", el.style.height || "");
-          el.style.height = el.getAttribute("data-legacy-ar");
-          var box = el.getBoundingClientRect();
-          if (box.width > 0 && box.height < box.width / r[1] - 1) el.style.height = box.width / r[1] + "px";
-        }
-      }
-    }
-    if (F.aspect) {
-      // inline aspect-ratio from React styles (FlipCard, MediaSlot): React's
-      // `style.aspectRatio = ...` is a no-op here, so read the server-rendered attribute
-      els = d.querySelectorAll('[style*="aspect-ratio"]');
-      for (j = 0; j < els.length; j++) {
-        var ie = els[j];
-        var src = ie.getAttribute("data-legacy-style") || ie.getAttribute("style") || "";
-        var am = /aspect-ratio\s*:\s*([^;]+)/i.exec(src);
-        if (!am) continue;
-        var ratio = parseRatio(ie, am[1]);
-        if (!(ratio > 0)) continue;
-        if (ie.getAttribute("data-legacy-ar") === null) ie.setAttribute("data-legacy-ar", ie.style.height || "");
-        ie.style.height = ie.getAttribute("data-legacy-ar");
-        var ib = ie.getBoundingClientRect();
-        if (ib.width > 0 && ib.height < ib.width / ratio - 1) ie.style.height = ib.width / ratio + "px";
-      }
-    }
-    if (F.aspect) {
-      // Old flexbox stretches an <img> to its natural height whatever its
-      // width: a 260px-wide 744x220 ornament came out 220px tall. Top-align
-      // just the images that are visibly taller than their own ratio.
-      els = d.querySelectorAll("img");
-      for (j = 0; j < els.length; j++) {
-        var im = els[j];
-        if (!im.naturalWidth || im.style.alignSelf) continue;
-        var pcs = im.parentElement && w.getComputedStyle(im.parentElement);
-        if (!pcs || !/flex/.test(pcs.display) || pcs.flexDirection.indexOf("row") !== 0) continue;
-        var ir = im.getBoundingClientRect();
-        if (ir.width > 0 && ir.height > ir.width * im.naturalHeight / im.naturalWidth + 2) {
-          var a = w.getComputedStyle(im).alignSelf;
-          if (a === "stretch" || a === "normal" || a === "auto") im.style.alignSelf = /center/.test(pcs.alignItems) ? "center" : "flex-start";
-        }
-      }
-    }
-    if (F.flexgap) {
-      for (var sel in gapSelectors) {
-        try { els = d.querySelectorAll(sel); } catch (e) { continue; }
-        for (j = 0; j < els.length; j++) flexGap(els[j]);
-      }
-    }
+    if (F.aspect) { aspectPass(); imagePass(); }
+    if (F.flexgap) flexGapPass();
   }
 
   // "4 / 5", "1.25", or var(--x, 4 / 5) resolved on the element
@@ -733,37 +772,58 @@
     return a > 0 && b > 0 ? a / b : 0;
   }
 
-  function flexGap(el) {
-    var cs = w.getComputedStyle(el);
-    if (!/flex/.test(cs.display)) return;
-    var cg = parseFloat(cs.columnGap) || 0, rg = parseFloat(cs.rowGap) || 0;
-    if (!cg && !rg) return;
-    var dir = cs.flexDirection, col = dir.indexOf("column") === 0, rev = /reverse/.test(dir);
-    var kids = [], c, k;
-    for (k = 0; k < el.children.length; k++) {
-      c = el.children[k];
-      var kcs = w.getComputedStyle(c);
-      if (kcs.display === "none" || kcs.position === "absolute" || kcs.position === "fixed") continue;
-      if (c.getAttribute("data-legacy-gap") === null) {
-        c.setAttribute("data-legacy-gap", JSON.stringify([c.style.marginLeft, c.style.marginRight, c.style.marginTop, c.style.marginBottom]));
-      }
-      var o = JSON.parse(c.getAttribute("data-legacy-gap"));
-      c.style.marginLeft = o[0]; c.style.marginRight = o[1]; c.style.marginTop = o[2]; c.style.marginBottom = o[3];
-      kids.push(c);
+  function flexGapPass() {
+    var boxes = [], i, k, c, els;
+    for (var sel in gapSelectors) {
+      try { els = d.querySelectorAll(sel); } catch (e) { continue; }
+      for (i = 0; i < els.length; i++) boxes.push(els[i]);
     }
-    var mainSide = col ? (rev ? "marginBottom" : "marginTop") : (rev ? "marginRight" : "marginLeft");
-    var main = col ? rg : cg, cross = col ? cg : rg;
-    var base = [];
-    for (k = 0; k < kids.length; k++) base.push(parseFloat(w.getComputedStyle(kids[k])[mainSide]) || 0);
-    for (k = 1; k < kids.length; k++) kids[k].style[mainSide] = base[k] + main + "px";
-    if (cs.flexWrap !== "nowrap" && cross && !col) {
-      // a new line starts where an item drops below its predecessor: no main gap, cross gap above
-      for (k = 1; k < kids.length; k++) {
-        if (kids[k].offsetTop > kids[k - 1].offsetTop + 1) {
-          kids[k].style[mainSide] = base[k] + "px";
-          kids[k].style.marginTop = (parseFloat(w.getComputedStyle(kids[k]).marginTop) || 0) + cross + "px";
+    // writes: every child back to its own margins
+    for (i = 0; i < boxes.length; i++) {
+      for (k = 0; k < boxes[i].children.length; k++) {
+        c = boxes[i].children[k];
+        if (c.getAttribute("data-legacy-gap") === null) {
+          c.setAttribute("data-legacy-gap", JSON.stringify([c.style.marginLeft, c.style.marginRight, c.style.marginTop, c.style.marginBottom]));
         }
+        var o = JSON.parse(c.getAttribute("data-legacy-gap"));
+        c.style.marginLeft = o[0]; c.style.marginRight = o[1]; c.style.marginTop = o[2]; c.style.marginBottom = o[3];
       }
+    }
+    // reads
+    var plans = [];
+    for (i = 0; i < boxes.length; i++) {
+      var cs = w.getComputedStyle(boxes[i]);
+      if (!/flex/.test(cs.display)) continue;
+      var cg = parseFloat(cs.columnGap) || 0, rg = parseFloat(cs.rowGap) || 0;
+      if (!cg && !rg) continue;
+      var dir = cs.flexDirection, col = dir.indexOf("column") === 0, rev = /reverse/.test(dir);
+      var side = col ? (rev ? "marginBottom" : "marginTop") : (rev ? "marginRight" : "marginLeft");
+      var kids = [];
+      for (k = 0; k < boxes[i].children.length; k++) {
+        c = boxes[i].children[k];
+        var kcs = w.getComputedStyle(c);
+        if (kcs.display === "none" || kcs.position === "absolute" || kcs.position === "fixed") continue;
+        kids.push([c, parseFloat(kcs[side]) || 0, parseFloat(kcs.marginTop) || 0]);
+      }
+      plans.push({ kids: kids, side: side, main: col ? rg : cg, cross: col ? cg : rg, wrap: cs.flexWrap !== "nowrap" && !col });
+    }
+    // writes
+    for (i = 0; i < plans.length; i++) {
+      var p = plans[i];
+      for (k = 1; k < p.kids.length; k++) p.kids[k][0].style[p.side] = p.kids[k][1] + p.main + "px";
+    }
+    // wrapping rows: a new line starts where an item drops below its predecessor
+    var lines = [];
+    for (i = 0; i < plans.length; i++) {
+      if (!plans[i].wrap || !plans[i].cross) continue;
+      for (k = 1; k < plans[i].kids.length; k++) {
+        if (plans[i].kids[k][0].offsetTop > plans[i].kids[k - 1][0].offsetTop + 1) lines.push([plans[i], k]);
+      }
+    }
+    for (i = 0; i < lines.length; i++) {
+      var q = lines[i][0], kid = q.kids[lines[i][1]];
+      kid[0].style[q.side] = kid[1] + "px";
+      kid[0].style.marginTop = kid[2] + q.cross + "px";
     }
   }
 
@@ -781,39 +841,48 @@
   /* ── wiring ───────────────────────────────────────────────────────── */
 
   var observer = new MutationObserver(function (records) {
-    var css = false, nodes = false;
+    var any = false;
     for (var i = 0; i < records.length; i++) {
       var r = records[i], t = r.target;
       if (r.type === "characterData") {
         t = t.parentNode;
-        if (t && t.tagName === "STYLE" && !ownNode(t)) { addStyle(t); css = true; }
+        if (t && t.tagName === "STYLE" && !ownNode(t)) addStyle(t);
         continue;
       }
-      if (t && t.tagName === "STYLE" && !ownNode(t)) { addStyle(t); css = true; }
+      if (t && t.tagName === "STYLE" && !ownNode(t)) { addStyle(t); continue; }
       for (var k = 0; k < r.addedNodes.length; k++) {
         var n = r.addedNodes[k];
         if (n.nodeType !== 1 || ownNode(n)) continue;
-        nodes = true;
-        if (n.tagName === "STYLE") { addStyle(n); css = true; }
+        if (n.tagName === "STYLE") addStyle(n);
         else if (n.tagName === "LINK") addLink(n);
-        else if (n.querySelector && n.querySelector("style, link[rel~=stylesheet]")) { scan(n); css = true; }
+        else {
+          if (n.querySelector("style, link[rel~=stylesheet]")) scan(n);
+          pendingRoots.push(n);
+          any = true;
+        }
       }
     }
-    if (css || nodes) schedule();
+    if (any) schedule();
   });
   observer.observe(d.documentElement, { childList: true, subtree: true, characterData: true });
 
+  // An Android browser fires resize as its URL bar slides during a scroll;
+  // re-evaluating every stylesheet then is a hitch mid-gesture. Only a real
+  // change of viewport (width, or height by more than a URL bar) re-runs it.
   var resizeTimer = 0;
   w.addEventListener("resize", function () {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function () {
-      if (F.math) {
-        // clamp()/min()/max() were evaluated for the previous viewport
+      var nw = d.documentElement.clientWidth, nh = w.innerHeight;
+      if (F.math && (nw !== vp.w || Math.abs(nh - vp.h) > vp.h * 0.15)) {
         dirtyCss = true;
         readViewport();
         reapplyInline();
+        schedule();
+      } else {
+        layoutAll = true;
+        scheduleLayout();
       }
-      schedule();
     }, 150);
   });
 
@@ -825,9 +894,16 @@
   }
   if (d.readyState === "loading") d.addEventListener("DOMContentLoaded", start);
   else start();
-  w.addEventListener("load", function () { dirtyCss = true; schedule(); });
-  // image sizes feed the aspect/flex fixes; load does not bubble, so capture it
-  d.addEventListener("load", function (e) { if (e.target && e.target.tagName === "IMG") scheduleLayout(); }, true);
+  w.addEventListener("load", function () { layoutAll = true; scheduleLayout(); });
+  if (d.fonts && d.fonts.ready) d.fonts.ready.then(function () { layoutAll = true; scheduleLayout(); });
+  // A lazy image arriving only needs its own check, not a page-wide pass:
+  // during a scroll they arrive one after another. (load does not bubble.)
+  var loadedImgs = [], imgTimer = 0;
+  d.addEventListener("load", function (e) {
+    if (!F.aspect || !e.target || e.target.tagName !== "IMG") return;
+    loadedImgs.push(e.target);
+    if (!imgTimer) imgTimer = setTimeout(function () { imgTimer = 0; var l = loadedImgs; loadedImgs = []; imagePass(l); }, 120);
+  }, true);
   w.__legacyCss = F;
   // For values React sets on the client, where an old engine rejects
   // clamp()/min()/max() silently: see src/lib/css-math.ts

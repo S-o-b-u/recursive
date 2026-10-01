@@ -877,3 +877,20 @@ a { color: inherit; text-decoration: none; }
   border-width: 0 !important;
 }
 
+
+/* ── Smartboard-class hardware (html.perf-lite, set by src/lib/legacy-bootstrap.ts) ──
+   Panel GPUs drive 4K with phone-class silicon. Backdrop blur re-samples the
+   page behind it on every scroll frame, and these loops repaint every frame
+   (background-position, box-shadow), so they stand down there. Transform and
+   opacity animations stay: the compositor runs those for almost nothing. */
+.perf-lite *,
+.perf-lite *::before,
+.perf-lite *::after {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.perf-lite .shader-container-exploded,
+.perf-lite .shader-container-exploded::after,
+.perf-lite .tr-card-active {
+  animation: none !important;
+}

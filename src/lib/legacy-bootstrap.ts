@@ -18,6 +18,12 @@
  * checked before Next polyfills it): third-party embeds such as the
  * OpenStreetMap iframe do not run there, so the venue map shows a still.
  *
+ * `perf-lite` marks smartboard-class hardware: an old engine, an Android
+ * screen 900+ CSS px on its short side (panels, not phones), or a 4K touch
+ * screen. Their GPUs are weak for the pixels they drive, so continuous
+ * effects stand down there (see perfLite() in src/lib/device.ts and the
+ * .perf-lite rules in globals.css).
+ *
  * Big panels: a 4K board whose browser reports 2560-3840 CSS px lays the site
  * out at desktop size in the middle of the screen, unreadable from the back of
  * a room. On screens that large the layout viewport is pinned to 1920 px and
@@ -49,8 +55,12 @@ if(Math.max(sw,sh)>=2200&&Math.min(sw,sh)>=1200){
   if(w.MutationObserver){new MutationObserver(fit).observe(d.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:["content"]});}
 }
 var sup=function(p,v){try{return !!(w.CSS&&CSS.supports&&CSS.supports(p,v));}catch(x){return false;}};
-if(!w.CSSLayerBlockRule||!sup("width","clamp(1px, 1px, 1px)")||!sup("translate","1px")||!sup("inset","0px")||!sup("padding-inline","0px")||!sup("aspect-ratio","1 / 1")){
+var oldCss=!w.CSSLayerBlockRule||!sup("width","clamp(1px, 1px, 1px)")||!sup("translate","1px")||!sup("inset","0px")||!sup("padding-inline","0px")||!sup("aspect-ratio","1 / 1");
+if(oldCss){
   d.documentElement.className+=" legacy-css";
   d.write('<script src="/legacy/css-compat.js"><\/script>');
 }
+var touch=("ontouchstart" in w)||navigator.maxTouchPoints>0;
+var panel=(/Android/i.test(navigator.userAgent)&&Math.min(sw,sh)>=900)||(touch&&Math.max(sw,sh)>=2200);
+if(panel||oldCss||!Object.hasOwn){d.documentElement.className+=" perf-lite";}
 }catch(e){}})(window,document);`;

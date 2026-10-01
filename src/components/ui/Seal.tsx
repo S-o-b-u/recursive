@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef } from "react";
 import { liquidMetalFragmentShader, ShaderMount } from "@paper-design/shaders";
+import { perfLite } from "@/lib/device";
 
 /**
  * Seal — a section taped off, "not decided yet".
@@ -39,7 +40,7 @@ export default function Seal({ word = "SEALED" }: { word?: string }) {
     const isMobile =
       window.matchMedia("(pointer: coarse), (max-width: 860px)").matches ||
       "ontouchstart" in window;
-    if (isMobile) return;
+    if (isMobile || perfLite()) return;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     try {
