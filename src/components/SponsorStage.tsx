@@ -407,25 +407,25 @@ export default function SponsorStage() {
                       </div>
                     </div>
                     <div className="sxp-top-card-col">
-                      <span className="sxp-tier-badge">CORE PLATFORM</span>
+                      <span className="sxp-tier-badge">PARTNER</span>
                       <div className="sxp-composio-card-wrap">
                         <a
                           href="https://composio.dev"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="sxp-partner-card sxp-float-card sxp-composio-card"
-                          title="Composio — Core Platform"
-                          aria-label="Composio"
+                          title="CORE PLATFORM"
+                          aria-label="CORE PLATFORM"
                         >
                           <div className="sxp-composio-content">
                             <img
                               src="/images/sponsors/composio.png"
-                              alt="Composio"
+                              alt="CORE PLATFORM"
                               className="sxp-composio-icon"
                               width={1024}
                               height={1024}
                             />
-                            <span className="sxp-composio-brand">Composio</span>
+                            <span className="sxp-composio-brand">CORE PLATFORM</span>
                           </div>
                         </a>
                       </div>
@@ -1592,7 +1592,7 @@ export default function SponsorStage() {
 
         .sxp-composio-card {
           flex: 0 0 auto !important;
-          width: clamp(122px, 9.8vw, 148px) !important;
+          width: clamp(140px, 11vw, 168px) !important;
           height: clamp(54px, 6.0vh, 62px) !important;
           border-radius: 16px !important;
           padding: 0 0.65rem !important;
@@ -1603,13 +1603,13 @@ export default function SponsorStage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: clamp(0.4rem, 0.55vw, 0.6rem);
+          gap: clamp(0.35rem, 0.45vw, 0.55rem);
           width: 100%;
         }
 
         .sxp-composio-icon {
-          height: clamp(24px, 3.0vh, 30px);
-          width: clamp(24px, 3.0vh, 30px);
+          height: clamp(22px, 2.7vh, 28px);
+          width: clamp(22px, 2.7vh, 28px);
           border-radius: 6px;
           object-fit: cover;
           display: block;
@@ -1619,8 +1619,8 @@ export default function SponsorStage() {
         .sxp-composio-brand {
           font-family: var(--font-display), var(--font-heading), var(--font-dm-sans), sans-serif;
           font-weight: 800;
-          font-size: clamp(0.74rem, 0.9vw, 0.88rem);
-          letter-spacing: -0.015em;
+          font-size: clamp(0.68rem, 0.8vw, 0.8rem);
+          letter-spacing: -0.01em;
           color: #111a12;
           line-height: 1;
           white-space: nowrap;
@@ -2021,19 +2021,19 @@ export default function SponsorStage() {
           }
 
           .sxp-composio-card {
-            width: clamp(125px, 13vw, 155px) !important;
+            width: clamp(138px, 14vw, 168px) !important;
             height: 64px !important;
             border-radius: 18px !important;
             padding: 0 0.6rem !important;
           }
 
           .sxp-composio-icon {
-            height: 30px !important;
-            width: 30px !important;
+            height: 26px !important;
+            width: 26px !important;
           }
 
           .sxp-composio-brand {
-            font-size: clamp(0.74rem, 0.95vw, 0.88rem) !important;
+            font-size: clamp(0.68rem, 0.85vw, 0.78rem) !important;
           }
 
           .sxp-sponsor-cards-wrap {
@@ -2308,19 +2308,19 @@ export default function SponsorStage() {
           }
 
           .sxp-composio-card {
-            width: clamp(110px, 13vw, 130px) !important;
+            width: clamp(126px, 15vw, 150px) !important;
             height: 58px !important;
             border-radius: 16px !important;
             padding: 0 0.5rem !important;
           }
 
           .sxp-composio-icon {
-            height: 26px !important;
-            width: 26px !important;
+            height: 24px !important;
+            width: 24px !important;
           }
 
           .sxp-composio-brand {
-            font-size: 0.72rem !important;
+            font-size: 0.65rem !important;
           }
 
           .sxp-devfolio-card {
@@ -2583,21 +2583,22 @@ export default function SponsorStage() {
           }
           .sxp-composio-card {
             flex: 0 0 auto !important;
-            width: clamp(100px, 29vw, 118px) !important;
+            width: clamp(118px, 34vw, 138px) !important;
             height: 46px !important;
             border-radius: 14px !important;
-            padding: 0 0.45rem !important;
+            padding: 0 0.4rem !important;
           }
           .sxp-composio-content {
             gap: 0.35rem !important;
           }
           .sxp-composio-icon {
-            height: 22px !important;
-            width: 22px !important;
+            height: 20px !important;
+            width: 20px !important;
             border-radius: 5px !important;
           }
           .sxp-composio-brand {
-            font-size: 0.65rem !important;
+            font-size: 0.58rem !important;
+            letter-spacing: -0.01em !important;
           }
           .sxp-devfolio-card {
             flex: 0 0 auto !important;

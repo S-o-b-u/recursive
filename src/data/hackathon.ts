@@ -258,7 +258,7 @@ export const JUDGES: Judge[] = [
 /** Sponsor logo wall. Add a slot per signed sponsor, drop the logo in, set `src`. */
 export const SPONSOR_SLOTS: Slot[] = [
   { label: "AQYRON LABS LOGO", expect: "/images/sponsors/aqyron-labs.png", src: "/images/sponsors/aqyron-labs.png" },
-  { label: "COMPOSIO LOGO", expect: "/images/sponsors/composio.png", src: "/images/sponsors/composio.png" },
+  { label: "CORE PLATFORM LOGO", expect: "/images/sponsors/composio.png", src: "/images/sponsors/composio.png" },
   { label: "N8N LOGO", expect: "/images/sponsors/n8n.png", src: "/images/sponsors/n8n.png" },
   { label: "DEVFOLIO LOGO", expect: "/images/sponsors/devfolio.png", src: "/images/sponsors/devfolio.png" },
   { label: "OSEN LOGO", expect: "/images/sponsors/OSEN.png", src: "/images/sponsors/OSEN.png" },
