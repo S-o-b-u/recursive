@@ -407,6 +407,30 @@ export default function SponsorStage() {
                       </div>
                     </div>
                     <div className="sxp-top-card-col">
+                      <span className="sxp-tier-badge">PARTNER</span>
+                      <div className="sxp-composio-card-wrap">
+                        <a
+                          href="https://composio.dev"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="sxp-partner-card sxp-float-card sxp-composio-card"
+                          title="Composio"
+                          aria-label="Composio"
+                        >
+                          <div className="sxp-composio-content">
+                            <img
+                              src="/images/sponsors/composio.png"
+                              alt="Composio"
+                              className="sxp-composio-icon"
+                              width={1024}
+                              height={1024}
+                            />
+                            <span className="sxp-composio-brand">Composio</span>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+                    <div className="sxp-top-card-col">
                       <span className="sxp-tier-badge">PLATFORM PARTNER</span>
                       <div className="sxp-devfolio-card-wrap">
                         <a
@@ -551,6 +575,22 @@ export default function SponsorStage() {
                           height={300}
                         />
                       </div>
+                      <a
+                        href="https://n8n.io"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="sxp-partner-card sxp-float-card sxp-n8n-card"
+                        title="n8n"
+                        aria-label="n8n"
+                      >
+                        <img
+                          src="/images/sponsors/n8n.png"
+                          alt="n8n"
+                          className="sxp-partner-logo sxp-n8n-logo"
+                          width={576}
+                          height={160}
+                        />
+                      </a>
                     </div>
                   </div>
 
@@ -1352,8 +1392,9 @@ export default function SponsorStage() {
           display: block;
         }
 
-        /* ── Top Tier: Aqyron Labs, Devfolio, Sponsor Cards & XYZ Wraps with Radiant Rays ── */
+        /* ── Top Tier: Aqyron Labs, Composio, Devfolio, Sponsor Cards & XYZ Wraps with Radiant Rays ── */
         .sxp-aqyron-card-wrap,
+        .sxp-composio-card-wrap,
         .sxp-devfolio-card-wrap,
         .sxp-mlkolkata-card-wrap,
         .sxp-sponsor-cards-wrap,
@@ -1549,6 +1590,42 @@ export default function SponsorStage() {
           display: block;
         }
 
+        .sxp-composio-card {
+          flex: 0 0 auto !important;
+          width: clamp(122px, 9.8vw, 148px) !important;
+          height: clamp(54px, 6.0vh, 62px) !important;
+          border-radius: 16px !important;
+          padding: 0 0.65rem !important;
+          text-decoration: none;
+        }
+
+        .sxp-composio-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: clamp(0.4rem, 0.55vw, 0.6rem);
+          width: 100%;
+        }
+
+        .sxp-composio-icon {
+          height: clamp(24px, 3.0vh, 30px);
+          width: clamp(24px, 3.0vh, 30px);
+          border-radius: 6px;
+          object-fit: cover;
+          display: block;
+          flex-shrink: 0;
+        }
+
+        .sxp-composio-brand {
+          font-family: var(--font-display), var(--font-heading), var(--font-dm-sans), sans-serif;
+          font-weight: 800;
+          font-size: clamp(0.74rem, 0.9vw, 0.88rem);
+          letter-spacing: -0.015em;
+          color: #111a12;
+          line-height: 1;
+          white-space: nowrap;
+        }
+
         .sxp-educare-card {
           flex: 0 0 auto !important;
           width: clamp(120px, 9.6vw, 145px) !important;
@@ -1664,6 +1741,24 @@ export default function SponsorStage() {
           height: clamp(46px, 5.5vh, 54px);
           max-height: 54px;
           max-width: 92%;
+          object-fit: contain;
+          display: block;
+        }
+
+        .sxp-n8n-card {
+          flex: 0 0 auto !important;
+          width: clamp(105px, 8.5vw, 125px) !important;
+          height: clamp(56px, 6.4vh, 64px) !important;
+          border-radius: 16px !important;
+          padding: 0 0.55rem !important;
+          text-decoration: none;
+        }
+
+        .sxp-n8n-logo {
+          width: auto;
+          height: clamp(22px, 2.6vh, 28px);
+          max-height: 28px;
+          max-width: 90%;
           object-fit: contain;
           display: block;
         }
@@ -1925,6 +2020,22 @@ export default function SponsorStage() {
             max-height: 40px !important;
           }
 
+          .sxp-composio-card {
+            width: clamp(125px, 13vw, 155px) !important;
+            height: 64px !important;
+            border-radius: 18px !important;
+            padding: 0 0.6rem !important;
+          }
+
+          .sxp-composio-icon {
+            height: 30px !important;
+            width: 30px !important;
+          }
+
+          .sxp-composio-brand {
+            font-size: clamp(0.74rem, 0.95vw, 0.88rem) !important;
+          }
+
           .sxp-sponsor-cards-wrap {
             gap: 10px !important;
           }
@@ -2000,6 +2111,18 @@ export default function SponsorStage() {
 
           .sxp-tmc-logo {
             max-height: 56px !important;
+          }
+
+          .sxp-n8n-card {
+            flex: 0 0 auto !important;
+            width: clamp(110px, 11.5vw, 132px) !important;
+            height: 66px !important;
+            border-radius: 18px !important;
+            padding: 0 0.55rem !important;
+          }
+
+          .sxp-n8n-logo {
+            max-height: 30px !important;
           }
 
           .sxp-media-grid {
@@ -2184,6 +2307,22 @@ export default function SponsorStage() {
             max-height: 36px !important;
           }
 
+          .sxp-composio-card {
+            width: clamp(110px, 13vw, 130px) !important;
+            height: 58px !important;
+            border-radius: 16px !important;
+            padding: 0 0.5rem !important;
+          }
+
+          .sxp-composio-icon {
+            height: 26px !important;
+            width: 26px !important;
+          }
+
+          .sxp-composio-brand {
+            font-size: 0.72rem !important;
+          }
+
           .sxp-devfolio-card {
             flex: 0 0 auto !important;
             width: clamp(180px, 24vw, 215px) !important;
@@ -2292,6 +2431,18 @@ export default function SponsorStage() {
             max-height: 50px !important;
           }
 
+          .sxp-n8n-card {
+            flex: 0 0 auto !important;
+            width: clamp(92px, 11vw, 112px) !important;
+            height: 60px !important;
+            border-radius: 16px !important;
+            padding: 0 0.45rem !important;
+          }
+
+          .sxp-n8n-logo {
+            max-height: 25px !important;
+          }
+
           .sxp-media-grid {
             gap: 10px !important;
           }
@@ -2396,6 +2547,7 @@ export default function SponsorStage() {
             align-items: center !important;
           }
           .sxp-aqyron-card-wrap,
+          .sxp-composio-card-wrap,
           .sxp-devfolio-card-wrap,
           .sxp-mlkolkata-card-wrap,
           .sxp-sponsor-cards-wrap,
@@ -2406,9 +2558,12 @@ export default function SponsorStage() {
           .sxp-sponsor-cards-wrap {
             display: flex !important;
             flex-direction: row !important;
+            flex-wrap: wrap !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 5px !important;
+            gap: 6px !important;
+            max-width: 360px !important;
+            margin-inline: auto !important;
           }
           .sxp-devfolio-rays,
           .sxp-rays {
@@ -2425,6 +2580,24 @@ export default function SponsorStage() {
             max-height: 30px !important;
             width: auto !important;
             max-width: 88% !important;
+          }
+          .sxp-composio-card {
+            flex: 0 0 auto !important;
+            width: clamp(100px, 29vw, 118px) !important;
+            height: 46px !important;
+            border-radius: 14px !important;
+            padding: 0 0.45rem !important;
+          }
+          .sxp-composio-content {
+            gap: 0.35rem !important;
+          }
+          .sxp-composio-icon {
+            height: 22px !important;
+            width: 22px !important;
+            border-radius: 5px !important;
+          }
+          .sxp-composio-brand {
+            font-size: 0.65rem !important;
           }
           .sxp-devfolio-card {
             flex: 0 0 auto !important;
@@ -2524,6 +2697,18 @@ export default function SponsorStage() {
             width: auto !important;
             max-width: 88% !important;
           }
+          .sxp-n8n-card {
+            flex: 0 0 auto !important;
+            width: clamp(70px, 19vw, 84px) !important;
+            height: 46px !important;
+            border-radius: 14px !important;
+            padding: 0 0.25rem !important;
+          }
+          .sxp-n8n-logo {
+            max-height: 20px !important;
+            width: auto !important;
+            max-width: 88% !important;
+          }
 
           /* Community grid: 3-column balanced composition fitting within viewport */
           .sxp-community-grid {
@@ -2558,11 +2743,13 @@ export default function SponsorStage() {
           .sxp-gdg-card,
           .sxp-stuamb-card,
           .sxp-aqyron-card,
+          .sxp-composio-card,
           .sxp-devfolio-card,
           .sxp-educare-card,
           .sxp-osen-card,
           .sxp-tmc-card,
           .sxp-iae-card,
+          .sxp-n8n-card,
           .sxp-xyz-card {
             transform: none !important;
           }
@@ -2572,11 +2759,13 @@ export default function SponsorStage() {
           .sxp-gdg-card:hover,
           .sxp-stuamb-card:hover,
           .sxp-aqyron-card:hover,
+          .sxp-composio-card:hover,
           .sxp-devfolio-card:hover,
           .sxp-educare-card:hover,
           .sxp-osen-card:hover,
           .sxp-tmc-card:hover,
           .sxp-iae-card:hover,
+          .sxp-n8n-card:hover,
           .sxp-xyz-card:hover {
             transform: translateY(-2px) scale(1.015) !important;
           }
