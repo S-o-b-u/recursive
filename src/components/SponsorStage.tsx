@@ -2465,29 +2465,33 @@ export default function SponsorStage() {
           .sxp-body {
             justify-content: safe center !important;
             align-items: center !important;
-            padding-top: clamp(1.8rem, 3.8vh, 2.5rem) !important;
-            padding-bottom: clamp(0.4rem, 1.2vh, 0.8rem) !important;
+            padding-top: clamp(2.2rem, 4.2vh, 2.8rem) !important;
+            padding-bottom: clamp(0.6rem, 1.5vh, 1.0rem) !important;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
           }
           .sxp-ornament-wrap {
-            margin-bottom: 0.04rem !important;
+            display: flex !important;
+            justify-content: center !important;
+            margin-bottom: 0.08rem !important;
           }
+          /* Artifact size matches other sections (About, Judges, Themes) */
           .sxp-crown {
-            width: clamp(56px, 15vw, 76px) !important;
+            width: clamp(114px, 56.87px + 15.87vw, 260px) !important;
             height: auto !important;
-            margin-bottom: 0.02rem !important;
+            margin-bottom: 0.04rem !important;
+            opacity: 0.88 !important;
           }
           .sxp-eyebrow {
-            font-size: 0.50rem !important;
-            letter-spacing: 0.12em !important;
-            margin-bottom: 0.02rem !important;
+            font-size: 0.52rem !important;
+            letter-spacing: 0.13em !important;
+            margin-bottom: 0.03rem !important;
             color: #1b381a;
             font-weight: 600;
           }
           .sxp-heading {
-            font-size: clamp(1.2rem, 4.4vw, 1.55rem) !important;
-            margin-bottom: 0.03rem !important;
+            font-size: clamp(1.3rem, 4.6vw, 1.65rem) !important;
+            margin-bottom: 0.04rem !important;
           }
           .sxp-lede {
             font-size: 0.68rem !important;
@@ -2519,18 +2523,18 @@ export default function SponsorStage() {
           }
           .sxp-partner-tier {
             gap: 0.04rem !important;
-            margin-top: 0.04rem !important;
+            margin-top: 0.06rem !important;
             align-items: center !important;
           }
           .sxp-platform-tier {
             margin-top: 0 !important;
           }
           .sxp-community-tier {
-            margin-top: 0.08rem !important;
+            margin-top: 0.1rem !important;
             margin-bottom: 0 !important;
           }
 
-          /* Top tier: Aqyron + Core Platform on row 1, Devfolio + XYZ on row 2, ML Kolkata on row 3 */
+          /* Top tier: Row 1 = Aqyron + Core Platform (2 cards), Row 2 = Devfolio (1 wide card), Row 3 = ML Kolkata + .xyz (2 cards) */
           .sxp-top-tier-row {
             display: flex !important;
             flex-direction: row !important;
@@ -2539,10 +2543,17 @@ export default function SponsorStage() {
             justify-content: center !important;
             gap: 4px 6px !important;
             width: 100% !important;
-            max-width: 380px !important;
+            max-width: 360px !important;
             margin-inline: auto !important;
           }
           .sxp-top-card-col {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+          }
+          /* Center Devfolio on its own middle row between Partner and Track Partner */
+          .sxp-top-tier-row > .sxp-top-card-col:nth-child(3) {
+            width: 100% !important;
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
@@ -2556,14 +2567,15 @@ export default function SponsorStage() {
           .sxp-xyz-card-wrap {
             margin-top: 0 !important;
           }
+          /* Sponsors tier: Row 1 = OSEN, 2i Educare, TMC (3 cards) | Row 2 = IAE, n8n (2 cards) */
           .sxp-sponsor-cards-wrap {
             display: flex !important;
             flex-direction: row !important;
             flex-wrap: wrap !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 4px !important;
-            max-width: 360px !important;
+            gap: 4px 6px !important;
+            max-width: 310px !important;
             margin-inline: auto !important;
           }
           .sxp-devfolio-rays,
@@ -2603,12 +2615,12 @@ export default function SponsorStage() {
           }
           .sxp-devfolio-card {
             flex: 0 0 auto !important;
-            width: clamp(148px, 44vw, 175px) !important;
+            width: clamp(155px, 46vw, 185px) !important;
             height: 38px !important;
             border-radius: 11px !important;
           }
           .sxp-devfolio-content {
-            padding-inline: 0.4rem !important;
+            padding-inline: 0.45rem !important;
           }
           .sxp-devfolio-logo {
             height: 14px !important;
@@ -2624,28 +2636,42 @@ export default function SponsorStage() {
           }
           .sxp-osen-card {
             flex: 0 0 auto !important;
-            width: clamp(70px, 20vw, 82px) !important;
+            width: clamp(76px, 22vw, 86px) !important;
             height: 38px !important;
             border-radius: 11px !important;
             padding: 0 0.3rem !important;
           }
           .sxp-educare-card {
             flex: 0 0 auto !important;
-            width: clamp(80px, 23vw, 94px) !important;
+            width: clamp(86px, 25vw, 98px) !important;
             height: 38px !important;
             border-radius: 11px !important;
             padding: 0 0.3rem !important;
           }
-          .sxp-iae-card {
+          .sxp-tmc-card {
             flex: 0 0 auto !important;
-            width: clamp(50px, 14vw, 58px) !important;
+            width: clamp(76px, 22vw, 86px) !important;
             height: 38px !important;
             border-radius: 11px !important;
-            padding: 0 0.2rem !important;
+            padding: 0 0.25rem !important;
+          }
+          .sxp-iae-card {
+            flex: 0 0 auto !important;
+            width: clamp(66px, 19vw, 76px) !important;
+            height: 38px !important;
+            border-radius: 11px !important;
+            padding: 0 0.25rem !important;
+          }
+          .sxp-n8n-card {
+            flex: 0 0 auto !important;
+            width: clamp(84px, 24vw, 96px) !important;
+            height: 38px !important;
+            border-radius: 11px !important;
+            padding: 0 0.25rem !important;
           }
           .sxp-xyz-card {
             flex: 0 0 auto !important;
-            width: clamp(62px, 18vw, 74px) !important;
+            width: clamp(64px, 19vw, 76px) !important;
             height: 38px !important;
             border-radius: 11px !important;
             padding: 0 0.2rem !important;
@@ -2661,7 +2687,7 @@ export default function SponsorStage() {
             max-width: 90% !important;
           }
           .sxp-iae-logo {
-            max-height: 32px !important;
+            max-height: 30px !important;
             width: auto !important;
             max-width: 90% !important;
           }
@@ -2687,24 +2713,10 @@ export default function SponsorStage() {
           .sxp-mlkolkata-brand {
             font-size: 0.56rem !important;
           }
-          .sxp-tmc-card {
-            flex: 0 0 auto !important;
-            width: clamp(68px, 19vw, 80px) !important;
-            height: 38px !important;
-            border-radius: 11px !important;
-            padding: 0 0.2rem !important;
-          }
           .sxp-tmc-logo {
             max-height: 28px !important;
             width: auto !important;
             max-width: 88% !important;
-          }
-          .sxp-n8n-card {
-            flex: 0 0 auto !important;
-            width: clamp(64px, 18vw, 76px) !important;
-            height: 38px !important;
-            border-radius: 11px !important;
-            padding: 0 0.2rem !important;
           }
           .sxp-n8n-logo {
             max-height: 16px !important;
@@ -2712,7 +2724,7 @@ export default function SponsorStage() {
             max-width: 88% !important;
           }
 
-          /* Community grid: 3-column balanced composition fitting within viewport */
+          /* Community grid: 3-column balanced composition, 2 cards per column */
           .sxp-community-grid {
             display: flex !important;
             flex-direction: row !important;
@@ -2794,7 +2806,7 @@ export default function SponsorStage() {
           }
           .sxp-stuamb-card {
             flex: 0 0 auto !important;
-            width: clamp(82px, 23vw, 94px) !important;
+            width: clamp(94px, 27vw, 108px) !important;
             height: 38px !important;
             aspect-ratio: auto !important;
             border-radius: 11px !important;
