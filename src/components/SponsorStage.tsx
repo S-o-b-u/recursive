@@ -2511,9 +2511,9 @@ export default function SponsorStage() {
             justify-content: center !important;
             margin-bottom: 0.08rem !important;
           }
-          /* Tuned artifact size for small screen phones */
+          /* Match artifact size to other sections on mobile */
           .sxp-crown {
-            width: clamp(76px, 21vw, 96px) !important;
+            width: clamp(114px, 56.87px + 15.87vw, 260px) !important;
             height: auto !important;
             margin-bottom: 0.04rem !important;
             opacity: 0.88 !important;
