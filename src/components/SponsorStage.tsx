@@ -2462,10 +2462,10 @@ export default function SponsorStage() {
           }
           .sxp { --sxp-track: 250vh; }
           .sxp-body {
-            justify-content: center !important;
+            justify-content: safe center !important;
             align-items: center !important;
             padding-top: clamp(2.6rem, 5.5vh, 4rem) !important;
-            padding-bottom: clamp(1.2rem, 2.5vh, 2rem) !important;
+            padding-bottom: clamp(1.6rem, 3vh, 2.4rem) !important;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
           }
@@ -2862,8 +2862,29 @@ export default function SponsorStage() {
             padding-inline: 0.6rem !important;
           }
           .sxp-cta-wrap {
-            margin-top: 0.18rem !important;
-            transform: scale(0.85) !important;
+            margin-top: 0.2rem !important;
+            transform: scale(0.88) !important;
+            /* Negative margins cancel the dead layout space that scale() leaves
+               behind (scale doesn't shrink layout footprint; margins compensate):
+               dead_space_per_side = height * (1 - 0.88) / 2 = 46px * 0.06 = 2.76px */
+            margin-bottom: -3px !important;
+          }
+        }
+
+        /* ── Extra-small / short phones (6.0–6.3 in ≈ 360–395px × ≤860px) ──
+           The crown ornament is the single largest vertical element on mobile (~116px).
+           On short viewports the stacked content would push the CTA off-screen even
+           with safe center, so we shrink the crown further to reclaim ~30–40px. */
+        @media (max-width: 620px) and (max-height: 860px) {
+          .sxp-crown {
+            width: clamp(72px, 38px + 11vw, 120px) !important;
+            /* At 375px: 38 + 41.25 = 79px (was ~116px → saves ~37px) */
+          }
+          .sxp-ornament-wrap {
+            margin-bottom: 0.08rem !important;
+          }
+          .sxp-cta-wrap {
+            margin-top: 0.12rem !important;
           }
         }
 
@@ -2906,7 +2927,8 @@ export default function SponsorStage() {
           }
           .sxp-cta-wrap {
             transform: scale(0.88) !important;
-            margin-top: 0.12rem !important;
+            margin-top: 0.1rem !important;
+            margin-bottom: -3px !important;
           }
         }
 
