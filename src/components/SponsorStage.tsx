@@ -195,9 +195,9 @@ export default function SponsorStage() {
         const inv = 1 - p;
         if (Math.abs(inv - lastInv) > 0.0004 || (inv <= 0.001 && lastInv > 0.001) || (inv >= 0.999 && lastInv < 0.999)) {
           lastInv = inv;
-          if (inv <= 0.001) {
+          if (inv <= 0.001 || window.innerWidth <= 620) {
             if (frameEl) {
-              frameEl.style.clipPath = "inset(0px 0px 0px 0px round 0px)";
+              frameEl.style.clipPath = "none";
             }
             if (keyline) {
               keyline.style.opacity = "0";
@@ -224,12 +224,20 @@ export default function SponsorStage() {
         }
 
         // 2. Smooth bidirectional crossfade for the night field.
-        const op = Math.max(0, Math.min(1, (1 - p) * 2.8));
-        if (Math.abs(op - lastOp) > 0.008 || (op === 0 && lastOp !== 0) || (op === 1 && lastOp !== 1)) {
-          lastOp = op;
-          const opStr = op.toFixed(3);
-          if (night) night.style.opacity = opStr;
-          if (plate) plate.style.opacity = opStr;
+        if (window.innerWidth <= 620) {
+          if (night) night.style.display = "none";
+          if (plate) plate.style.opacity = "1";
+        } else {
+          const op = Math.max(0, Math.min(1, (1 - p) * 2.8));
+          if (Math.abs(op - lastOp) > 0.008 || (op === 0 && lastOp !== 0) || (op === 1 && lastOp !== 1)) {
+            lastOp = op;
+            const opStr = op.toFixed(3);
+            if (night) {
+              night.style.display = "";
+              night.style.opacity = opStr;
+            }
+            if (plate) plate.style.opacity = opStr;
+          }
         }
 
         // 3. The night-side labels step aside smoothly and return gracefully on close.
@@ -250,14 +258,25 @@ export default function SponsorStage() {
         }
 
         // 5. The panel arrives softly as the window expands and dissolves smoothly as it closes.
-        const b = easePanel(clamp01((t - PANEL_IN) / PANEL_LEN));
-        if (Math.abs(b - lastB) > 0.008 || (b === 0 && lastB !== 0) || (b === 1 && lastB !== 1)) {
-          lastB = b;
-          setBody({ opacity: b, y: 28 * (1 - b) });
-          const bodyOn = b > 0.08;
-          if (bodyOn !== bodyInteractive) {
-            bodyInteractive = bodyOn;
-            body.style.pointerEvents = bodyOn ? "auto" : "none";
+        if (window.innerWidth <= 620) {
+          if (lastB !== 1) {
+            lastB = 1;
+            setBody({ opacity: 1, y: 0 });
+            if (bodyInteractive !== true) {
+              bodyInteractive = true;
+              body.style.pointerEvents = "auto";
+            }
+          }
+        } else {
+          const b = easePanel(clamp01((t - PANEL_IN) / PANEL_LEN));
+          if (Math.abs(b - lastB) > 0.008 || (b === 0 && lastB !== 0) || (b === 1 && lastB !== 1)) {
+            lastB = b;
+            setBody({ opacity: b, y: 28 * (1 - b) });
+            const bodyOn = b > 0.08;
+            if (bodyOn !== bodyInteractive) {
+              bodyInteractive = bodyOn;
+              body.style.pointerEvents = bodyOn ? "auto" : "none";
+            }
           }
         }
 
@@ -2460,6 +2479,23 @@ export default function SponsorStage() {
         @media (max-width: 620px) {
           .sxp-artifacts-wing {
             display: none !important;
+          }
+          .sxp-night {
+            display: none !important;
+          }
+          .sxp-frame {
+            clip-path: none !important;
+          }
+          .sxp-keyline {
+            display: none !important;
+          }
+          .sxp-intro,
+          .sxp-outro,
+          .sxp-frame-preview {
+            display: none !important;
+          }
+          .sxp-plate {
+            opacity: 1 !important;
           }
           .sxp { --sxp-track: 250vh; }
           .sxp-body {
