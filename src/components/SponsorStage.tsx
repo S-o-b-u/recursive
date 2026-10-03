@@ -866,6 +866,7 @@ export default function SponsorStage() {
           position: sticky;
           top: 0;
           height: 100vh;
+          height: 100dvh;
           width: 100%;
           overflow: hidden;
         }
@@ -2165,9 +2166,9 @@ export default function SponsorStage() {
           }
 
           .sxp-body {
-            justify-content: center;
+            justify-content: safe center;
             padding-top: clamp(3.2rem, 4.5vh, 4.2rem);
-            padding-bottom: clamp(2rem, 3.5vh, 3.2rem);
+            padding-bottom: clamp(1.6rem, 3vh, 2.4rem);
             overflow-y: auto;
           }
 
@@ -2464,44 +2465,44 @@ export default function SponsorStage() {
           .sxp-body {
             justify-content: safe center !important;
             align-items: center !important;
-            padding-top: clamp(2.6rem, 5.5vh, 4rem) !important;
-            padding-bottom: clamp(1.6rem, 3vh, 2.4rem) !important;
+            padding-top: clamp(1.8rem, 3.8vh, 2.5rem) !important;
+            padding-bottom: clamp(0.4rem, 1.2vh, 0.8rem) !important;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
           }
           .sxp-ornament-wrap {
-            margin-bottom: clamp(0.15rem, 0.5vh, 0.35rem) !important;
+            margin-bottom: 0.04rem !important;
           }
           .sxp-crown {
-            width: clamp(114px, 56.87px + 15.87vw, 260px) !important;
+            width: clamp(56px, 15vw, 76px) !important;
             height: auto !important;
-            margin-bottom: 0.05rem !important;
+            margin-bottom: 0.02rem !important;
           }
           .sxp-eyebrow {
-            font-size: 0.54rem !important;
-            letter-spacing: 0.14em !important;
-            margin-bottom: 0.05rem !important;
+            font-size: 0.50rem !important;
+            letter-spacing: 0.12em !important;
+            margin-bottom: 0.02rem !important;
             color: #1b381a;
             font-weight: 600;
           }
           .sxp-heading {
-            font-size: clamp(1.4rem, 5.2vw, 1.85rem) !important;
-            margin-bottom: 0.05rem !important;
+            font-size: clamp(1.2rem, 4.4vw, 1.55rem) !important;
+            margin-bottom: 0.03rem !important;
           }
           .sxp-lede {
-            font-size: 0.72rem !important;
-            line-height: 1.28 !important;
-            max-width: 19rem !important;
-            margin-bottom: 0.15rem !important;
+            font-size: 0.68rem !important;
+            line-height: 1.25 !important;
+            max-width: 18rem !important;
+            margin-bottom: 0.1rem !important;
             color: #263e24;
           }
           .sxp-tier-badge {
-            font-size: 0.54rem !important;
-            letter-spacing: 0.12em !important;
-            margin-bottom: 0.04rem !important;
+            font-size: 0.50rem !important;
+            letter-spacing: 0.11em !important;
+            margin-bottom: 0.03rem !important;
           }
           .sxp-inner {
-            gap: 0.1rem !important;
+            gap: 0 !important;
             align-items: center !important;
           }
           .sxp-inner::before {
@@ -2517,26 +2518,26 @@ export default function SponsorStage() {
             filter: blur(28px);
           }
           .sxp-partner-tier {
-            gap: 0.1rem !important;
-            margin-top: 0.05rem !important;
+            gap: 0.04rem !important;
+            margin-top: 0.04rem !important;
             align-items: center !important;
           }
           .sxp-platform-tier {
             margin-top: 0 !important;
           }
           .sxp-community-tier {
-            margin-top: 0.15rem !important;
+            margin-top: 0.08rem !important;
             margin-bottom: 0 !important;
           }
 
-          /* Top tier: Aqyron + Devfolio on row 1, OSEN + Educare + XYZ on row 2 on mobile */
+          /* Top tier: Aqyron + Core Platform on row 1, Devfolio + XYZ on row 2, ML Kolkata on row 3 */
           .sxp-top-tier-row {
             display: flex !important;
             flex-direction: row !important;
             flex-wrap: wrap !important;
             align-items: flex-end !important;
             justify-content: center !important;
-            gap: 6px 8px !important;
+            gap: 4px 6px !important;
             width: 100% !important;
             max-width: 380px !important;
             margin-inline: auto !important;
@@ -2561,7 +2562,7 @@ export default function SponsorStage() {
             flex-wrap: wrap !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 6px !important;
+            gap: 4px !important;
             max-width: 360px !important;
             margin-inline: auto !important;
           }
@@ -2571,142 +2572,142 @@ export default function SponsorStage() {
           }
           .sxp-aqyron-card {
             flex: 0 0 auto !important;
-            width: clamp(100px, 29vw, 118px) !important;
-            height: 46px !important;
-            border-radius: 14px !important;
-            padding: 0 0.45rem !important;
+            width: clamp(92px, 27vw, 110px) !important;
+            height: 38px !important;
+            border-radius: 11px !important;
+            padding: 0 0.4rem !important;
           }
           .sxp-aqyron-logo {
-            max-height: 30px !important;
+            max-height: 24px !important;
             width: auto !important;
             max-width: 88% !important;
           }
           .sxp-composio-card {
             flex: 0 0 auto !important;
-            width: clamp(118px, 34vw, 138px) !important;
-            height: 46px !important;
-            border-radius: 14px !important;
-            padding: 0 0.4rem !important;
+            width: clamp(108px, 31vw, 128px) !important;
+            height: 38px !important;
+            border-radius: 11px !important;
+            padding: 0 0.35rem !important;
           }
           .sxp-composio-content {
-            gap: 0.35rem !important;
+            gap: 0.3rem !important;
           }
           .sxp-composio-icon {
-            height: 20px !important;
-            width: 20px !important;
-            border-radius: 5px !important;
+            height: 17px !important;
+            width: 17px !important;
+            border-radius: 4px !important;
           }
           .sxp-composio-brand {
-            font-size: 0.58rem !important;
+            font-size: 0.54rem !important;
             letter-spacing: -0.01em !important;
           }
           .sxp-devfolio-card {
             flex: 0 0 auto !important;
-            width: clamp(165px, 48vw, 195px) !important;
-            height: 46px !important;
-            border-radius: 14px !important;
+            width: clamp(148px, 44vw, 175px) !important;
+            height: 38px !important;
+            border-radius: 11px !important;
           }
           .sxp-devfolio-content {
-            padding-inline: 0.5rem !important;
+            padding-inline: 0.4rem !important;
           }
           .sxp-devfolio-logo {
-            height: 16px !important;
+            height: 14px !important;
             width: auto !important;
           }
           .sxp-devfolio-divider {
-            height: 15px !important;
-            margin-inline: 0.32rem !important;
+            height: 13px !important;
+            margin-inline: 0.28rem !important;
           }
           .sxp-devfolio-tagline {
-            font-size: 0.42rem !important;
+            font-size: 0.38rem !important;
             gap: 1px !important;
           }
           .sxp-osen-card {
             flex: 0 0 auto !important;
-            width: clamp(75px, 22vw, 88px) !important;
-            height: 46px !important;
-            border-radius: 14px !important;
-            padding: 0 0.35rem !important;
+            width: clamp(70px, 20vw, 82px) !important;
+            height: 38px !important;
+            border-radius: 11px !important;
+            padding: 0 0.3rem !important;
           }
           .sxp-educare-card {
             flex: 0 0 auto !important;
-            width: clamp(88px, 25vw, 102px) !important;
-            height: 46px !important;
-            border-radius: 14px !important;
-            padding: 0 0.35rem !important;
+            width: clamp(80px, 23vw, 94px) !important;
+            height: 38px !important;
+            border-radius: 11px !important;
+            padding: 0 0.3rem !important;
           }
           .sxp-iae-card {
             flex: 0 0 auto !important;
-            width: clamp(54px, 15vw, 64px) !important;
-            height: 46px !important;
-            border-radius: 14px !important;
-            padding: 0 0.25rem !important;
+            width: clamp(50px, 14vw, 58px) !important;
+            height: 38px !important;
+            border-radius: 11px !important;
+            padding: 0 0.2rem !important;
           }
           .sxp-xyz-card {
             flex: 0 0 auto !important;
-            width: clamp(68px, 20vw, 80px) !important;
-            height: 46px !important;
-            border-radius: 14px !important;
-            padding: 0 0.25rem !important;
+            width: clamp(62px, 18vw, 74px) !important;
+            height: 38px !important;
+            border-radius: 11px !important;
+            padding: 0 0.2rem !important;
           }
           .sxp-osen-logo {
-            max-height: 22px !important;
+            max-height: 18px !important;
             width: auto !important;
             max-width: 88% !important;
           }
           .sxp-educare-logo {
-            max-height: 22px !important;
+            max-height: 18px !important;
             width: auto !important;
             max-width: 90% !important;
           }
           .sxp-iae-logo {
-            max-height: 40px !important;
+            max-height: 32px !important;
             width: auto !important;
             max-width: 90% !important;
           }
           .sxp-xyz-logo {
-            max-height: 18px !important;
+            max-height: 15px !important;
             width: auto !important;
             max-width: 86% !important;
           }
           .sxp-mlkolkata-card {
             flex: 0 0 auto !important;
-            width: clamp(120px, 35vw, 142px) !important;
-            height: 46px !important;
-            border-radius: 14px !important;
-            padding: 0 0.45rem !important;
+            width: clamp(108px, 32vw, 130px) !important;
+            height: 38px !important;
+            border-radius: 11px !important;
+            padding: 0 0.4rem !important;
           }
           .sxp-mlkolkata-content {
-            gap: 0.35rem !important;
+            gap: 0.3rem !important;
           }
           .sxp-mlkolkata-torch {
-            max-height: 24px !important;
+            max-height: 20px !important;
             width: auto !important;
           }
           .sxp-mlkolkata-brand {
-            font-size: 0.62rem !important;
+            font-size: 0.56rem !important;
           }
           .sxp-tmc-card {
             flex: 0 0 auto !important;
-            width: clamp(74px, 20vw, 88px) !important;
-            height: 46px !important;
-            border-radius: 14px !important;
-            padding: 0 0.25rem !important;
+            width: clamp(68px, 19vw, 80px) !important;
+            height: 38px !important;
+            border-radius: 11px !important;
+            padding: 0 0.2rem !important;
           }
           .sxp-tmc-logo {
-            max-height: 36px !important;
+            max-height: 28px !important;
             width: auto !important;
             max-width: 88% !important;
           }
           .sxp-n8n-card {
             flex: 0 0 auto !important;
-            width: clamp(70px, 19vw, 84px) !important;
-            height: 46px !important;
-            border-radius: 14px !important;
-            padding: 0 0.25rem !important;
+            width: clamp(64px, 18vw, 76px) !important;
+            height: 38px !important;
+            border-radius: 11px !important;
+            padding: 0 0.2rem !important;
           }
           .sxp-n8n-logo {
-            max-height: 20px !important;
+            max-height: 16px !important;
             width: auto !important;
             max-width: 88% !important;
           }
@@ -2718,7 +2719,7 @@ export default function SponsorStage() {
             flex-wrap: nowrap !important;
             justify-content: center !important;
             align-items: center !important;
-            gap: 6px !important;
+            gap: 5px !important;
             width: 100% !important;
             max-width: 350px !important;
             margin-inline: auto !important;
@@ -2728,15 +2729,15 @@ export default function SponsorStage() {
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 6px !important;
+            gap: 5px !important;
             flex: 0 0 auto !important;
           }
           .sxp-community-grid .sxp-partner-card:not(.sxp-stuamb-card) {
             flex: 0 0 auto !important;
-            width: clamp(100px, 28vw, 114px) !important;
-            height: 42px !important;
-            border-radius: 12px !important;
-            padding: 0 0.35rem !important;
+            width: clamp(94px, 27vw, 108px) !important;
+            height: 38px !important;
+            border-radius: 11px !important;
+            padding: 0 0.3rem !important;
           }
           .sxp-react-kolkata-card,
           .sxp-coderush-card,
@@ -2771,58 +2772,59 @@ export default function SponsorStage() {
             transform: translateY(-2px) scale(1.015) !important;
           }
           .sxp-react-kolkata-logo {
-            max-height: 18px !important;
+            max-height: 16px !important;
             width: auto !important;
             max-width: 88% !important;
           }
           .sxp-innofusion-card {
-            padding: 0 0.35rem !important;
+            padding: 0 0.3rem !important;
           }
           .sxp-innofusion-content {
-            gap: 0.25rem !important;
+            gap: 0.2rem !important;
           }
           .sxp-innofusion-logo {
-            height: 16px !important;
-            width: 16px !important;
+            height: 14px !important;
+            width: 14px !important;
           }
           .sxp-innofusion-brand {
-            font-size: 0.63rem !important;
+            font-size: 0.58rem !important;
             letter-spacing: 0.01em !important;
             font-weight: 700 !important;
             white-space: nowrap !important;
           }
           .sxp-stuamb-card {
             flex: 0 0 auto !important;
-            width: clamp(84px, 23vw, 92px) !important;
-            height: clamp(84px, 23vw, 92px) !important;
-            aspect-ratio: 1 / 1 !important;
-            border-radius: 14px !important;
-            padding: 0.25rem !important;
+            width: clamp(82px, 23vw, 94px) !important;
+            height: 38px !important;
+            aspect-ratio: auto !important;
+            border-radius: 11px !important;
+            padding: 0 0.3rem !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
           }
           .sxp-stuamb-logo {
-            max-height: 64px !important;
+            max-height: 28px !important;
             width: auto !important;
             max-width: 88% !important;
           }
           .sxp-gdg-card {
-            width: clamp(96px, 27vw, 114px) !important;
-            height: 48px !important;
+            width: clamp(94px, 27vw, 108px) !important;
+            height: 38px !important;
+            border-radius: 11px !important;
           }
           .sxp-gdg-logo {
-            max-height: 32px !important;
-            width: clamp(78px, 22vw, 96px) !important;
+            max-height: 24px !important;
+            width: clamp(72px, 21vw, 90px) !important;
             max-width: 90% !important;
           }
           .sxp-coderush-logo {
-            max-height: 16px !important;
+            max-height: 14px !important;
             width: auto !important;
             max-width: 88% !important;
           }
           .sxp-mahakash-logo {
-            max-height: 20px !important;
+            max-height: 17px !important;
             width: auto !important;
             max-width: 90% !important;
           }
@@ -2833,58 +2835,40 @@ export default function SponsorStage() {
             flex-direction: row !important;
             justify-content: center !important;
             align-items: center !important;
-            gap: 8px !important;
+            gap: 6px !important;
             width: min(94vw, 350px) !important;
           }
           .sxp-media-grid .sxp-lnc-card,
           .sxp-media-grid .sxp-eventopia-card {
             flex: 0 0 auto !important;
-            width: clamp(140px, 42vw, 156px) !important;
-            height: 44px !important;
-            border-radius: 12px !important;
-            padding: 0 0.4rem !important;
+            width: clamp(126px, 38vw, 146px) !important;
+            height: 38px !important;
+            border-radius: 11px !important;
+            padding: 0 0.35rem !important;
           }
           .sxp-lnc-logo {
-            max-height: 20px !important;
+            max-height: 17px !important;
             width: auto !important;
             max-width: 85% !important;
           }
           .sxp-eventopia-logo {
-            max-height: 15px !important;
+            max-height: 13px !important;
             width: auto !important;
             max-width: 88% !important;
           }
           .sxp-unrevealed-note {
-            font-size: 0.64rem !important;
-            margin-top: 0.15rem !important;
+            font-size: 0.60rem !important;
+            margin-top: 0.12rem !important;
             margin-bottom: 0 !important;
             text-align: center !important;
-            padding-inline: 0.6rem !important;
+            padding-inline: 0.5rem !important;
+            opacity: 0.85 !important;
           }
           .sxp-cta-wrap {
-            margin-top: 0.2rem !important;
-            transform: scale(0.88) !important;
-            /* Negative margins cancel the dead layout space that scale() leaves
-               behind (scale doesn't shrink layout footprint; margins compensate):
-               dead_space_per_side = height * (1 - 0.88) / 2 = 46px * 0.06 = 2.76px */
-            margin-bottom: -3px !important;
-          }
-        }
-
-        /* ── Extra-small / short phones (6.0–6.3 in ≈ 360–395px × ≤860px) ──
-           The crown ornament is the single largest vertical element on mobile (~116px).
-           On short viewports the stacked content would push the CTA off-screen even
-           with safe center, so we shrink the crown further to reclaim ~30–40px. */
-        @media (max-width: 620px) and (max-height: 860px) {
-          .sxp-crown {
-            width: clamp(72px, 38px + 11vw, 120px) !important;
-            /* At 375px: 38 + 41.25 = 79px (was ~116px → saves ~37px) */
-          }
-          .sxp-ornament-wrap {
-            margin-bottom: 0.08rem !important;
-          }
-          .sxp-cta-wrap {
-            margin-top: 0.12rem !important;
+            margin-top: clamp(0.18rem, 0.4vh, 0.3rem) !important;
+            transform: scale(0.84) !important;
+            transform-origin: center top !important;
+            margin-bottom: -4px !important;
           }
         }
 
