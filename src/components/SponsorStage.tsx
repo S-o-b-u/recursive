@@ -226,7 +226,7 @@ export default function SponsorStage() {
         // 2. Smooth bidirectional crossfade for the night field.
         if (window.innerWidth <= 620) {
           if (night) night.style.display = "none";
-          if (plate) plate.style.opacity = "1";
+          if (plate) plate.style.display = "none";
         } else {
           const op = Math.max(0, Math.min(1, (1 - p) * 2.8));
           if (Math.abs(op - lastOp) > 0.008 || (op === 0 && lastOp !== 0) || (op === 1 && lastOp !== 1)) {
@@ -1013,7 +1013,7 @@ export default function SponsorStage() {
           background-color: var(--color-bg);
           background-image: url("/images/bg/cloud.jpg");
           background-size: cover;
-          background-position: center 25%;
+          background-position: center top;
           background-repeat: no-repeat;
           transform: translateZ(0);
           -webkit-transform: translateZ(0);
@@ -2495,7 +2495,7 @@ export default function SponsorStage() {
             display: none !important;
           }
           .sxp-plate {
-            opacity: 1 !important;
+            display: none !important;
           }
           .sxp { --sxp-track: 250vh; }
           .sxp-body {
@@ -2546,16 +2546,7 @@ export default function SponsorStage() {
             align-items: center !important;
           }
           .sxp-inner::before {
-            width: 100vw;
-            height: 100%;
-            background: radial-gradient(
-              ellipse 90% 75% at 50% 45%,
-              rgba(255, 255, 255, 0.98) 0%,
-              rgba(255, 255, 255, 0.88) 45%,
-              rgba(255, 255, 255, 0.5) 75%,
-              transparent 95%
-            );
-            filter: blur(28px);
+            display: none !important;
           }
           .sxp-partner-tier {
             gap: 0.04rem !important;
