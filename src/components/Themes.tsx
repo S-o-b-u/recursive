@@ -10,6 +10,7 @@ import MorphSlider, {
   type MorphSliderItem,
 } from "@/components/ui/MorphSlider";
 import { buildTrackTextures } from "@/lib/track-textures";
+import { revealForce3D } from "@/lib/device";
 
 /** Autoplay dwell, shared by the slider and the rail's progress bar. */
 const DWELL = 6;
@@ -77,26 +78,27 @@ export default function Themes() {
     const isVisible = rect.top < window.innerHeight + 100 && rect.bottom > -100;
     if (!isVisible) return;
 
+    const f3d = revealForce3D();
     const ctx = gsap.context(() => {
       // 1. Seat badge lift
       gsap.fromTo(
         ".th-brief-seat",
         { opacity: 0, y: 14 },
-        { opacity: 1, y: 0, force3D: true, ease: "expo.out", duration: 0.9 }
+        { opacity: 1, y: 0, force3D: f3d, ease: "expo.out", duration: 0.9 }
       );
 
       // 2. Title mask reveal
       gsap.fromTo(
         ".th-brief-title .th-mask-inner",
         { yPercent: 112 },
-        { yPercent: 0, force3D: true, ease: "expo.out", duration: 1.1, delay: 0.04 }
+        { yPercent: 0, force3D: f3d, ease: "expo.out", duration: 1.1, delay: 0.04 }
       );
 
       // 3. Hairline divider rule draw
       gsap.fromTo(
         ".th-brief-rule i",
         { scaleX: 0 },
-        { scaleX: 1, force3D: true, ease: "expo.out", duration: 1.2, delay: 0.08 }
+        { scaleX: 1, force3D: f3d, ease: "expo.out", duration: 1.2, delay: 0.08 }
       );
 
       // 4. Punchline words reveal
@@ -106,7 +108,7 @@ export default function Themes() {
         {
           opacity: 1,
           y: 0,
-          force3D: true,
+          force3D: f3d,
           ease: "power2.out",
           duration: 0.65,
           stagger: 0.03,
@@ -121,7 +123,7 @@ export default function Themes() {
         {
           opacity: 1,
           y: 0,
-          force3D: true,
+          force3D: f3d,
           ease: "power2.out",
           duration: 0.65,
           stagger: 0.015,
@@ -136,7 +138,7 @@ export default function Themes() {
         {
           opacity: 1,
           x: 0,
-          force3D: true,
+          force3D: f3d,
           ease: "expo.out",
           duration: 0.85,
           stagger: 0.08,
@@ -150,7 +152,7 @@ export default function Themes() {
         {
           opacity: 1,
           y: 0,
-          force3D: true,
+          force3D: f3d,
           ease: "power2.out",
           duration: 0.55,
           stagger: 0.02,

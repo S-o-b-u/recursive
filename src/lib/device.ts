@@ -55,3 +55,12 @@ export function perfLite(): boolean {
     document.documentElement.classList.contains("perf-lite")
   );
 }
+
+/**
+ * GSAP `force3D` for one-shot reveals. `true` leaves every revealed element on
+ * its own GPU layer after the tween ends; on smartboards that added up to
+ * hundreds of layers, so there the transform drops back to 2D at the end.
+ */
+export function revealForce3D(): true | "auto" {
+  return perfLite() ? "auto" : true;
+}

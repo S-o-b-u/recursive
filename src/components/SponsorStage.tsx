@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SPONSOR_SLOTS, EVENT } from "@/data/hackathon";
 import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import Ornament from "@/components/ui/Ornament";
+import { perfLite } from "@/lib/device";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -85,10 +86,18 @@ export default function SponsorStage() {
     const night = stage.querySelector<HTMLElement>(".sxp-night");
     const frameEl = stage.querySelector<HTMLElement>(".sxp-frame");
     const keyline = stage.querySelector<HTMLElement>(".sxp-keyline");
+    // Smartboards: top, bottom, left, right night panels (see .sxp-shutters).
+    const shutters = perfLite()
+      ? Array.from(stage.querySelectorAll<HTMLElement>(".sxp-shutter"))
+      : [];
+    const shutterWrap = shutters.length ? stage.querySelector<HTMLElement>(".sxp-shutters") : null;
     const setP = (v: number) => stage.style.setProperty("--sxp-p", v.toFixed(4));
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setP(1);
+      shutters.forEach((el) => {
+        el.style.display = "none";
+      });
       gsap.set([intro, outro], { opacity: 0 });
       if (preview) gsap.set(preview, { opacity: 0 });
       gsap.set(body, { opacity: 1, y: 0 });
@@ -189,13 +198,30 @@ export default function SponsorStage() {
       const PANEL_IN = 0.20;
       const PANEL_LEN = 0.32;
 
+      /** Panels' inner edges onto the window's, which is inset iy/ix from the stage. */
+      const placeShutters = (iy: number, ix: number) => {
+        const [top, bottom, left, right] = shutters;
+        const hh = stageH / 2;
+        const hw = stageW / 2;
+        top.style.transform = "translate3d(0," + (iy - hh).toFixed(1) + "px,0)";
+        bottom.style.transform = "translate3d(0," + (hh - iy).toFixed(1) + "px,0)";
+        left.style.transform = "translate3d(" + (ix - hw).toFixed(1) + "px,0,0)";
+        right.style.transform = "translate3d(" + (hw - ix).toFixed(1) + "px,0,0)";
+      };
+
       const apply = (t: number) => {
         // 1. The window opens and closes with organic, gentle sine.out curve.
         const p = easeWindow(clamp01(t / WINDOW_END));
         const inv = 1 - p;
         if (Math.abs(inv - lastInv) > 0.0004 || (inv <= 0.001 && lastInv > 0.001) || (inv >= 0.999 && lastInv < 0.999)) {
           lastInv = inv;
-          if (inv <= 0.001 || window.innerWidth <= 620) {
+          if (shutters.length === 4) {
+            const open = inv <= 0.001 || window.innerWidth <= 620;
+            placeShutters(
+              open ? 0 : Math.max(0, (stageH - winH) / 2) * inv,
+              open ? 0 : Math.max(0, (stageW - winW) / 2) * inv,
+            );
+          } else if (inv <= 0.001 || window.innerWidth <= 620) {
             if (frameEl) {
               frameEl.style.clipPath = "none";
             }
@@ -237,6 +263,8 @@ export default function SponsorStage() {
               night.style.opacity = opStr;
             }
             if (plate) plate.style.opacity = opStr;
+            // The panels are the night here, so they retire with it.
+            if (shutterWrap) shutterWrap.style.opacity = opStr;
           }
         }
 
@@ -823,6 +851,17 @@ export default function SponsorStage() {
               because both read it off the stage. */}
           <span className="sxp-keyline" aria-hidden="true" />
 
+          {/* Smartboards (html.perf-lite) open the window by sliding four
+              night panels apart instead. Re-clipping the frame repaints the
+              whole stage on every scroll frame; moving the panels is
+              compositor work. */}
+          <div className="sxp-shutters" aria-hidden="true">
+            <span className="sxp-shutter sxp-shutter-t" />
+            <span className="sxp-shutter sxp-shutter-b" />
+            <span className="sxp-shutter sxp-shutter-l" />
+            <span className="sxp-shutter sxp-shutter-r" />
+          </div>
+
           {/* ── Scroll Navigation to Exit Frame (Beside Nav Bar) ── */}
           <div ref={scrollUpRef} className="sxp-scrollup-wrap">
             <button
@@ -1038,6 +1077,39 @@ export default function SponsorStage() {
           will-change: opacity;
           transform: translateZ(0);
           -webkit-transform: translateZ(0);
+        }
+
+        /* The smartboard window: the frame stays unclipped and the night is
+           four solid panels, each half the stage, translated by the apply()
+           loop so their inner edges sit on the window's. Square corners and
+           no keyline, which is the price of never repainting. */
+        .sxp-shutters {
+          display: none;
+        }
+        .perf-lite .sxp-shutters {
+          display: block;
+          position: absolute;
+          inset: 0;
+          z-index: 2;
+          pointer-events: none;
+          will-change: opacity;
+        }
+        .sxp-shutter {
+          position: absolute;
+          background: var(--color-night);
+          will-change: transform;
+        }
+        .sxp-shutter-t { top: 0; left: 0; right: 0; height: 50%; }
+        .sxp-shutter-b { bottom: 0; left: 0; right: 0; height: 50%; }
+        .sxp-shutter-l { top: 0; bottom: 0; left: 0; width: 50%; }
+        .sxp-shutter-r { top: 0; bottom: 0; right: 0; width: 50%; }
+        .perf-lite .sxp-frame {
+          clip-path: none !important;
+          will-change: auto;
+        }
+        .perf-lite .sxp-night,
+        .perf-lite .sxp-keyline {
+          display: none !important;
         }
 
         /* ── Preview title inside the frame before it expands (matches reference) ── */
@@ -2486,7 +2558,8 @@ export default function SponsorStage() {
           .sxp-frame {
             clip-path: none !important;
           }
-          .sxp-keyline {
+          .sxp-keyline,
+          .sxp-shutters {
             display: none !important;
           }
           .sxp-intro,

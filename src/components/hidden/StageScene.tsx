@@ -3,11 +3,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gradeAt, DAY_START_HOUR, DAY_END_HOUR } from "./day-grade";
 import { perfLite } from "@/lib/device";
+import { stageVideo } from "./stage-video";
 
 interface StageSceneProps {
   /** Clock hour the plate should be lit for (10 = morning ... 18 = dusk). */
   hour: number;
-  src?: string;
   poster?: string;
 }
 
@@ -17,7 +17,8 @@ interface StageSceneProps {
  * One <video> (a forward+reverse palindrome, so a plain `loop` is seamless) is
  * uploaded to a WebGL texture on every new frame and drawn through the grade
  * in day-grade.ts. The near-field depth of field is baked into the video
- * itself, so the shader only has to colour it.
+ * itself, so the shader only has to colour it. The element itself comes from
+ * stage-video.ts, so the password screen can start it.
  *
  * The grade needs to know where the sky is, and a pixel's colour alone cannot
  * tell a sunlit sky from a sunlit leaf, so /images/stage/stage-masks.png
@@ -31,6 +32,8 @@ interface StageSceneProps {
 
 const MASK_SRC = "/images/stage/stage-masks.png";
 const VIDEO_ASPECT = 1920 / 1080;
+/** The plate's frame rate. */
+const VIDEO_FPS = 24;
 /** Seconds for the light to catch up when the clock jumps (reset, milestone click). */
 const HOUR_EASE_S = 0.9;
 /** Longest backing-store edge; the plate is 1080p, more pixels add nothing. */
@@ -179,11 +182,10 @@ function makeTexture(gl: WebGLRenderingContext) {
 
 export default function StageScene({
   hour,
-  src = "/videos/stage-loop-dof.mp4",
   poster = "/videos/stage-poster-dof.jpg",
 }: StageSceneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoHostRef = useRef<HTMLDivElement>(null);
   const targetHour = useRef(hour);
   const [mode, setMode] = useState<"pending" | "gl" | "video">("pending");
   const [drawn, setDrawn] = useState(false);
@@ -191,15 +193,46 @@ export default function StageScene({
   targetHour.current = Math.min(Math.max(hour, DAY_START_HOUR), DAY_END_HOUR);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.play().catch(() => {});
+    const host = videoHostRef.current;
+    if (!host) return;
+    const video = stageVideo();
+    video.className = "absolute inset-0 w-full h-full object-cover object-center";
+    host.appendChild(video);
+
+    // Keep it playing. Where every play() needs a gesture and the password
+    // screen's did not take, the first tap or key press anywhere starts it.
+    const kick = () => {
+      if (video.paused && !document.hidden) video.play().catch(() => {});
+    };
+    const gestures = ["pointerup", "touchend", "mousedown", "keydown", "click"];
+    for (const type of gestures) window.addEventListener(type, kick, true);
+    video.addEventListener("canplay", kick);
+    document.addEventListener("visibilitychange", kick);
+    kick();
+
+    return () => {
+      for (const type of gestures) window.removeEventListener(type, kick, true);
+      video.removeEventListener("canplay", kick);
+      document.removeEventListener("visibilitychange", kick);
+      video.pause();
+      video.remove();
+    };
   }, []);
+
+  // The video stays visible under the canvas, which covers it once drawn.
+  // Older Android engines stop handing a video they are not showing fresh
+  // frames, and the canvas only ever gets what the element has.
+  useEffect(() => {
+    const video = stageVideo();
+    // Ungraded fallback: show the poster until the first frame.
+    if (mode === "video") video.poster = poster;
+    else video.removeAttribute("poster");
+  }, [mode, poster]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const video = videoRef.current;
-    if (!canvas || !video) return;
+    if (!canvas) return;
+    const video = stageVideo();
 
     const gl = canvas.getContext("webgl", {
       alpha: false,
@@ -254,6 +287,7 @@ export default function StageScene({
 
     let disposed = false;
     let lost = false;
+    let gaveUp = false; // frames never reached the texture: plain video instead
     let hasFrame = false; // something (poster or video) is in frameTex
     let hasMask = false;
     let videoLive = false; // frameTex holds a video frame
@@ -340,33 +374,67 @@ export default function StageScene({
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 
-    const onVideoFrame = () => {
-      if (disposed) return;
+    let uploads = 0; // video frames that reached the texture
+    const takeVideoFrame = () => {
       if (!lost && video.readyState >= 2 && upload(0, frameTex, video)) {
         hasFrame = true;
         videoLive = true;
         needsDraw = true;
+        uploads++;
       }
+    };
+
+    let useVfc = "requestVideoFrameCallback" in HTMLVideoElement.prototype;
+    const onVideoFrame = () => {
+      if (disposed || !useVfc) return;
+      takeVideoFrame();
       vfc = video.requestVideoFrameCallback(onVideoFrame);
     };
-    const hasVfc = "requestVideoFrameCallback" in HTMLVideoElement.prototype;
-    if (hasVfc) vfc = video.requestVideoFrameCallback(onVideoFrame);
-    let lastVideoTime = -1;
+    if (useVfc) vfc = video.requestVideoFrameCallback(onVideoFrame);
+    let lastFrameIdx = -1;
+    // Frames reaching the texture, measured over each 2s of playback.
+    let watchT = -1;
+    let watchN = 0;
     let drawnOnce = false;
 
     const tick = (now: number) => {
       raf = requestAnimationFrame(tick);
-      if (lost) return;
+      if (lost || gaveUp) return;
       const dt = Math.min(0.25, (now - last) / 1000);
       last = now;
 
-      // No requestVideoFrameCallback: poll for a new frame instead.
-      if (!hasVfc && video.readyState >= 2 && video.currentTime !== lastVideoTime) {
-        lastVideoTime = video.currentTime;
-        if (upload(0, frameTex, video)) {
-          hasFrame = true;
-          videoLive = true;
-          needsDraw = true;
+      // No requestVideoFrameCallback (or it stalled): poll, once per video frame.
+      if (!useVfc && video.readyState >= 2) {
+        const idx = Math.floor(video.currentTime * VIDEO_FPS);
+        if (idx !== lastFrameIdx) {
+          lastFrameIdx = idx;
+          takeVideoFrame();
+        }
+      }
+
+      // The plate is playing but its frames are not arriving here (some
+      // engines run requestVideoFrameCallback at a few Hz, or not at all, or
+      // refuse the upload): poll instead, and if that fails too, show the
+      // plain video. Moving and ungraded beats graded and frozen.
+      if (!video.paused && video.readyState >= 3) {
+        const ct = video.currentTime;
+        if (watchT < 0 || ct < watchT) {
+          watchT = ct; // first look, or the loop wrapped
+          watchN = uploads;
+        } else if (ct - watchT >= 2) {
+          const rate = (uploads - watchN) / (ct - watchT);
+          if (rate < VIDEO_FPS / 3) {
+            if (useVfc) {
+              useVfc = false;
+              video.cancelVideoFrameCallback(vfc);
+            } else if (rate < 1) {
+              gaveUp = true;
+              setMode("video");
+              return;
+            }
+          }
+          watchT = ct;
+          watchN = uploads;
         }
       }
 
@@ -400,7 +468,7 @@ export default function StageScene({
     return () => {
       disposed = true;
       cancelAnimationFrame(raf);
-      if (hasVfc && vfc) video.cancelVideoFrameCallback(vfc);
+      if (useVfc && vfc) video.cancelVideoFrameCallback(vfc);
       ro.disconnect();
       canvas.removeEventListener("webglcontextlost", onLost);
       mask.onload = null;
@@ -423,19 +491,9 @@ export default function StageScene({
 
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0 bg-black">
-      {/* Also the fallback: shown ungraded when WebGL is unavailable. */}
-      <video
-        ref={videoRef}
-        src={src}
-        poster={graded ? undefined : poster}
-        muted
-        loop
-        playsInline
-        preload="auto"
-        aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover object-center"
-        style={{ opacity: mode === "video" ? 1 : 0 }}
-      />
+      {/* Holds the shared <video>, which is also the fallback: shown
+          ungraded when WebGL is unavailable. */}
+      <div ref={videoHostRef} className="absolute inset-0" />
       <canvas
         ref={canvasRef}
         aria-hidden="true"

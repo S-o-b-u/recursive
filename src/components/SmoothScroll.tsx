@@ -5,6 +5,7 @@ import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { setLenis } from '@/lib/lenis';
+import { scheduleRefresh } from '@/components/ui/reveal';
 
 // Register once at module scope so every component that creates a
 // ScrollTrigger shares the same (idempotent) plugin instance.
@@ -12,6 +13,13 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function SmoothScroll({ children }: { children: ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
+
+  // Old engines: /legacy/css-compat.js finishes some layout by script
+  // (aspect-ratio, flex gap) after the triggers were measured, and says so.
+  useEffect(() => {
+    window.addEventListener('legacy-layout', scheduleRefresh);
+    return () => window.removeEventListener('legacy-layout', scheduleRefresh);
+  }, []);
 
   useEffect(() => {
     // Respect reduced-motion: skip smooth scrolling entirely and let the

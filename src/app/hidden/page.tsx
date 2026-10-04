@@ -10,6 +10,7 @@ import MockupScheduleCard, {
 } from "@/components/hidden/MockupScheduleCard";
 import NowStatusBadge from "@/components/hidden/NowStatusBadge";
 import StageScene from "@/components/hidden/StageScene";
+import { primeStageVideo } from "@/components/hidden/stage-video";
 import { stageSans } from "@/components/hidden/stage-font";
 import stage from "@/components/hidden/stage.module.css";
 import { TOTAL_HACKATHON_SECONDS, getActiveMilestone } from "@/data/shift8";
@@ -56,6 +57,9 @@ export default function HiddenChairPage() {
     const inputEl = document.getElementById("pass-input") as HTMLInputElement | null;
     const val = inputEl ? inputEl.value : passInput;
     if (val === PASSWORD || passInput === PASSWORD) {
+      // Still inside the Enter press: browsers that gate every play() on a
+      // gesture accept it now, and not once the stage has mounted.
+      primeStageVideo();
       setIsAuthenticated(true);
       setPassError(false);
     } else {

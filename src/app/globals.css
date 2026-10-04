@@ -880,9 +880,12 @@ a { color: inherit; text-decoration: none; }
 
 /* ── Smartboard-class hardware (html.perf-lite, set by src/lib/legacy-bootstrap.ts) ──
    Panel GPUs drive 4K with phone-class silicon. Backdrop blur re-samples the
-   page behind it on every scroll frame, and these loops repaint every frame
-   (background-position, box-shadow), so they stand down there. Transform and
-   opacity animations stay: the compositor runs those for almost nothing. */
+   page behind it on every scroll frame, so it goes. So do the decorative
+   loops: some repaint every frame (background-position, box-shadow, the dial
+   hands, which are SVG children and never reach the compositor), and any
+   running loop at all keeps an old engine restyling and re-checking every
+   GPU layer on the page 60 times a second, even while nothing is scrolling.
+   One-shot reveals, the flip clock and the marquees keep moving. */
 .perf-lite *,
 .perf-lite *::before,
 .perf-lite *::after {
@@ -891,6 +894,38 @@ a { color: inherit; text-decoration: none; }
 }
 .perf-lite .shader-container-exploded,
 .perf-lite .shader-container-exploded::after,
-.perf-lite .tr-card-active {
+.perf-lite .tr-card-active,
+.perf-lite .cd-dial-min,
+.perf-lite .cd-dial-hour,
+.perf-lite .cd-dial-smoke i,
+.perf-lite .jd-front-figure,
+.perf-lite .jseal-track,
+.perf-lite .jseal-gloss {
   animation: none !important;
+}
+.perf-lite .jseal-gloss {
+  opacity: 0.75;
+}
+
+/* Every word of the scroll-lit prose, every heading line and every themes
+   word sat on its own GPU layer for good (3D transforms, backface-visibility,
+   will-change): ~470 layers on the home page, which an old engine re-checks
+   on every frame. On boards they animate in 2D and drop back into the page
+   (see revealForce3D() in src/lib/device.ts). */
+.perf-lite .rw-word,
+.perf-lite .rh-inner {
+  transform: none;
+}
+.perf-lite .rd {
+  transform: scaleX(0);
+}
+.perf-lite .rw-word,
+.perf-lite .rh-inner,
+.perf-lite .rd {
+  -webkit-backface-visibility: visible;
+  backface-visibility: visible;
+}
+.perf-lite .th-word,
+.perf-lite .px-in {
+  will-change: auto;
 }

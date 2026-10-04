@@ -3,6 +3,7 @@
 import { ReactNode, useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { perfLite, revealForce3D } from "@/lib/device";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -110,6 +111,28 @@ export function RevealWords({
       window.matchMedia("(pointer: coarse), (max-width: 768px)").matches;
 
     const ctx = gsap.context(() => {
+      // Smartboards: a scrubbed tween across every word is hundreds of style
+      // writes per scroll frame and a GPU layer per word. There each paragraph
+      // fades up once instead, with its words already lit.
+      if (perfLite()) {
+        gsap.set(words, { opacity: 1 });
+        gsap.fromTo(
+          gsap.utils.toArray<HTMLElement>(".rw-para", root),
+          { opacity: 0, y: 18 },
+          {
+            opacity: 1,
+            y: 0,
+            force3D: "auto",
+            ease: "power2.out",
+            duration: 1.1,
+            stagger: 0.14,
+            clearProps: "transform,opacity",
+            scrollTrigger: { trigger: root, start: "top 86%", once: true },
+          }
+        );
+        return;
+      }
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: root,
@@ -141,7 +164,8 @@ export function RevealWords({
 
     // Two coalesced refreshes after mount (layout settles, images land), and
     // one on fonts-ready. See scheduleRefresh for why nothing here listens
-    // to intro-done or resize any more.
+    // to intro-done or resize any more. Every trigger on the page relies on
+    // these, so the smartboard path above keeps them too.
     const timer1 = setTimeout(scheduleRefresh, 150);
     const timer2 = setTimeout(scheduleRefresh, 600);
     const cancelFonts = refreshOnFonts();
@@ -229,7 +253,7 @@ export function RevealHeading({
         { yPercent: 112 },
         {
           yPercent: 0,
-          force3D: true,
+          force3D: revealForce3D(),
           ease: "expo.out",
           duration: 1.5,
           delay,
@@ -323,7 +347,7 @@ export function RevealBlock({
         {
           opacity: 1,
           y: 0,
-          force3D: true,
+          force3D: revealForce3D(),
           ease: "expo.out",
           duration: 1.25,
           delay,
@@ -458,7 +482,7 @@ export function RuleDraw({
         { scaleX: 0 },
         {
           scaleX: 1,
-          force3D: true,
+          force3D: revealForce3D(),
           ease: "expo.out",
           duration,
           delay,

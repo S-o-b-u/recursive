@@ -5,6 +5,7 @@ import { Renderer, Triangle, Program, Mesh, Texture } from "ogl";
 import { gsap } from "gsap";
 
 import "./MorphSlider.css";
+import { perfLite } from "@/lib/device";
 
 const TRANSITIONS: Record<string, number> = { melt: 0, ripple: 1, shear: 2, swirl: 3 };
 
@@ -422,8 +423,8 @@ class MorphEngine {
       typeof window !== "undefined" &&
       window.matchMedia?.("(pointer: coarse), (max-width: 860px)").matches;
 
-    // Sleep when idle on mobile / touch / reduced-motion to save GPU and maintain 120fps scrolling
-    if ((isTouch || this.reducedMotion) && !this.animating && !this.dragging) {
+    // Sleep when idle on mobile / touch / smartboards / reduced-motion to save GPU and maintain 120fps scrolling
+    if ((isTouch || perfLite() || this.reducedMotion) && !this.animating && !this.dragging) {
       this.raf = 0;
       return;
     }
@@ -665,7 +666,7 @@ export default function MorphSlider({
       items,
       startIndex,
       reducedMotion,
-      dprCap: isTouch ? 1.25 : 2,
+      dprCap: perfLite() ? 1 : isTouch ? 1.25 : 2,
       getOptions: () => optsRef.current,
       onIndexChange: handleIndexChange
     });

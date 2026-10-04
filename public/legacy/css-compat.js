@@ -757,6 +757,21 @@
     if (F.math && deferred.length) resolveDeferred();
     if (F.aspect) { aspectPass(); imagePass(); }
     if (F.flexgap) flexGapPass();
+    announceLayout();
+  }
+
+  // The page's scroll animations measured it before these passes finished
+  // it. When the page height moves, say so: SmoothScroll.tsx re-measures
+  // ScrollTrigger on "legacy-layout", or every trigger below the change
+  // fires in the wrong place.
+  var lastHeight = -1;
+  function announceLayout() {
+    var h = d.documentElement.scrollHeight;
+    if (h === lastHeight) return;
+    lastHeight = h;
+    var e = d.createEvent("Event");
+    e.initEvent("legacy-layout", false, false);
+    w.dispatchEvent(e);
   }
 
   // "4 / 5", "1.25", or var(--x, 4 / 5) resolved on the element
@@ -902,7 +917,7 @@
   d.addEventListener("load", function (e) {
     if (!F.aspect || !e.target || e.target.tagName !== "IMG") return;
     loadedImgs.push(e.target);
-    if (!imgTimer) imgTimer = setTimeout(function () { imgTimer = 0; var l = loadedImgs; loadedImgs = []; imagePass(l); }, 120);
+    if (!imgTimer) imgTimer = setTimeout(function () { imgTimer = 0; var l = loadedImgs; loadedImgs = []; imagePass(l); announceLayout(); }, 120);
   }, true);
   w.__legacyCss = F;
   // For values React sets on the client, where an old engine rejects
