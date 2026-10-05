@@ -15,10 +15,13 @@ import {
   Car,
   Map as MapIcon,
   Building2,
+  Crosshair,
 } from "lucide-react";
 
 export default function VenueLocation() {
   const [copied, setCopied] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
+  const [mapKey, setMapKey] = useState(0);
 
   const addressText = VENUE.full;
   // Pin the exact campus coordinates rather than a name search: a text query
@@ -32,6 +35,12 @@ export default function VenueLocation() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     }
+  };
+
+  const handleLocate = () => {
+    setIsLocating(true);
+    setMapKey((k) => k + 1);
+    setTimeout(() => setIsLocating(false), 800);
   };
 
   return (
@@ -166,17 +175,35 @@ export default function VenueLocation() {
                 {/* Floating Top Header Badges */}
                 <div className="map-floating-top">
                   <div className="map-float-pill">
-                    <MapIcon className="w-4 h-4 text-[#1b4324]" />
+                    <MapIcon className="w-3.5 h-3.5 text-[#1b4324]" />
                     <span>Live Navigation</span>
                   </div>
 
                   <div className="map-float-pill">
-                    <Building2 className="w-4 h-4 text-[#1b4324]" />
+                    <Building2 className="w-3.5 h-3.5 text-[#1b4324]" />
                     <span>GNIT Campus</span>
                   </div>
                 </div>
 
+                {/* Floating Locate Control (paired with OSM zoom controls) */}
+                <div className="map-locate-control">
+                  <button
+                    type="button"
+                    onClick={handleLocate}
+                    className={`map-locate-btn ${isLocating ? "locating" : ""}`}
+                    aria-label="Center Map on GNIT Campus"
+                    title="Center Map on GNIT Campus"
+                  >
+                    <Crosshair
+                      className={`w-3.5 h-3.5 ${
+                        isLocating ? "animate-spin text-emerald-700" : "text-[#111a14]"
+                      }`}
+                    />
+                  </button>
+                </div>
+
                 <iframe
+                  key={mapKey}
                   title="Interactive map of Guru Nanak Institute of Technology"
                   src={`https://www.openstreetmap.org/export/embed.html?bbox=88.3687%2C22.6851%2C88.3888%2C22.7051&layer=mapnik&marker=${VENUE.lat}%2C${VENUE.lng}`}
                   className="google-maps-frame"
@@ -642,11 +669,13 @@ export default function VenueLocation() {
           position: absolute;
           top: 0.85rem;
           left: 0.85rem;
-          right: 0.85rem;
+          right: auto;
+          max-width: calc(100% - 54px);
           z-index: 10;
           display: flex;
           align-items: center;
-          justify-content: space-between;
+          gap: 0.5rem;
+          flex-wrap: wrap;
           pointer-events: none;
         }
 
@@ -671,44 +700,36 @@ export default function VenueLocation() {
           color: #111c14;
         }
 
-        /* Floating Controls */
-        .map-floating-controls {
+        /* Floating Locate Control (aligned right under OSM zoom buttons) */
+        .map-locate-control {
           position: absolute;
-          right: 0.85rem;
-          bottom: 5.25rem;
+          top: 74px;
+          right: 10px;
           z-index: 10;
-          display: flex;
-          flex-direction: column;
-          gap: 0.45rem;
         }
 
-        .map-control-btn {
-          width: 34px;
-          height: 34px;
-          border-radius: 0.65rem;
-          background: rgba(255, 255, 255, 0.22);
-          backdrop-filter: blur(12px) saturate(160%);
-          -webkit-backdrop-filter: blur(12px) saturate(160%);
-          border: 1px solid rgba(255, 255, 255, 0.45);
-          box-shadow:
-            inset 0 1px 1.5px rgba(255, 255, 255, 0.65),
-            0 4px 10px rgba(0, 0, 0, 0.03);
+        .map-locate-btn {
+          width: 29px;
+          height: 29px;
+          border-radius: 4px;
+          background: #ffffff;
+          border: none;
+          box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          transition: background 150ms ease, transform 150ms ease, border-color 150ms ease;
+          color: #111c14;
+          transition: background-color 150ms ease, transform 150ms ease;
         }
 
-        .map-control-btn:hover {
-          background: rgba(255, 255, 255, 0.5);
-          border-color: rgba(255, 255, 255, 0.75);
-          transform: translateY(-1px);
+        .map-locate-btn:hover {
+          background-color: #f2f2f2;
+          transform: scale(1.05);
         }
 
-        .map-control-btn.locating {
-          background: rgba(234, 243, 230, 0.55);
-          border-color: #5c8c3a;
+        .map-locate-btn.locating {
+          background-color: #eaf3e6;
         }
 
         /* Floating Bottom Bar */
@@ -854,7 +875,9 @@ export default function VenueLocation() {
           .map-floating-top {
             top: 0.55rem;
             left: 0.55rem;
-            right: 0.55rem;
+            right: auto;
+            max-width: calc(100% - 46px);
+            gap: 0.35rem;
           }
 
           .map-float-pill {
@@ -869,21 +892,14 @@ export default function VenueLocation() {
             height: 13px;
           }
 
-          .map-floating-controls {
-            right: 0.55rem;
-            bottom: 4.25rem;
-            gap: 0.35rem;
+          .map-locate-control {
+            top: 72px;
+            right: 10px;
           }
 
-          .map-control-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 0.5rem;
-          }
-
-          .map-control-btn svg {
-            width: 13px;
-            height: 13px;
+          .map-locate-btn {
+            width: 29px;
+            height: 29px;
           }
 
           .map-floating-bottom {

@@ -146,18 +146,13 @@ export default function Navigation() {
       <nav className="nav-root">
         <motion.div
           className="nav-glass-container"
-          initial={reduced ? false : { y: -22, opacity: 0 }}
+          initial={reduced || introFinished ? false : { y: -16, opacity: 0 }}
           animate={
             introFinished
               ? { y: 0, opacity: 1 }
-              : { y: -22, opacity: 0 }
+              : { y: -16, opacity: 0 }
           }
-          // Enters after the intro's dissolve (0.65s from hand-off), not during
-          // it. This pill carries a 36px backdrop blur and a glass card: fading
-          // it in over a backdrop that is itself cross-fading meant re-blurring
-          // its region on every frame of the costliest window in the sequence.
-          // As a final beat after the hero has settled it costs nothing visible.
-          transition={{ duration: reduced ? 0 : 0.7, ease: EASE_OUT, delay: reduced ? 0 : 0.85 }}
+          transition={{ duration: reduced ? 0 : 0.28, ease: EASE_OUT, delay: 0 }}
         >
           <LiquidGlassCard
             glowIntensity="sm"

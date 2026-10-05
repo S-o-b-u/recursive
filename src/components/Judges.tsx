@@ -6,7 +6,6 @@ import { gsap } from "gsap";
 import { JUDGES, EVENT } from "@/data/hackathon";
 import { RevealHeading, RevealBlock, ParallaxY } from "@/components/ui/reveal";
 import Ornament from "@/components/ui/Ornament";
-import FlipCard from "@/components/ui/FlipCard";
 import Seal from "@/components/ui/Seal";
 
 const GRAIN =
@@ -142,30 +141,11 @@ function PhotoFront({
 }) {
   return (
     <span className="jd-badge-card">
-      {/* Top Lanyard Clip & Punch Hole */}
-      <span className="jd-badge-top" aria-hidden="true">
-        <span className="jd-badge-slot-clip">
-          <span className="jd-badge-strap">
-            <svg
-              className="jd-badge-strap-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="7" y1="17" x2="17" y2="7" />
-              <polyline points="7 7 17 7 17 17" />
-            </svg>
-          </span>
-          <span className="jd-badge-slot" />
-        </span>
-      </span>
-
-      {/* Middle: Portrait Area with Vertical Theme Accent Bar */}
+      {/* Portrait Area with Vertical Theme Accent Bar */}
       <span className="jd-badge-body">
-        <span className="jd-badge-stripe" aria-hidden="true" />
+        <span className="jd-badge-stripe" aria-hidden="true">
+          <span className="jd-badge-stripe-text">recursive</span>
+        </span>
         <span className="jd-badge-neutral" aria-hidden="true" />
         <span className="jd-badge-photo-wrap">
           <Image
@@ -182,38 +162,16 @@ function PhotoFront({
       {/* Bottom: Left Dark Monogram Box + Right Clean White Nameplate */}
       <span className="jd-badge-bottom">
         <span className="jd-badge-box" aria-hidden="true">
-          <svg className="jd-badge-box-mark" viewBox="0 0 40 40" fill="none">
-            {/* Left starburst rays */}
-            <path
-              d="M12 9V31M6 14L18 26M6 26L18 14M3 20H21"
-              stroke="#8FC45A"
-              strokeWidth="2.4"
-              strokeLinecap="round"
+          <span className="jd-badge-r-wrap">
+            <Image
+              src="/images/ui/Glowing Green R Orbit Logo.png"
+              alt="Recursive Emblem"
+              width={52}
+              height={44}
+              loading="eager"
+              className="jd-badge-r-logo"
             />
-            {/* Right stacked seat digits */}
-            <text
-              x="29"
-              y="19"
-              textAnchor="middle"
-              fill="#FFFFFF"
-              fontSize="11"
-              fontWeight="800"
-              fontFamily="var(--font-geist-mono), monospace"
-            >
-              0
-            </text>
-            <text
-              x="29"
-              y="31"
-              textAnchor="middle"
-              fill="#8FC45A"
-              fontSize="11"
-              fontWeight="800"
-              fontFamily="var(--font-geist-mono), monospace"
-            >
-              {index + 1}
-            </text>
-          </svg>
+          </span>
         </span>
         <span className="jd-badge-info">
           <span className="jd-badge-name" title={judge.name}>{judge.name}</span>
@@ -357,23 +315,13 @@ export default function Judges() {
                     distance={DRIFT[i % DRIFT.length]}
                     key={judge.photo.expect}
                   >
-                    <FlipCard
-                      ratio="var(--jd-ratio, 3 / 4.25)"
-                      disabled={!filled}
-                      label={
-                        filled
-                          ? `${judge.name} — ${judge.role}. Turn the pass for details.`
-                          : `${seat.domain} — seat ${i + 1}. Locked.`
-                      }
-                      front={
-                        filled ? (
-                          <PhotoFront index={i} judge={judge} />
-                        ) : (
-                          <SealedFront index={i} seat={seat} />
-                        )
-                      }
-                      back={<SeatBack index={i} seat={seat} judge={judge} />}
-                    />
+                    <div className="jd-card-shell">
+                      {filled ? (
+                        <PhotoFront index={i} judge={judge} />
+                      ) : (
+                        <SealedFront index={i} seat={seat} />
+                      )}
+                    </div>
                   </ParallaxY>
                 );
               })}
@@ -391,23 +339,13 @@ export default function Judges() {
 
                     return (
                       <div className="jd-marquee-card" key={`m1-${idx}-${judge.photo.expect}`}>
-                        <FlipCard
-                          ratio="3 / 4.25"
-                          disabled={!filled}
-                          label={
-                            filled
-                              ? `${judge.name} — ${judge.role}. Turn pass for details.`
-                              : `${seat.domain} — seat ${originalIdx + 1}.`
-                          }
-                          front={
-                            filled ? (
-                              <PhotoFront index={originalIdx} judge={judge} />
-                            ) : (
-                              <SealedFront index={originalIdx} seat={seat} />
-                            )
-                          }
-                          back={<SeatBack index={originalIdx} seat={seat} judge={judge} />}
-                        />
+                        <div className="jd-card-shell">
+                          {filled ? (
+                            <PhotoFront index={originalIdx} judge={judge} />
+                          ) : (
+                            <SealedFront index={originalIdx} seat={seat} />
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -424,23 +362,13 @@ export default function Judges() {
 
                     return (
                       <div className="jd-marquee-card" key={`m2-${idx}-${judge.photo.expect}`}>
-                        <FlipCard
-                          ratio="3 / 4.25"
-                          disabled={!filled}
-                          label={
-                            filled
-                              ? `${judge.name} — ${judge.role}. Turn pass for details.`
-                              : `${seat.domain} — seat ${originalIdx + 1}.`
-                          }
-                          front={
-                            filled ? (
-                              <PhotoFront index={originalIdx} judge={judge} />
-                            ) : (
-                              <SealedFront index={originalIdx} seat={seat} />
-                            )
-                          }
-                          back={<SeatBack index={originalIdx} seat={seat} judge={judge} />}
-                        />
+                        <div className="jd-card-shell">
+                          {filled ? (
+                            <PhotoFront index={originalIdx} judge={judge} />
+                          ) : (
+                            <SealedFront index={originalIdx} seat={seat} />
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -456,23 +384,8 @@ export default function Judges() {
         <RevealBlock y={14} delay={0.12}>
           <div className="jd-foot-wrap">
             <p className="jd-foot-note">
-              Hover a pass — or tap it on a phone — to inspect credentials &amp; background.
+              Official mentors &amp; judges panel · Recursive 2026
             </p>
-
-            <a
-              href="#tracks"
-              className="jd-explore-btn jd-explore-btn-active"
-              aria-label="Explore Tracks & Challenges"
-            >
-              <span className="jd-btn-icon-wrap" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="jd-badge-btn-icon">
-                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-                </svg>
-              </span>
-              <span className="jd-btn-text-default">Explore Tracks &amp; Mentorship</span>
-              <span className="jd-btn-text-hover">View Hackathon Tracks →</span>
-            </a>
           </div>
         </RevealBlock>
       </div>
@@ -691,6 +604,19 @@ export default function Judges() {
           background: rgba(8, 18, 6, 0.88);
         }
 
+        /* ── Card Shell (No 3D Flip) ── */
+        .jd-card-shell {
+          position: relative;
+          width: 100%;
+          aspect-ratio: var(--jd-ratio, 3 / 4.25);
+          display: block;
+          transition: transform 320ms cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .jd-cell:hover .jd-card-shell {
+          transform: translateY(-5px);
+        }
+
         /* ── Conference ID Badge Pass (Front Face) ── */
         .jd-badge-card {
           position: absolute;
@@ -699,80 +625,24 @@ export default function Judges() {
           flex-direction: column;
           border-radius: var(--radius-lg, 22px);
           overflow: hidden;
-          background: #F4F7F2;
+          background: rgba(14, 26, 16, 0.4);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
           box-shadow:
-            0 16px 40px rgba(0, 0, 0, 0.45),
-            0 4px 14px rgba(0, 0, 0, 0.25),
-            inset 0 0 0 1px rgba(255, 255, 255, 0.95),
-            inset 0 1px 0 rgba(255, 255, 255, 1);
-          border: 1px solid rgba(190, 224, 168, 0.35);
-          padding: clamp(6px, 1.1vw, 10px);
+            0 16px 40px rgba(0, 0, 0, 0.5),
+            0 4px 14px rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(143, 196, 90, 0.22);
+          padding: 0;
           user-select: none;
           transition: transform 320ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 320ms ease, border-color 320ms ease;
         }
 
-        .fcd:hover .jd-badge-card,
+        .jd-cell:hover .jd-badge-card,
         .jd-marquee-card:hover .jd-badge-card {
           box-shadow:
-            0 22px 52px rgba(0, 0, 0, 0.58),
-            0 0 28px rgba(143, 196, 90, 0.25),
-            inset 0 0 0 1px rgba(255, 255, 255, 1);
-          border-color: rgba(143, 196, 90, 0.65);
-        }
-
-        /* Top Lanyard Header & Punch Slot */
-        .jd-badge-top {
-          position: relative;
-          width: 100%;
-          height: clamp(38px, 9.8%, 46px);
-          background: transparent;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-shrink: 0;
-          z-index: 4;
-        }
-
-        .jd-badge-slot-clip {
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .jd-badge-strap {
-          position: absolute;
-          top: -22px;
-          width: clamp(36px, 11%, 44px);
-          height: 28px;
-          background: #142217;
-          border-radius: 3px 3px 2px 2px;
-          box-shadow:
-            0 3px 6px rgba(0, 0, 0, 0.45),
-            inset 0 1px 0 rgba(255, 255, 255, 0.2);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 3;
-        }
-
-        .jd-badge-strap-icon {
-          width: 14px;
-          height: 14px;
-          color: #FFFFFF;
-          stroke: #FFFFFF;
-        }
-
-        .jd-badge-slot {
-          width: clamp(42px, 13%, 52px);
-          height: clamp(8px, 2.3%, 10px);
-          border-radius: 9999px;
-          background: #081109;
-          box-shadow:
-            inset 0 2px 3px rgba(0, 0, 0, 0.8),
-            0 1px 0 rgba(255, 255, 255, 0.85);
-          z-index: 2;
+            0 24px 54px rgba(0, 0, 0, 0.65),
+            0 0 32px rgba(143, 196, 90, 0.28);
+          border-color: rgba(143, 196, 90, 0.55);
         }
 
         /* Badge Portrait Area */
@@ -783,24 +653,45 @@ export default function Judges() {
           min-height: 0;
           display: flex;
           overflow: hidden;
-          background: #DCE4D8;
-          border-radius: 4px 4px 0 0;
+          background: transparent;
         }
 
-        /* Vertical Theme Accent Bar */
+        /* Vertical Theme Typography ("recursive") */
         .jd-badge-stripe {
-          width: 35%;
-          height: 100%;
-          background: linear-gradient(180deg, #96CF60 0%, #6EAD3B 100%);
-          box-shadow: inset -1px 0 3px rgba(0, 0, 0, 0.08);
-          flex-shrink: 0;
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          width: 52%;
+          overflow: visible;
+          background: transparent;
+          z-index: 1;
+          pointer-events: none;
+        }
+
+        .jd-badge-stripe-text {
+          position: absolute;
+          top: -10px;
+          left: -4px;
+          font-family: var(--font-dm-sans), sans-serif;
+          font-size: clamp(5.2rem, 6vw, 6.2rem);
+          font-weight: 900;
+          line-height: 0.82;
+          letter-spacing: -0.05em;
+          text-transform: lowercase;
+          color: #98E255;
+          text-shadow: 0 0 24px rgba(152, 226, 85, 0.28);
+          writing-mode: vertical-rl;
+          transform: rotate(180deg);
+          white-space: nowrap;
+          user-select: none;
         }
 
         /* Neutral right area behind photo */
         .jd-badge-neutral {
           flex: 1;
           height: 100%;
-          background: linear-gradient(145deg, #E5EBE1 0%, #D4DDD0 100%);
+          background: transparent;
         }
 
         /* Cutout photo container */
@@ -825,7 +716,7 @@ export default function Judges() {
           transform-origin: bottom center;
         }
 
-        .fcd:hover .jd-badge-photo,
+        .jd-cell:hover .jd-badge-photo,
         .jd-marquee-card:hover .jd-badge-photo {
           filter: grayscale(15%) contrast(1.06) brightness(1);
           transform: scale(1.02);
@@ -835,52 +726,64 @@ export default function Judges() {
         .jd-badge-bottom {
           position: relative;
           width: 100%;
-          height: clamp(62px, 18.5%, 76px);
+          min-height: clamp(66px, 20.5%, 84px);
           display: flex;
           flex-shrink: 0;
           z-index: 3;
-          border-radius: 0 0 4px 4px;
           overflow: hidden;
-          border-top: 1px solid rgba(18, 36, 20, 0.08);
+          border-top: 1px solid rgba(143, 196, 90, 0.2);
+          background: rgba(10, 22, 13, 0.88);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
         }
 
         /* Dark square monogram badge on the left */
         .jd-badge-box {
-          width: 35%;
-          height: 100%;
-          background: #0A160D;
+          width: 28%;
+          background: #08120A;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
-          box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.55);
+          border-right: 1px solid rgba(143, 196, 90, 0.15);
+          padding: 0;
         }
 
-        .jd-badge-box-mark {
-          width: clamp(34px, 80%, 42px);
-          height: clamp(34px, 80%, 42px);
+        .jd-badge-r-wrap {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
         }
 
-        /* Clean light panel on the right with Name and Role */
+        .jd-badge-r-logo {
+          width: clamp(44px, 3.6vw, 52px);
+          height: clamp(38px, 3.1vw, 44px);
+          object-fit: contain;
+          filter: brightness(1.22) drop-shadow(0 0 10px rgba(152, 226, 85, 0.48));
+        }
+
+        /* Clean dark panel on the right with Name and Role */
         .jd-badge-info {
           flex: 1;
           min-width: 0;
-          background: #FFFFFF;
+          background: transparent;
           display: flex;
           flex-direction: column;
           justify-content: center;
-          padding-inline: clamp(0.7rem, 1.4vw, 1.05rem);
-          padding-block: 0.35rem;
+          padding-inline: clamp(0.6rem, 1.2vw, 0.95rem);
+          padding-block: clamp(0.35rem, 0.8vw, 0.55rem);
           text-align: left;
         }
 
         .jd-badge-name {
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: clamp(0.9rem, 1.2vw, 1.06rem);
+          font-size: clamp(0.82rem, 1.08vw, 0.96rem);
           font-weight: 700;
-          line-height: 1.18;
-          letter-spacing: -0.02em;
-          color: #121F14;
+          line-height: 1.15;
+          letter-spacing: -0.015em;
+          color: #EEF5E6;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -888,14 +791,18 @@ export default function Judges() {
 
         .jd-badge-role {
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: clamp(0.7rem, 0.86vw, 0.78rem);
-          font-weight: 500;
-          line-height: 1.25;
-          color: #556B58;
-          margin-top: 0.2rem;
-          white-space: nowrap;
+          font-size: clamp(0.58rem, 0.72vw, 0.66rem);
+          font-weight: 600;
+          line-height: 1.26;
+          letter-spacing: 0.015em;
+          color: #8FC45A;
+          margin-top: 0.18rem;
+          white-space: pre-line;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
           overflow: hidden;
-          text-overflow: ellipsis;
+          text-wrap: pretty;
         }
 
         /* ── Back face: The pass dossier ── */
@@ -1038,87 +945,6 @@ export default function Judges() {
           color: rgba(206, 226, 194, 0.42);
         }
 
-        .jd-explore-btn {
-          position: relative;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.65rem;
-          padding: 0.72rem clamp(1.25rem, 16.87px + 0.87vw, 1.75rem);
-          border-radius: var(--radius-pill);
-          background: rgba(18, 38, 16, 0.85);
-          border: 1px solid rgba(190, 224, 168, 0.22);
-          font-family: var(--font-dm-sans), sans-serif;
-          font-size: 0.88rem;
-          font-weight: 600;
-          color: #E9F4DE;
-          user-select: none;
-          overflow: hidden;
-          min-width: 17rem;
-          transition: transform 200ms ease, background 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
-        }
-
-        .jd-explore-btn-active {
-          cursor: pointer !important;
-          pointer-events: auto !important;
-          background: rgba(18, 38, 16, 0.9);
-          border-color: rgba(143, 196, 90, 0.35);
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-          text-decoration: none;
-        }
-
-        .jd-explore-btn-active:hover {
-          background: rgba(26, 54, 23, 0.95);
-          border-color: rgba(143, 196, 90, 0.65);
-          box-shadow: 0 0 24px rgba(143, 196, 90, 0.22);
-          transform: translateY(-2px);
-        }
-
-        .jd-btn-icon-wrap {
-          display: grid;
-          place-items: center;
-          width: 1.25rem;
-          height: 1.25rem;
-          color: #9FD066;
-          transition: color 220ms ease, transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .jd-badge-btn-icon {
-          width: 0.95rem;
-          height: 0.95rem;
-        }
-
-        .jd-btn-text-default {
-          display: inline-block;
-          transition: opacity 200ms ease, transform 200ms ease;
-        }
-
-        .jd-btn-text-hover {
-          position: absolute;
-          left: 3.2rem;
-          opacity: 0;
-          transform: translateY(8px);
-          color: #8FC45A;
-          font-weight: 600;
-          letter-spacing: 0.02em;
-          transition: opacity 200ms ease, transform 200ms ease;
-          white-space: nowrap;
-        }
-
-        .jd-explore-btn-active:hover .jd-btn-icon-wrap {
-          color: #8FC45A;
-          transform: scale(1.15);
-        }
-
-        .jd-explore-btn-active:hover .jd-btn-text-default {
-          opacity: 0;
-          transform: translateY(-8px);
-        }
-
-        .jd-explore-btn-active:hover .jd-btn-text-hover {
-          opacity: 1;
-          transform: translateY(0);
-        }
 
         @media (max-width: 960px) {
           .jd-grid-wrap {
@@ -1263,18 +1089,15 @@ export default function Judges() {
           }
 
           /* Mobile Badge pass adjustments */
-          .jd-badge-card { padding: 5px; border-radius: 16px; }
-          .jd-badge-top { height: 26px; }
-          .jd-badge-strap { top: -14px; width: 28px; height: 20px; }
-          .jd-badge-strap-icon { width: 10px; height: 10px; }
-          .jd-badge-slot { width: 30px; height: 6px; }
-          .jd-badge-stripe { width: 28%; }
+          .jd-badge-card { padding: 0; border-radius: 16px; }
+          .jd-badge-stripe { width: 50%; left: 0; padding-left: 0; overflow: visible; background: transparent; }
+          .jd-badge-stripe-text { position: absolute; top: -6px; left: -3px; font-size: clamp(2.8rem, 8.5vw, 3.2rem); letter-spacing: -0.05em; transform: rotate(180deg); }
           .jd-badge-bottom { height: 46px; }
-          .jd-badge-box { width: 28%; }
-          .jd-badge-box-mark { width: 24px; height: 24px; }
+          .jd-badge-box { width: 26%; border-right: 1px solid rgba(143, 196, 90, 0.15); padding: 0; }
+          .jd-badge-r-logo { width: 32px; height: 26px; filter: brightness(1.22) drop-shadow(0 0 8px rgba(152, 226, 85, 0.45)); }
           .jd-badge-info { padding: 0.15rem 0.35rem; }
-          .jd-badge-name { font-size: 0.74rem; line-height: 1.15; }
-          .jd-badge-role { font-size: 0.58rem; margin-top: 0.05rem; }
+          .jd-badge-name { font-size: 0.74rem; line-height: 1.15; color: #EEF5E6; }
+          .jd-badge-role { font-size: 0.58rem; margin-top: 0.05rem; color: #8FC45A; }
           .jd-back { padding: 0.55rem 0.5rem; }
           .jd-back-slot-wrap { margin-bottom: 0.25rem; }
           .jd-back-slot { width: 30px; height: 5px; }

@@ -245,57 +245,57 @@ export type Judge = { name: string; role: string; photo: Slot };
 
 export const JUDGES: Judge[] = [
   {
-    name: "Dr. Nabendu Chaki",
-    role: "Professor, CSE, Univ. of Calcutta | ACM Kolkata Chair",
+    name: "Dr. NABENDU CHAKI",
+    role: "FOUNDER CHAIR, ACM\nPROFESSIONAL CHAPTER",
     photo: {
-      label: "Dr. Nabendu Chaki",
+      label: "Dr. NABENDU CHAKI",
       expect: "/images/judges/Dr. NABENDU CHAKI.png",
       src: "/images/judges/Dr. NABENDU CHAKI.png",
     },
   },
   {
-    name: "Dr. Snehasis Banerjee",
-    role: "Lead Research Scientist, TCS Research",
+    name: "Dr. SNEHASIS BANERJEE",
+    role: "LEAD RESEARCH SCIENTIST,\nTCS RESEARCH",
     photo: {
-      label: "Dr. Snehasis Banerjee",
+      label: "Dr. SNEHASIS BANERJEE",
       expect: "/images/judges/Dr. SNEHASIS BANERJEE.png",
       src: "/images/judges/Dr. SNEHASIS BANERJEE.png",
     },
   },
   {
-    name: "Vishal Nandy",
-    role: "Founder & Lead, CORE Platform",
+    name: "VISHAL NANDY",
+    role: "FOUNDER & CTO,\nAQYRON LABS PRIVATE LIMITED",
     photo: {
-      label: "Vishal Nandy",
+      label: "VISHAL NANDY",
       expect: "/images/judges/VISHAL NANDY.png",
       src: "/images/judges/VISHAL NANDY.png",
     },
   },
   {
-    name: "Avik Agarwala",
-    role: "AI Engineer, TCS | InnoFusion Organizer",
+    name: "AVIK AGARWALA",
+    role: "AI ENGINEER, TCS",
     photo: {
-      label: "Avik Agarwala",
+      label: "AVIK AGARWALA",
       expect: "/images/judges/AVIK AGARWALA.png",
       src: "/images/judges/AVIK AGARWALA.png",
     },
   },
   {
-    name: "Devesh Tulsiyan",
-    role: "Software Engineer & NLP Researcher",
+    name: "DEVESH TULSIYAN",
+    role: "FULLSTACK ENGINEER, TCS",
     photo: {
-      label: "Devesh Tulsiyan",
+      label: "DEVESH TULSIYAN",
       expect: "/images/judges/DEVESH TULSIYAN.png",
       src: "/images/judges/DEVESH TULSIYAN.png",
     },
   },
   {
-    name: "Arpan Chowdhury",
-    role: "Software Engineer & Systems Developer",
+    name: "ARPAN CHOWDHURY",
+    role: "SOFTWARE ENGINEER, GREENTREE\nCAPITAL AND ASSET MANAGEMENT",
     photo: {
-      label: "Arpan Chowdhury",
+      label: "ARPAN CHOWDHURY",
       expect: "/images/judges/ARPAN CHOWDHURY.png",
-      src: "/images/judges/ARPAN CHOWDHURY.png",
+      src: "/images/judges/ARPAN_CHOWDHURY_NEW.png",
     },
   },
 ];
