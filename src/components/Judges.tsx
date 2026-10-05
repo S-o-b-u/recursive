@@ -17,112 +17,77 @@ const BUST =
   "M120 40c26 0 47 21 47 47 0 17-9 32-23 40 34 7 60 30 68 62 3 12 4 25 4 39l0 34-186 0 0-34c0-14 1-27 4-39 8-32 34-55 68-62-14-8-23-23-23-40 0-26 21-47 47-47z";
 
 /**
- * What each seat on the panel covers.
- *
- * The names are still sealed — `JUDGES` carries six empty entries until each
- * person confirms — but the domains are locked, so the back of every card has
- * something real on it rather than six copies of "TBA". Index-matched to
- * `JUDGES`; fill a judge's `name`/`role`/`photo.src` and the front face swaps
- * from the sealed print to the portrait on its own.
+/**
+ * Confirmed panel seats and domains.
+ * Index-matched to `JUDGES`.
  */
 const SEATS = [
   {
     tag: "Technical architecture",
     domain: "Distributed & scalable systems",
-    role: "Full-stack, cloud & infrastructure",
-    desc: "Systems design, backend performance, local-first sync protocols, and the real-time infrastructure underneath it all.",
+    role: "Professor, CSE, Univ. of Calcutta | ACM Kolkata Chair",
+    desc: "Systems architecture, distributed protocols, cloud resilience, and large-scale computing infrastructure.",
     stats: [
-      { val: "8h", label: "On the floor" },
-      { val: "1:1", label: "Mentor slots" },
+      { val: "30+ yrs", label: "Research & Academics" },
+      { val: "ACM", label: "Chapter Chair" },
     ],
   },
   {
-    tag: "Intelligent agents",
-    domain: "AI, agents & machine learning",
-    role: "Applied ML & research",
-    desc: "Agentic workflows, retrieval and vector search, evaluation loops, and procedural generation for systems that refine their own output.",
+    tag: "Intelligent systems",
+    domain: "AI, agents & cognitive systems",
+    role: "Lead Research Scientist, TCS Research",
+    desc: "Autonomous agentic workflows, knowledge graphs, cognitive computing, and applied machine learning models.",
     stats: [
-      { val: "24/7", label: "Lab access" },
-      { val: "6+", label: "Specialists" },
+      { val: "TCS", label: "Research Lab" },
+      { val: "AI/ML", label: "Cognitive Systems" },
     ],
   },
   {
-    tag: "Product & design",
-    domain: "Interface, craft & typography",
-    role: "Creative technologists",
-    desc: "Interface polish, WebGL and shader work, kinetic typography, and the fluid micro-interactions that carry a demo.",
+    tag: "Platform architecture",
+    domain: "Generative AI & cloud platforms",
+    role: "Founder & Lead, CORE Platform",
+    desc: "High-scale cloud backends, API automation, agent tooling integrations, and rapid product venture delivery.",
     stats: [
-      { val: "3D", label: "Shader help" },
-      { val: "Demo", label: "Pitch prep" },
+      { val: "CORE", label: "Platform Founder" },
+      { val: "GenAI", label: "Cloud Systems" },
     ],
   },
   {
-    tag: "Embedded systems",
-    domain: "IoT & hardware prototyping",
-    role: "Hardware & sensor lab",
-    desc: "Low-power microcontrollers, sensor arrays, firmware debugging, and physical computing you can put on a table.",
+    tag: "Applied AI & Cloud",
+    domain: "Applied ML & hackathon mentorship",
+    role: "AI Engineer, TCS | InnoFusion Organizer",
+    desc: "Production LLM pipelines, multi-modal applications, cloud orchestration, and community hackathon architecture.",
     stats: [
-      { val: "Kits", label: "On site" },
-      { val: "ESP32", label: "Test rigs" },
+      { val: "TCS", label: "AI Engineer" },
+      { val: "Lead", label: "InnoFusion" },
     ],
   },
   {
-    tag: "Trust & security",
-    domain: "Security, privacy & resilience",
-    role: "Security engineering",
-    desc: "Threat modelling, auth and key handling, dependency hygiene, and the failure modes that only show up under load.",
+    tag: "NLP & Deep Learning",
+    domain: "NLP, embeddings & software systems",
+    role: "Software Engineer & NLP Researcher",
+    desc: "Language model fine-tuning, embeddings, vector search, and dependable backend software system architecture.",
     stats: [
-      { val: "Audit", label: "Walkthroughs" },
-      { val: "0-day", label: "War stories" },
+      { val: "NLP", label: "Deep Learning" },
+      { val: "Systems", label: "Software Engineer" },
     ],
   },
   {
-    tag: "Story & venture",
-    domain: "Pitching, product & venture",
-    role: "Founders & operators",
-    desc: "Framing the problem, cutting scope honestly, and telling the judges in two minutes why any of it matters.",
+    tag: "Product & Interface",
+    domain: "Interface craft & frontend systems",
+    role: "Software Engineer & Systems Developer",
+    desc: "High-performance web applications, fluid micro-interactions, reactive architecture, and stage demo execution.",
     stats: [
-      { val: "2 min", label: "Pitch drills" },
-      { val: "Top 6", label: "Stage coaching" },
-    ],
-  },
-  {
-    tag: "Bio & Climate",
-    domain: "Climate tech & bio-computation",
-    role: "Regenerative systems & data",
-    desc: "Low-power sensing arrays, emissions accounting, carbon transparency protocols, and environmental data models.",
-    stats: [
-      { val: "Field", label: "Sensor kits" },
-      { val: "Open", label: "Climate data" },
-    ],
-  },
-  {
-    tag: "Open web & tools",
-    domain: "Devtools, protocols & compilers",
-    role: "Core infrastructure engineering",
-    desc: "Local-first sync, edge runtimes, custom DSLs, debugging tools, and peer-to-peer protocols for resilient apps.",
-    stats: [
-      { val: "CRDTs", label: "Sync patterns" },
-      { val: "Wasm", label: "Toolchain" },
-    ],
-  },
-  {
-    tag: "Autonomous systems",
-    domain: "Vision, robotics & edge compute",
-    role: "Applied robotics & perception",
-    desc: "Camera pipelines, spatial tracking, edge inference models, and physical computing that reacts in real-time.",
-    stats: [
-      { val: "Edge", label: "Inference GPUs" },
-      { val: "0.2s", label: "Control loops" },
+      { val: "Fullstack", label: "Frontend Systems" },
+      { val: "Mentor", label: "Hackathon Winner" },
     ],
   },
 ];
 
 /**
- * Per-card scroll drift, alternating direction so the grid shears past itself
- * on the way down — the same trick the sponsor wall uses on its mosaic.
+ * Per-card scroll drift for the 6 cards.
  */
-const DRIFT = [45, -45, 45, -45, 45, -45, 45, -45, 45] as const;
+const DRIFT = [35, -35, 35, -35, 35, -35] as const;
 
 function SealedFront({ index, seat }: { index: number; seat: (typeof SEATS)[number] }) {
   const qShift = ((index % 3) - 1) * 6;
@@ -162,6 +127,12 @@ function SealedFront({ index, seat }: { index: number; seat: (typeof SEATS)[numb
   );
 }
 
+/**
+ * ID Badge Pass card face matching conference credential design.
+ * Features outer laminate frame, top lanyard slot & strap with arrow glyph,
+ * vertical theme color block, grayscale cutout portrait, and bottom
+ * monogram emblem + high-contrast nameplate.
+ */
 function PhotoFront({
   index,
   judge,
@@ -170,42 +141,122 @@ function PhotoFront({
   judge: (typeof JUDGES)[number];
 }) {
   return (
-    <span className="jd-front jd-front-filled">
-      <Image
-        src={judge.photo.src as string}
-        alt={judge.name}
-        fill
-        sizes="(max-width: 620px) 90vw, (max-width: 1000px) 44vw, 30vw"
-        className="jd-front-photo"
-      />
-      <span className="jd-front-scrim" aria-hidden="true" />
-      <span className="jd-front-meta">
-        <span className="jd-front-seat">
-          Seat {String(index + 1).padStart(2, "0")}
+    <span className="jd-badge-card">
+      {/* Top Lanyard Clip & Punch Hole */}
+      <span className="jd-badge-top" aria-hidden="true">
+        <span className="jd-badge-slot-clip">
+          <span className="jd-badge-strap">
+            <svg
+              className="jd-badge-strap-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="7" y1="17" x2="17" y2="7" />
+              <polyline points="7 7 17 7 17 17" />
+            </svg>
+          </span>
+          <span className="jd-badge-slot" />
         </span>
-        <span className="jd-front-domain">{judge.name}</span>
-        <span className="jd-front-role">{judge.role}</span>
+      </span>
+
+      {/* Middle: Portrait Area with Vertical Theme Accent Bar */}
+      <span className="jd-badge-body">
+        <span className="jd-badge-stripe" aria-hidden="true" />
+        <span className="jd-badge-neutral" aria-hidden="true" />
+        <span className="jd-badge-photo-wrap">
+          <Image
+            src={judge.photo.src as string}
+            alt={judge.name}
+            fill
+            sizes="(max-width: 680px) 185px, (max-width: 1024px) 45vw, 360px"
+            className="jd-badge-photo"
+            priority={index < 3}
+          />
+        </span>
+      </span>
+
+      {/* Bottom: Left Dark Monogram Box + Right Clean White Nameplate */}
+      <span className="jd-badge-bottom">
+        <span className="jd-badge-box" aria-hidden="true">
+          <svg className="jd-badge-box-mark" viewBox="0 0 40 40" fill="none">
+            {/* Left starburst rays */}
+            <path
+              d="M12 9V31M6 14L18 26M6 26L18 14M3 20H21"
+              stroke="#8FC45A"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
+            {/* Right stacked seat digits */}
+            <text
+              x="29"
+              y="19"
+              textAnchor="middle"
+              fill="#FFFFFF"
+              fontSize="11"
+              fontWeight="800"
+              fontFamily="var(--font-geist-mono), monospace"
+            >
+              0
+            </text>
+            <text
+              x="29"
+              y="31"
+              textAnchor="middle"
+              fill="#8FC45A"
+              fontSize="11"
+              fontWeight="800"
+              fontFamily="var(--font-geist-mono), monospace"
+            >
+              {index + 1}
+            </text>
+          </svg>
+        </span>
+        <span className="jd-badge-info">
+          <span className="jd-badge-name" title={judge.name}>{judge.name}</span>
+          <span className="jd-badge-role" title={judge.role}>{judge.role}</span>
+        </span>
       </span>
     </span>
   );
 }
 
-function SeatBack({ seat }: { seat: (typeof SEATS)[number] }) {
+function SeatBack({
+  index,
+  seat,
+  judge,
+}: {
+  index: number;
+  seat: (typeof SEATS)[number];
+  judge: (typeof JUDGES)[number];
+}) {
   return (
     <span className="jd-back">
-      <span className="jd-back-tag">{seat.tag}</span>
-      <span className="jd-back-title">{seat.domain}</span>
-      <span className="jd-back-rule" aria-hidden="true" />
-      <span className="jd-back-role">{seat.role}</span>
-      <span className="jd-back-desc">{seat.desc}</span>
+      <span className="jd-back-slot-wrap" aria-hidden="true">
+        <span className="jd-back-slot" />
+      </span>
 
-      <span className="jd-back-stats">
-        {seat.stats.map((s) => (
-          <span className="jd-back-stat" key={s.label}>
-            <span className="jd-back-val">{s.val}</span>
-            <span className="jd-back-lbl">{s.label}</span>
-          </span>
-        ))}
+      <span className="jd-back-content">
+        <span className="jd-back-tag">
+          Seat {String(index + 1).padStart(2, "0")} · {seat.tag}
+        </span>
+        <span className="jd-back-title">{judge.name}</span>
+        <span className="jd-back-role">{seat.role}</span>
+        <span className="jd-back-rule" aria-hidden="true" />
+        <span className="jd-back-desc">{seat.desc}</span>
+
+        <span className="jd-back-stats">
+          {seat.stats.map((s) => (
+            <span className="jd-back-stat" key={s.label}>
+              <span className="jd-back-val">{s.val}</span>
+              <span className="jd-back-lbl">{s.label}</span>
+            </span>
+          ))}
+        </span>
+        <span className="jd-back-hint">Turn card over ↺</span>
       </span>
     </span>
   );
@@ -281,14 +332,12 @@ export default function Judges() {
 
           <RevealBlock y={12} delay={0.06}>
             <p className="jd-lede">
-              {sealed
-                ? "Nine seats, nine domains — locked. The mentor & judge lineup stays sealed until the official reveal."
-                : "Experienced builders, designers, and researchers guiding teams through the 8-hour sprint."}
+              Distinguished researchers, academic leaders, and platform engineers guiding and evaluating teams throughout Recursive 2026.
             </p>
           </RevealBlock>
         </div>
 
-        {/* ── Nine flip cards (3x3 grid), one per seat ── */}
+        {/* ── Six conference pass cards (3x2 grid), one per judge ── */}
         <RevealBlock
           y={24}
           delay={0.1}
@@ -309,11 +358,11 @@ export default function Judges() {
                     key={judge.photo.expect}
                   >
                     <FlipCard
-                      ratio="var(--jd-ratio, 4 / 5)"
+                      ratio="var(--jd-ratio, 3 / 4.25)"
                       disabled={!filled}
                       label={
                         filled
-                          ? `${judge.name} — ${judge.role}. Turn the card for details.`
+                          ? `${judge.name} — ${judge.role}. Turn the pass for details.`
                           : `${seat.domain} — seat ${i + 1}. Locked.`
                       }
                       front={
@@ -323,7 +372,7 @@ export default function Judges() {
                           <SealedFront index={i} seat={seat} />
                         )
                       }
-                      back={<SeatBack seat={seat} />}
+                      back={<SeatBack index={i} seat={seat} judge={judge} />}
                     />
                   </ParallaxY>
                 );
@@ -332,22 +381,22 @@ export default function Judges() {
 
             {/* ── Mobile: Smooth Infinite Marquee Tracks (< 680px) ── */}
             <div className="jd-marquee-wrap" aria-label="Mentors and judges scrolling carousel">
-              {/* Row 1 — Seats 1 to 5 scrolling left */}
+              {/* Row 1 — All 6 judges scrolling left */}
               <div className="jd-drift jd-drift-1">
                 <div className="jd-marquee-track jd-marquee-track-1">
-                  {[...JUDGES.slice(0, 5), ...JUDGES.slice(0, 5)].map((judge, idx) => {
-                    const originalIdx = idx % 5;
+                  {[...JUDGES, ...JUDGES].map((judge, idx) => {
+                    const originalIdx = idx % JUDGES.length;
                     const seat = SEATS[originalIdx];
                     const filled = judge.name.trim().length > 0 && !!judge.photo.src;
 
                     return (
                       <div className="jd-marquee-card" key={`m1-${idx}-${judge.photo.expect}`}>
                         <FlipCard
-                          ratio="3 / 4.4"
+                          ratio="3 / 4.25"
                           disabled={!filled}
                           label={
                             filled
-                              ? `${judge.name} — ${judge.role}.`
+                              ? `${judge.name} — ${judge.role}. Turn pass for details.`
                               : `${seat.domain} — seat ${originalIdx + 1}.`
                           }
                           front={
@@ -357,7 +406,7 @@ export default function Judges() {
                               <SealedFront index={originalIdx} seat={seat} />
                             )
                           }
-                          back={<SeatBack seat={seat} />}
+                          back={<SeatBack index={originalIdx} seat={seat} judge={judge} />}
                         />
                       </div>
                     );
@@ -365,22 +414,22 @@ export default function Judges() {
                 </div>
               </div>
 
-              {/* Row 2 — Seats 6 to 9 scrolling right */}
+              {/* Row 2 — Offset judges scrolling right */}
               <div className="jd-drift jd-drift-2">
                 <div className="jd-marquee-track jd-marquee-track-2">
-                  {[...JUDGES.slice(5, 9), ...JUDGES.slice(5, 9), ...JUDGES.slice(5, 9)].map((judge, idx) => {
-                    const originalIdx = 5 + (idx % 4);
+                  {[...JUDGES.slice(3), ...JUDGES.slice(0, 3), ...JUDGES.slice(3), ...JUDGES.slice(0, 3)].map((judge, idx) => {
+                    const originalIdx = (idx + 3) % JUDGES.length;
                     const seat = SEATS[originalIdx];
                     const filled = judge.name.trim().length > 0 && !!judge.photo.src;
 
                     return (
                       <div className="jd-marquee-card" key={`m2-${idx}-${judge.photo.expect}`}>
                         <FlipCard
-                          ratio="3 / 4.4"
+                          ratio="3 / 4.25"
                           disabled={!filled}
                           label={
                             filled
-                              ? `${judge.name} — ${judge.role}.`
+                              ? `${judge.name} — ${judge.role}. Turn pass for details.`
                               : `${seat.domain} — seat ${originalIdx + 1}.`
                           }
                           front={
@@ -390,7 +439,7 @@ export default function Judges() {
                               <SealedFront index={originalIdx} seat={seat} />
                             )
                           }
-                          back={<SeatBack seat={seat} />}
+                          back={<SeatBack index={originalIdx} seat={seat} judge={judge} />}
                         />
                       </div>
                     );
@@ -399,8 +448,7 @@ export default function Judges() {
               </div>
             </div>
 
-            {/* Barrier tape and wax over the whole panel: the seats are set,
-                the names are not. */}
+            {/* Barrier tape and wax over the whole panel if sealed */}
             {sealed && <Seal word="PANEL SEALED" />}
           </div>
         </RevealBlock>
@@ -408,26 +456,23 @@ export default function Judges() {
         <RevealBlock y={14} delay={0.12}>
           <div className="jd-foot-wrap">
             <p className="jd-foot-note">
-              {sealed
-                ? "Mentor & judge profiles are currently locked · Revealing soon"
-                : "Hover a card — or tap it on a phone — to read the seat."}
+              Hover a pass — or tap it on a phone — to inspect credentials &amp; background.
             </p>
 
-            <button
-              type="button"
-              className="jd-explore-btn"
-              aria-label="Explore all mentors and judges - Currently Locked"
-              disabled
+            <a
+              href="#tracks"
+              className="jd-explore-btn jd-explore-btn-active"
+              aria-label="Explore Tracks & Challenges"
             >
               <span className="jd-btn-icon-wrap" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="jd-lock-icon">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="jd-badge-btn-icon">
+                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
                 </svg>
               </span>
-              <span className="jd-btn-text-default">Explore all mentors &amp; judges</span>
-              <span className="jd-btn-text-hover">Locked · Revealing Soon</span>
-            </button>
+              <span className="jd-btn-text-default">Explore Tracks &amp; Mentorship</span>
+              <span className="jd-btn-text-hover">View Hackathon Tracks →</span>
+            </a>
           </div>
         </RevealBlock>
       </div>
@@ -512,7 +557,7 @@ export default function Judges() {
         .jd-grid-wrap {
           position: relative;
           width: 100%;
-          max-width: 86rem;
+          max-width: 76rem;
           margin-inline: auto;
         }
 
@@ -520,7 +565,7 @@ export default function Judges() {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
           width: 100%;
-          gap: clamp(1.2rem, 2.8vw, 2.2rem);
+          gap: clamp(1.4rem, 2.5vw, 2.4rem);
         }
 
         .jd .jseal {
@@ -541,15 +586,13 @@ export default function Judges() {
           opacity: 0.88;
         }
 
-        /* Seal was drawn for the sage sections: its vignette is a pale wash
-           that would ring the panel in light on the night field. */
         .jd .jseal::before {
           background: radial-gradient(130% 100% at 50% 44%,
             rgba(1, 3, 1, 0) 46%,
             rgba(1, 3, 1, 0.72) 100%);
         }
 
-        /* ── Front face: the print that has not developed ── */
+        /* ── Sealed front face (fallback) ── */
         .jd-front {
           position: absolute;
           inset: 0;
@@ -601,14 +644,6 @@ export default function Judges() {
           pointer-events: none;
         }
 
-        /* real portrait, once one exists */
-        .jd-front-photo { object-fit: cover; }
-        .jd-front-scrim {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(180deg, rgba(3, 8, 2, 0) 42%, rgba(3, 8, 2, 0.88) 100%);
-        }
-
         .jd-front-meta {
           position: absolute;
           left: 0;
@@ -640,12 +675,6 @@ export default function Judges() {
           text-wrap: balance;
         }
 
-        .jd-front-role {
-          font-family: var(--font-dm-sans), sans-serif;
-          font-size: 0.8rem;
-          color: rgba(214, 232, 202, 0.62);
-        }
-
         .jd-stamp {
           position: absolute;
           top: clamp(0.75rem, 1.6vw, 1rem);
@@ -662,82 +691,312 @@ export default function Judges() {
           background: rgba(8, 18, 6, 0.88);
         }
 
-        /* ── Back face: the seat brief ── */
+        /* ── Conference ID Badge Pass (Front Face) ── */
+        .jd-badge-card {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          flex-direction: column;
+          border-radius: var(--radius-lg, 22px);
+          overflow: hidden;
+          background: #F4F7F2;
+          box-shadow:
+            0 16px 40px rgba(0, 0, 0, 0.45),
+            0 4px 14px rgba(0, 0, 0, 0.25),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.95),
+            inset 0 1px 0 rgba(255, 255, 255, 1);
+          border: 1px solid rgba(190, 224, 168, 0.35);
+          padding: clamp(6px, 1.1vw, 10px);
+          user-select: none;
+          transition: transform 320ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 320ms ease, border-color 320ms ease;
+        }
+
+        .fcd:hover .jd-badge-card,
+        .jd-marquee-card:hover .jd-badge-card {
+          box-shadow:
+            0 22px 52px rgba(0, 0, 0, 0.58),
+            0 0 28px rgba(143, 196, 90, 0.25),
+            inset 0 0 0 1px rgba(255, 255, 255, 1);
+          border-color: rgba(143, 196, 90, 0.65);
+        }
+
+        /* Top Lanyard Header & Punch Slot */
+        .jd-badge-top {
+          position: relative;
+          width: 100%;
+          height: clamp(38px, 9.8%, 46px);
+          background: transparent;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-shrink: 0;
+          z-index: 4;
+        }
+
+        .jd-badge-slot-clip {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .jd-badge-strap {
+          position: absolute;
+          top: -22px;
+          width: clamp(36px, 11%, 44px);
+          height: 28px;
+          background: #142217;
+          border-radius: 3px 3px 2px 2px;
+          box-shadow:
+            0 3px 6px rgba(0, 0, 0, 0.45),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 3;
+        }
+
+        .jd-badge-strap-icon {
+          width: 14px;
+          height: 14px;
+          color: #FFFFFF;
+          stroke: #FFFFFF;
+        }
+
+        .jd-badge-slot {
+          width: clamp(42px, 13%, 52px);
+          height: clamp(8px, 2.3%, 10px);
+          border-radius: 9999px;
+          background: #081109;
+          box-shadow:
+            inset 0 2px 3px rgba(0, 0, 0, 0.8),
+            0 1px 0 rgba(255, 255, 255, 0.85);
+          z-index: 2;
+        }
+
+        /* Badge Portrait Area */
+        .jd-badge-body {
+          position: relative;
+          flex: 1;
+          width: 100%;
+          min-height: 0;
+          display: flex;
+          overflow: hidden;
+          background: #DCE4D8;
+          border-radius: 4px 4px 0 0;
+        }
+
+        /* Vertical Theme Accent Bar */
+        .jd-badge-stripe {
+          width: 35%;
+          height: 100%;
+          background: linear-gradient(180deg, #96CF60 0%, #6EAD3B 100%);
+          box-shadow: inset -1px 0 3px rgba(0, 0, 0, 0.08);
+          flex-shrink: 0;
+        }
+
+        /* Neutral right area behind photo */
+        .jd-badge-neutral {
+          flex: 1;
+          height: 100%;
+          background: linear-gradient(145deg, #E5EBE1 0%, #D4DDD0 100%);
+        }
+
+        /* Cutout photo container */
+        .jd-badge-photo-wrap {
+          position: absolute;
+          top: clamp(8px, 1.5vw, 14px);
+          bottom: 0;
+          left: 0;
+          right: 0;
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+          pointer-events: none;
+          z-index: 2;
+        }
+
+        .jd-badge-photo {
+          object-fit: contain !important;
+          object-position: bottom center !important;
+          filter: grayscale(100%) contrast(1.12) brightness(0.97);
+          transition: filter 350ms ease, transform 350ms cubic-bezier(0.23, 1, 0.32, 1);
+          transform-origin: bottom center;
+        }
+
+        .fcd:hover .jd-badge-photo,
+        .jd-marquee-card:hover .jd-badge-photo {
+          filter: grayscale(15%) contrast(1.06) brightness(1);
+          transform: scale(1.02);
+        }
+
+        /* Bottom Information Block */
+        .jd-badge-bottom {
+          position: relative;
+          width: 100%;
+          height: clamp(62px, 18.5%, 76px);
+          display: flex;
+          flex-shrink: 0;
+          z-index: 3;
+          border-radius: 0 0 4px 4px;
+          overflow: hidden;
+          border-top: 1px solid rgba(18, 36, 20, 0.08);
+        }
+
+        /* Dark square monogram badge on the left */
+        .jd-badge-box {
+          width: 35%;
+          height: 100%;
+          background: #0A160D;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.55);
+        }
+
+        .jd-badge-box-mark {
+          width: clamp(34px, 80%, 42px);
+          height: clamp(34px, 80%, 42px);
+        }
+
+        /* Clean light panel on the right with Name and Role */
+        .jd-badge-info {
+          flex: 1;
+          min-width: 0;
+          background: #FFFFFF;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding-inline: clamp(0.7rem, 1.4vw, 1.05rem);
+          padding-block: 0.35rem;
+          text-align: left;
+        }
+
+        .jd-badge-name {
+          font-family: var(--font-dm-sans), sans-serif;
+          font-size: clamp(0.9rem, 1.2vw, 1.06rem);
+          font-weight: 700;
+          line-height: 1.18;
+          letter-spacing: -0.02em;
+          color: #121F14;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .jd-badge-role {
+          font-family: var(--font-dm-sans), sans-serif;
+          font-size: clamp(0.7rem, 0.86vw, 0.78rem);
+          font-weight: 500;
+          line-height: 1.25;
+          color: #556B58;
+          margin-top: 0.2rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        /* ── Back face: The pass dossier ── */
         .jd-back {
           position: absolute;
           inset: 0;
           display: flex;
           flex-direction: column;
-          padding: clamp(1.1rem, 2.4vw, 1.6rem);
-          border-radius: var(--radius-lg);
+          padding: clamp(0.85rem, 1.8vw, 1.35rem);
+          border-radius: var(--radius-lg, 18px);
           background:
-            radial-gradient(110% 70% at 12% 0%, rgba(92, 140, 58, 0.3) 0%, rgba(92, 140, 58, 0) 58%),
-            linear-gradient(165deg, #1B2E16 0%, #070E05 100%);
+            radial-gradient(110% 70% at 12% 0%, rgba(92, 140, 58, 0.28) 0%, rgba(92, 140, 58, 0) 58%),
+            linear-gradient(165deg, #182B14 0%, #070F06 100%);
           box-shadow:
-            inset 0 0 0 1px rgba(190, 224, 168, 0.18),
-            inset 0 1px 0 rgba(214, 240, 190, 0.2);
+            inset 0 0 0 1px rgba(190, 224, 168, 0.22),
+            inset 0 1px 0 rgba(214, 240, 190, 0.24);
+          overflow: hidden;
+        }
+
+        .jd-back-slot-wrap {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          margin-bottom: clamp(0.45rem, 1vh, 0.75rem);
+        }
+
+        .jd-back-slot {
+          width: clamp(38px, 12.5%, 48px);
+          height: clamp(7px, 2%, 9px);
+          border-radius: 9999px;
+          background: #020603;
+          box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(190, 224, 168, 0.15);
+        }
+
+        .jd-back-content {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          min-height: 0;
+          text-align: left;
         }
 
         .jd-back-tag {
           font-family: var(--font-geist-mono), monospace;
           font-size: 0.6rem;
           font-weight: 500;
-          letter-spacing: 0.19em;
+          letter-spacing: 0.18em;
           text-transform: uppercase;
           color: #9FD066;
         }
 
         .jd-back-title {
-          margin-top: 0.55rem;
+          margin-top: 0.4rem;
           font-family: var(--font-heading), var(--font-dm-sans), sans-serif;
-          font-size: clamp(1rem, 1.5vw, 1.2rem);
-          font-weight: 500;
+          font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+          font-weight: 600;
           line-height: 1.2;
           letter-spacing: -0.02em;
           color: #F2F8EA;
-          text-wrap: balance;
-        }
-
-        .jd-back-rule {
-          display: block;
-          width: 2.25rem;
-          height: 1px;
-          margin: 0.8rem 0;
-          background: rgba(143, 196, 90, 0.45);
         }
 
         .jd-back-role {
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: 0.8rem;
+          font-size: 0.76rem;
           font-weight: 500;
-          color: rgba(200, 226, 185, 0.72);
+          color: rgba(200, 226, 185, 0.75);
+          margin-top: 0.15rem;
+        }
+
+        .jd-back-rule {
+          display: block;
+          width: 2rem;
+          height: 1px;
+          margin: 0.55rem 0;
+          background: rgba(143, 196, 90, 0.45);
         }
 
         .jd-back-desc {
-          margin-top: 0.6rem;
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: clamp(0.79rem, 1.02vw, 0.87rem);
-          line-height: 1.58;
-          color: rgba(206, 226, 194, 0.6);
+          font-size: clamp(0.74rem, 0.95vw, 0.82rem);
+          line-height: 1.5;
+          color: rgba(206, 226, 194, 0.68);
         }
 
         .jd-back-stats {
           display: flex;
-          gap: clamp(0.9rem, 2vw, 1.5rem);
+          gap: clamp(0.75rem, 1.8vw, 1.35rem);
           margin-top: auto;
-          padding-top: 1rem;
+          padding-top: 0.75rem;
           border-top: 1px solid rgba(190, 224, 168, 0.16);
         }
 
         .jd-back-stat {
           display: flex;
           flex-direction: column;
-          gap: 0.1rem;
+          gap: 0.05rem;
         }
 
         .jd-back-val {
           font-family: var(--font-bebas), sans-serif;
-          font-size: clamp(1.0rem, 12.56px + 0.957vw, 1.55rem);
+          font-size: clamp(0.95rem, 1.35vw, 1.35rem);
           line-height: 1;
           letter-spacing: 0.02em;
           color: #F2F8EA;
@@ -745,11 +1004,21 @@ export default function Judges() {
 
         .jd-back-lbl {
           font-family: var(--font-dm-sans), sans-serif;
-          font-size: 0.66rem;
+          font-size: 0.62rem;
           font-weight: 500;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.04em;
           text-transform: uppercase;
           color: rgba(200, 226, 185, 0.55);
+        }
+
+        .jd-back-hint {
+          margin-top: 0.4rem;
+          font-family: var(--font-geist-mono), monospace;
+          font-size: 0.55rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: rgba(143, 196, 90, 0.6);
+          text-align: center;
         }
 
         /* ── Footer ── */
@@ -783,11 +1052,26 @@ export default function Judges() {
           font-size: 0.88rem;
           font-weight: 600;
           color: #E9F4DE;
-          cursor: not-allowed;
           user-select: none;
           overflow: hidden;
           min-width: 17rem;
           transition: transform 200ms ease, background 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+        }
+
+        .jd-explore-btn-active {
+          cursor: pointer !important;
+          pointer-events: auto !important;
+          background: rgba(18, 38, 16, 0.9);
+          border-color: rgba(143, 196, 90, 0.35);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+          text-decoration: none;
+        }
+
+        .jd-explore-btn-active:hover {
+          background: rgba(26, 54, 23, 0.95);
+          border-color: rgba(143, 196, 90, 0.65);
+          box-shadow: 0 0 24px rgba(143, 196, 90, 0.22);
+          transform: translateY(-2px);
         }
 
         .jd-btn-icon-wrap {
@@ -799,7 +1083,7 @@ export default function Judges() {
           transition: color 220ms ease, transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .jd-lock-icon {
+        .jd-badge-btn-icon {
           width: 0.95rem;
           height: 0.95rem;
         }
@@ -814,31 +1098,24 @@ export default function Judges() {
           left: 3.2rem;
           opacity: 0;
           transform: translateY(8px);
-          color: #FFDE7A;
+          color: #8FC45A;
           font-weight: 600;
           letter-spacing: 0.02em;
           transition: opacity 200ms ease, transform 200ms ease;
           white-space: nowrap;
         }
 
-        .jd-explore-btn:hover {
-          background: rgba(235, 175, 45, 0.12);
-          border-color: rgba(255, 215, 90, 0.45);
-          box-shadow: 0 0 20px rgba(240, 190, 60, 0.16);
-          transform: translateY(-1px);
+        .jd-explore-btn-active:hover .jd-btn-icon-wrap {
+          color: #8FC45A;
+          transform: scale(1.15);
         }
 
-        .jd-explore-btn:hover .jd-btn-icon-wrap {
-          color: #FFDE7A;
-          transform: scale(1.18);
-        }
-
-        .jd-explore-btn:hover .jd-btn-text-default {
+        .jd-explore-btn-active:hover .jd-btn-text-default {
           opacity: 0;
           transform: translateY(-8px);
         }
 
-        .jd-explore-btn:hover .jd-btn-text-hover {
+        .jd-explore-btn-active:hover .jd-btn-text-hover {
           opacity: 1;
           transform: translateY(0);
         }
@@ -849,13 +1126,7 @@ export default function Judges() {
           }
           .jd-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: clamp(0.75rem, 2vw, 1.25rem);
-          }
-          .jd-front-domain {
-            font-size: clamp(0.85rem, 1.8vw, 1.05rem);
-          }
-          .jd-back-title {
-            font-size: clamp(0.85rem, 1.8vw, 1.08rem);
+            gap: clamp(1rem, 2.2vw, 1.5rem);
           }
           .jd .jseal-tape-a { transform: translateY(-50%) rotate(-45deg); }
           .jd .jseal-tape-b { transform: translateY(-50%) rotate(43deg); }
@@ -912,7 +1183,7 @@ export default function Judges() {
         }
 
         .jd-marquee-card {
-          width: clamp(140px, 42vw, 185px);
+          width: clamp(146px, 43vw, 182px);
           flex-shrink: 0;
           transform: translate3d(0, 0, 0);
           backface-visibility: hidden;
@@ -927,11 +1198,11 @@ export default function Judges() {
         }
 
         .jd-marquee-track-1 {
-          animation: jd-marquee-scroll-left 28s linear infinite;
+          animation: jd-marquee-scroll-left 26s linear infinite;
         }
 
         .jd-marquee-track-2 {
-          animation: jd-marquee-scroll-right 32s linear infinite;
+          animation: jd-marquee-scroll-right 30s linear infinite;
         }
 
         .jd-marquee-wrap:hover .jd-marquee-track,
@@ -990,23 +1261,32 @@ export default function Judges() {
           .jd .jseal-wax {
             width: clamp(105px, 28vw, 135px);
           }
-          .jd-front-meta {
-            padding: 0.55rem 0.5rem;
-            gap: 0.15rem;
-          }
-          .jd-front-seat { font-size: 0.64rem; letter-spacing: 0.12em; }
-          .jd-front-domain { font-size: 0.88rem; line-height: 1.18; }
-          .jd-front-role { font-size: 0.72rem; }
-          .jd-stamp { font-size: 0.66rem; padding: 0.16rem 0.4rem; top: 0.35rem; right: 0.35rem; }
-          .jd-back { padding: 0.6rem 0.55rem; }
-          .jd-back-tag { font-size: 0.66rem; letter-spacing: 0.1em; }
-          .jd-back-title { font-size: 0.88rem; line-height: 1.18; margin-top: 0.15rem; }
-          .jd-back-rule { margin: 0.3rem 0; width: 1.2rem; }
-          .jd-back-role { font-size: 0.72rem; }
-          .jd-back-desc { font-size: 0.72rem; line-height: 1.36; margin-top: 0.25rem; }
-          .jd-back-stats { margin-top: auto; padding-top: 0.3rem; gap: 0.45rem; }
-          .jd-back-val { font-size: 1.05rem; }
-          .jd-back-lbl { font-size: 0.66rem; }
+
+          /* Mobile Badge pass adjustments */
+          .jd-badge-card { padding: 5px; border-radius: 16px; }
+          .jd-badge-top { height: 26px; }
+          .jd-badge-strap { top: -14px; width: 28px; height: 20px; }
+          .jd-badge-strap-icon { width: 10px; height: 10px; }
+          .jd-badge-slot { width: 30px; height: 6px; }
+          .jd-badge-stripe { width: 28%; }
+          .jd-badge-bottom { height: 46px; }
+          .jd-badge-box { width: 28%; }
+          .jd-badge-box-mark { width: 24px; height: 24px; }
+          .jd-badge-info { padding: 0.15rem 0.35rem; }
+          .jd-badge-name { font-size: 0.74rem; line-height: 1.15; }
+          .jd-badge-role { font-size: 0.58rem; margin-top: 0.05rem; }
+          .jd-back { padding: 0.55rem 0.5rem; }
+          .jd-back-slot-wrap { margin-bottom: 0.25rem; }
+          .jd-back-slot { width: 30px; height: 5px; }
+          .jd-back-tag { font-size: 0.54rem; letter-spacing: 0.08em; }
+          .jd-back-title { font-size: 0.8rem; line-height: 1.15; margin-top: 0.15rem; }
+          .jd-back-role { font-size: 0.64rem; margin-top: 0.05rem; }
+          .jd-back-rule { margin: 0.25rem 0; width: 1.2rem; }
+          .jd-back-desc { font-size: 0.64rem; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+          .jd-back-stats { margin-top: auto; padding-top: 0.25rem; gap: 0.45rem; }
+          .jd-back-val { font-size: 0.95rem; }
+          .jd-back-lbl { font-size: 0.55rem; }
+          .jd-back-hint { display: none; }
         }
 
         @media (prefers-reduced-motion: reduce) {

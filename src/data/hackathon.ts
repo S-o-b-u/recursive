@@ -244,15 +244,60 @@ export const TRACK_CRITERIA: Record<string, string[]> = {
 export type Judge = { name: string; role: string; photo: Slot };
 
 export const JUDGES: Judge[] = [
-  { name: "", role: "", photo: { label: "Judge 01", expect: "/images/judges/01.jpg", src: "" } },
-  { name: "", role: "", photo: { label: "Judge 02", expect: "/images/judges/02.jpg", src: "" } },
-  { name: "", role: "", photo: { label: "Judge 03", expect: "/images/judges/03.jpg", src: "" } },
-  { name: "", role: "", photo: { label: "Judge 04", expect: "/images/judges/04.jpg", src: "" } },
-  { name: "", role: "", photo: { label: "Judge 05", expect: "/images/judges/05.jpg", src: "" } },
-  { name: "", role: "", photo: { label: "Judge 06", expect: "/images/judges/06.jpg", src: "" } },
-  { name: "", role: "", photo: { label: "Judge 07", expect: "/images/judges/07.jpg", src: "" } },
-  { name: "", role: "", photo: { label: "Judge 08", expect: "/images/judges/08.jpg", src: "" } },
-  { name: "", role: "", photo: { label: "Judge 09", expect: "/images/judges/09.jpg", src: "" } },
+  {
+    name: "Dr. Nabendu Chaki",
+    role: "Professor, CSE, Univ. of Calcutta | ACM Kolkata Chair",
+    photo: {
+      label: "Dr. Nabendu Chaki",
+      expect: "/images/judges/Dr. NABENDU CHAKI.png",
+      src: "/images/judges/Dr. NABENDU CHAKI.png",
+    },
+  },
+  {
+    name: "Dr. Snehasis Banerjee",
+    role: "Lead Research Scientist, TCS Research",
+    photo: {
+      label: "Dr. Snehasis Banerjee",
+      expect: "/images/judges/Dr. SNEHASIS BANERJEE.png",
+      src: "/images/judges/Dr. SNEHASIS BANERJEE.png",
+    },
+  },
+  {
+    name: "Vishal Nandy",
+    role: "Founder & Lead, CORE Platform",
+    photo: {
+      label: "Vishal Nandy",
+      expect: "/images/judges/VISHAL NANDY.png",
+      src: "/images/judges/VISHAL NANDY.png",
+    },
+  },
+  {
+    name: "Avik Agarwala",
+    role: "AI Engineer, TCS | InnoFusion Organizer",
+    photo: {
+      label: "Avik Agarwala",
+      expect: "/images/judges/AVIK AGARWALA.png",
+      src: "/images/judges/AVIK AGARWALA.png",
+    },
+  },
+  {
+    name: "Devesh Tulsiyan",
+    role: "Software Engineer & NLP Researcher",
+    photo: {
+      label: "Devesh Tulsiyan",
+      expect: "/images/judges/DEVESH TULSIYAN.png",
+      src: "/images/judges/DEVESH TULSIYAN.png",
+    },
+  },
+  {
+    name: "Arpan Chowdhury",
+    role: "Software Engineer & Systems Developer",
+    photo: {
+      label: "Arpan Chowdhury",
+      expect: "/images/judges/ARPAN CHOWDHURY.png",
+      src: "/images/judges/ARPAN CHOWDHURY.png",
+    },
+  },
 ];
 
 /** Sponsor logo wall. Add a slot per signed sponsor, drop the logo in, set `src`. */
