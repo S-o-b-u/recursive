@@ -27,7 +27,9 @@ interface StageSceneProps {
  * from foliage per pixel by smoothness), B = the zone around the chair where
  * the white plastic must not be read as sky.
  *
- * Without WebGL the video is shown as-is, ungraded.
+ * Without WebGL, on a smartboard, or where the shader cannot get the video's
+ * frames, the video is shown as-is under a CSS grade (exposure, colour and
+ * contrast for the hour, but the evening sky).
  */
 
 const MASK_SRC = "/images/stage/stage-masks.png";
@@ -38,6 +40,29 @@ const VIDEO_FPS = 24;
 const HOUR_EASE_S = 0.9;
 /** Longest backing-store edge; the plate is 1080p, more pixels add nothing. */
 const MAX_BACKING = 2560;
+/** The same on a smartboard (html.perf-lite): 720p of backing, scaled up by the compositor. */
+const LITE_BACKING = 1280;
+/** The watchdog never draws fewer than this share of the backing size. */
+const MIN_SCALE = 0.5;
+/** A hour change smaller than this (43 clock seconds) snaps; larger ones sweep. */
+const HOUR_SNAP = 0.012;
+/** The video frame whose drawn output is checked for black (see outputIsBlack). */
+const BLACK_CHECK_FRAME = 3;
+
+/**
+ * Which backdrop to run. Smartboards (html.perf-lite) get the plain video with
+ * the CSS grade: on an Android 11 WebView it played the full 24 frames a second
+ * on about 60% of the main-thread time the shader took, where the shader
+ * managed 20 (every frame is copied into a texture on the main thread). The
+ * hardware decoder's output goes straight to the compositor instead.
+ * `?grade=gl` or `?grade=video` overrides, for comparing on a real board.
+ */
+function wantShader() {
+  const forced = new URLSearchParams(window.location.search).get("grade");
+  if (forced === "gl") return true;
+  if (forced === "video") return false;
+  return !perfLite();
+}
 
 const VERT = `
 attribute vec2 aPos;
@@ -187,10 +212,16 @@ export default function StageScene({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoHostRef = useRef<HTMLDivElement>(null);
   const targetHour = useRef(hour);
+  const wakeRef = useRef<(() => void) | null>(null);
   const [mode, setMode] = useState<"pending" | "gl" | "video">("pending");
   const [drawn, setDrawn] = useState(false);
 
   targetHour.current = Math.min(Math.max(hour, DAY_START_HOUR), DAY_END_HOUR);
+
+  // The light changed; draw it (when the video is playing, its next frame does this anyway).
+  useEffect(() => {
+    wakeRef.current?.();
+  }, [hour]);
 
   useEffect(() => {
     const host = videoHostRef.current;
@@ -229,10 +260,31 @@ export default function StageScene({
     else video.removeAttribute("poster");
   }, [mode, poster]);
 
+  // Without the shader (no WebGL, or a device too slow for it) the plain video
+  // still follows the hour in exposure, colour and contrast: a CSS filter is a
+  // colour matrix, which the compositor applies for next to nothing. It cannot
+  // swap the sky, so the morning is a brighter evening rather than a blue one.
+  useEffect(() => {
+    const video = stageVideo();
+    if (mode !== "video") {
+      video.style.filter = "";
+      return;
+    }
+    const g = gradeAt(Math.min(Math.max(hour, DAY_START_HOUR), DAY_END_HOUR));
+    // Always a filter, even at 17:00 where it changes nothing: without one,
+    // Android hands the video to a separate overlay surface, a mode switch
+    // twice a day that page screenshots (and some capture tools) see as black.
+    video.style.filter = `brightness(${g.exp.toFixed(3)}) saturate(${g.sat.toFixed(3)}) contrast(${g.con.toFixed(3)})`;
+  }, [mode, hour]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const video = stageVideo();
+    if (!wantShader()) {
+      setMode("video");
+      return;
+    }
 
     const gl = canvas.getContext("webgl", {
       alpha: false,
@@ -243,6 +295,7 @@ export default function StageScene({
       preserveDrawingBuffer: false,
     }) as WebGLRenderingContext | null;
     if (!gl) {
+      console.warn("[stage] no WebGL: showing the plain video");
       setMode("video");
       return;
     }
@@ -293,7 +346,9 @@ export default function StageScene({
     let videoLive = false; // frameTex holds a video frame
     let needsDraw = true;
     let shownHour = targetHour.current;
-    let last = performance.now();
+    let lastStep = performance.now();
+    let lastFrameAt = -1e9; // when the last video frame reached the texture
+    let scale = 1; // share of the full backing size actually drawn; the watchdog lowers it
     let raf = 0;
     let vfc = 0;
 
@@ -308,12 +363,31 @@ export default function StageScene({
       }
     };
 
+    // Nothing here loops on its own. A frame is drawn when a new video frame
+    // arrives (requestVideoFrameCallback), or, when none is arriving (the
+    // poster, a paused video, an engine without that callback), on the next
+    // animation frame after something changed. It used to run a requestAnimationFrame
+    // loop for the page's whole life and redraw the shader on every one of
+    // those frames, 60 a second, for a plate that has 24.
+    // `tick` is assigned below; the first resize() wakes the loop before that, so
+    // the frame goes through this wrapper, which reads `tick` when it runs.
+    let tick: FrameRequestCallback = () => {};
+    const onFrame: FrameRequestCallback = (now) => {
+      raf = 0;
+      tick(now);
+    };
+    const wake = () => {
+      if (disposed || raf) return;
+      raf = requestAnimationFrame(onFrame);
+    };
+
     const mask = new Image();
     mask.decoding = "async";
     mask.onload = () => {
       if (disposed || lost) return;
       hasMask = upload(1, maskTex, mask);
       needsDraw = true;
+      wake();
     };
     mask.src = MASK_SRC;
 
@@ -324,6 +398,7 @@ export default function StageScene({
       if (disposed || lost || videoLive) return;
       hasFrame = upload(0, frameTex, still);
       needsDraw = true;
+      wake();
     };
     still.src = poster;
 
@@ -331,14 +406,16 @@ export default function StageScene({
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
       if (!w || !h) return;
-      // smartboards: 1080p of backing is what the plate holds anyway
-      const r = Math.min(window.devicePixelRatio || 1, (perfLite() ? 1920 : MAX_BACKING) / Math.max(w, h));
+      // smartboards: the plate is 1080p and soft (its depth of field is baked in),
+      // and a 4K panel's GPU is better spent elsewhere
+      const r = Math.min(window.devicePixelRatio || 1, (perfLite() ? LITE_BACKING : MAX_BACKING) / Math.max(w, h)) * scale;
       const bw = Math.max(1, Math.round(w * r));
       const bh = Math.max(1, Math.round(h * r));
       if (canvas.width !== bw || canvas.height !== bh) {
         canvas.width = bw;
         canvas.height = bh;
         needsDraw = true;
+        wake();
       }
     };
     const ro = new ResizeObserver(resize);
@@ -374,101 +451,181 @@ export default function StageScene({
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 
+    // Some Android WebViews hand WebGL a video frame as solid black, with no
+    // error anywhere. Read back three rows of what was just drawn (the plate
+    // is never dark enough to be all black) before it is presented.
+    const outputIsBlack = () => {
+      const w = canvas.width;
+      const row = new Uint8Array(w * 4);
+      let peak = 0;
+      for (const at of [0.3, 0.5, 0.7]) {
+        gl.readPixels(0, Math.floor(canvas.height * at), w, 1, gl.RGBA, gl.UNSIGNED_BYTE, row);
+        for (let i = 0; i < row.length; i += 4) peak = Math.max(peak, row[i], row[i + 1], row[i + 2]);
+      }
+      return peak < 8;
+    };
+
+    let drawnOnce = false;
+    let videoDraws = 0;
+    const render = () => {
+      if (!needsDraw || !hasFrame || !hasMask) return;
+      needsDraw = false;
+      draw();
+      if (videoLive && ++videoDraws === BLACK_CHECK_FRAME && outputIsBlack()) {
+        console.warn("[stage] video frames reach the shader black: showing the plain video");
+        gaveUp = true;
+        setMode("video");
+        return;
+      }
+      if (!drawnOnce) {
+        drawnOnce = true;
+        setDrawn(true);
+      }
+    };
+
+    /**
+     * Move the light toward the clock. The clock's own creep (a second at a
+     * time) is far below what the eye can see, so it snaps; a jump (reset,
+     * milestone click) sweeps rather than cuts. True while still moving.
+     */
+    const stepHour = (now: number) => {
+      const dt = Math.min(0.25, Math.max(0, (now - lastStep) / 1000));
+      lastStep = now;
+      const target = targetHour.current;
+      const diff = target - shownHour;
+      if (diff === 0) return false;
+      if (Math.abs(diff) < HOUR_SNAP) shownHour = target;
+      else shownHour += diff * (1 - Math.exp(-dt / HOUR_EASE_S));
+      if (Math.abs(target - shownHour) < 1e-4) shownHour = target;
+      needsDraw = true;
+      return shownHour !== target;
+    };
+
     let uploads = 0; // video frames that reached the texture
     const takeVideoFrame = () => {
       if (!lost && video.readyState >= 2 && upload(0, frameTex, video)) {
         hasFrame = true;
         videoLive = true;
         needsDraw = true;
+        lastFrameAt = performance.now();
         uploads++;
       }
     };
 
     let useVfc = "requestVideoFrameCallback" in HTMLVideoElement.prototype;
-    const onVideoFrame = () => {
-      if (disposed || !useVfc) return;
+    const onVideoFrame = (now: number) => {
+      vfc = 0;
+      if (disposed || lost || gaveUp || !useVfc) return;
       takeVideoFrame();
+      stepHour(now);
+      render();
       vfc = video.requestVideoFrameCallback(onVideoFrame);
     };
     if (useVfc) vfc = video.requestVideoFrameCallback(onVideoFrame);
-    let lastFrameIdx = -1;
-    // Frames reaching the texture, measured over each 2s of playback.
-    let watchT = -1;
-    let watchN = 0;
-    let drawnOnce = false;
 
-    const tick = (now: number) => {
-      raf = requestAnimationFrame(tick);
-      if (lost || gaveUp) return;
-      const dt = Math.min(0.25, (now - last) / 1000);
-      last = now;
+    let lastFrameIdx = -1;
+    tick = (now: number) => {
+      if (disposed || lost || gaveUp) return;
+      let again = false;
 
       // No requestVideoFrameCallback (or it stalled): poll, once per video frame.
-      if (!useVfc && video.readyState >= 2) {
-        const idx = Math.floor(video.currentTime * VIDEO_FPS);
-        if (idx !== lastFrameIdx) {
-          lastFrameIdx = idx;
-          takeVideoFrame();
-        }
-      }
-
-      // The plate is playing but its frames are not arriving here (some
-      // engines run requestVideoFrameCallback at a few Hz, or not at all, or
-      // refuse the upload): poll instead, and if that fails too, show the
-      // plain video. Moving and ungraded beats graded and frozen.
-      if (!video.paused && video.readyState >= 3) {
-        const ct = video.currentTime;
-        if (watchT < 0 || ct < watchT) {
-          watchT = ct; // first look, or the loop wrapped
-          watchN = uploads;
-        } else if (ct - watchT >= 2) {
-          const rate = (uploads - watchN) / (ct - watchT);
-          if (rate < VIDEO_FPS / 3) {
-            if (useVfc) {
-              useVfc = false;
-              video.cancelVideoFrameCallback(vfc);
-            } else if (rate < 1) {
-              gaveUp = true;
-              setMode("video");
-              return;
-            }
+      if (!useVfc && !video.paused) {
+        again = true;
+        if (video.readyState >= 2) {
+          const idx = Math.floor(video.currentTime * VIDEO_FPS);
+          if (idx !== lastFrameIdx) {
+            lastFrameIdx = idx;
+            takeVideoFrame();
           }
-          watchT = ct;
-          watchN = uploads;
         }
       }
 
-      // The light follows the clock; a jump (reset, milestone click) sweeps rather than cuts.
-      const target = targetHour.current;
-      if (Math.abs(target - shownHour) > 1e-4) {
-        shownHour += (target - shownHour) * (1 - Math.exp(-dt / HOUR_EASE_S));
-        if (Math.abs(target - shownHour) < 1e-4) shownHour = target;
-        needsDraw = true;
+      // While frames flow, their callback moves the light; here only when they do not.
+      if (!useVfc || performance.now() - lastFrameAt > 300) {
+        if (stepHour(now)) again = true;
       }
-
-      if (needsDraw && hasFrame && hasMask) {
-        needsDraw = false;
-        draw();
-        if (!drawnOnce) {
-          drawnOnce = true;
-          setDrawn(true);
-        }
-      }
+      render();
+      if (again) wake();
     };
-    raf = requestAnimationFrame(tick);
+    wakeRef.current = wake;
+    wake();
     setMode("gl");
+
+    // Once a second: are frames getting through, and in time?
+    let watchT = -1;
+    let watchN = 0;
+    let late = 0;
+    const watchdog = window.setInterval(() => {
+      if (disposed || lost || gaveUp) return;
+      // Not playing, or nobody is looking (a background tab stops presenting
+      // frames, which would read as a stall): nothing to judge.
+      if (video.paused || video.readyState < 3 || document.hidden) {
+        watchT = -1;
+        late = 0;
+        return;
+      }
+      const ct = video.currentTime;
+      if (watchT < 0 || ct < watchT) {
+        watchT = ct; // first look, or the loop wrapped
+        watchN = uploads;
+        return;
+      }
+      if (ct - watchT < 2) return;
+      const rate = (uploads - watchN) / (ct - watchT); // frames drawn per second of the plate
+      watchT = ct;
+      watchN = uploads;
+
+      // Playing but its frames are not arriving here through the video
+      // callback (some engines run requestVideoFrameCallback at a few Hz, or
+      // not at all): poll instead.
+      if (useVfc && rate < VIDEO_FPS / 3) {
+        late = 0;
+        console.info("[stage] video frame callbacks are slow (" + rate.toFixed(1) + "/s): polling instead");
+        useVfc = false;
+        if (vfc) video.cancelVideoFrameCallback(vfc);
+        vfc = 0;
+        wake();
+        return;
+      }
+
+      // Nothing at all is getting through (the upload is refused): show the
+      // plain video. Moving and ungraded beats graded and frozen.
+      if (rate < 1) {
+        console.warn("[stage] video frames are not reaching the shader (" + rate.toFixed(1) + "/s): showing the plain video");
+        gaveUp = true;
+        setMode("video");
+        return;
+      }
+
+      // Frames get through, but late: this device cannot draw the plate at
+      // full size. Two slow windows running, draw 3/4 as many pixels (down to
+      // half the width), as many times as it takes.
+      if (rate < VIDEO_FPS * 0.75 && scale > MIN_SCALE) {
+        if (++late >= 2) {
+          late = 0;
+          scale = Math.max(MIN_SCALE, scale * 0.75);
+          console.info("[stage] drawing at " + Math.round(scale * 100) + "% size (" + rate.toFixed(1) + " frames/s)");
+          resize();
+        }
+      } else {
+        late = 0;
+      }
+    }, 1000);
 
     const onLost = (e: Event) => {
       e.preventDefault();
       lost = true;
+      console.warn("[stage] WebGL context lost: showing the plain video");
       setMode("video");
     };
     canvas.addEventListener("webglcontextlost", onLost);
 
     return () => {
       disposed = true;
+      wakeRef.current = null;
+      window.clearInterval(watchdog);
       cancelAnimationFrame(raf);
-      if (useVfc && vfc) video.cancelVideoFrameCallback(vfc);
+      if (vfc) video.cancelVideoFrameCallback(vfc);
       ro.disconnect();
       canvas.removeEventListener("webglcontextlost", onLost);
       mask.onload = null;

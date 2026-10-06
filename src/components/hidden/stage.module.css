@@ -2,22 +2,26 @@
  * The stage overlay. Everything is sized in --u, a pixel scaled with the
  * cover-fit video plate (1 at a 1600px-wide plate), so the countdown, the
  * NOW caption and the schedule stay locked to the chair and the hill at any
- * window size. The extra vw/vh terms stop it outgrowing a narrow or very
- * wide window, where the plate itself is cropped.
+ * window size, and never outgrow a narrow or very wide window, where the
+ * plate itself is cropped.
+ *
+ * The geometry arrives from page.tsx as plain pixels, measured from the area
+ * the browser really shows: --stage-w, --stage-h (the plate's box), --u,
+ * --card-top and --now-max. It is not built from vw/vh here, because on
+ * Android browsers 100vh is the viewport with the toolbar hidden, which hung
+ * the bottom of the stage off the screen whenever a toolbar was showing.
  */
 .stage {
-  --stage-w: max(100vw, calc(100vh * 1024 / 571));
   /* clock numerals: height, and width = the wordmark's proportion x 1.2 */
   --digit-h: calc(var(--u) * 128);
   --digit-w: calc(var(--digit-h) * 100 / 268 * 1.2);
-  --u: min(calc(var(--stage-w) / 1600), calc(100vw / 760), calc(100vh / 820));
   --ink: #101a10;
   --lunch: #30401c;
   position: absolute;
   left: 50%;
   top: 50%;
   width: var(--stage-w);
-  height: max(100vh, calc(100vw * 571 / 1024));
+  height: var(--stage-h);
   transform: translate(-50%, -50%);
   pointer-events: none;
   font-family: var(--font-stage), var(--font-dm-sans), system-ui, sans-serif;
@@ -28,23 +32,24 @@
   position: absolute;
   pointer-events: auto;
 }
-/* Anchors are percentages of the plate. 50% + 50vh is the bottom of the
-   window in the same box, which on a very wide window crops the plate. */
+/* Anchors are percentages of the plate. The card is the exception: it rests
+   on the hill but is held above the bottom of the visible area, which on a
+   wide or short window crops the plate (--card-top, worked out in page.tsx). */
 .atCount {
   top: 22.5%;
   left: 50.39%;
   transform: translateX(-50%);
 }
 .atCard {
-  top: min(70%, calc(50% + 50vh - var(--u) * 236));
+  top: var(--card-top);
   left: 49.9%;
   transform: translateX(-50%);
 }
 .atNow {
   top: 51.8%;
   left: 55.2%;
-  /* up to the window's right edge: 50vw past the centre, less the 5.2% offset */
-  max-width: calc(50vw - 5.2% - 12px);
+  /* up to the visible area's right edge */
+  max-width: var(--now-max);
   transform: translateY(-50%);
 }
 
@@ -127,6 +132,11 @@
   width: 100%;
   height: 100%;
   animation: drop 0.42s cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+.digit > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 .label {
   margin-top: calc(var(--u) * 16);
@@ -378,6 +388,29 @@
     opacity: 0;
     transform: scale(2.8);
   }
+}
+
+/* ── Smartboards (html.perf-lite) ─────────────────────────────────────────
+   Panels have weak GPUs and draw 4K. Three things here ran all the time:
+   the double drop-shadow filter around the digits (re-run on every frame the
+   digits or sparkles animate, which was nearly every frame), the sparkles'
+   twinkle (alive 95% of every second, on a non-composited transform), and the
+   NOW dot's endless ping. Each kept the browser producing a full frame at
+   60Hz, for a clock that changes once a second. The digits' drop goes too:
+   the engines these panels ship (Chromium 83 in an Android 11 WebView) restyle
+   and recommit on every frame of any CSS animation, even one the compositor
+   runs, and a new digit drops in every second. The digits swap instead; the
+   captions still rise, as they change only a few times a day. */
+:global(.perf-lite) .digits {
+  filter: none;
+}
+:global(.perf-lite) .digit,
+:global(.perf-lite) .twinkle,
+:global(.perf-lite) .nowDot::after {
+  animation: none;
+}
+:global(.perf-lite) .progress > i {
+  transition: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

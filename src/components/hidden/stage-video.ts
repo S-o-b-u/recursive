@@ -10,7 +10,15 @@
  * same element.
  */
 
+import { perfLite } from "@/lib/device";
+
 export const STAGE_VIDEO_SRC = "/videos/stage-loop-dof.mp4";
+/**
+ * The same loop at 1280x720, for smartboards (html.perf-lite): under half the
+ * pixels to decode and scale, 24 times a second. The plate is soft by design
+ * (its depth of field is baked in), so this costs almost nothing in looks.
+ */
+export const STAGE_VIDEO_LITE_SRC = "/videos/stage-loop-dof-720.mp4";
 
 let shared: HTMLVideoElement | null = null;
 
@@ -28,7 +36,11 @@ export function stageVideo(): HTMLVideoElement {
     v.setAttribute("playsinline", "");
     v.setAttribute("webkit-playsinline", "");
     v.setAttribute("aria-hidden", "true");
-    v.src = STAGE_VIDEO_SRC;
+    // No cast button: Android Chromium overlays one on a video whenever a
+    // cast device is on the network, which on a venue's wifi there may be.
+    v.disableRemotePlayback = true;
+    v.setAttribute("disableremoteplayback", "");
+    v.src = perfLite() ? STAGE_VIDEO_LITE_SRC : STAGE_VIDEO_SRC;
     shared = v;
   }
   return shared;

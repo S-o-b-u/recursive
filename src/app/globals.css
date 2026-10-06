@@ -270,6 +270,13 @@ html[data-intro="playing"] body::before {
   transition: none;
 }
 
+/* The /hidden stage covers the viewport and paints its own opaque backdrop:
+   the cloud plate underneath would only cost a viewport-sized layer. */
+.stage-page .fixed-cloud-plate,
+.stage-page body::before {
+  display: none;
+}
+
 html[data-intro="playing"] .nav-root {
   opacity: 0 !important;
   visibility: hidden !important;

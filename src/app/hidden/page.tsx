@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
@@ -22,6 +22,9 @@ import {
   applyCountdownAction,
 } from "@/lib/countdown-sync";
 import { EVENT } from "@/data/hackathon";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { getLenis } from "@/lib/lenis";
 
 const UI_FONT = "var(--font-stage), var(--font-dm-sans), sans-serif";
 import {
@@ -36,6 +39,74 @@ import {
 } from "lucide-react";
 
 const PASSWORD = "@recursive#26";
+
+/**
+ * The clock reads TOTAL - floor(remaining) = TOTAL - ceil(elapsed), so a state
+ * that holds whole seconds shows exactly the same digits as one that holds
+ * milliseconds, and the page only has to render when a second rolls over
+ * (it used to render 20 times a second, 19 of them to change nothing).
+ */
+const wholeSecond = (seconds: number) => Math.ceil(seconds - 1e-6);
+
+/** The cover-fit plate's proportions (the video is 1024 x 571 of useful picture). */
+const PLATE_ASPECT = 1024 / 571;
+
+/**
+ * Where everything on the stage goes, in pixels, for a visible area of w x h.
+ *
+ * This used to be CSS built on vw/vh and min()/max(). Two problems: on Android
+ * browsers 100vh is the viewport with the toolbar *hidden*, so while a toolbar
+ * shows (it does on most smartboard browsers) the bottom of the stage hangs off
+ * the screen until the page is scrolled; and old engines need a script to
+ * evaluate min()/max() at all. The area is measured instead (see useVisibleBox)
+ * and the layout is plain numbers.
+ */
+function stageVars(w: number, h: number): React.CSSProperties {
+  const stageW = Math.max(w, h * PLATE_ASPECT);
+  const stageH = Math.max(h, w / PLATE_ASPECT);
+  // one stage pixel: 1 at a 1600px-wide plate, and never so big that a narrow or very wide window crops the clock
+  const u = Math.min(stageW / 1600, w / 760, h / 820);
+  // the schedule card rests on the hill, but never below the bottom of the visible area
+  const cardTop = Math.min(0.7 * stageH, 0.5 * stageH + h / 2 - u * 236);
+  // the NOW caption may run up to the visible area's right edge
+  const nowMax = Math.max(0, w / 2 - 0.052 * stageW - 12);
+  return {
+    "--stage-w": `${stageW}px`,
+    "--stage-h": `${stageH}px`,
+    "--u": `${u}px`,
+    "--card-top": `${cardTop}px`,
+    "--now-max": `${nowMax}px`,
+  } as React.CSSProperties;
+}
+
+/**
+ * The size of the area the page can actually draw in. The element is
+ * position: fixed, which browsers size to the *visible* viewport (toolbar
+ * showing or not), and it is re-read on every resize of it.
+ */
+function useVisibleBox(ref: React.RefObject<HTMLElement | null>, active: boolean) {
+  const [box, setBox] = useState({ w: 0, h: 0 });
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el || !active) return undefined;
+    const read = () => {
+      const w = el.clientWidth;
+      const h = Math.min(el.clientHeight, window.innerHeight || el.clientHeight);
+      setBox((b) => (b.w === w && b.h === h ? b : { w, h }));
+    };
+    read();
+    const ro = typeof ResizeObserver === "function" ? new ResizeObserver(read) : null;
+    ro?.observe(el);
+    window.addEventListener("resize", read);
+    window.addEventListener("orientationchange", read);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener("resize", read);
+      window.removeEventListener("orientationchange", read);
+    };
+  }, [ref, active]);
+  return box;
+}
 
 export default function HiddenChairPage() {
   const router = useRouter();
@@ -72,6 +143,7 @@ export default function HiddenChairPage() {
   const serverOffsetRef = useRef<number>(0);
   const firstSyncRef = useRef<boolean>(true);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const rootRef = useRef<HTMLDivElement>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [forcedLunch, setForcedLunch] = useState(false);
@@ -105,14 +177,14 @@ export default function HiddenChairPage() {
 
       if (!state.isRunning) {
         // Paused/reset: snap elapsed to the exact server value immediately.
-        setElapsedSeconds(state.accumulatedSeconds);
+        setElapsedSeconds(wholeSecond(state.accumulatedSeconds));
       } else {
         // Running: only correct the display if drift vs. server is significant
         // (> 2 s). Small differences are absorbed by the 50 ms local tick so
         // the display stays smooth without constant polling-induced jumps.
         const localElapsed = computeElapsedSeconds(state, Date.now() + serverOffsetRef.current);
         if (Math.abs(serverElapsed - localElapsed) > 2.0) {
-          setElapsedSeconds(serverElapsed);
+          setElapsedSeconds(wholeSecond(serverElapsed));
         }
       }
     },
@@ -145,22 +217,31 @@ export default function HiddenChairPage() {
     return () => clearInterval(interval);
   }, [fetchSyncState]);
 
-  // Smooth local tick loop with sub-second precision
+  // Local tick: sleeps until the clock's next whole second, then renders once.
+  // (A 50ms interval used to re-render the whole stage 20 times a second for a
+  // display that changes once; on a smartboard that alone kept the CPU busy.)
+  // Restarted whenever the run state or speed changes, so a start is instant.
   useEffect(() => {
-    const interval = setInterval(() => {
+    if (!isRunning) return undefined;
+    let timer = 0;
+    const tick = () => {
       const state = serverStateRef.current;
       if (!state.isRunning) return;
 
-      const serverNow = Date.now() + serverOffsetRef.current;
-      const cur = computeElapsedSeconds(state, serverNow);
-      setElapsedSeconds(cur);
+      const cur = computeElapsedSeconds(state, Date.now() + serverOffsetRef.current);
+      const whole = wholeSecond(cur);
+      setElapsedSeconds(whole);
       if (cur >= TOTAL_HACKATHON_SECONDS) {
         setIsRunning(false);
+        return;
       }
-    }, 50);
-
-    return () => clearInterval(interval);
-  }, []);
+      // elapsed advances `speed` seconds per real second; the next whole second is this far off
+      const wait = ((whole + 1e-6 - cur) / Math.max(1, state.speed)) * 1000 + 4;
+      timer = window.setTimeout(tick, Math.max(8, wait));
+    };
+    tick();
+    return () => window.clearTimeout(timer);
+  }, [isRunning, speed]);
 
   // Dispatch action to server with optimistic update for 0ms latency
   const dispatchAction = useCallback(async (action: CountdownAction) => {
@@ -172,7 +253,7 @@ export default function HiddenChairPage() {
     setSpeed(optimistic.speed);
     setForcedLunch(optimistic.forcedLunch);
     if (!optimistic.isRunning) {
-      setElapsedSeconds(optimistic.accumulatedSeconds);
+      setElapsedSeconds(wholeSecond(optimistic.accumulatedSeconds));
     }
 
     try {
@@ -193,6 +274,31 @@ export default function HiddenChairPage() {
     }
   }, [applyServerSync]);
 
+  // This page never scrolls, but the site-wide scroll engine (mounted in the root
+  // layout) keeps itself busy anyway: ScrollTrigger re-requests an animation frame
+  // forever, and so does GSAP's ticker, which makes the browser run a full frame
+  // 60 times a second. On a smartboard that more than doubled the frames it had
+  // to produce for a clock that changes once a second. Put both to sleep here
+  // (GSAP wakes its ticker by itself if a tween is ever started); wake them when
+  // leaving, so the home page's animations are exactly as they were.
+  useEffect(() => {
+    getLenis()?.stop();
+    ScrollTrigger.disable();
+    gsap.ticker.sleep();
+    return () => {
+      ScrollTrigger.enable();
+      gsap.ticker.wake();
+      getLenis()?.start();
+    };
+  }, []);
+
+  // The stage covers the viewport and never scrolls; the home page's fixed cloud
+  // backdrop behind it is a viewport-sized layer nobody can see (see globals.css).
+  useEffect(() => {
+    document.documentElement.classList.add("stage-page");
+    return () => document.documentElement.classList.remove("stage-page");
+  }, []);
+
   // Handle URL param jump if provided
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -209,11 +315,14 @@ export default function HiddenChairPage() {
   const isLunchTime = forcedLunch || activeMilestone?.isLunch;
   const activeMockupMilestone = getActiveMockupMilestone(elapsedSeconds, forcedLunch);
 
+  // Inside the scheduled lunch slot, count down to its end, however lunch was
+  // started: forcing it (L, or the Lunch row) jumps the clock to 01:30, where
+  // the 45-minute cycle below would have read 15 minutes left.
   let lunchRemainingSec = 0;
-  if (forcedLunch) {
-    lunchRemainingSec = Math.max(0, 2700 - (elapsedSeconds % 2700));
-  } else if (activeMilestone?.isLunch) {
+  if (activeMilestone?.isLunch) {
     lunchRemainingSec = Math.max(0, activeMilestone.endSec - elapsedSeconds);
+  } else if (forcedLunch) {
+    lunchRemainingSec = Math.max(0, 2700 - (elapsedSeconds % 2700));
   }
 
   // Controls Handlers (all synchronized via dispatchAction)
@@ -296,10 +405,12 @@ export default function HiddenChairPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isAuthenticated, handleTogglePlay, handleToggleLunch, handleReset, toggleFullscreen, router]);
 
+  const box = useVisibleBox(rootRef, isAuthenticated);
+
   // Password Gate
   if (!isAuthenticated) {
     return (
-      <div className={`${stageSans.variable} relative w-screen h-screen overflow-hidden bg-[#0A0D0A] flex flex-col items-center justify-center text-white select-none`}>
+      <div className={`${stageSans.variable} fixed inset-0 overflow-hidden bg-[#0A0D0A] flex flex-col items-center justify-center text-white select-none`}>
         {/* Back Link */}
         <Link
           href="/?intro=0#hero"
@@ -371,7 +482,11 @@ export default function HiddenChairPage() {
   }
 
   return (
-    <div className={`${stageSans.variable} relative w-screen h-screen overflow-hidden bg-black text-white select-none`}>
+    <div
+      ref={rootRef}
+      className={`${stageSans.variable} fixed inset-0 overflow-hidden bg-black text-white select-none`}
+      style={{ touchAction: "none" }}
+    >
       {/* ── The chair on the hill, lit for the hackathon's hour: 10:00 morning -> 18:00 dusk ── */}
       <StageScene hour={10 + elapsedSeconds / 3600} />
 
@@ -493,7 +608,8 @@ export default function HiddenChairPage() {
       )}
 
       {/* ── Overlay locked to the cover-fit plate, so it tracks the chair at any size ── */}
-      <div className={stage.stage}>
+      {box.w > 0 && (
+      <div className={stage.stage} style={stageVars(box.w, box.h)}>
         {/* Countdown in the sky above the chair */}
         <div className={`${stage.anchor} ${stage.atCount}`}>
           <MockupCountdown
@@ -520,6 +636,7 @@ export default function HiddenChairPage() {
           <NowStatusBadge item={activeMockupMilestone} isLunchActive={Boolean(isLunchTime)} />
         </div>
       </div>
+      )}
     </div>
   );
 }

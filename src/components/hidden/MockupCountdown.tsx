@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { formatTime } from "@/data/shift8";
+import { perfLite } from "@/lib/device";
 import { RecursiveDigit, Sparkle } from "./RecursiveDigit";
 import s from "./stage.module.css";
 
@@ -13,14 +14,22 @@ interface MockupCountdownProps {
   isCodeFreeze?: boolean;
 }
 
-/** A two-digit unit. Each numeral is keyed by its value, so a change drops the new one in. */
+/**
+ * A two-digit unit. Each numeral is keyed by its value, so a change drops the
+ * new one in. The drop animates an HTML wrapper, not the <svg>: Chromium will
+ * not run an SVG element's animation on the compositor, so it repainted the
+ * masked glyph every frame. (Smartboards swap digits without the drop; see
+ * stage.module.css.)
+ */
 function Unit({ value, label }: { value: string; label: string }) {
   return (
     <div className={s.group}>
       <div className={s.pair}>
         {[0, 1].map((i) => (
           <span key={i} className={s.cell}>
-            <RecursiveDigit key={value[i]} ch={value[i]} className={s.digit} />
+            <span key={value[i]} className={s.digit}>
+              <RecursiveDigit ch={value[i]} />
+            </span>
           </span>
         ))}
       </div>
@@ -31,10 +40,14 @@ function Unit({ value, label }: { value: string; label: string }) {
 
 /** The colon is the wordmark's sparkle; it twinkles on each second while the clock runs. */
 function Colon({ running, tick }: { running: boolean; tick: string }) {
+  // Re-keyed each second so the twinkle restarts. Smartboards (html.perf-lite)
+  // do not twinkle (see stage.module.css), so there is nothing to restart and
+  // the two sparkles are left alone instead of being rebuilt every second.
+  const twinkling = running && !perfLite();
   return (
     <div className={s.colon} data-running={running ? "1" : "0"} aria-hidden="true">
-      <Sparkle key={running ? "a" + tick : "a"} className={`${s.colonStar} ${running ? s.twinkle : ""}`} />
-      <Sparkle key={running ? "b" + tick : "b"} className={`${s.colonStar} ${running ? s.twinkle : ""}`} />
+      <Sparkle key={twinkling ? "a" + tick : "a"} className={`${s.colonStar} ${twinkling ? s.twinkle : ""}`} />
+      <Sparkle key={twinkling ? "b" + tick : "b"} className={`${s.colonStar} ${twinkling ? s.twinkle : ""}`} />
     </div>
   );
 }
