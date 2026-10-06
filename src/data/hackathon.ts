@@ -319,6 +319,7 @@ export const SPONSOR_SLOTS: Slot[] = [
   { label: "XYZ DOMAIN SPONSOR LOGO", expect: "/images/sponsors/xyz-logo-color.png", src: "/images/sponsors/xyz-logo-color.png" },
   { label: "EVENTOPIA LOGO", expect: "/images/sponsors/Eventopia-Logo-04.png", src: "/images/sponsors/Eventopia-Logo-04.png" },
   { label: "GNIT MAHAKASH LOGO", expect: "/images/sponsors/FinalBlack.png", src: "/images/sponsors/FinalBlack.png" },
+  { label: "MASTRA LOGO", expect: "/images/sponsors/03_01_Mastra_Logo_ver4[black].png", src: "/images/sponsors/03_01_Mastra_Logo_ver4[black].png" },
 ];
 
 export type ScheduleDay = {

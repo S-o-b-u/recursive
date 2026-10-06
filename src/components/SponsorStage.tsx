@@ -136,6 +136,12 @@ const TILES: Tile[] = [
     mark: logo("/images/sponsors/n8n.png", 576, 160, "wide"),
   },
   {
+    name: "Mastra",
+    role: "Sponsor",
+    href: "https://mastra.ai",
+    mark: logo("/images/sponsors/03_01_Mastra_Logo_ver4[black].png", 1536, 258, "wide"),
+  },
+  {
     name: "React Kolkata",
     role: "Community Partner",
     href: "https://reactkolkata.com",
@@ -1047,10 +1053,10 @@ export default function SponsorStage() {
         }
 
         /* ═══════════════════════════ THE WALL: TIERED BENTO ═══════════════════════════
-           A 4-6-8 Tiered Bento Glassmorphic Grid across 24 columns:
-           - Tier 1 (4 Headline & Platform Partners): span 6 cols each (horizontal cards)
-           - Tier 2 (6 Official Sponsors): span 4 cols each (vertical cards)
-           - Tier 3 (8 Community & Media Partners): span 3 cols each (compact vertical cards)
+           A 4-7-8 Tiered Bento Glassmorphic Grid across 56 columns:
+           - Tier 1 (4 Headline & Platform Partners): span 14 cols each (4 * 14 = 56 cols)
+           - Tier 2 (7 Official Sponsors): span 8 cols each (7 * 8 = 56 cols)
+           - Tier 3 (8 Community & Media Partners): span 7 cols each (8 * 7 = 56 cols)
         */
         .sxt-grid {
           list-style: none;
@@ -1058,7 +1064,7 @@ export default function SponsorStage() {
           padding: 0;
           width: var(--sxt-w);
           display: grid;
-          grid-template-columns: repeat(24, minmax(0, 1fr));
+          grid-template-columns: repeat(56, minmax(0, 1fr));
           gap: 14px;
           text-align: left;
           background: transparent;
@@ -1066,17 +1072,17 @@ export default function SponsorStage() {
           box-shadow: none;
         }
 
-        /* Tier 1: 4 feature cards (6 cols each = 24 cols) */
+        /* Tier 1: 4 feature cards (14 cols each = 56 cols) */
         .sxt-tile:nth-child(-n+4) {
-          grid-column: span 6;
+          grid-column: span 14;
         }
-        /* Tier 2: 6 cards (4 cols each = 24 cols) */
-        .sxt-tile:nth-child(n+5):nth-child(-n+10) {
-          grid-column: span 4;
+        /* Tier 2: 7 cards (8 cols each = 56 cols) */
+        .sxt-tile:nth-child(n+5):nth-child(-n+11) {
+          grid-column: span 8;
         }
-        /* Tier 3: 8 cards (3 cols each = 24 cols) */
-        .sxt-tile:nth-child(n+11) {
-          grid-column: span 3;
+        /* Tier 3: 8 cards (7 cols each = 56 cols) */
+        .sxt-tile:nth-child(n+12) {
+          grid-column: span 7;
         }
 
         .sxt-tile {
@@ -1148,25 +1154,25 @@ export default function SponsorStage() {
           text-align: center;
           height: 100%;
         }
-        .sxt-tile:nth-child(n+5):nth-child(-n+10) .sxt-disc {
+        .sxt-tile:nth-child(n+5):nth-child(-n+11) .sxt-disc {
           width: 100%;
           height: 70px;
           margin-bottom: 12px;
         }
-        .sxt-tile:nth-child(n+5):nth-child(-n+10) .sxt-logo {
+        .sxt-tile:nth-child(n+5):nth-child(-n+11) .sxt-logo {
           max-height: 60px;
           max-width: 135px;
         }
 
-        .sxt-tile:nth-child(n+11) .sxt-link {
+        .sxt-tile:nth-child(n+12) .sxt-link {
           padding: 18px 10px 14px;
         }
-        .sxt-tile:nth-child(n+11) .sxt-disc {
+        .sxt-tile:nth-child(n+12) .sxt-disc {
           width: 100%;
           height: 58px;
           margin-bottom: 10px;
         }
-        .sxt-tile:nth-child(n+11) .sxt-logo {
+        .sxt-tile:nth-child(n+12) .sxt-logo {
           max-height: 48px;
           max-width: 115px;
         }
@@ -1239,7 +1245,7 @@ export default function SponsorStage() {
           color: #122415;
         }
 
-        .sxt-tile:nth-child(n+11) .sxt-name {
+        .sxt-tile:nth-child(n+12) .sxt-name {
           font-size: 0.78rem;
         }
 
@@ -1261,7 +1267,7 @@ export default function SponsorStage() {
           color: #3B6B34;
         }
 
-        .sxt-tile:nth-child(n+11) .sxt-role {
+        .sxt-tile:nth-child(n+12) .sxt-role {
           font-size: 0.62rem;
         }
 
@@ -1338,19 +1344,19 @@ export default function SponsorStage() {
           .sxt-tile:nth-child(n+5) .sxt-link {
             padding: 16px 10px 14px;
           }
-          .sxt-tile:nth-child(n+5):nth-child(-n+10) .sxt-disc {
+          .sxt-tile:nth-child(n+5):nth-child(-n+11) .sxt-disc {
             height: 58px;
             margin-bottom: 8px;
           }
-          .sxt-tile:nth-child(n+5):nth-child(-n+10) .sxt-logo {
+          .sxt-tile:nth-child(n+5):nth-child(-n+11) .sxt-logo {
             max-height: 50px;
             max-width: 120px;
           }
-          .sxt-tile:nth-child(n+11) .sxt-disc {
+          .sxt-tile:nth-child(n+12) .sxt-disc {
             height: 48px;
             margin-bottom: 8px;
           }
-          .sxt-tile:nth-child(n+11) .sxt-logo {
+          .sxt-tile:nth-child(n+12) .sxt-logo {
             max-height: 40px;
             max-width: 100px;
           }
@@ -1486,9 +1492,15 @@ export default function SponsorStage() {
             border: none;
           }
           .sxt-tile:nth-child(-n+4),
-          .sxt-tile:nth-child(n+5):nth-child(-n+10),
-          .sxt-tile:nth-child(n+11) {
+          .sxt-tile:nth-child(n+5):nth-child(-n+11),
+          .sxt-tile:nth-child(n+12) {
             grid-column: span 1;
+          }
+          .sxt-tile:last-child {
+            grid-column: span 2;
+            max-width: 220px;
+            justify-self: center;
+            width: 100%;
           }
           .sxt-tile {
             border-radius: 18px;
@@ -1533,7 +1545,7 @@ export default function SponsorStage() {
           }
           .sxt-name,
           .sxt-tile:nth-child(-n+4) .sxt-name,
-          .sxt-tile:nth-child(n+11) .sxt-name {
+          .sxt-tile:nth-child(n+12) .sxt-name {
             font-size: 0.82rem;
             min-height: 2.2em;
             justify-content: center;
@@ -1546,7 +1558,7 @@ export default function SponsorStage() {
           }
           .sxt-role,
           .sxt-tile:nth-child(-n+4) .sxt-role,
-          .sxt-tile:nth-child(n+11) .sxt-role {
+          .sxt-tile:nth-child(n+12) .sxt-role {
             font-size: 0.62rem;
           }
           .sxt-foot {
