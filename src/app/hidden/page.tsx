@@ -9,6 +9,7 @@ import MockupScheduleCard, {
   getActiveMockupMilestone,
 } from "@/components/hidden/MockupScheduleCard";
 import NowStatusBadge from "@/components/hidden/NowStatusBadge";
+import SetTimePanel from "@/components/hidden/SetTimePanel";
 import StageScene from "@/components/hidden/StageScene";
 import { preload } from "react-dom";
 import { primeStageVideo, stageVideo } from "@/components/hidden/stage-video";
@@ -38,6 +39,7 @@ import {
   Eye,
   EyeOff,
   LogOut,
+  Clock,
 } from "lucide-react";
 
 const PASSWORD = "@recursive#26";
@@ -271,6 +273,7 @@ export default function HiddenChairPage() {
   const [forcedLunch, setForcedLunch] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [timePanelOpen, setTimePanelOpen] = useState(false);
   // The clock is drawn once the server's state has arrived (or after 3 s, so
   // an offline screen still shows something): a remembered login mounts the
   // stage at once, and the default 08:00:00 would otherwise flash first.
@@ -425,9 +428,9 @@ export default function HiddenChairPage() {
     setIsRunning(optimistic.isRunning);
     setSpeed(optimistic.speed);
     setForcedLunch(optimistic.forcedLunch);
-    if (!optimistic.isRunning) {
-      setElapsedSeconds(wholeSecond(optimistic.accumulatedSeconds));
-    }
+    // show the new time now (a running clock set elsewhere in the day too,
+    // rather than at its next tick)
+    setElapsedSeconds(wholeSecond(computeElapsedSeconds(optimistic, serverNow)));
 
     try {
       const sentAt = monoNow();
@@ -570,7 +573,19 @@ export default function HiddenChairPage() {
         return;
       }
 
-      if (e.code === "Space") {
+      // The Set time panel has its own buttons; Esc closes it, nothing else runs.
+      if (timePanelOpen) {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          setTimePanelOpen(false);
+        }
+        return;
+      }
+
+      if (e.key === "t" || e.key === "T") {
+        e.preventDefault();
+        setTimePanelOpen(true);
+      } else if (e.code === "Space") {
         e.preventDefault();
         handleTogglePlay();
       } else if (e.key === "l" || e.key === "L") {
@@ -595,7 +610,7 @@ export default function HiddenChairPage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isAuthenticated, handleTogglePlay, handleToggleLunch, handleReset, toggleFullscreen, router]);
+  }, [isAuthenticated, timePanelOpen, handleTogglePlay, handleToggleLunch, handleReset, toggleFullscreen, router]);
 
   const box = useVisibleBox(rootRef, isAuthenticated === true);
 
@@ -789,6 +804,21 @@ export default function HiddenChairPage() {
                 {speed}x
               </button>
 
+              {/* Set the time by hand (analog clock), for when something went wrong */}
+              <button
+                id="set-time-btn"
+                onClick={() => setTimePanelOpen(true)}
+                title="Set the time by hand (T)"
+                className="px-2 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors bg-transparent hover:bg-black/20 text-white/85 hover:text-white"
+                style={{
+                  fontFamily: UI_FONT,
+                  textShadow: "0 1px 4px rgba(0, 0, 0, 0.7)",
+                }}
+              >
+                <Clock className="w-3.5 h-3.5" />
+                <span>Set time</span>
+              </button>
+
               {/* Fullscreen Toggle */}
               <button
                 onClick={toggleFullscreen}
@@ -873,6 +903,20 @@ export default function HiddenChairPage() {
           <NowStatusBadge item={activeMockupMilestone} isLunchActive={Boolean(isLunchTime)} />
         </div>
       </div>
+      )}
+
+      {/* ── Set time by hand (T): put every screen at a time of the day, running or paused ── */}
+      {timePanelOpen && (
+        <SetTimePanel
+          elapsedNow={elapsedSeconds}
+          serverNow={() => monoNow() + serverOffsetRef.current}
+          onClose={() => setTimePanelOpen(false)}
+          onApply={(elapsed, resume) => {
+            setTimePanelOpen(false);
+            // one change: the time, running or paused, at normal speed, lunch by the schedule
+            dispatchAction({ type: "set", elapsedSeconds: elapsed, forcedLunch: false, running: resume, speed: 1 });
+          }}
+        />
       )}
     </div>
   );

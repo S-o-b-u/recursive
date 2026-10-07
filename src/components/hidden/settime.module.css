@@ -1,0 +1,283 @@
+/*
+ * Set time panel (SetTimePanel.tsx). Plain CSS on purpose: the smartboards run
+ * Chromium 83, which has no flexbox `gap` and none of the newer colour
+ * functions, so spacing is margins and colours are hex/rgba.
+ *
+ * Every size is a multiple of --k (set by the panel from the screen size:
+ * 1 on a laptop or phone, up to 1.5 on a large board), so the dial and the
+ * buttons stay finger-sized at a smartboard.
+ */
+.overlay {
+  --k: 1;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  /* while it is open, no pinch or double-tap zoom on a touch board (the
+     board's page is 1920 px wide and zoomable), and no 300 ms tap delay */
+  touch-action: none;
+}
+.panel {
+  position: relative;
+  width: calc(var(--k) * 380px);
+  max-width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  padding: calc(var(--k) * 16px) calc(var(--k) * 18px) calc(var(--k) * 14px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: calc(var(--k) * 20px);
+  background: rgba(14, 20, 14, 0.95);
+  box-shadow: 0 calc(var(--k) * 24px) calc(var(--k) * 60px) rgba(0, 0, 0, 0.45);
+  color: #f4f4f5;
+  font-family: var(--font-stage), var(--font-dm-sans), system-ui, sans-serif;
+  outline: none;
+  /* a long press on a board selects text or opens a menu; neither helps here */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  /* a short screen (a phone on its side) can still scroll the panel, never zoom it */
+  touch-action: pan-y;
+  animation: panelIn 0.22s ease-out both;
+}
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: calc(var(--k) * 4px);
+}
+.title {
+  font-size: calc(var(--k) * 15px);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.close {
+  width: calc(var(--k) * 36px);
+  height: calc(var(--k) * 36px);
+  border: 0;
+  border-radius: 99px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: calc(var(--k) * 16px);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.close:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+/* ── the analog clock ─────────────────────────────────────────────────── */
+.dial {
+  display: block;
+  width: calc(var(--k) * 236px);
+  height: calc(var(--k) * 236px);
+  margin: calc(var(--k) * 2px) auto calc(var(--k) * 8px);
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: grab;
+}
+.dial[data-grab="hour"],
+.dial[data-grab="minute"] {
+  cursor: grabbing;
+}
+.face {
+  fill: #f3efe2;
+  stroke: rgba(255, 255, 255, 0.35);
+  stroke-width: 1.5;
+}
+/* where a grab takes the hour hand rather than the minute hand */
+.hourZone {
+  fill: rgba(16, 26, 16, 0.045);
+}
+.tick {
+  stroke: rgba(16, 26, 16, 0.3);
+  stroke-width: 1;
+}
+.tickMajor {
+  stroke: rgba(16, 26, 16, 0.7);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+/* inside the SVG: sizes are in its own units, so they scale with the dial */
+.num {
+  fill: #101a10;
+  font-size: 15px;
+  font-weight: 800;
+}
+/* 5-8 never happen during hacking */
+.num[data-off="1"] {
+  fill: rgba(16, 26, 16, 0.22);
+}
+.hourHand,
+.minuteHand {
+  stroke: #101a10;
+  stroke-linecap: round;
+}
+.hourHand {
+  stroke-width: 6.5;
+}
+.minuteHand {
+  stroke-width: 4;
+}
+.hourHand[data-on="1"],
+.minuteHand[data-on="1"] {
+  stroke: #2f5d1f;
+}
+.secondHand {
+  stroke: #c2410c;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+.pin {
+  fill: #c2410c;
+}
+
+/* ── digital readout ──────────────────────────────────────────────────── */
+.readout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: calc(var(--k) * 4px);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 calc(var(--k) * 2px);
+}
+.step {
+  width: calc(var(--k) * 48px);
+  height: calc(var(--k) * 28px);
+  border: 0;
+  border-radius: calc(var(--k) * 8px);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: calc(var(--k) * 12px);
+  line-height: calc(var(--k) * 28px);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.step:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+.digits {
+  min-width: calc(var(--k) * 46px);
+  font-size: calc(var(--k) * 30px);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  text-align: center;
+}
+.colon {
+  margin: 0 1px;
+  font-size: calc(var(--k) * 26px);
+  font-weight: 700;
+  opacity: 0.5;
+}
+.ampm {
+  margin-left: calc(var(--k) * 6px);
+  font-size: calc(var(--k) * 15px);
+  font-weight: 800;
+  opacity: 0.75;
+}
+
+.preview {
+  margin: calc(var(--k) * 2px) 0 calc(var(--k) * 10px);
+  font-size: calc(var(--k) * 13px);
+  line-height: 1.4;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+}
+.preview b {
+  color: #fff;
+  font-weight: 800;
+}
+.note {
+  margin: calc(var(--k) * -4px) 0 calc(var(--k) * 10px);
+  font-size: calc(var(--k) * 12px);
+  line-height: 1.4;
+  text-align: center;
+  color: #fbbf24;
+}
+
+/* ── buttons ──────────────────────────────────────────────────────────── */
+.row {
+  display: flex;
+  margin-top: calc(var(--k) * 8px);
+}
+.row > * + * {
+  margin-left: calc(var(--k) * 8px);
+}
+.btn {
+  flex: 1 1 0;
+  min-width: 0;
+  height: calc(var(--k) * 44px);
+  padding: 0 calc(var(--k) * 10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: calc(var(--k) * 12px);
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: calc(var(--k) * 13.5px);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.btn:active,
+.step:active,
+.close:active {
+  background: rgba(255, 255, 255, 0.16);
+}
+.primary {
+  border-color: #f3efe2;
+  background: #f3efe2;
+  color: #101a10;
+  font-weight: 800;
+}
+.primary:hover,
+.primary:active {
+  background: #fff;
+}
+.now[data-on="1"] {
+  border-color: rgba(74, 222, 128, 0.6);
+  background: rgba(74, 222, 128, 0.14);
+  color: #bbf7d0;
+}
+.hint {
+  margin: calc(var(--k) * 10px) 0 0;
+  font-size: calc(var(--k) * 11px);
+  line-height: 1.4;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    animation: none;
+  }
+}

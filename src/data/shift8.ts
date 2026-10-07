@@ -114,18 +114,37 @@ export const HACKATHON_SCHEDULE: Milestone[] = [
     endSec: at(16, 30),
     badge: "⚖️ JURY",
   },
-  {
-    id: "deliberation",
-    timeRange: "04:30 – 04:45",
-    title: "Jury Deliberation",
-    subtitle: "Final arrangements",
-    shortTitle: "Jury Deliberation",
-    description: "The jury finalizes the results while participants prepare for the closing and awards ceremony.",
-    startSec: at(16, 30),
-    endSec: at(16, 45),
-    badge: "🏆 DELIBERATION",
-  },
 ];
+
+/**
+ * The event's own time zone: Kolkata (IST, UTC+5:30, no daylight saving).
+ * "Set time > Now" reads the time of day from the server's clock in IST, so
+ * a board whose clock or time zone is set wrong cannot set the wrong time.
+ */
+export const EVENT_UTC_OFFSET_MIN = 330;
+
+/** Time of day (seconds since midnight) when hacking starts and ends: 9:30 AM, 4:30 PM. */
+export const DAY_START_SEC = EVENT_START_HOUR * 3600;
+export const DAY_END_SEC = DAY_START_SEC + TOTAL_HACKATHON_SECONDS;
+
+/** The countdown's elapsed seconds for a time of day, kept inside the event. */
+export function elapsedForTimeOfDay(daySec: number): number {
+  return Math.min(TOTAL_HACKATHON_SECONDS, Math.max(0, daySec - DAY_START_SEC));
+}
+
+/** The time of day (seconds since midnight, IST) at an epoch time in ms. */
+export function eventTimeOfDay(epochMs: number): number {
+  const sec = Math.floor(epochMs / 1000) + EVENT_UTC_OFFSET_MIN * 60;
+  return ((sec % 86400) + 86400) % 86400;
+}
+
+/** "11:42:05 AM" for seconds since midnight. */
+export function formatTimeOfDay(daySec: number): string {
+  const s = Math.max(0, Math.round(daySec));
+  const h24 = Math.floor(s / 3600) % 24;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(h24 % 12 || 12)}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)} ${h24 < 12 ? "AM" : "PM"}`;
+}
 
 /** The lunch slot (1:00-2:00 PM) and the final submission window (3:00-3:30 PM). */
 export const LUNCH_SLOT = HACKATHON_SCHEDULE.find((m) => m.isLunch) as Milestone;

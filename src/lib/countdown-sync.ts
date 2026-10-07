@@ -14,7 +14,12 @@ export type CountdownAction =
   | { type: "start" }
   | { type: "pause" }
   | { type: "reset" }
-  | { type: "set"; elapsedSeconds: number; forcedLunch?: boolean }
+  /**
+   * Jump to a point in the day. `running` also starts or pauses the clock and
+   * `speed` sets its rate, in the same change (Set time > "Set & resume"), so
+   * no other screen sees a half-applied correction.
+   */
+  | { type: "set"; elapsedSeconds: number; forcedLunch?: boolean; running?: boolean; speed?: number }
   | { type: "speed"; speed: number }
   | { type: "toggleLunch" };
 
@@ -91,9 +96,13 @@ export function applyCountdownAction(
       };
     }
     case "set": {
-      const targetSec = Math.min(TOTAL_HACKATHON_SECONDS, Math.max(0, action.elapsedSeconds));
+      const targetSec = Math.min(TOTAL_HACKATHON_SECONDS, Math.max(0, Number(action.elapsedSeconds) || 0));
+      const running = typeof action.running === "boolean" ? action.running : currentState.isRunning;
       return {
         ...currentState,
+        // a clock set to the very end has nothing left to run
+        isRunning: running && targetSec < TOTAL_HACKATHON_SECONDS,
+        speed: typeof action.speed === "number" && action.speed > 0 ? action.speed : currentState.speed,
         accumulatedSeconds: targetSec,
         startTime: serverNow,
         forcedLunch: action.forcedLunch !== undefined ? action.forcedLunch : currentState.forcedLunch,
