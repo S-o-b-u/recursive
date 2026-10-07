@@ -36,9 +36,43 @@ import {
   Minimize2,
   Eye,
   EyeOff,
+  LogOut,
 } from "lucide-react";
 
 const PASSWORD = "@recursive#26";
+
+/**
+ * Unlocking is remembered on this device until Log out, so a refresh (or a
+ * board that reloads) goes straight back to the stage. What is stored is a
+ * fingerprint of the password, not the password, and a new PASSWORD has a
+ * new fingerprint, so changing it signs every device out.
+ */
+const AUTH_KEY = "recursive:stage-auth";
+const AUTH_TOKEN = (() => {
+  let h = 0x811c9dc5; // FNV-1a
+  for (let i = 0; i < PASSWORD.length; i++) {
+    h ^= PASSWORD.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return "v1-" + h.toString(16);
+})();
+
+function rememberedLogin(): boolean {
+  try {
+    return window.localStorage.getItem(AUTH_KEY) === AUTH_TOKEN;
+  } catch {
+    return false; // storage blocked (private mode, locked-down kiosk): ask every time
+  }
+}
+
+function rememberLogin(on: boolean) {
+  try {
+    if (on) window.localStorage.setItem(AUTH_KEY, AUTH_TOKEN);
+    else window.localStorage.removeItem(AUTH_KEY);
+  } catch {
+    // not remembered; the session itself still works
+  }
+}
 
 /**
  * The clock reads TOTAL - floor(remaining) = TOTAL - ceil(elapsed), so a state
@@ -111,16 +145,19 @@ function useVisibleBox(ref: React.RefObject<HTMLElement | null>, active: boolean
 export default function HiddenChairPage() {
   const router = useRouter();
 
-  // Authentication Gate State - Always prompts on every entry
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Authentication gate: null until this device's remembered login is read
+  // (storage only exists in the browser), then true/false.
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [passInput, setPassInput] = useState("");
   const [passError, setPassError] = useState(false);
   const [showPass, setShowPass] = useState(false);
+  const [confirmLogout, setConfirmLogout] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      sessionStorage.removeItem("chair_auth");
-    }
+    try {
+      sessionStorage.removeItem("chair_auth"); // the old per-tab flag
+    } catch {}
+    setIsAuthenticated(rememberedLogin());
   }, []);
 
   const handlePassSubmit = (e?: React.FormEvent) => {
@@ -131,11 +168,32 @@ export default function HiddenChairPage() {
       // Still inside the Enter press: browsers that gate every play() on a
       // gesture accept it now, and not once the stage has mounted.
       primeStageVideo();
+      rememberLogin(true);
       setIsAuthenticated(true);
       setPassError(false);
     } else {
       setPassError(true);
     }
+  };
+
+  // Log out takes two taps (the first arms it for 3 s), so a stray touch on a
+  // smartboard does not drop the stage to the password screen mid-event.
+  useEffect(() => {
+    if (!confirmLogout) return undefined;
+    const t = window.setTimeout(() => setConfirmLogout(false), 3000);
+    return () => window.clearTimeout(t);
+  }, [confirmLogout]);
+
+  const handleLogout = () => {
+    if (!confirmLogout) {
+      setConfirmLogout(true);
+      return;
+    }
+    rememberLogin(false);
+    setConfirmLogout(false);
+    setPassInput("");
+    setShowPass(false);
+    setIsAuthenticated(false);
   };
 
   // Timer State (Server-Authoritative Synchronization across all devices)
@@ -211,10 +269,21 @@ export default function HiddenChairPage() {
     fetchSyncState();
   }, [fetchSyncState]);
 
-  // Periodic polling for multi-device sync (every 800ms)
+  // Periodic polling for multi-device sync (every 800ms). A tab nobody can
+  // see does not poll (each poll is a server call); it catches up the moment
+  // it is shown again.
   useEffect(() => {
-    const interval = setInterval(fetchSyncState, 800);
-    return () => clearInterval(interval);
+    const interval = setInterval(() => {
+      if (!document.hidden) fetchSyncState();
+    }, 800);
+    const onShow = () => {
+      if (!document.hidden) fetchSyncState();
+    };
+    document.addEventListener("visibilitychange", onShow);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onShow);
+    };
   }, [fetchSyncState]);
 
   // Local tick: sleeps until the clock's next whole second, then renders once.
@@ -246,7 +315,8 @@ export default function HiddenChairPage() {
   // Dispatch action to server with optimistic update for 0ms latency
   const dispatchAction = useCallback(async (action: CountdownAction) => {
     const serverNow = Date.now() + serverOffsetRef.current;
-    const optimistic = applyCountdownAction(serverStateRef.current, action, serverNow);
+    const before = serverStateRef.current;
+    const optimistic = applyCountdownAction(before, action, serverNow);
     // Apply optimistic update immediately so the UI feels instant
     serverStateRef.current = optimistic;
     setIsRunning(optimistic.isRunning);
@@ -268,11 +338,18 @@ export default function HiddenChairPage() {
           // Reconcile with authoritative server response
           applyServerSync(data.state, data.serverTime, data.elapsedSeconds ?? 0);
         }
+        return;
       }
+      console.error("[countdown] The server did not take the action:", res.status);
     } catch (err) {
       console.error("[countdown] Failed to dispatch action:", err);
     }
-  }, [applyServerSync]);
+    // The change never reached the server (bad connection, store down). Undo
+    // the optimistic copy, whose higher version would otherwise make this
+    // device ignore the server's real state, and show what the server has.
+    if (serverStateRef.current === optimistic) serverStateRef.current = before;
+    fetchSyncState();
+  }, [applyServerSync, fetchSyncState]);
 
   // This page never scrolls, but the site-wide scroll engine (mounted in the root
   // layout) keeps itself busy anyway: ScrollTrigger re-requests an animation frame
@@ -405,12 +482,21 @@ export default function HiddenChairPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isAuthenticated, handleTogglePlay, handleToggleLunch, handleReset, toggleFullscreen, router]);
 
-  const box = useVisibleBox(rootRef, isAuthenticated);
+  const box = useVisibleBox(rootRef, isAuthenticated === true);
+
+  // Not known yet (the first paint, before storage is read): the gate's
+  // background alone, so a remembered device does not flash the password box.
+  if (isAuthenticated === null) {
+    return <div className="fixed inset-0" style={{ background: "#0A0D0A" }} />;
+  }
 
   // Password Gate
   if (!isAuthenticated) {
     return (
-      <div className={`${stageSans.variable} fixed inset-0 overflow-hidden bg-[#0A0D0A] flex flex-col items-center justify-center text-white select-none`}>
+      <div
+        className={`${stageSans.variable} fixed inset-0 overflow-hidden bg-[#0A0D0A] flex flex-col items-center justify-center text-white select-none`}
+        style={{ background: "#0A0D0A" }}
+      >
         {/* Back Link */}
         <Link
           href="/?intro=0#hero"
@@ -579,6 +665,23 @@ export default function HiddenChairPage() {
                 ) : (
                   <Maximize2 className="w-3.5 h-3.5 text-white" />
                 )}
+              </button>
+
+              {/* Log out of this device (two taps) */}
+              <button
+                id="logout-btn"
+                onClick={handleLogout}
+                title={confirmLogout ? "Tap again to log out" : "Log out of this device"}
+                className={`px-2 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors bg-transparent hover:bg-black/20 ${
+                  confirmLogout ? "text-red-300" : "text-white/70 hover:text-white"
+                }`}
+                style={{
+                  fontFamily: UI_FONT,
+                  textShadow: "0 1px 4px rgba(0, 0, 0, 0.7)",
+                }}
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>{confirmLogout ? "Tap again to log out" : "Log out"}</span>
               </button>
 
               {/* Hide Controls Button */}
