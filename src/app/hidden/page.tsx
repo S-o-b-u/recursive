@@ -69,6 +69,15 @@ const AUTH_TOKEN = (() => {
   return "v1-" + h.toString(16);
 })();
 
+type FullscreenDocument = Document & { webkitFullscreenElement?: Element | null; webkitExitFullscreen?: () => void };
+type FullscreenElement = HTMLElement & { webkitRequestFullscreen?: () => void };
+
+/** The element shown fullscreen: the standard name, or Chromium's before version 71. */
+function fullscreenElement(): Element | null {
+  const d = document as FullscreenDocument;
+  return d.fullscreenElement || d.webkitFullscreenElement || null;
+}
+
 function rememberedLogin(): boolean {
   try {
     return window.localStorage.getItem(AUTH_KEY) === AUTH_TOKEN;
@@ -544,21 +553,35 @@ export default function HiddenChairPage() {
 
   const toggleFullscreen = useCallback(() => {
     if (typeof document === "undefined") return;
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen().catch(() => {});
-      setIsFullscreen(false);
+    // Old engines (Chromium before 71, which many smartboards run) only have the
+    // webkit-prefixed fullscreen calls, and theirs return nothing, not a promise.
+    const doc = document as FullscreenDocument;
+    const root = document.documentElement as FullscreenElement;
+    try {
+      if (!fullscreenElement()) {
+        const enter = root.requestFullscreen || root.webkitRequestFullscreen;
+        Promise.resolve(enter?.call(root)).catch(() => {});
+        setIsFullscreen(true);
+      } else {
+        const exit = doc.exitFullscreen || doc.webkitExitFullscreen;
+        Promise.resolve(exit?.call(doc)).catch(() => {});
+        setIsFullscreen(false);
+      }
+    } catch {
+      // the host browser does not allow fullscreen (some WebView shells)
     }
   }, []);
 
   useEffect(() => {
     const onFsChange = () => {
-      setIsFullscreen(Boolean(document.fullscreenElement));
+      setIsFullscreen(Boolean(fullscreenElement()));
     };
     document.addEventListener("fullscreenchange", onFsChange);
-    return () => document.removeEventListener("fullscreenchange", onFsChange);
+    document.addEventListener("webkitfullscreenchange", onFsChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFsChange);
+      document.removeEventListener("webkitfullscreenchange", onFsChange);
+    };
   }, []);
 
   // Hotkeys
@@ -601,7 +624,7 @@ export default function HiddenChairPage() {
         e.preventDefault();
         setShowControls((prev) => !prev);
       } else if (e.key === "Escape") {
-        if (!document.fullscreenElement) {
+        if (!fullscreenElement()) {
           try { sessionStorage.setItem("recursive:skip-intro-for-anchor", "1"); } catch {}
           router.push("/?intro=0#hero");
         }

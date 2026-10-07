@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gradeAt, DAY_START_HOUR, DAY_END_HOUR } from "./day-grade";
 import { perfLite } from "@/lib/device";
-import { stageVideo } from "./stage-video";
+import { stageVideo, stageVideoRung, stepDownStageVideo, wantShader } from "./stage-video";
 import s from "./stage.module.css";
 
 interface StageSceneProps {
@@ -51,18 +51,23 @@ const HOUR_SNAP = 0.012;
 const BLACK_CHECK_FRAME = 3;
 
 /**
- * Which backdrop to run. Smartboards (html.perf-lite) get the plain video with
- * the CSS grade: on an Android 11 WebView it played the full 24 frames a second
- * on about 60% of the main-thread time the shader took, where the shader
- * managed 20 (every frame is copied into a texture on the main thread). The
- * hardware decoder's output goes straight to the compositor instead.
- * `?grade=gl` or `?grade=video` overrides, for comparing on a real board.
+ * The plain-video backdrop's quality check (see STAGE_VIDEO_BOARD_LADDER):
+ * frames the browser had to drop, per window, before stepping down a copy.
+ * Waiting on the network is not counted (playback just pauses then), so a
+ * slow first download on the venue's wifi does not cost the board its 60 fps.
  */
-function wantShader() {
-  const forced = new URLSearchParams(window.location.search).get("grade");
-  if (forced === "gl") return true;
-  if (forced === "video") return false;
-  return !perfLite();
+const DROP_WINDOW_MS = 3000;
+const DROP_LIMIT = 0.1;
+const DROP_STRIKES = 2;
+
+function playbackQuality(v: HTMLVideoElement) {
+  if (typeof v.getVideoPlaybackQuality === "function") {
+    const q = v.getVideoPlaybackQuality();
+    return { total: q.totalVideoFrames, dropped: q.droppedVideoFrames };
+  }
+  // older engines
+  const w = v as HTMLVideoElement & { webkitDecodedFrameCount?: number; webkitDroppedFrameCount?: number };
+  return { total: w.webkitDecodedFrameCount ?? 0, dropped: w.webkitDroppedFrameCount ?? 0 };
 }
 
 const VERT = `
@@ -277,6 +282,54 @@ export default function StageScene({
     // twice a day that page screenshots (and some capture tools) see as black.
     video.style.filter = `brightness(${g.exp.toFixed(3)}) saturate(${g.sat.toFixed(3)}) contrast(${g.con.toFixed(3)})`;
   }, [mode, hour]);
+
+  // The plain-video backdrop starts on the best copy of the loop (1080p,
+  // 60 fps) and steps down while the board cannot keep up: too many dropped
+  // frames two windows running, or a copy it cannot decode at all.
+  useEffect(() => {
+    if (mode !== "video" || wantShader()) return undefined;
+    const video = stageVideo();
+    let last = playbackQuality(video);
+    let strikes = 0;
+    let settle = 1; // the window after a (re)start is not judged
+    const stepDown = (why: string) => {
+      const from = stageVideoRung();
+      if (stepDownStageVideo()) {
+        console.info(`[stage] video copy ${from} -> ${stageVideoRung()} (${why})`);
+        strikes = 0;
+        settle = 2;
+      }
+    };
+    const watch = window.setInterval(() => {
+      const q = playbackQuality(video);
+      const frames = q.total - last.total;
+      const dropped = q.dropped - last.dropped;
+      last = q;
+      if (video.paused || document.hidden || video.readyState < 3 || frames < 0) {
+        settle = Math.max(settle, 1);
+        return;
+      }
+      if (settle > 0) {
+        settle--;
+        return;
+      }
+      if (frames + dropped < 10) return; // too little played to judge
+      if (dropped / Math.max(1, frames) > DROP_LIMIT) {
+        if (++strikes >= DROP_STRIKES) stepDown(`${dropped} of ${frames} frames dropped`);
+      } else {
+        strikes = 0;
+      }
+    }, DROP_WINDOW_MS);
+    const onError = () => stepDown(`cannot play it (error ${video.error?.code ?? "?"})`);
+    video.addEventListener("error", onError);
+    // The element starts loading on the password screen, before this runs:
+    // a copy that failed then has already fired its error.
+    if (video.error) onError();
+    return () => {
+      window.clearInterval(watch);
+      video.removeEventListener("error", onError);
+    };
+  }, [mode]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

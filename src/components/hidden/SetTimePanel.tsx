@@ -140,7 +140,12 @@ export default function SetTimePanel({ elapsedNow, serverNow, onApply, onClose }
   const onMove = (e: React.PointerEvent<SVGSVGElement>) => {
     if (grab) fromPointer(e, grab);
   };
-  const onUp = () => setGrab(null);
+  // The hand ends where the finger left the glass: a busy board merges move
+  // events, so the last move can fall short of the release point.
+  const onUp = (e: React.PointerEvent<SVGSVGElement>) => {
+    if (grab) fromPointer(e, grab);
+    setGrab(null);
+  };
 
   // what the screens will show
   const elapsed = elapsedForTimeOfDay(tod);
@@ -214,7 +219,7 @@ export default function SetTimePanel({ elapsedNow, serverNow, onApply, onClose }
           onPointerDown={onDown}
           onPointerMove={onMove}
           onPointerUp={onUp}
-          onPointerCancel={onUp}
+          onPointerCancel={() => setGrab(null)}
           aria-hidden="true"
         >
           <circle r="97" className={s.face} />
