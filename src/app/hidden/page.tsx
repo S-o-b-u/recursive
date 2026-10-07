@@ -4,7 +4,7 @@ import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import MockupCountdown from "@/components/hidden/MockupCountdown";
+import MockupCountdown, { type CountdownWindow } from "@/components/hidden/MockupCountdown";
 import MockupScheduleCard, {
   getActiveMockupMilestone,
 } from "@/components/hidden/MockupScheduleCard";
@@ -14,7 +14,7 @@ import { preload } from "react-dom";
 import { primeStageVideo, stageVideo } from "@/components/hidden/stage-video";
 import { stageSans } from "@/components/hidden/stage-font";
 import stage from "@/components/hidden/stage.module.css";
-import { TOTAL_HACKATHON_SECONDS, getActiveMilestone } from "@/data/shift8";
+import { TOTAL_HACKATHON_SECONDS, EVENT_START_HOUR, LUNCH_SLOT, getActiveMilestone } from "@/data/shift8";
 import {
   CountdownSyncState,
   CountdownAction,
@@ -504,13 +504,17 @@ export default function HiddenChairPage() {
   const activeMockupMilestone = getActiveMockupMilestone(elapsedSeconds, forcedLunch);
 
   // Inside the scheduled lunch slot, count down to its end, however lunch was
-  // started: forcing it (L, or the Lunch row) jumps the clock to 01:30, where
-  // the 45-minute cycle below would have read 15 minutes left.
-  let lunchRemainingSec = 0;
+  // started (forcing it, with L or the Lunch row, jumps the clock to the slot's
+  // start); lunch forced outside the slot runs a lunch-length cycle.
+  const lunchLength = LUNCH_SLOT.endSec - LUNCH_SLOT.startSec;
+  let countdownSlot: CountdownWindow | null = null;
   if (activeMilestone?.isLunch) {
-    lunchRemainingSec = Math.max(0, activeMilestone.endSec - elapsedSeconds);
+    countdownSlot = { kind: "lunch", remainingSec: Math.max(0, activeMilestone.endSec - elapsedSeconds) };
   } else if (forcedLunch) {
-    lunchRemainingSec = Math.max(0, 2700 - (elapsedSeconds % 2700));
+    countdownSlot = { kind: "lunch", remainingSec: Math.max(0, lunchLength - (elapsedSeconds % lunchLength)) };
+  } else if (activeMilestone?.isSubmission) {
+    // the final submission window counts down to the submission deadline
+    countdownSlot = { kind: "submit", remainingSec: Math.max(0, activeMilestone.endSec - elapsedSeconds) };
   }
 
   // Controls Handlers (all synchronized via dispatchAction)
@@ -684,8 +688,8 @@ export default function HiddenChairPage() {
       className={`${stageSans.variable} fixed inset-0 overflow-hidden bg-black text-white select-none`}
       style={{ touchAction: "none" }}
     >
-      {/* ── The chair on the hill, lit for the hackathon's hour: 10:00 morning -> 18:00 dusk ── */}
-      <StageScene hour={10 + elapsedSeconds / 3600} />
+      {/* ── The chair on the hill, lit for the hour of the day (hacking runs 9:30 AM -> 4:30 PM) ── */}
+      <StageScene hour={EVENT_START_HOUR + elapsedSeconds / 3600} />
 
       {/* ── Subtle Floating Controls Bar ── */}
       <AnimatePresence>
@@ -768,7 +772,7 @@ export default function HiddenChairPage() {
               <button
                 id="reset-btn"
                 onClick={handleReset}
-                title="Reset to 8 Hours (R)"
+                title={`Reset to ${TOTAL_HACKATHON_SECONDS / 3600} Hours (R)`}
                 className="p-1.5 rounded-full bg-transparent hover:bg-black/20 text-white/80 hover:text-white transition-colors cursor-pointer"
                 style={{ textShadow: "0 1px 4px rgba(0, 0, 0, 0.7)" }}
               >
@@ -849,10 +853,8 @@ export default function HiddenChairPage() {
         <div className={`${stage.anchor} ${stage.atCount}`}>
           <MockupCountdown
             remainingSeconds={remainingSeconds}
-            isLunchTime={Boolean(isLunchTime)}
-            lunchRemainingSec={lunchRemainingSec}
+            slot={countdownSlot}
             isRunning={isRunning}
-            isCodeFreeze={activeMockupMilestone?.id === "code-freeze"}
           />
         </div>
 

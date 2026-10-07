@@ -1,17 +1,27 @@
 "use client";
 
 import React, { useState } from "react";
-import { formatTime } from "@/data/shift8";
+import { formatTime, LUNCH_SLOT, SUBMISSION_SLOT, TOTAL_HACKATHON_SECONDS } from "@/data/shift8";
 import { perfLite } from "@/lib/device";
 import { RecursiveDigit, Sparkle } from "./RecursiveDigit";
 import s from "./stage.module.css";
 
+/**
+ * A slot with a countdown of its own, shown in place of the total while it
+ * runs (a tap on the digits shows the total instead): lunch, and the final
+ * submission window, which counts down to the submission deadline.
+ */
+export type CountdownWindow = { kind: "lunch" | "submit"; remainingSec: number };
+
+const WINDOW_HEADING: Record<CountdownWindow["kind"], string> = {
+  lunch: `Lunch & networking time (${LUNCH_SLOT.timeRange} PM)`,
+  submit: `Final submission open · deadline ${SUBMISSION_SLOT.timeRange.split("–").pop()?.trim()} PM`,
+};
+
 interface MockupCountdownProps {
   remainingSeconds: number;
-  isLunchTime: boolean;
-  lunchRemainingSec: number;
+  slot: CountdownWindow | null;
   isRunning: boolean;
-  isCodeFreeze?: boolean;
 }
 
 /**
@@ -68,32 +78,27 @@ function Colon({ running, tick }: { running: boolean; tick: string }) {
 
 export default function MockupCountdown({
   remainingSeconds,
-  isLunchTime,
-  lunchRemainingSec,
+  slot,
   isRunning,
 }: MockupCountdownProps) {
-  const [showTotalDuringLunch, setShowTotalDuringLunch] = useState(false);
+  // which slot's countdown was tapped away to show the total
+  const [totalFor, setTotalFor] = useState<CountdownWindow["kind"] | null>(null);
 
-  const { hours, minutes, seconds } = formatTime(remainingSeconds);
-  const lunchFormatted = formatTime(lunchRemainingSec);
-
-  const lunchView = isLunchTime && !showTotalDuringLunch;
-  const h = lunchView ? "00" : hours;
-  const m = lunchView ? lunchFormatted.minutes : minutes;
-  const sec = lunchView ? lunchFormatted.seconds : seconds;
   const isAllZero = remainingSeconds <= 0;
+  const slotView = slot && !isAllZero && totalFor !== slot.kind ? slot : null;
+  const { hours: h, minutes: m, seconds: sec } = formatTime(slotView ? slotView.remainingSec : remainingSeconds);
 
   let headerText = "Time left to hackathon start";
   if (isAllZero) {
     headerText = "Now is the time to pack your things!! This is the END";
-  } else if (lunchView) {
-    headerText = "Lunch & networking time (01:30 – 02:15 PM)";
-  } else if (isRunning || remainingSeconds < 28800) {
+  } else if (slotView) {
+    headerText = WINDOW_HEADING[slotView.kind];
+  } else if (isRunning || remainingSeconds < TOTAL_HACKATHON_SECONDS) {
     headerText = "Time left to hackathon finish";
   }
 
   return (
-    <div className={s.count} data-lunch={lunchView ? "1" : "0"}>
+    <div className={s.count} data-window={slotView ? slotView.kind : "none"}>
       <div className={s.eyebrow} data-end={isAllZero ? "1" : "0"}>
         {!isAllZero && <Sparkle className={s.eyebrowStar} />}
         <span key={headerText} className={s.eyebrowText}>
@@ -106,10 +111,10 @@ export default function MockupCountdown({
         role="timer"
         aria-label={`${h}:${m}:${sec}`}
         data-time={`${h}:${m}:${sec}`}
-        data-clickable={isLunchTime ? "1" : "0"}
+        data-clickable={slot ? "1" : "0"}
         className={s.digits}
         onClick={() => {
-          if (isLunchTime) setShowTotalDuringLunch(!showTotalDuringLunch);
+          if (slot) setTotalFor(totalFor === slot.kind ? null : slot.kind);
         }}
       >
         <Unit value={h} label="HOURS" />

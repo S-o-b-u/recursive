@@ -17,6 +17,8 @@
   --digit-w: calc(var(--digit-h) * 100 / 268 * 1.2);
   --ink: #101a10;
   --lunch: #30401c;
+  /* the final submission window: a warm, urgent brown-red */
+  --submit: #5a210c;
   position: absolute;
   left: 50%;
   top: 50%;
@@ -85,8 +87,11 @@
   color: var(--ink);
   transition: color 0.6s ease;
 }
-.count[data-lunch="1"] {
+.count[data-window="lunch"] {
   color: var(--lunch);
+}
+.count[data-window="submit"] {
+  color: var(--submit);
 }
 
 .eyebrow {
@@ -220,8 +225,11 @@
   text-shadow: 0 0 calc(var(--u) * 12) rgba(255, 255, 255, 0.45);
   transition: color 0.4s ease;
 }
-.now[data-lunch="1"] {
+.now[data-tone="lunch"] {
   color: var(--lunch);
+}
+.now[data-tone="submit"] {
+  color: var(--submit);
 }
 .nowRule {
   width: calc(var(--u) * 3);
@@ -276,9 +284,6 @@
 
 .card {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--u) * 2);
   width: calc(var(--u) * 410);
   padding: calc(var(--u) * 9);
   border: 1px solid rgba(255, 255, 255, 0.22);
@@ -301,13 +306,26 @@
 :global(.perf-lite) .card {
   background: rgba(12, 20, 10, 0.58);
 }
-/* The current row's highlight: one element, placed on the row by
-   MockupScheduleCard and gliding to the next one when the schedule moves on. */
+/* The card is a window onto the day's list (MockupScheduleCard): cardView is
+   the window, sized to the rows it shows; cardList scrolls inside it. */
+.cardView {
+  position: relative;
+  overflow: hidden;
+  border-radius: calc(var(--u) * 14);
+}
+.cardList {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 2);
+}
+/* The current row's highlight: one element, placed on the row and gliding
+   to the next one when the schedule moves on. */
 .cursor {
   position: absolute;
   top: 0;
-  left: calc(var(--u) * 9);
-  right: calc(var(--u) * 9);
+  left: 0;
+  right: 0;
   border-radius: calc(var(--u) * 14);
   background: rgba(255, 255, 255, 0.78);
   -webkit-backdrop-filter: blur(8px);
@@ -315,10 +333,20 @@
   box-shadow: 0 calc(var(--u) * 6) calc(var(--u) * 18) rgba(0, 0, 0, 0.12);
   pointer-events: none;
 }
-.cursor[data-lunch="1"] {
+.cursor[data-tone="lunch"] {
   background: rgba(221, 236, 172, 0.82);
 }
-.cursorGlide {
+.cursor[data-tone="submit"] {
+  background: rgba(255, 222, 188, 0.86);
+}
+/* window, list and highlight move together, after their first placement */
+.cardView.glide {
+  transition: height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cardList.glide {
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cursor.glide {
   transition:
     transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
     height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -350,8 +378,11 @@
 .item[data-state="now"] {
   color: var(--ink);
 }
-.item[data-state="now"][data-lunch="1"] {
+.item[data-state="now"][data-tone="lunch"] {
   color: var(--lunch);
+}
+.item[data-state="now"][data-tone="submit"] {
+  color: var(--submit);
 }
 @media (hover: hover) {
   .item:not([data-state="now"]):hover {
@@ -370,6 +401,11 @@
 }
 .item[data-state="now"] .title {
   font-weight: 800;
+}
+/* only the current row shows its second line, so the card keeps one size
+   whichever stretch of the day it shows */
+.item:not([data-state="now"]) .sub {
+  display: none;
 }
 .sub {
   display: block;
@@ -494,8 +530,11 @@
 :global(.perf-lite) .cursor {
   background: rgba(255, 255, 255, 0.88);
 }
-:global(.perf-lite) .cursor[data-lunch="1"] {
+:global(.perf-lite) .cursor[data-tone="lunch"] {
   background: rgba(221, 236, 172, 0.92);
+}
+:global(.perf-lite) .cursor[data-tone="submit"] {
+  background: rgba(255, 222, 188, 0.94);
 }
 :global(.perf-lite) .digit,
 :global(.perf-lite) .twinkle,
@@ -521,7 +560,7 @@
   .digitOut {
     display: none;
   }
-  .cursorGlide {
-    transition: none;
+  .glide {
+    transition: none !important;
   }
 }

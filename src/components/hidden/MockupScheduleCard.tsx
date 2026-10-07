@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useLayoutEffect, useRef, useState } from "react";
+import { HACKATHON_SCHEDULE } from "@/data/shift8";
 import s from "./stage.module.css";
 
 export interface ScheduleItem {
@@ -12,47 +13,20 @@ export interface ScheduleItem {
   /** When the slot ends, for the progress line on the current row. */
   endOffset: number;
   isLunch?: boolean;
+  isSubmission?: boolean;
 }
 
-export const MOCKUP_SCHEDULE: ScheduleItem[] = [
-  {
-    id: "shift-8-start",
-    time: "10:00",
-    title: "Shift-8 Starts",
-    secondsOffset: 0,
-    endOffset: 3600,
-  },
-  {
-    id: "checkpoint-1",
-    time: "11:00 – 01:00",
-    title: "Sprint Checkpoint 1",
-    secondsOffset: 3600,
-    endOffset: 10800,
-  },
-  {
-    id: "lunch-networking",
-    time: "01:30 – 02:15",
-    title: "Lunch & Networking",
-    secondsOffset: 12600,
-    endOffset: 15300,
-    isLunch: true,
-  },
-  {
-    id: "checkpoint-2",
-    time: "02:15 – 04:30",
-    title: "Sprint Checkpoint 2 & Devfolio",
-    subtitle: "Submission Deadline",
-    secondsOffset: 15300,
-    endOffset: 23400,
-  },
-  {
-    id: "code-freeze",
-    time: "05:00",
-    title: "Code Freeze",
-    secondsOffset: 25200,
-    endOffset: 28800,
-  },
-];
+/** The day's schedule (src/data/shift8.ts is the one place it is written down). */
+export const MOCKUP_SCHEDULE: ScheduleItem[] = HACKATHON_SCHEDULE.map((m) => ({
+  id: m.id,
+  time: m.timeRange,
+  title: m.title,
+  subtitle: m.subtitle,
+  secondsOffset: m.startSec,
+  endOffset: m.endSec,
+  isLunch: m.isLunch,
+  isSubmission: m.isSubmission,
+}));
 
 export function getActiveMockupMilestone(
   elapsedSeconds: number,
@@ -73,6 +47,9 @@ export function getActiveMockupMilestone(
   return active;
 }
 
+/** Rows the card shows at once: the one before, the current one and the next three. */
+const VISIBLE_ROWS = 5;
+
 interface MockupScheduleCardProps {
   elapsedSeconds: number;
   isLunchActive: boolean;
@@ -81,31 +58,63 @@ interface MockupScheduleCardProps {
   onSelectMilestone?: (seconds: number, isLunch?: boolean) => void;
 }
 
+type Layout = {
+  /** the current row's highlight */
+  cursorY: number;
+  cursorH: number;
+  /** the visible stretch of the list */
+  viewY: number;
+  viewH: number;
+  /** false for the first placement, which lands without moving */
+  glide: boolean;
+};
+
 /**
- * The current row's highlight is one element that glides from row to row when
- * the schedule moves on, rather than each row painting its own (which made it
- * jump). It is placed from the rows themselves, so it fits rows of any height
- * (the one with a subtitle is taller) at any size, and lands without gliding
- * the first time.
+ * The day has more slots than fit on the hill under the chair, so the card is
+ * a window onto the list: the slot before, the current one and the next
+ * three. As the day moves on, the list scrolls up in the window and the
+ * highlight (one element, not each row's own background) glides onto the new
+ * current row. Both are placed from the rows themselves, so rows of any
+ * height (a subtitle makes one taller) and any size work, and both land
+ * without moving the first time.
  */
-function useCursor(cardRef: React.RefObject<HTMLDivElement | null>, currentId: string) {
-  const [cursor, setCursor] = useState<{ y: number; h: number; glide: boolean } | null>(null);
+function useScheduleLayout(
+  listRef: React.RefObject<HTMLDivElement | null>,
+  currentId: string,
+  first: number
+) {
+  const [layout, setLayout] = useState<Layout | null>(null);
   useLayoutEffect(() => {
-    const card = cardRef.current;
-    if (!card) return undefined;
+    const list = listRef.current;
+    if (!list) return undefined;
     const place = () => {
-      const row = card.querySelector<HTMLElement>(`[data-milestone-id="${currentId}"]`);
-      if (!row) return;
-      const y = row.offsetTop;
-      const h = row.offsetHeight;
-      setCursor((c) => (c && c.y === y && c.h === h ? c : { y, h, glide: c !== null }));
+      const rows = Array.from(list.querySelectorAll<HTMLElement>("[data-milestone-id]"));
+      const row = rows.find((r) => r.dataset.milestoneId === currentId);
+      const top = rows[first];
+      const bottom = rows[Math.min(rows.length, first + VISIBLE_ROWS) - 1];
+      if (!row || !top || !bottom) return;
+      const next = {
+        cursorY: row.offsetTop,
+        cursorH: row.offsetHeight,
+        viewY: top.offsetTop,
+        viewH: bottom.offsetTop + bottom.offsetHeight - top.offsetTop,
+      };
+      setLayout((l) =>
+        l &&
+        l.cursorY === next.cursorY &&
+        l.cursorH === next.cursorH &&
+        l.viewY === next.viewY &&
+        l.viewH === next.viewH
+          ? l
+          : { ...next, glide: l !== null }
+      );
     };
     place();
     const ro = typeof ResizeObserver === "function" ? new ResizeObserver(place) : null;
-    ro?.observe(card);
+    ro?.observe(list);
     return () => ro?.disconnect();
-  }, [cardRef, currentId]);
-  return cursor;
+  }, [listRef, currentId, first]);
+  return layout;
 }
 
 export default function MockupScheduleCard({
@@ -115,48 +124,65 @@ export default function MockupScheduleCard({
   onSelectMilestone,
 }: MockupScheduleCardProps) {
   const currentId = activeId ?? getActiveMockupMilestone(elapsedSeconds).id;
-  const cardRef = useRef<HTMLDivElement>(null);
-  const cursor = useCursor(cardRef, currentId);
-  const currentIsLunch = Boolean(MOCKUP_SCHEDULE.find((m) => m.id === currentId)?.isLunch && isLunchActive);
+  const index = Math.max(0, MOCKUP_SCHEDULE.findIndex((m) => m.id === currentId));
+  const first = Math.max(0, Math.min(index - 1, MOCKUP_SCHEDULE.length - VISIBLE_ROWS));
+  const listRef = useRef<HTMLDivElement>(null);
+  const layout = useScheduleLayout(listRef, currentId, first);
+  const current = MOCKUP_SCHEDULE[index];
+  const tone = current?.isLunch && isLunchActive ? "lunch" : current?.isSubmission ? "submit" : "day";
+  const glide = layout?.glide ? s.glide : "";
   return (
-    <div ref={cardRef} className={s.card}>
-      {cursor && (
-        <span
-          aria-hidden="true"
-          className={`${s.cursor} ${cursor.glide ? s.cursorGlide : ""}`}
-          data-lunch={currentIsLunch ? "1" : "0"}
-          style={{ transform: `translateY(${cursor.y}px)`, height: cursor.h }}
-        />
-      )}
-      {MOCKUP_SCHEDULE.map((item) => {
-        const isNow = item.id === currentId;
-        const state = isNow ? "now" : elapsedSeconds >= item.endOffset ? "past" : "next";
-        const progress = Math.min(
-          1,
-          Math.max(0, (elapsedSeconds - item.secondsOffset) / (item.endOffset - item.secondsOffset))
-        );
-        return (
-          <div
-            key={item.id}
-            data-milestone-id={item.id}
-            data-state={state}
-            data-lunch={item.isLunch && isLunchActive ? "1" : "0"}
-            className={s.item}
-            onClick={() => onSelectMilestone?.(item.secondsOffset, item.isLunch)}
-          >
-            <span className={s.time}>{item.time}</span>
-            <span className={s.title}>
-              {item.title}
-              {item.subtitle && <span className={s.sub}>{item.subtitle}</span>}
-            </span>
-            {isNow && (
-              <span className={s.progress} aria-hidden="true">
-                <i style={{ transform: `scaleX(${progress})` }} />
-              </span>
-            )}
-          </div>
-        );
-      })}
+    <div className={s.card}>
+      <div
+        className={`${s.cardView} ${glide}`}
+        style={layout ? { height: layout.viewH } : undefined}
+      >
+        <div
+          ref={listRef}
+          className={`${s.cardList} ${glide}`}
+          style={layout ? { transform: `translateY(${-layout.viewY}px)` } : undefined}
+        >
+          {layout && (
+            <span
+              aria-hidden="true"
+              className={`${s.cursor} ${glide}`}
+              data-tone={tone}
+              style={{ transform: `translateY(${layout.cursorY}px)`, height: layout.cursorH }}
+            />
+          )}
+          {MOCKUP_SCHEDULE.map((item, i) => {
+            const isNow = item.id === currentId;
+            const state = isNow ? "now" : elapsedSeconds >= item.endOffset ? "past" : "next";
+            const progress = Math.min(
+              1,
+              Math.max(0, (elapsedSeconds - item.secondsOffset) / (item.endOffset - item.secondsOffset))
+            );
+            const shown = i >= first && i < first + VISIBLE_ROWS;
+            return (
+              <div
+                key={item.id}
+                data-milestone-id={item.id}
+                data-state={state}
+                data-tone={isNow ? tone : "day"}
+                aria-hidden={shown ? undefined : true}
+                className={s.item}
+                onClick={() => onSelectMilestone?.(item.secondsOffset, item.isLunch)}
+              >
+                <span className={s.time}>{item.time}</span>
+                <span className={s.title}>
+                  {item.title}
+                  {item.subtitle && <span className={s.sub}>{item.subtitle}</span>}
+                </span>
+                {isNow && (
+                  <span className={s.progress} aria-hidden="true">
+                    <i style={{ transform: `scaleX(${progress})` }} />
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

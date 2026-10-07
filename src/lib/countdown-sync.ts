@@ -1,4 +1,4 @@
-import { TOTAL_HACKATHON_SECONDS } from "@/data/shift8";
+import { TOTAL_HACKATHON_SECONDS, LUNCH_SLOT } from "@/data/shift8";
 
 export interface CountdownSyncState {
   isRunning: boolean;
@@ -116,8 +116,9 @@ export function applyCountdownAction(
       const nextForcedLunch = !currentState.forcedLunch;
       let newAccumulated = currentElapsed;
       if (nextForcedLunch) {
-        if (currentElapsed < 12600 || currentElapsed > 15300) {
-          newAccumulated = 12600;
+        // outside the lunch slot: jump to its start
+        if (currentElapsed < LUNCH_SLOT.startSec || currentElapsed >= LUNCH_SLOT.endSec) {
+          newAccumulated = LUNCH_SLOT.startSec;
         }
       }
       return {
