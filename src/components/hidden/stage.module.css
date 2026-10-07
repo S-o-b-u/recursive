@@ -284,7 +284,8 @@
 
 .card {
   position: relative;
-  width: calc(var(--u) * 410);
+  /* two columns of the day; never wider than the narrowest stage (760u) */
+  width: calc(var(--u) * 730);
   padding: calc(var(--u) * 9);
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: calc(var(--u) * 22);
@@ -306,26 +307,28 @@
 :global(.perf-lite) .card {
   background: rgba(12, 20, 10, 0.58);
 }
-/* The card is a window onto the day's list (MockupScheduleCard): cardView is
-   the window, sized to the rows it shows; cardList scrolls inside it. */
-.cardView {
-  position: relative;
-  overflow: hidden;
-  border-radius: calc(var(--u) * 14);
-}
+/* The whole day in two columns, morning | afternoon (MockupScheduleCard).
+   Each column is its own stack, so a taller row on one side (the current
+   row shows its subtitle) does not stretch its neighbour on the other. */
 .cardList {
   position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--u) * 10);
+}
+.cardColumn {
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: calc(var(--u) * 2);
 }
 /* The current row's highlight: one element, placed on the row and gliding
-   to the next one when the schedule moves on. */
+   to the next one when the schedule moves on (across columns too). */
 .cursor {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
   border-radius: calc(var(--u) * 14);
   background: rgba(255, 255, 255, 0.78);
   -webkit-backdrop-filter: blur(8px);
@@ -339,16 +342,11 @@
 .cursor[data-tone="submit"] {
   background: rgba(255, 222, 188, 0.86);
 }
-/* window, list and highlight move together, after their first placement */
-.cardView.glide {
-  transition: height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-.cardList.glide {
-  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
+/* after its first placement */
 .cursor.glide {
   transition:
     transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+    width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
     height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
     background-color 0.4s ease;
 }
@@ -356,7 +354,7 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: calc(var(--u) * 108) 1fr;
+  grid-template-columns: calc(var(--u) * 100) 1fr;
   align-items: baseline;
   padding: calc(var(--u) * 8) calc(var(--u) * 13) calc(var(--u) * 9);
   border-radius: calc(var(--u) * 14);

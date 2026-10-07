@@ -47,9 +47,6 @@ export function getActiveMockupMilestone(
   return active;
 }
 
-/** Rows the card shows at once: the one before, the current one and the next three. */
-const VISIBLE_ROWS = 5;
-
 interface MockupScheduleCardProps {
   elapsedSeconds: number;
   isLunchActive: boolean;
@@ -58,63 +55,40 @@ interface MockupScheduleCardProps {
   onSelectMilestone?: (seconds: number, isLunch?: boolean) => void;
 }
 
-type Layout = {
-  /** the current row's highlight */
-  cursorY: number;
-  cursorH: number;
-  /** the visible stretch of the list */
-  viewY: number;
-  viewH: number;
-  /** false for the first placement, which lands without moving */
-  glide: boolean;
-};
+/** Slots in the left column: the morning, up to the end of lunch; the afternoon fills the right. */
+const LEFT_COLUMN_ROWS = Math.max(1, MOCKUP_SCHEDULE.findIndex((m) => m.isLunch) + 1);
+
+type Cursor = { x: number; y: number; w: number; h: number; glide: boolean };
 
 /**
- * The day has more slots than fit on the hill under the chair, so the card is
- * a window onto the list: the slot before, the current one and the next
- * three. As the day moves on, the list scrolls up in the window and the
- * highlight (one element, not each row's own background) glides onto the new
- * current row. Both are placed from the rows themselves, so rows of any
- * height (a subtitle makes one taller) and any size work, and both land
- * without moving the first time.
+ * The whole day is on the card, in two columns (morning | afternoon), so it
+ * fits on the hill under the chair. The current slot's highlight is one
+ * element that glides from slot to slot as the day moves on (across to the
+ * other column too), rather than each row painting its own. It is placed from
+ * the rows themselves, so it fits rows of any height (the current row shows
+ * its subtitle) at any size, and it lands without moving the first time.
  */
-function useScheduleLayout(
-  listRef: React.RefObject<HTMLDivElement | null>,
-  currentId: string,
-  first: number
-) {
-  const [layout, setLayout] = useState<Layout | null>(null);
+function useCursor(listRef: React.RefObject<HTMLDivElement | null>, currentId: string) {
+  const [cursor, setCursor] = useState<Cursor | null>(null);
   useLayoutEffect(() => {
     const list = listRef.current;
     if (!list) return undefined;
     const place = () => {
-      const rows = Array.from(list.querySelectorAll<HTMLElement>("[data-milestone-id]"));
-      const row = rows.find((r) => r.dataset.milestoneId === currentId);
-      const top = rows[first];
-      const bottom = rows[Math.min(rows.length, first + VISIBLE_ROWS) - 1];
-      if (!row || !top || !bottom) return;
-      const next = {
-        cursorY: row.offsetTop,
-        cursorH: row.offsetHeight,
-        viewY: top.offsetTop,
-        viewH: bottom.offsetTop + bottom.offsetHeight - top.offsetTop,
-      };
-      setLayout((l) =>
-        l &&
-        l.cursorY === next.cursorY &&
-        l.cursorH === next.cursorH &&
-        l.viewY === next.viewY &&
-        l.viewH === next.viewH
-          ? l
-          : { ...next, glide: l !== null }
+      const row = list.querySelector<HTMLElement>(`[data-milestone-id="${currentId}"]`);
+      if (!row) return;
+      const next = { x: row.offsetLeft, y: row.offsetTop, w: row.offsetWidth, h: row.offsetHeight };
+      setCursor((c) =>
+        c && c.x === next.x && c.y === next.y && c.w === next.w && c.h === next.h
+          ? c
+          : { ...next, glide: c !== null }
       );
     };
     place();
     const ro = typeof ResizeObserver === "function" ? new ResizeObserver(place) : null;
     ro?.observe(list);
     return () => ro?.disconnect();
-  }, [listRef, currentId, first]);
-  return layout;
+  }, [listRef, currentId]);
+  return cursor;
 }
 
 export default function MockupScheduleCard({
@@ -124,64 +98,58 @@ export default function MockupScheduleCard({
   onSelectMilestone,
 }: MockupScheduleCardProps) {
   const currentId = activeId ?? getActiveMockupMilestone(elapsedSeconds).id;
-  const index = Math.max(0, MOCKUP_SCHEDULE.findIndex((m) => m.id === currentId));
-  const first = Math.max(0, Math.min(index - 1, MOCKUP_SCHEDULE.length - VISIBLE_ROWS));
   const listRef = useRef<HTMLDivElement>(null);
-  const layout = useScheduleLayout(listRef, currentId, first);
-  const current = MOCKUP_SCHEDULE[index];
+  const cursor = useCursor(listRef, currentId);
+  const current = MOCKUP_SCHEDULE.find((m) => m.id === currentId);
   const tone = current?.isLunch && isLunchActive ? "lunch" : current?.isSubmission ? "submit" : "day";
-  const glide = layout?.glide ? s.glide : "";
+
+  const row = (item: ScheduleItem) => {
+    const isNow = item.id === currentId;
+    const state = isNow ? "now" : elapsedSeconds >= item.endOffset ? "past" : "next";
+    const progress = Math.min(
+      1,
+      Math.max(0, (elapsedSeconds - item.secondsOffset) / (item.endOffset - item.secondsOffset))
+    );
+    return (
+      <div
+        key={item.id}
+        data-milestone-id={item.id}
+        data-state={state}
+        data-tone={isNow ? tone : "day"}
+        className={s.item}
+        onClick={() => onSelectMilestone?.(item.secondsOffset, item.isLunch)}
+      >
+        <span className={s.time}>{item.time}</span>
+        <span className={s.title}>
+          {item.title}
+          {item.subtitle && <span className={s.sub}>{item.subtitle}</span>}
+        </span>
+        {isNow && (
+          <span className={s.progress} aria-hidden="true">
+            <i style={{ transform: `scaleX(${progress})` }} />
+          </span>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={s.card}>
-      <div
-        className={`${s.cardView} ${glide}`}
-        style={layout ? { height: layout.viewH } : undefined}
-      >
-        <div
-          ref={listRef}
-          className={`${s.cardList} ${glide}`}
-          style={layout ? { transform: `translateY(${-layout.viewY}px)` } : undefined}
-        >
-          {layout && (
-            <span
-              aria-hidden="true"
-              className={`${s.cursor} ${glide}`}
-              data-tone={tone}
-              style={{ transform: `translateY(${layout.cursorY}px)`, height: layout.cursorH }}
-            />
-          )}
-          {MOCKUP_SCHEDULE.map((item, i) => {
-            const isNow = item.id === currentId;
-            const state = isNow ? "now" : elapsedSeconds >= item.endOffset ? "past" : "next";
-            const progress = Math.min(
-              1,
-              Math.max(0, (elapsedSeconds - item.secondsOffset) / (item.endOffset - item.secondsOffset))
-            );
-            const shown = i >= first && i < first + VISIBLE_ROWS;
-            return (
-              <div
-                key={item.id}
-                data-milestone-id={item.id}
-                data-state={state}
-                data-tone={isNow ? tone : "day"}
-                aria-hidden={shown ? undefined : true}
-                className={s.item}
-                onClick={() => onSelectMilestone?.(item.secondsOffset, item.isLunch)}
-              >
-                <span className={s.time}>{item.time}</span>
-                <span className={s.title}>
-                  {item.title}
-                  {item.subtitle && <span className={s.sub}>{item.subtitle}</span>}
-                </span>
-                {isNow && (
-                  <span className={s.progress} aria-hidden="true">
-                    <i style={{ transform: `scaleX(${progress})` }} />
-                  </span>
-                )}
-              </div>
-            );
-          })}
-        </div>
+      <div ref={listRef} className={s.cardList}>
+        {cursor && (
+          <span
+            aria-hidden="true"
+            className={`${s.cursor} ${cursor.glide ? s.glide : ""}`}
+            data-tone={tone}
+            style={{
+              transform: `translate(${cursor.x}px, ${cursor.y}px)`,
+              width: cursor.w,
+              height: cursor.h,
+            }}
+          />
+        )}
+        <div className={s.cardColumn}>{MOCKUP_SCHEDULE.slice(0, LEFT_COLUMN_ROWS).map(row)}</div>
+        <div className={s.cardColumn}>{MOCKUP_SCHEDULE.slice(LEFT_COLUMN_ROWS).map(row)}</div>
       </div>
     </div>
   );
