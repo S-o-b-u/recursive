@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { getCache } from "@vercel/functions";
 import {
   CountdownSyncState,
   DEFAULT_COUNTDOWN_STATE,
@@ -17,26 +18,47 @@ import { TOTAL_HACKATHON_SECONDS } from "@/data/shift8";
  * Neither works on Vercel: each serverless instance has its own memory,
  * instances are started and recycled at will (a fresh one began at 08:00:00,
  * paused, so a Play pressed from one room could vanish for another), and the
- * filesystem is read-only. So when a Redis REST endpoint is configured, the
- * state is kept there instead, and every device on every instance reads the
- * same clock. Upstash Redis (Vercel Marketplace, free tier) sets
- * KV_REST_API_URL / KV_REST_API_TOKEN; a database made directly on upstash.com
- * gives UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN. Either pair works.
+ * filesystem is read-only. So there the state goes to a store every instance
+ * shares, in this order:
+ *
+ *  - "redis": a Redis REST endpoint, when configured. Durable. Upstash Redis
+ *    (Vercel Marketplace, free tier) sets KV_REST_API_URL / KV_REST_API_TOKEN;
+ *    a database made on upstash.com gives UPSTASH_REDIS_REST_URL / _TOKEN.
+ *  - "vercel-cache": otherwise, on Vercel, the Vercel Runtime Cache. Needs no
+ *    setup, is shared by every instance in the region and survives deploys,
+ *    but it is a cache: it evicts what has not been read lately, and this
+ *    entry is read every second while any screen is open. Its client never
+ *    throws: a failed read looks like an empty one, so an empty read keeps
+ *    what this instance last saw instead of resetting the clock.
+ *  - "memory": this process's memory + the JSON file (`next dev`, `next start`).
+ *
+ * COUNTDOWN_STORE=redis|vercel-cache|memory overrides the choice.
  */
 const STATE_FILE_PATH = path.join(process.cwd(), ".countdown-state.json");
 const REDIS_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-const REDIS_KEY = "recursive:countdown-state";
+const STORE_KEY = "recursive:countdown-state";
+/** Long enough to outlast any gap between control presses; every write renews it. */
+const CACHE_TTL_S = 14 * 24 * 3600;
 /**
- * Every device polls about once a second. Within one instance, reads this
- * close together share a single Redis read; a change made through another
+ * Every device polls every second or two. Within one instance, reads this
+ * close together share a single store read; a change made through another
  * instance shows up here at most this late (the device that made it already
  * has it from its own POST).
  */
-const REDIS_READ_TTL_MS = 700;
+const SHARED_READ_TTL_MS = 700;
 
-export type CountdownStore = "redis" | "memory";
-export const COUNTDOWN_STORE: CountdownStore = REDIS_URL && REDIS_TOKEN ? "redis" : "memory";
+export type CountdownStore = "redis" | "vercel-cache" | "memory";
+const onVercel = Boolean(process.env.VERCEL || process.env.VERCEL_ENV || process.env.VERCEL_REGION);
+const forced = process.env.COUNTDOWN_STORE as CountdownStore | undefined;
+export const COUNTDOWN_STORE: CountdownStore =
+  forced === "redis" || forced === "vercel-cache" || forced === "memory"
+    ? forced
+    : REDIS_URL && REDIS_TOKEN
+      ? "redis"
+      : onVercel
+        ? "vercel-cache"
+        : "memory";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -116,11 +138,11 @@ function saveToFile(state: CountdownSyncState) {
 // ── the store ───────────────────────────────────────────────────────────────
 
 async function readState(now: number): Promise<CountdownSyncState> {
+  const cached = globalThis.__countdown_state__;
   if (COUNTDOWN_STORE === "redis") {
-    const cached = globalThis.__countdown_state__;
-    if (cached && now - (globalThis.__countdown_read_at__ ?? 0) < REDIS_READ_TTL_MS) return cached;
+    if (cached && now - (globalThis.__countdown_read_at__ ?? 0) < SHARED_READ_TTL_MS) return cached;
     try {
-      const raw = await redis(["GET", REDIS_KEY]);
+      const raw = await redis(["GET", STORE_KEY]);
       const state = typeof raw === "string" ? normalize(JSON.parse(raw), now) : freshState(now);
       globalThis.__countdown_state__ = state;
       globalThis.__countdown_read_at__ = now;
@@ -130,6 +152,22 @@ async function readState(now: number): Promise<CountdownSyncState> {
       console.error("[countdown-server] Redis read failed:", err);
       return cached ?? freshState(now);
     }
+  }
+  if (COUNTDOWN_STORE === "vercel-cache") {
+    if (cached && now - (globalThis.__countdown_read_at__ ?? 0) < SHARED_READ_TTL_MS) return cached;
+    const raw = (await getCache().get(STORE_KEY)) as Partial<CountdownSyncState> | null;
+    globalThis.__countdown_read_at__ = now;
+    if (raw && typeof raw === "object") {
+      const state = normalize(raw, now);
+      // never step back to an older version this instance has already served
+      if (!cached || state.version >= cached.version) globalThis.__countdown_state__ = state;
+      return globalThis.__countdown_state__ as CountdownSyncState;
+    }
+    // Empty: never written, or a read that failed (the client cannot tell
+    // which). Keep what this instance last saw; only a brand-new instance
+    // with nothing to go on starts from the default.
+    if (!cached) globalThis.__countdown_state__ = freshState(now);
+    return globalThis.__countdown_state__ as CountdownSyncState;
   }
   if (!globalThis.__countdown_state__) {
     globalThis.__countdown_state__ = loadFromFile(now) ?? freshState(now);
@@ -143,7 +181,10 @@ async function writeState(state: CountdownSyncState): Promise<CountdownSyncState
     globalThis.__countdown_read_at__ = Date.now();
     // Throws when Redis is unreachable, so the caller can report that the
     // change did not reach the other devices.
-    await redis(["SET", REDIS_KEY, JSON.stringify(state)]);
+    await redis(["SET", STORE_KEY, JSON.stringify(state)]);
+  } else if (COUNTDOWN_STORE === "vercel-cache") {
+    globalThis.__countdown_read_at__ = Date.now();
+    await getCache().set(STORE_KEY, state, { ttl: CACHE_TTL_S, name: "countdown state" });
   } else {
     saveToFile(state);
   }
@@ -164,7 +205,7 @@ export async function getServerCountdownState(): Promise<CountdownSyncState> {
         accumulatedSeconds: TOTAL_HACKATHON_SECONDS,
         startTime: now,
         updatedAt: now,
-        version: state.version + 1,
+        version: nextVersion(state, now),
       };
       try {
         return await writeState(expiredState);
@@ -186,5 +227,17 @@ export async function dispatchServerCountdownAction(
   globalThis.__countdown_read_at__ = 0;
   const currentState = await getServerCountdownState();
   const nextState = applyCountdownAction(currentState, action, serverNow);
-  return writeState(nextState);
+  // Start on a running clock, Pause on a paused one: nothing to store.
+  if (nextState === currentState) return currentState;
+  return writeState({ ...nextState, version: nextVersion(currentState, serverNow) });
+}
+
+/**
+ * Versions are server timestamps (ms), not a count: a store that was emptied
+ * (an evicted cache entry, a new database) would restart a count at 1, and
+ * every screen that had seen a higher number would ignore all changes after
+ * that. A timestamp keeps growing whatever happened to the store.
+ */
+function nextVersion(state: CountdownSyncState, now: number): number {
+  return Math.max(state.version + 1, now);
 }

@@ -41,6 +41,11 @@ import {
 
 const PASSWORD = "@recursive#26";
 
+/** Server polling (see the polling effect): fast for a while after a change, then slow. */
+const POLL_FAST_MS = 800;
+const POLL_SLOW_MS = 2000;
+const POLL_FAST_FOR_MS = 20000;
+
 /**
  * Unlocking is remembered on this device until Log out, so a refresh (or a
  * board that reloads) goes straight back to the stage. What is stored is a
@@ -200,6 +205,7 @@ export default function HiddenChairPage() {
   const serverStateRef = useRef<CountdownSyncState>(DEFAULT_COUNTDOWN_STATE);
   const serverOffsetRef = useRef<number>(0);
   const firstSyncRef = useRef<boolean>(true);
+  const lastChangeRef = useRef<number>(Date.now()); // when the shared state last changed (polling speed)
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -207,6 +213,10 @@ export default function HiddenChairPage() {
   const [forcedLunch, setForcedLunch] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  // The clock is drawn once the server's state has arrived (or after 3 s, so
+  // an offline screen still shows something): a remembered login mounts the
+  // stage at once, and the default 08:00:00 would otherwise flash first.
+  const [synced, setSynced] = useState(false);
 
   // Sync state from server response
   const applyServerSync = useCallback(
@@ -215,6 +225,7 @@ export default function HiddenChairPage() {
       // Reject stale/out-of-order responses. An older version can arrive when
       // two rapid actions (e.g. reset then start) race through the network.
       if (state.version < serverStateRef.current.version) return;
+      if (state.version !== serverStateRef.current.version) lastChangeRef.current = Date.now();
 
       // ── Server-clock offset (EMA smoothed) ───────────────────────────────
       // Raw offset = how far server time is from local time (network latency included).
@@ -229,6 +240,7 @@ export default function HiddenChairPage() {
       }
 
       serverStateRef.current = state;
+      setSynced(true);
       setIsRunning(state.isRunning);
       setSpeed(state.speed);
       setForcedLunch(state.forcedLunch);
@@ -264,27 +276,34 @@ export default function HiddenChairPage() {
     }
   }, [applyServerSync]);
 
-  // Initial fetch on mount
+  // Polling for multi-device sync. Every poll is a server call (on Vercel, a
+  // function invocation, and each open screen made 108,000 a day at a steady
+  // 800 ms), so: only while the stage is unlocked (the password screen shows
+  // no clock), fast for a while after anything changes, from this screen or
+  // another, then every 2 s while nothing does. A press elsewhere reaches
+  // this screen within 2 s, and the clock itself never depends on polling.
+  // A tab nobody can see does not poll; it catches up the moment it is shown.
   useEffect(() => {
+    if (isAuthenticated !== true) return undefined;
     fetchSyncState();
-  }, [fetchSyncState]);
-
-  // Periodic polling for multi-device sync (every 800ms). A tab nobody can
-  // see does not poll (each poll is a server call); it catches up the moment
-  // it is shown again.
-  useEffect(() => {
-    const interval = setInterval(() => {
+    const giveUp = window.setTimeout(() => setSynced(true), 3000);
+    let timer = 0;
+    const loop = () => {
       if (!document.hidden) fetchSyncState();
-    }, 800);
+      const recent = Date.now() - lastChangeRef.current < POLL_FAST_FOR_MS;
+      timer = window.setTimeout(loop, recent ? POLL_FAST_MS : POLL_SLOW_MS);
+    };
+    timer = window.setTimeout(loop, POLL_FAST_MS);
     const onShow = () => {
       if (!document.hidden) fetchSyncState();
     };
     document.addEventListener("visibilitychange", onShow);
     return () => {
-      clearInterval(interval);
+      window.clearTimeout(timer);
+      window.clearTimeout(giveUp);
       document.removeEventListener("visibilitychange", onShow);
     };
-  }, [fetchSyncState]);
+  }, [fetchSyncState, isAuthenticated]);
 
   // Local tick: sleeps until the clock's next whole second, then renders once.
   // (A 50ms interval used to re-render the whole stage 20 times a second for a
@@ -315,6 +334,7 @@ export default function HiddenChairPage() {
   // Dispatch action to server with optimistic update for 0ms latency
   const dispatchAction = useCallback(async (action: CountdownAction) => {
     const serverNow = Date.now() + serverOffsetRef.current;
+    lastChangeRef.current = Date.now();
     const before = serverStateRef.current;
     const optimistic = applyCountdownAction(before, action, serverNow);
     // Apply optimistic update immediately so the UI feels instant
@@ -335,7 +355,12 @@ export default function HiddenChairPage() {
       if (res.ok) {
         const data = await res.json();
         if (data?.state) {
-          // Reconcile with authoritative server response
+          // The server's answer to this press is the truth, even when it
+          // changed nothing (Start on a clock another screen had already
+          // started) and so carries a lower version than the optimistic copy.
+          if (serverStateRef.current === optimistic && data.state.version >= before.version) {
+            serverStateRef.current = before;
+          }
           applyServerSync(data.state, data.serverTime, data.elapsedSeconds ?? 0);
         }
         return;
@@ -711,7 +736,7 @@ export default function HiddenChairPage() {
       )}
 
       {/* ── Overlay locked to the cover-fit plate, so it tracks the chair at any size ── */}
-      {box.w > 0 && (
+      {box.w > 0 && synced && (
       <div className={stage.stage} style={stageVars(box.w, box.h)}>
         {/* Countdown in the sky above the chair */}
         <div className={`${stage.anchor} ${stage.atCount}`}>
