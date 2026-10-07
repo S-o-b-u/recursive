@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import s from "./stage.module.css";
 
 export interface ScheduleItem {
@@ -81,6 +81,33 @@ interface MockupScheduleCardProps {
   onSelectMilestone?: (seconds: number, isLunch?: boolean) => void;
 }
 
+/**
+ * The current row's highlight is one element that glides from row to row when
+ * the schedule moves on, rather than each row painting its own (which made it
+ * jump). It is placed from the rows themselves, so it fits rows of any height
+ * (the one with a subtitle is taller) at any size, and lands without gliding
+ * the first time.
+ */
+function useCursor(cardRef: React.RefObject<HTMLDivElement | null>, currentId: string) {
+  const [cursor, setCursor] = useState<{ y: number; h: number; glide: boolean } | null>(null);
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    if (!card) return undefined;
+    const place = () => {
+      const row = card.querySelector<HTMLElement>(`[data-milestone-id="${currentId}"]`);
+      if (!row) return;
+      const y = row.offsetTop;
+      const h = row.offsetHeight;
+      setCursor((c) => (c && c.y === y && c.h === h ? c : { y, h, glide: c !== null }));
+    };
+    place();
+    const ro = typeof ResizeObserver === "function" ? new ResizeObserver(place) : null;
+    ro?.observe(card);
+    return () => ro?.disconnect();
+  }, [cardRef, currentId]);
+  return cursor;
+}
+
 export default function MockupScheduleCard({
   elapsedSeconds,
   isLunchActive,
@@ -88,8 +115,19 @@ export default function MockupScheduleCard({
   onSelectMilestone,
 }: MockupScheduleCardProps) {
   const currentId = activeId ?? getActiveMockupMilestone(elapsedSeconds).id;
+  const cardRef = useRef<HTMLDivElement>(null);
+  const cursor = useCursor(cardRef, currentId);
+  const currentIsLunch = Boolean(MOCKUP_SCHEDULE.find((m) => m.id === currentId)?.isLunch && isLunchActive);
   return (
-    <div className={s.card}>
+    <div ref={cardRef} className={s.card}>
+      {cursor && (
+        <span
+          aria-hidden="true"
+          className={`${s.cursor} ${cursor.glide ? s.cursorGlide : ""}`}
+          data-lunch={currentIsLunch ? "1" : "0"}
+          style={{ transform: `translateY(${cursor.y}px)`, height: cursor.h }}
+        />
+      )}
       {MOCKUP_SCHEDULE.map((item) => {
         const isNow = item.id === currentId;
         const state = isNow ? "now" : elapsedSeconds >= item.endOffset ? "past" : "next";

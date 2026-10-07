@@ -15,23 +15,37 @@ interface MockupCountdownProps {
 }
 
 /**
- * A two-digit unit. Each numeral is keyed by its value, so a change drops the
- * new one in. The drop animates an HTML wrapper, not the <svg>: Chromium will
- * not run an SVG element's animation on the compositor, so it repainted the
- * masked glyph every frame. (Smartboards swap digits without the drop; see
- * stage.module.css.)
+ * One numeral. On a change the old numeral slides down and out while the new
+ * one drops in from above, like a rolling counter; both are keyed by the
+ * change count so each change replays the pair. The motion is on HTML
+ * wrappers, not the <svg>: Chromium will not run an SVG element's animation
+ * on the compositor, so it repainted the masked glyph every frame.
+ * (Smartboards swap numerals without either motion; see stage.module.css.)
  */
+function Cell({ ch }: { ch: string }) {
+  const [roll, setRoll] = useState({ cur: ch, old: null as string | null, n: 0 });
+  if (roll.cur !== ch) setRoll({ cur: ch, old: roll.cur, n: roll.n + 1 }); // derived from the previous render
+  return (
+    <span className={s.cell}>
+      {roll.old !== null && !perfLite() && (
+        <span key={"out" + roll.n} className={s.digitOut} aria-hidden="true">
+          <RecursiveDigit ch={roll.old} />
+        </span>
+      )}
+      <span key={"in" + roll.n} className={s.digit}>
+        <RecursiveDigit ch={ch} />
+      </span>
+    </span>
+  );
+}
+
+/** A two-digit unit. */
 function Unit({ value, label }: { value: string; label: string }) {
   return (
     <div className={s.group}>
       <div className={s.pair}>
-        {[0, 1].map((i) => (
-          <span key={i} className={s.cell}>
-            <span key={value[i]} className={s.digit}>
-              <RecursiveDigit ch={value[i]} />
-            </span>
-          </span>
-        ))}
+        <Cell ch={value[0]} />
+        <Cell ch={value[1]} />
       </div>
       <span className={s.label}>{label}</span>
     </div>

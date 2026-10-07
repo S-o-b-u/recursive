@@ -10,7 +10,8 @@ import MockupScheduleCard, {
 } from "@/components/hidden/MockupScheduleCard";
 import NowStatusBadge from "@/components/hidden/NowStatusBadge";
 import StageScene from "@/components/hidden/StageScene";
-import { primeStageVideo } from "@/components/hidden/stage-video";
+import { preload } from "react-dom";
+import { primeStageVideo, stageVideo } from "@/components/hidden/stage-video";
 import { stageSans } from "@/components/hidden/stage-font";
 import stage from "@/components/hidden/stage.module.css";
 import { TOTAL_HACKATHON_SECONDS, getActiveMilestone } from "@/data/shift8";
@@ -45,6 +46,10 @@ const PASSWORD = "@recursive#26";
 const POLL_FAST_MS = 800;
 const POLL_SLOW_MS = 2000;
 const POLL_FAST_FOR_MS = 20000;
+/** No answer from the server for this long: the status shows "Reconnecting". */
+const OFFLINE_AFTER_MS = 7000;
+/** The stage's still (also its video poster), fetched with the page itself. */
+const STAGE_POSTER = "/videos/stage-poster-dof.jpg";
 
 /**
  * Unlocking is remembered on this device until Log out, so a refresh (or a
@@ -77,6 +82,35 @@ function rememberLogin(on: boolean) {
   } catch {
     // not remembered; the session itself still works
   }
+}
+
+/**
+ * A clock that only moves forward: the wall time when the page loaded, plus
+ * monotonic time since. A board whose system clock is corrected mid-event
+ * (network time, a timezone fix) would otherwise jump its countdown with it.
+ */
+let monoOrigin: number | null = null;
+function monoNow(): number {
+  if (monoOrigin === null) monoOrigin = Date.now() - performance.now();
+  return monoOrigin + performance.now();
+}
+
+/**
+ * Reading the server's clock. A response says what time it was on the server,
+ * but it arrives half a round trip later, so taking it at face value put every
+ * screen behind by half its own round trip (300-800 ms to the live server):
+ * boards on different connections changed seconds at visibly different
+ * moments. Each sample is placed at the middle of its round trip instead
+ * (NTP-style), and of the last minute's samples the one with the shortest
+ * round trip wins, since it has the least room for error.
+ */
+type ClockSample = { offset: number; rtt: number; at: number };
+const CLOCK_WINDOW_MS = 60000;
+
+function bestSample(samples: ClockSample[]): ClockSample | undefined {
+  let best: ClockSample | undefined;
+  for (const s of samples) if (!best || s.rtt < best.rtt) best = s;
+  return best;
 }
 
 /**
@@ -149,6 +183,8 @@ function useVisibleBox(ref: React.RefObject<HTMLElement | null>, active: boolean
 
 export default function HiddenChairPage() {
   const router = useRouter();
+  // In the page's own HTML, so the still is on its way before any script runs.
+  preload(STAGE_POSTER, { as: "image" });
 
   // Authentication gate: null until this device's remembered login is read
   // (storage only exists in the browser), then true/false.
@@ -165,6 +201,19 @@ export default function HiddenChairPage() {
     setIsAuthenticated(rememberedLogin());
   }, []);
 
+  // While the password is typed, start downloading the plate, so the stage
+  // opens on a moving picture instead of waiting for it. pause() keeps the
+  // element from starting by itself (it has autoplay set); the Enter press
+  // plays it (primeStageVideo).
+  useEffect(() => {
+    if (isAuthenticated !== false) return;
+    try {
+      stageVideo().pause();
+    } catch {}
+  }, [isAuthenticated]);
+
+  const passRowRef = useRef<HTMLDivElement>(null);
+
   const handlePassSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const inputEl = document.getElementById("pass-input") as HTMLInputElement | null;
@@ -178,6 +227,13 @@ export default function HiddenChairPage() {
       setPassError(false);
     } else {
       setPassError(true);
+      // a short head-shake, restarted on every wrong try
+      try {
+        passRowRef.current?.animate(
+          [0, -7, 6, -4, 3, 0].map((x) => ({ transform: `translateX(${x}px)` })),
+          { duration: 380, easing: "ease-out" }
+        );
+      } catch {}
     }
   };
 
@@ -203,9 +259,11 @@ export default function HiddenChairPage() {
 
   // Timer State (Server-Authoritative Synchronization across all devices)
   const serverStateRef = useRef<CountdownSyncState>(DEFAULT_COUNTDOWN_STATE);
-  const serverOffsetRef = useRef<number>(0);
-  const firstSyncRef = useRef<boolean>(true);
+  const serverOffsetRef = useRef<number>(0); // server time = monoNow() + this
+  const clockSamplesRef = useRef<ClockSample[]>([]);
   const lastChangeRef = useRef<number>(Date.now()); // when the shared state last changed (polling speed)
+  const lastContactRef = useRef<number>(0); // monoNow() of the last answer from the server
+  const [online, setOnline] = useState(true);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -218,26 +276,32 @@ export default function HiddenChairPage() {
   // stage at once, and the default 08:00:00 would otherwise flash first.
   const [synced, setSynced] = useState(false);
 
+  // Every answer from the server carries its clock: fold it into the offset
+  // (see ClockSample). sentAt/receivedAt are monoNow() around the request.
+  const noteServerTime = useCallback((serverTime: number, sentAt: number, receivedAt: number) => {
+    if (typeof serverTime !== "number" || !isFinite(serverTime)) return;
+    lastContactRef.current = receivedAt;
+    setOnline(true);
+    const rtt = Math.max(0, receivedAt - sentAt);
+    const sample = { offset: serverTime - (sentAt + rtt / 2), rtt, at: receivedAt };
+    let samples = clockSamplesRef.current.filter((s) => receivedAt - s.at < CLOCK_WINDOW_MS);
+    const best = bestSample(samples);
+    // The two clocks moved apart since (a device that slept, a server
+    // clock step): what was measured before no longer applies.
+    if (best && Math.abs(sample.offset - best.offset) > 1000 + rtt) samples = [];
+    samples.push(sample);
+    clockSamplesRef.current = samples;
+    serverOffsetRef.current = (bestSample(samples) as ClockSample).offset;
+  }, []);
+
   // Sync state from server response
   const applyServerSync = useCallback(
-    (state: CountdownSyncState, serverTime: number, serverElapsed: number) => {
+    (state: CountdownSyncState, serverElapsed: number) => {
       // ── Version guard ────────────────────────────────────────────────────
       // Reject stale/out-of-order responses. An older version can arrive when
       // two rapid actions (e.g. reset then start) race through the network.
       if (state.version < serverStateRef.current.version) return;
       if (state.version !== serverStateRef.current.version) lastChangeRef.current = Date.now();
-
-      // ── Server-clock offset (EMA smoothed) ───────────────────────────────
-      // Raw offset = how far server time is from local time (network latency included).
-      // We use an exponential moving average (α = 0.15) so that latency spikes
-      // don't cause visible time jumps in the 50ms tick loop.
-      const rawOffset = serverTime - Date.now();
-      if (firstSyncRef.current) {
-        serverOffsetRef.current = rawOffset; // first sample: use raw directly
-        firstSyncRef.current = false;
-      } else {
-        serverOffsetRef.current = serverOffsetRef.current * 0.85 + rawOffset * 0.15;
-      }
 
       serverStateRef.current = state;
       setSynced(true);
@@ -249,12 +313,11 @@ export default function HiddenChairPage() {
         // Paused/reset: snap elapsed to the exact server value immediately.
         setElapsedSeconds(wholeSecond(state.accumulatedSeconds));
       } else {
-        // Running: only correct the display if drift vs. server is significant
-        // (> 2 s). Small differences are absorbed by the 50 ms local tick so
-        // the display stays smooth without constant polling-induced jumps.
-        const localElapsed = computeElapsedSeconds(state, Date.now() + serverOffsetRef.current);
+        // Running: the local tick reads the new state at its next second.
+        // Only a large disagreement (> 2 s) is shown at once.
+        const localElapsed = computeElapsedSeconds(state, monoNow() + serverOffsetRef.current);
         if (Math.abs(serverElapsed - localElapsed) > 2.0) {
-          setElapsedSeconds(wholeSecond(serverElapsed));
+          setElapsedSeconds(wholeSecond(localElapsed));
         }
       }
     },
@@ -265,16 +328,19 @@ export default function HiddenChairPage() {
   // Poll server state
   const fetchSyncState = useCallback(async () => {
     try {
+      const sentAt = monoNow();
       const res = await fetch("/api/countdown", { cache: "no-store" });
+      const receivedAt = monoNow(); // headers are in: the body is a few hundred bytes
       if (!res.ok) return;
       const data = await res.json();
       if (data?.state) {
-        applyServerSync(data.state, data.serverTime, data.elapsedSeconds ?? 0);
+        noteServerTime(data.serverTime, sentAt, receivedAt);
+        applyServerSync(data.state, data.elapsedSeconds ?? 0);
       }
     } catch {
-      // Ignore network errors during polling
+      // Ignore network errors during polling (the status shows "Reconnecting")
     }
-  }, [applyServerSync]);
+  }, [applyServerSync, noteServerTime]);
 
   // Polling for multi-device sync. Every poll is a server call (on Vercel, a
   // function invocation, and each open screen made 108,000 a day at a steady
@@ -289,10 +355,16 @@ export default function HiddenChairPage() {
     const giveUp = window.setTimeout(() => setSynced(true), 3000);
     let timer = 0;
     const loop = () => {
-      if (!document.hidden) fetchSyncState();
+      if (!document.hidden) {
+        fetchSyncState();
+        // No answer for a while (the first answer gets a grace period): say so.
+        // The clock keeps counting on its own meanwhile.
+        if (monoNow() - Math.max(lastContactRef.current, mountedAt) > OFFLINE_AFTER_MS) setOnline(false);
+      }
       const recent = Date.now() - lastChangeRef.current < POLL_FAST_FOR_MS;
       timer = window.setTimeout(loop, recent ? POLL_FAST_MS : POLL_SLOW_MS);
     };
+    const mountedAt = monoNow();
     timer = window.setTimeout(loop, POLL_FAST_MS);
     const onShow = () => {
       if (!document.hidden) fetchSyncState();
@@ -308,7 +380,9 @@ export default function HiddenChairPage() {
   // Local tick: sleeps until the clock's next whole second, then renders once.
   // (A 50ms interval used to re-render the whole stage 20 times a second for a
   // display that changes once; on a smartboard that alone kept the CPU busy.)
-  // Restarted whenever the run state or speed changes, so a start is instant.
+  // Restarted whenever the run state or speed changes, so a start is instant,
+  // and run at once when a hidden tab is shown again (browsers slow a hidden
+  // tab's timers to once a minute or less).
   useEffect(() => {
     if (!isRunning) return undefined;
     let timer = 0;
@@ -316,7 +390,7 @@ export default function HiddenChairPage() {
       const state = serverStateRef.current;
       if (!state.isRunning) return;
 
-      const cur = computeElapsedSeconds(state, Date.now() + serverOffsetRef.current);
+      const cur = computeElapsedSeconds(state, monoNow() + serverOffsetRef.current);
       const whole = wholeSecond(cur);
       setElapsedSeconds(whole);
       if (cur >= TOTAL_HACKATHON_SECONDS) {
@@ -328,12 +402,21 @@ export default function HiddenChairPage() {
       timer = window.setTimeout(tick, Math.max(8, wait));
     };
     tick();
-    return () => window.clearTimeout(timer);
+    const onShow = () => {
+      if (document.hidden) return;
+      window.clearTimeout(timer);
+      tick();
+    };
+    document.addEventListener("visibilitychange", onShow);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onShow);
+    };
   }, [isRunning, speed]);
 
   // Dispatch action to server with optimistic update for 0ms latency
   const dispatchAction = useCallback(async (action: CountdownAction) => {
-    const serverNow = Date.now() + serverOffsetRef.current;
+    const serverNow = monoNow() + serverOffsetRef.current;
     lastChangeRef.current = Date.now();
     const before = serverStateRef.current;
     const optimistic = applyCountdownAction(before, action, serverNow);
@@ -347,21 +430,24 @@ export default function HiddenChairPage() {
     }
 
     try {
+      const sentAt = monoNow();
       const res = await fetch("/api/countdown", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action }),
       });
+      const receivedAt = monoNow();
       if (res.ok) {
         const data = await res.json();
         if (data?.state) {
+          noteServerTime(data.serverTime, sentAt, receivedAt);
           // The server's answer to this press is the truth, even when it
           // changed nothing (Start on a clock another screen had already
           // started) and so carries a lower version than the optimistic copy.
           if (serverStateRef.current === optimistic && data.state.version >= before.version) {
             serverStateRef.current = before;
           }
-          applyServerSync(data.state, data.serverTime, data.elapsedSeconds ?? 0);
+          applyServerSync(data.state, data.elapsedSeconds ?? 0);
         }
         return;
       }
@@ -374,7 +460,7 @@ export default function HiddenChairPage() {
     // device ignore the server's real state, and show what the server has.
     if (serverStateRef.current === optimistic) serverStateRef.current = before;
     fetchSyncState();
-  }, [applyServerSync, fetchSyncState]);
+  }, [applyServerSync, fetchSyncState, noteServerTime]);
 
   // This page never scrolls, but the site-wide scroll engine (mounted in the root
   // layout) keeps itself busy anyway: ScrollTrigger re-requests an animation frame
@@ -540,7 +626,7 @@ export default function HiddenChairPage() {
           className="flex flex-col items-center gap-3 p-6"
           style={{ fontFamily: UI_FONT }}
         >
-          <div className="flex items-center gap-3">
+          <div ref={passRowRef} className="flex items-center gap-3">
             <label
               htmlFor="pass-input"
               className="text-sm tracking-wider text-zinc-300 font-bold whitespace-nowrap"
@@ -628,6 +714,27 @@ export default function HiddenChairPage() {
 
             {/* Quick Action Tools */}
             <div className="pointer-events-auto flex items-center gap-2">
+              {/* Contact with the server, for whoever runs the screens */}
+              <span
+                id="sync-status"
+                data-online={online ? "1" : "0"}
+                title={
+                  online
+                    ? "In sync with the other screens"
+                    : "No answer from the server. The clock keeps counting here and catches up when it is back."
+                }
+                className={`px-2 py-1.5 flex items-center gap-1.5 text-[11px] font-semibold select-none ${
+                  online ? "text-white/85" : "text-amber-300"
+                }`}
+                style={{ fontFamily: UI_FONT, textShadow: "0 1px 4px rgba(0, 0, 0, 0.7)" }}
+              >
+                <span
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{ background: online ? "#4ade80" : "#fbbf24", boxShadow: "0 0 4px rgba(0,0,0,0.5)" }}
+                />
+                {online ? "Live" : "Reconnecting…"}
+              </span>
+
               {/* Start / Pause Button */}
               <button
                 id="toggle-play-btn"

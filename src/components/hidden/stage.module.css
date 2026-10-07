@@ -28,9 +28,31 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* The backdrop (StageScene's root): the still under the video from the first
+   frame, faded up from black once on arrival. */
+.scene {
+  background-size: cover;
+  background-position: center;
+  animation: sceneIn 0.7s ease-out both;
+}
+
 .anchor {
   position: absolute;
   pointer-events: auto;
+}
+
+/* The overlay arrives once, after the server's state (page.tsx): clock,
+   then the NOW caption, then the schedule. */
+.count,
+.now,
+.card {
+  animation: enter 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.now {
+  animation-delay: 0.12s;
+}
+.card {
+  animation-delay: 0.22s;
 }
 /* Anchors are percentages of the plate. The card is the exception: it rests
    on the hill but is held above the bottom of the visible area, which on a
@@ -133,10 +155,20 @@
   height: 100%;
   animation: drop 0.42s cubic-bezier(0.2, 0.9, 0.25, 1) both;
 }
-.digit > svg {
+.digit > svg,
+.digitOut > svg {
   display: block;
   width: 100%;
   height: 100%;
+}
+/* the numeral being replaced, rolling down out of its cell */
+.digitOut {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  animation: leave 0.42s cubic-bezier(0.4, 0, 0.7, 1) both;
 }
 .label {
   margin-top: calc(var(--u) * 16);
@@ -243,6 +275,7 @@
 /* ── Schedule card on the hill ─────────────────────────────────────────── */
 
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: calc(var(--u) * 2);
@@ -268,8 +301,32 @@
 :global(.perf-lite) .card {
   background: rgba(12, 20, 10, 0.58);
 }
+/* The current row's highlight: one element, placed on the row by
+   MockupScheduleCard and gliding to the next one when the schedule moves on. */
+.cursor {
+  position: absolute;
+  top: 0;
+  left: calc(var(--u) * 9);
+  right: calc(var(--u) * 9);
+  border-radius: calc(var(--u) * 14);
+  background: rgba(255, 255, 255, 0.78);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 calc(var(--u) * 6) calc(var(--u) * 18) rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+}
+.cursor[data-lunch="1"] {
+  background: rgba(221, 236, 172, 0.82);
+}
+.cursorGlide {
+  transition:
+    transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+    height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 0.4s ease;
+}
 .item {
   position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: calc(var(--u) * 108) 1fr;
   align-items: baseline;
@@ -291,16 +348,9 @@
   opacity: 0.9;
 }
 .item[data-state="now"] {
-  background: rgba(255, 255, 255, 0.78);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
   color: var(--ink);
-  box-shadow: 0 calc(var(--u) * 6) calc(var(--u) * 18) rgba(0, 0, 0, 0.12);
 }
 .item[data-state="now"][data-lunch="1"] {
-  background: rgba(221, 236, 172, 0.82);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
   color: var(--lunch);
 }
 @media (hover: hover) {
@@ -367,6 +417,34 @@
     transform: none;
   }
 }
+@keyframes leave {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(26%);
+  }
+}
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--u) * 14));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes sceneIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 @keyframes twinkle {
   0% {
     transform: scale(0.6) rotate(-20deg);
@@ -399,10 +477,25 @@
    60Hz, for a clock that changes once a second. The digits' drop goes too:
    the engines these panels ship (Chromium 83 in an Android 11 WebView) restyle
    and recommit on every frame of any CSS animation, even one the compositor
-   runs, and a new digit drops in every second. The digits swap instead; the
-   captions still rise, as they change only a few times a day. */
+   runs, and a new digit drops in every second. The digits swap instead (the
+   outgoing numeral is not even rendered there); the captions still rise, the
+   overlay still arrives and the highlight still glides, as each happens a few
+   times a day at most. The card's frosted glass is a backdrop blur that has
+   to be redone for every frame of the video under it: the firmer tint below
+   replaces it. */
 :global(.perf-lite) .digits {
   filter: none;
+}
+:global(.perf-lite) .card,
+:global(.perf-lite) .cursor {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+:global(.perf-lite) .cursor {
+  background: rgba(255, 255, 255, 0.88);
+}
+:global(.perf-lite) .cursor[data-lunch="1"] {
+  background: rgba(221, 236, 172, 0.92);
 }
 :global(.perf-lite) .digit,
 :global(.perf-lite) .twinkle,
@@ -418,7 +511,17 @@
   .twinkle,
   .eyebrowText,
   .nowTitle,
-  .nowDot::after {
+  .nowDot::after,
+  .scene,
+  .count,
+  .now,
+  .card {
     animation: none;
+  }
+  .digitOut {
+    display: none;
+  }
+  .cursorGlide {
+    transition: none;
   }
 }

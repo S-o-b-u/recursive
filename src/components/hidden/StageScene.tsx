@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { gradeAt, DAY_START_HOUR, DAY_END_HOUR } from "./day-grade";
 import { perfLite } from "@/lib/device";
 import { stageVideo } from "./stage-video";
+import s from "./stage.module.css";
 
 interface StageSceneProps {
   /** Clock hour the plate should be lit for (10 = morning ... 18 = dusk). */
@@ -647,7 +648,13 @@ export default function StageScene({
   const graded = mode === "gl";
 
   return (
-    <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0 bg-black">
+    <div
+      className={`absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0 bg-black ${s.scene}`}
+      // The still (preloaded by the page) is there from the first frame, so
+      // the stage never opens on black while the video's first frame decodes;
+      // the video and the graded canvas cover it once they have pictures.
+      style={{ backgroundImage: `url(${poster})` }}
+    >
       {/* Holds the shared <video>, which is also the fallback: shown
           ungraded when WebGL is unavailable. */}
       <div ref={videoHostRef} className="absolute inset-0" />

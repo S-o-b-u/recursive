@@ -74,6 +74,13 @@ const nextConfig: NextConfig = {
         source: "/college_logo/:path*",
         headers: [{ key: "Cache-Control", value: IMMUTABLE }],
       },
+      {
+        // the /hidden stage plate (8-19 MB) and its still: a board reloading
+        // the page should not have to ask for them again. Same rule as above:
+        // a replaced file gets a new name.
+        source: "/videos/:path*",
+        headers: [{ key: "Cache-Control", value: IMMUTABLE }],
+      },
     ];
   },
 };
