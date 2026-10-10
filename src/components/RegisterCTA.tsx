@@ -52,12 +52,29 @@ export default function RegisterCTA() {
           <div className="cta-actions">
             <DevfolioButton locked={true} />
             <LiquidMetalButton
-              label="Join Discord"
-              href={EVENT.discordUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              width={132}
+              label="Discord Closed"
+              locked={true}
+              title="Discord community is closed — Recursive 2026 has concluded"
+              width={152}
               height={44}
+              iconPosition="right"
+              icon={
+                <svg
+                  viewBox="0 0 24 24"
+                  width={13}
+                  height={13}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ marginLeft: 3, display: "inline-block", opacity: 0.85 }}
+                  aria-hidden="true"
+                >
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              }
             />
           </div>
         </Reveal>
