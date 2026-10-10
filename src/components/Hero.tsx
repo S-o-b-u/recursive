@@ -267,8 +267,32 @@ export default function Hero() {
             }
             transition={{ duration: 0.7, delay: 0.1, ease: EASE_OUT }}
           >
+            {/* ── Event Concluded Status Divider ("---") ── */}
+            <div className="hero-status-divider-wrap" aria-label="Event Concluded · Applications Closed">
+              <span className="hero-status-line" aria-hidden="true" />
+              <div className="hero-status-badge">
+                <svg
+                  className="hero-status-lock-icon"
+                  viewBox="0 0 24 24"
+                  width="12"
+                  height="12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                <span className="hero-status-pill-text">Applications Closed · Event Ended</span>
+              </div>
+              <span className="hero-status-line" aria-hidden="true" />
+            </div>
+
             <div className="hero-action-dock-split">
-              <DevfolioButton />
+              <DevfolioButton locked={true} />
               <a
                 href={EVENT.discordUrl}
                 target="_blank"
@@ -723,12 +747,61 @@ export default function Hero() {
           position: relative;
           width: 100%;
           display: flex;
+          flex-direction: column;
+          align-items: center;
           justify-content: center;
+          gap: 0.65rem;
           z-index: 25;
           will-change: transform, opacity;
           padding-inline: 1rem;
           pointer-events: auto;
           flex-shrink: 0;
+        }
+
+        .hero-status-divider-wrap {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          width: min(92vw, 440px);
+          user-select: none;
+        }
+
+        .hero-status-line {
+          flex: 1;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        }
+
+        .hero-status-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          padding: 0.28rem 0.85rem;
+          border-radius: 999px;
+          background: rgba(18, 30, 20, 0.72);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+          color: #e5ece1;
+          white-space: nowrap;
+        }
+
+        .hero-status-lock-icon {
+          width: 11px;
+          height: 11px;
+          color: #a4e884;
+          flex-shrink: 0;
+        }
+
+        .hero-status-pill-text {
+          font-family: var(--font-geist-mono), monospace;
+          font-size: 0.68rem;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: #e2ede0;
         }
 
         .hero-action-dock-split {

@@ -56,6 +56,9 @@ export interface LiquidMetalButtonProps {
   href?: string;
   target?: string;
   rel?: string;
+  disabled?: boolean;
+  locked?: boolean;
+  title?: string;
 }
 
 export function LiquidMetalButton({
@@ -70,7 +73,11 @@ export function LiquidMetalButton({
   href,
   target,
   rel,
+  disabled = false,
+  locked = false,
+  title,
 }: LiquidMetalButtonProps) {
+  const isLocked = Boolean(locked || disabled);
   const [isHovered, setIsHovered] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
   const [ripples, setRipples] = useState<
@@ -286,6 +293,7 @@ export function LiquidMetalButton({
   }, []);
 
   const handleMouseEnter = () => {
+    if (isLocked) return;
     setIsHovered(true);
     if (shaderMount.current) {
       shaderMount.current.isInViewport = true;
@@ -294,6 +302,7 @@ export function LiquidMetalButton({
   };
 
   const handleMouseLeave = () => {
+    if (isLocked) return;
     setIsHovered(false);
     setIsPressed(false);
     if (shaderMount.current) {
@@ -301,7 +310,13 @@ export function LiquidMetalButton({
     }
   };
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+    if (isLocked) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
     if (shaderMount.current) {
       shaderMount.current.isInViewport = true;
       shaderMount.current.setSpeed?.(2.4);
@@ -328,7 +343,11 @@ export function LiquidMetalButton({
   };
 
   return (
-    <div className={`relative inline-block ${className}`}>
+    <div
+      className={`relative inline-block ${isLocked ? "is-locked" : ""} ${className}`.trim()}
+      title={title}
+      style={{ cursor: isLocked ? "not-allowed" : undefined }}
+    >
       <div
         style={{
           perspective: "1000px",
@@ -381,7 +400,7 @@ export function LiquidMetalButton({
               <span
                 style={{
                   fontSize: "14px",
-                  color: "#f3f8ee",
+                  color: isLocked ? "rgba(220, 230, 222, 0.72)" : "#f3f8ee",
                   fontFamily: "var(--font-display), var(--font-dm-sans), sans-serif",
                   fontWeight: 700,
                   letterSpacing: "-0.012em",
@@ -412,7 +431,7 @@ export function LiquidMetalButton({
               transformStyle: "preserve-3d",
               transition:
                 EASE,
-              transform: `translateZ(10px) ${isPressed ? "translateY(1px) scale(0.98)" : "translateY(0) scale(1)"}`,
+              transform: `translateZ(10px) ${!isLocked && isPressed ? "translateY(1px) scale(0.98)" : "translateY(0) scale(1)"}`,
               zIndex: 20,
             }}
           >
@@ -422,8 +441,11 @@ export function LiquidMetalButton({
                 height: `${dimensions.innerHeight}px`,
                 margin: "2px",
                 borderRadius: "100px",
-                background: "linear-gradient(180deg, rgba(32,32,32,0.85) 0%, rgba(0,0,0,0.92) 100%)",
-                boxShadow: isPressed
+                background: isLocked
+                  ? "linear-gradient(180deg, rgba(22,26,24,0.92) 0%, rgba(12,16,14,0.96) 100%)"
+                  : "linear-gradient(180deg, rgba(32,32,32,0.85) 0%, rgba(0,0,0,0.92) 100%)",
+                border: isLocked ? "1px solid rgba(255, 255, 255, 0.12)" : "none",
+                boxShadow: !isLocked && isPressed
                   ? "inset 0px 2px 4px rgba(0, 0, 0, 0.4), inset 0px 1px 2px rgba(0, 0, 0, 0.3)"
                   : "none",
                 transition:
@@ -473,7 +495,7 @@ export function LiquidMetalButton({
             </div>
           </div>
 
-          {href ? (
+          {href && !isLocked ? (
             <a
               ref={buttonRef as any}
               href={href}
@@ -530,8 +552,10 @@ export function LiquidMetalButton({
               onClick={handleClick}
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
-              onMouseDown={() => setIsPressed(true)}
-              onMouseUp={() => setIsPressed(false)}
+              onMouseDown={() => !isLocked && setIsPressed(true)}
+              onMouseUp={() => !isLocked && setIsPressed(false)}
+              disabled={isLocked}
+              aria-disabled={isLocked ? "true" : undefined}
               style={{
                 position: "absolute",
                 top: 0,
@@ -540,7 +564,7 @@ export function LiquidMetalButton({
                 height: `${dimensions.height}px`,
                 background: "transparent",
                 border: "none",
-                cursor: "pointer",
+                cursor: isLocked ? "not-allowed" : "pointer",
                 outline: "none",
                 zIndex: 40,
                 transformStyle: "preserve-3d",
@@ -551,8 +575,9 @@ export function LiquidMetalButton({
                 borderRadius: "100px",
               }}
               aria-label={label}
+              title={title}
             >
-              {ripples.map((ripple) => (
+              {!isLocked && ripples.map((ripple) => (
                 <span
                   key={ripple.id}
                   style={{
